@@ -5,6 +5,7 @@ import SignInPage from './SignInPage';
 import ForgotPasswordPage from './ForgotPasswordPage';
 import CheckMailPage from './CheckMailPage';
 import AboutUsPage from './AboutUsPage';
+import FeaturesPage from './FeaturesPage';
 
 export{
     LandingPage,
@@ -13,5 +14,6 @@ export{
     SignInPage,
     ForgotPasswordPage,
     CheckMailPage,
-    AboutUsPage
+    AboutUsPage,
+    FeaturesPage
 }
