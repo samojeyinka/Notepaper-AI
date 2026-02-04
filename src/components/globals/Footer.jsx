@@ -46,7 +46,7 @@ export default function Footer() {
             <div className="flex gap-6">
 
               {socialLinks.map((link, index) => (
-              <Link to={link.href} key={index} target='_blank' className="text-slate-400 hover:text-white transition-colors" href="#">
+              <Link to={`/${link.href}`} key={index} target='_blank' className="text-slate-400 hover:text-white transition-colors" href="#">
                 <span className="material-symbols-outlined">
                   {link.icon}
                 </span>
@@ -63,7 +63,7 @@ export default function Footer() {
 
               {navLinks.map((navlink, index) => (
                   <li key={index}>
-                <Link to={navlink.href} className="hover:text-white transition-colors" href="#">
+                <Link to={`/${navlink.href}`} className="hover:text-white transition-colors" href="#">
                   {navlink.label}
                 </Link>
               </li>

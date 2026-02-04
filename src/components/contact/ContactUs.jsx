@@ -1,6 +1,7 @@
 import React from 'react';
 import ContactHero from './ContactHero';
 import ContactForm from './ContactForm';
+import CustomerSupport from '../globals/CustomerSupport';
 
 
 export default function ContactUs() {
@@ -42,6 +43,7 @@ export default function ContactUs() {
         {/* Right Column - Contact Form */}
         <ContactForm />
       </div>
+            <CustomerSupport/>
     </main>
   );
 }

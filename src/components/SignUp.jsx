@@ -200,9 +200,7 @@ export default function SignUp() {
                 <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest" htmlFor="password">
                   Password
                 </label>
-                <a className="text-xs font-semibold text-purple-600 hover:underline handwritten text-base" href="#">
-                  Forgot?
-                </a>
+                
               </div>
               <div className="relative">
                 <input

@@ -1,14 +1,16 @@
 import React from 'react'
-import SignIn from '../components/SignUp'
+import SignUp from '../components/SignUp'
 import Header from '../components/globals/Header'
 import Footer from '../components/globals/Footer'
+import CustomerSupport from '../components/globals/CustomerSupport'
 
 const SignUpPage = () => {
   return (
     <>
-    <Header/>
-    <SignIn/>
-    <Footer/>
+      <Header />
+      <SignUp />
+      <CustomerSupport />
+      <Footer />
     </>
   )
 }
