@@ -1,7 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom';
 
 import { LandingPage,PricingPage,SignUpPage,
-    SignInPage,ForgotPasswordPage,CheckMailPage,AboutUsPage,FeaturesPage } from '../pages/pages';
+    SignInPage,ForgotPasswordPage,CheckMailPage,AboutUsPage,FeaturesPage,ContactUsPage } from '../pages/pages';
 import ScrollToTop from './ScrollToTop';
 
 const AppRoutes = createBrowserRouter([
@@ -30,6 +30,13 @@ const AppRoutes = createBrowserRouter([
         path: '/features',
         element:<ScrollToTop>
         <FeaturesPage/>
+        </ScrollToTop>,       
+    },
+
+      {
+        path: '/contact-us',
+        element:<ScrollToTop>
+        <ContactUsPage/>
         </ScrollToTop>,       
     },
 

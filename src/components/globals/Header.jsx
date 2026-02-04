@@ -9,6 +9,7 @@ export default function Header() {
     { label: 'Features', href: 'features' },
     { label: 'About Us ', href: 'about-us' },
     { label: 'Plans', href: 'pricing' },
+    { label: 'Contact Us', href: 'contact-us' },
   ];
 
   return (
