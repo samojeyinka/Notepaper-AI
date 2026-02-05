@@ -79,7 +79,7 @@ export default function Footer() {
             <ul className="space-y-4 text-slate-400">
 
               {companyLinks.map((comlink,index) => (
-              <li>
+              <li key={index}>
                 <Link to={`/${comlink.href}`} className="hover:text-white transition-colors" href="#">
                   {comlink.label}
                 </Link>

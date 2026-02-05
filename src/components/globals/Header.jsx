@@ -29,6 +29,7 @@ export default function Header() {
           <div className="hidden md:flex items-center gap-8 font-medium">
             {navLinks.map((link) => (
               <Link
+              key={link.label}
                 to={`/${link.href}`}
                 className="text-ink-black hover:text-primary transition-colors"
               >
