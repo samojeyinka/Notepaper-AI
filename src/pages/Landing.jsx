@@ -8,6 +8,7 @@ import '@/styles/App.css'
 import HandcraftedExperience from '../components/landing/Handcraftedexperience'
 import FeaturesDetail from '../components/landing/Featuresdetail'
 import Library from '../components/landing/Library'
+import CustomerSupport from '../components/globals/CustomerSupport'
 
 const Landing = () => {
   return (
@@ -21,6 +22,7 @@ const Landing = () => {
         <Library/>
         <CTA />
       </main>
+       <CustomerSupport/>
       <Footer />
     </div>
   )

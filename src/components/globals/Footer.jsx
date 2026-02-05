@@ -7,7 +7,7 @@ export default function Footer() {
 
   const companyLinks = [
     { label: 'Our Story', href: 'our-story' },
-     { label: 'Contact', href: 'Contact' },
+     { label: 'Contact Us', href: 'Contact-us' },
     { label: 'Privacy', href: 'privacy' },
     
   ]
@@ -80,7 +80,7 @@ export default function Footer() {
 
               {companyLinks.map((comlink,index) => (
               <li>
-                <Link to={comlink.href} className="hover:text-white transition-colors" href="#">
+                <Link to={`/${comlink.href}`} className="hover:text-white transition-colors" href="#">
                   {comlink.label}
                 </Link>
               </li>

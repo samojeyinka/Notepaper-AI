@@ -82,10 +82,10 @@ export default function CustomerSupportModal({ onClose }) {
       ></div>
 
       {/* Modal */}
-      <div className="fixed bottom-24 right-8 w-full max-w-sm z-50 animate-in fade-in slide-in-from-bottom-4 duration-300">
+      <div className="fixed bottom-24 right-4 w-[90%] max-w-sm z-50 animate-in fade-in slide-in-from-bottom-4 duration-300">
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col h-[550px]">
           {/* Header */}
-          <div className="bg-primary text-white p-6 flex items-center justify-between">
+          <div className="bg-primary text-white p-3 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
                 <span className="material-symbols-outlined text-xl">

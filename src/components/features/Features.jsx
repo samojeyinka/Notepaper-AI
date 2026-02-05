@@ -5,7 +5,6 @@ import FeaturesShowcase from './FeaturesShowcase';
 import CTA from '../landing/CTA';
 import Header from '../globals/Header';
 import Footer from '../globals/Footer';
-import { RiCustomerService2Fill } from 'react-icons/ri';
 import CustomerSupport from '../globals/CustomerSupport';
 
 
