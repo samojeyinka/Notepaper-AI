@@ -21,11 +21,11 @@ export const QuizCard = ({
       </div>
 
       {/* Content */}
-      <h4 className="font-medium text-[15px] text-slate-900">{title}</h4>
-      <p className="text-slate-500 font-light text-[12px] mt-1">{subtitle}</p>
+      <h4 className="font-medium text-[13.5px] md:text-[15px] text-slate-900">{title}</h4>
+      <p className="text-slate-500 font-light text-[10.5px] md:text-[12px] mt-1">{subtitle}</p>
 
       {/* Time */}
-      <div className="mt-4 flex items-center text-xs text-slate-400">
+      <div className="mt-4 flex items-center text-[10.5px] md:text-xs text-slate-400">
         <span className="material-icons-round text-sm mr-1">schedule</span>
         {time}
       </div>
@@ -37,7 +37,7 @@ export const QuizCard = ({
 export const UpcomingQuizzesSection = () => {
   return (
     <div className="xl:col-span-1 mb-[10rem]">
-      <h2 className="text-xl font-semibold mb-6">Upcoming Quizzes</h2>
+      <h2 className="text-[16px] md:text-xl font-medium md:font-semibold mb-3 md:mb-6">Upcoming Quizzes</h2>
       <div className="space-y-4">
         {/* Chemistry Quiz */}
         <QuizCard
@@ -64,9 +64,9 @@ export const UpcomingQuizzesSection = () => {
         />
 
         {/* Add Study Plan Button */}
-        <button className="w-full py-2 border-2 border-dashed border-slate-200 rounded-3xl text-slate-400 hover:text-purple-500 hover:border-purple-500 transition-all flex items-center justify-center space-x-2">
-          <span className="material-icons-round">add</span>
-          <span className="font-medium">Add Study Plan</span>
+        <button className="w-full py-1 md:py-2 border-2 border-dashed border-slate-200 rounded-3xl text-slate-400 hover:text-purple-500 hover:border-purple-500 transition-all flex items-center justify-center space-x-2">
+          <span className="material-icons-round text-[13px] md:text-[16px]">add</span>
+          <span className="font-medium text-[13px] md:text-[16px]">Add Study Plan</span>
         </button>
       </div>
     </div>

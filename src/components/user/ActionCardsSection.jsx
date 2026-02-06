@@ -2,11 +2,11 @@
 
 export const ActionCard = ({ icon, label, shapeClass, bgColor }) => {
   return (
-    <button className="group flex flex-col items-center justify-center p-4 bg-white rounded-2xl  hover:shadow-sm transition-all hover:-translate-y-1">
-      <div className={`${shapeClass} ${bgColor} w-24 h-24 flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform`}>
-        <span className="material-icons-round text-3xl">{icon}</span>
+    <button className="group flex flex-col items-center justify-center p-2 md:p-4 bg-white rounded-2xl  hover:shadow-sm transition-all hover:-translate-y-1">
+      <div className={`${shapeClass} ${bgColor} w-10 h-10 md:w-24 md:h-24 flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform`}>
+        <span className="material-icons-round text-[16px] md:text-3xl">{icon}</span>
       </div>
-      <span className="font-semibold text-lg">{label}</span>
+      <span className="font-semibold text-[14px] md:text-lg">{label}</span>
     </button>
   );
 };
@@ -14,7 +14,7 @@ export const ActionCard = ({ icon, label, shapeClass, bgColor }) => {
 // Action Cards Section
 export const ActionCardsSection = () => {
   return (
-    <section className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+    <section className="grid grid-cols-3 md:grid-cols-3 gap-3 md:gap-8 mb-4">
       <ActionCard
         icon="add"
         label="New Note"
