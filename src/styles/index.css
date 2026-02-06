@@ -1,7 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Architects+Daughter&family=Shadows+Into+Light&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;1,700&family=Caveat:wght@400;700&family=Gochi+Hand&display=swap');
-
+@import url("https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&amp;display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap");
+@import url("https://fonts.googleapis.com/icon?family=Material+Icons+Round");
 
 @tailwind base;
 @tailwind components;
@@ -16,6 +18,12 @@
   --tape-blue: rgba(147, 197, 253, 0.4);
   --tape-green: rgba(167, 243, 208, 0.4);
   --ink-blue: #2563eb;
+  --background-light: #F8FAFC;
+  --background-dark: #0F172A;
+  --note-yellow: #FBBF24;
+  --note-green: #10B981;
+  --note-purple: #A78BFA;
+  --organic-purple: #A78BFA;
 }
 
 /* Material Symbols */
@@ -31,6 +39,7 @@
 
 .font-handwritten {
   font-family: 'Architects Daughter', cursive;
+  
 }
 
 .font-sketch {
@@ -110,4 +119,36 @@ html {
 body {
   overflow-x: hidden;
   @apply bg-paper text-ink-black transition-colors duration-300;
+}
+
+.blob-shape {
+  border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+}
+
+.pentagon-shape {
+  clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+}
+
+.polaroid-card {
+  transition: transform 0.3s ease;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+.polaroid-card:hover {
+  transform: translateY(-8px) rotate(-1deg);
+}
+
+.nav-active-blob {
+  position: relative;
+  background: transparent;
+}
+
+.nav-active-blob::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #A78BFA;
+  z-index: -1;
+  border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  transform: scale(1.1) translateX(-5%);
 }

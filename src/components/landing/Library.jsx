@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function Library() {
   return (
-    <section className="py-32 bg-paper-darker/50 relative overflow-hidden">
+    <section className="py-32 bg-paper-darker relative overflow-hidden">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 opacity-20">
         <svg className="sketchy-arrow text-slate-400" fill="none" height="100" viewBox="0 0 100 100" width="100">
           <path d="M50,0 Q60,50 50,100" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="1.5"></path>

@@ -1,65 +1,38 @@
 <!DOCTYPE html>
-<html class="scroll-smooth" lang="en"><head>
+<html class="light" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Sign Up | Notepaper.ai</title>
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Playfair+Display:ital,wght@0,700;1,700&amp;family=Caveat:wght@400;700&amp;family=Gochi+Hand&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
+<title>Notepaper AI Dashboard</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&amp;family=Caveat:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <style type="text/tailwindcss">
         :root {
-            --paper-cream: #fdfaf3;
-            --paper-edge: #e7e2d5;
-            --ruled-line: #e2e8f0;
-            --ink-blue: #1e293b;
-            --tape-color: rgba(255, 255, 255, 0.4);
+            --primary: #A78BFA;
+            --note-yellow: #FBBF24;
+            --note-green: #10B981;
+            --note-purple: #A78BFA;
         }
-        .paper-texture {
-            background-color: var(--paper-cream);
-            background-image: 
-                radial-gradient(circle at 2px 2px, rgba(0,0,0,0.02) 1px, transparent 0);
-            background-size: 24px 24px;
+        .blob-shape {
+            border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
         }
-        .paper-scrap {
-            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.1));
-            border: 1px solid var(--paper-edge);
-            position: relative;
-        }
-        .rough-edge {
-            clip-path: polygon(
-                0% 2%, 2% 0%, 98% 1%, 100% 3%, 99% 97%, 97% 100%, 3% 99%, 0% 98%
-            );
-        }
-        .tape {
-            background: var(--tape-color);
-            width: 60px;
-            height: 20px;
-            transform: rotate(-15deg);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            backdrop-filter: blur(1px);
-        }
-        .ruled-input {
-            border: none;
-            border-bottom: 1px solid var(--ruled-line);
-            background: transparent;
-            padding-left: 0;
-            padding-right: 0;
-            border-radius: 0;
-        }
-        .ruled-input:focus {
-            box-shadow: none;
-            border-bottom-color: #9333ea;
-        }
-        .handwritten {
-            font-family: 'Caveat', cursive;
-        }
-        .scribble {
-            font-family: 'Gochi Hand', cursive;
-        }
-        .organic-pentagon {
+        .pentagon-shape {
             clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+        }
+        .polaroid-card {
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .polaroid-card:hover {
+            transform: translateY(-8px) rotate(-1deg);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
     </style>
 <script>
@@ -68,152 +41,280 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: "#9333ea",
-                        "paper-cream": "#fdfaf3",
-                        accent: {
-                            yellow: "#ffedbc",
-                            green: "#dcfce7",
-                            blue: "#e0e7ff",
-                            peach: "#fee2e2"
-                        }
+                        primary: "#A78BFA",
+                        "background-light": "#F8FAFC",
+                        "background-dark": "#0F172A",
                     },
                     fontFamily: {
-                        sans: ["Plus Jakarta Sans", "sans-serif"],
-                        display: ["Playfair Display", "serif"],
-                        hand: ["Caveat", "cursive"],
-                    }
-                }
-            }
+                        display: ["Plus Jakarta Sans", "sans-serif"],
+                        handwriting: ["Caveat", "cursive"],
+                    },
+                },
+            },
         };
     </script>
 </head>
-<body class="bg-stone-100 dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-100 min-h-screen flex items-center justify-center p-4 md:p-6">
-<main class="w-full max-w-6xl flex flex-col md:flex-row overflow-hidden bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl min-h-[85vh]">
-<section class="hidden md:flex flex-1 relative paper-texture p-12 overflow-hidden items-center justify-center border-r border-stone-200">
-<div class="absolute top-8 left-8 flex items-center gap-2 z-20">
-<div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shadow-md">
-<span class="material-symbols-outlined text-white text-xl">sticky_note_2</span>
+<body class="font-display bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-100 min-h-screen">
+<div class="flex min-h-screen">
+<aside class="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col fixed h-full z-20">
+<div class="p-8 flex items-center space-x-2">
+<div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white">
+<span class="material-symbols-outlined">edit_note</span>
 </div>
-<span class="text-slate-800 font-bold tracking-tight">Notepaper.ai</span>
+<span class="text-xl font-bold tracking-tight">Notepaper<span class="text-primary">.ai</span></span>
 </div>
-<div class="relative z-10 w-full max-w-lg">
-<div class="relative h-[400px] mb-8">
-<div class="absolute inset-0 bg-white paper-scrap rough-edge transform rotate-1 p-8 flex flex-col justify-center">
-<h1 class="text-4xl md:text-5xl font-extrabold text-slate-800 mb-6 leading-tight">
-                        Turn thoughts into <span class="font-display italic text-primary">masterpieces.</span>
+<nav class="flex-1 px-4 space-y-2 mt-4">
+<a class="flex items-center space-x-3 px-4 py-3 bg-slate-100 dark:bg-slate-800 text-primary rounded-2xl transition-all" href="#">
+<span class="material-symbols-outlined">grid_view</span>
+<span class="font-semibold">Dashboard</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-2xl transition-all" href="#">
+<span class="material-symbols-outlined">description</span>
+<span>My Notes</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-2xl transition-all" href="#">
+<span class="material-symbols-outlined">mic</span>
+<span>Recordings</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-2xl transition-all" href="#">
+<span class="material-symbols-outlined">event_note</span>
+<span>Study Plan</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-2xl transition-all" href="#">
+<span class="material-symbols-outlined">quiz</span>
+<span>Quizzes</span>
+</a>
+</nav>
+<div class="p-4 mx-4 mb-8 bg-slate-50 dark:bg-slate-800/50 rounded-3xl border border-slate-100 dark:border-slate-700">
+<div class="flex items-center space-x-3 mb-3">
+<div class="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-sm">stars</span>
+</div>
+<span class="text-xs font-bold uppercase tracking-wider text-slate-400">Current Plan</span>
+</div>
+<p class="text-sm font-bold mb-1">Free Tier</p>
+<div class="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full mb-3">
+<div class="bg-primary h-1.5 rounded-full w-3/4"></div>
+</div>
+<p class="text-[10px] text-slate-500 mb-3">750/1000 AI Credits used</p>
+<button class="w-full bg-slate-900 dark:bg-white dark:text-slate-900 text-white text-xs font-bold py-2.5 rounded-xl hover:opacity-90 transition-all flex items-center justify-center space-x-2">
+<span class="material-symbols-outlined text-sm">bolt</span>
+<span>Upgrade to Pro</span>
+</button>
+</div>
+</aside>
+<main class="flex-1 ml-64 p-8">
+<header class="relative mb-16 pt-4">
+<div class="flex justify-between items-start">
+<div class="relative z-10">
+<div class="inline-flex items-center px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-bold mb-4">
+<span class="material-symbols-outlined text-sm mr-1">auto_awesome</span>
+                        AI-POWERED WORKSPACE
+                    </div>
+<h1 class="text-6xl font-extrabold text-slate-900 dark:text-white leading-tight -ml-1">
+                        Creative <span class="relative">
+                            Hub
+                            <svg class="absolute -bottom-2 left-0 w-full h-3 text-primary/30" preserveAspectRatio="none" viewBox="0 0 100 10">
+<path d="M0 5 Q 25 0, 50 5 T 100 5" fill="none" stroke="currentColor" stroke-width="4"></path>
+</svg>
+</span>
 </h1>
-<p class="text-slate-600 text-lg font-medium opacity-90">
-                        The AI-powered creative hub for modern thinkers, students, and professionals.
+<p class="text-xl text-slate-500 dark:text-slate-400 mt-6 max-w-md font-medium leading-relaxed">
+                        Transforming your <span class="text-slate-900 dark:text-white font-bold italic underline decoration-primary/50">digital whispers</span> into organized masterpieces.
                     </p>
 </div>
-<div class="absolute -top-10 -right-4 w-32 h-32 bg-accent-yellow paper-scrap organic-pentagon flex items-center justify-center transform rotate-12">
-<span class="material-symbols-outlined text-4xl text-amber-600">edit_note</span>
-<div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 w-2 h-2 rounded-full bg-slate-400 shadow-inner"></div>
+<div class="flex items-center space-x-4 bg-white/50 dark:bg-slate-800/50 p-2 rounded-3xl backdrop-blur-sm border border-white dark:border-slate-700 shadow-sm">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="pl-10 pr-4 py-2 bg-transparent border-none rounded-2xl w-48 focus:ring-0 text-sm" placeholder="Find anything..." type="text"/>
 </div>
-<div class="absolute -bottom-6 -left-6 w-40 h-28 bg-accent-peach paper-scrap rough-edge transform -rotate-3 p-4">
-<div class="tape absolute -top-4 left-1/2 -translate-x-1/2"></div>
-<p class="handwritten text-xl leading-none text-rose-800 pt-2">"This app changed my whole workflow..."</p>
-<div class="flex items-center gap-2 mt-2">
-<img alt="User avatar" class="w-6 h-6 rounded-full border border-rose-200" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8Xu1OjV5L3VKF6dwYX_LVs0lUBVgEl1Sx4GZuWU6dUCKTUS_XQh8zRjTZZeJUri_YHl0bjKdpUKlVdVq3RxPasgqwThglTNPNhmd8XNNCTgYhjRspL6nKRF9M7e41p3z74BDxIcbegQoXDl86RONwEg-n8DrL3n5Gl_4I3uf8GWyGZ6YOJFK08FWIFKSs6VsLduzQCXF2AtEpTxkh7t4y5O7yDRV448fhgFjR7BRgjsD9q4_0ev69zQaKbFhzs8ufQzi6K-b2LFHU"/>
-<span class="text-[10px] uppercase tracking-wider font-bold text-rose-700">Alex R.</span>
-</div>
-</div>
-<div class="absolute top-20 -right-12 w-24 h-24 rounded-full bg-accent-green paper-scrap flex items-center justify-center transform -rotate-6">
-<span class="material-symbols-outlined text-3xl text-emerald-600">auto_awesome</span>
-<div class="absolute top-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-red-500 rounded-full shadow-md"></div> 
-</div>
-<div class="absolute bottom-10 -right-8 w-36 h-48 bg-accent-blue paper-scrap rough-edge transform rotate-6 p-4">
-<div class="w-full h-24 bg-indigo-200/50 rounded-sm mb-2"></div>
-<div class="space-y-1">
-<div class="h-1 w-full bg-indigo-300/30"></div>
-<div class="h-1 w-4/5 bg-indigo-300/30"></div>
-<div class="h-1 w-full bg-indigo-300/30"></div>
+<div class="w-[1px] h-6 bg-slate-200 dark:bg-slate-700"></div>
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-slate-500 hover:bg-white dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="w-10 h-10 rounded-full bg-slate-200 overflow-hidden border-2 border-primary">
+<img alt="User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHdJM_IMxFny9z7zuCwC5G3fA4cSdflQJCZ0oXsjNmvii6OpAxNxz85wKVeKDROwx_AJQ1dIAYh-ayH4r9SNVH6FU8DFzjEdOKhhMbylDqhjNrW0DI_7b2Az66SNvIOIE4wpVHwmcXgI8a3bqW7lYnE9O3LywNyVoY3hJ4hdcRcKIGIgJmd939vyINbr7NqwWTY4PT0mhjYB9RaZajxt1ocASHOaeQv-eCEQ2wPYlYQa4smpAp_fdkUpVD9T6l3smacr_vcy3_mSzi"/>
 </div>
 </div>
 </div>
-</div>
-</section>
-<section class="flex-1 p-8 md:p-16 flex flex-col justify-center bg-white dark:bg-slate-900 relative">
-<div class="max-w-md mx-auto w-full">
-<div class="flex md:hidden items-center gap-2 mb-8">
-<div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
-<span class="material-symbols-outlined text-white">sticky_note_2</span>
-</div>
-<span class="text-2xl font-bold tracking-tight text-slate-800 dark:text-white">Notepaper.ai</span>
-</div>
-<header class="mb-10">
-<h2 class="text-3xl font-extrabold text-slate-900 dark:text-white mb-2">Join the Hub</h2>
-<p class="text-slate-500 dark:text-slate-400">Start your creative journey in seconds.</p>
+<div class="absolute -top-12 -left-12 w-64 h-64 bg-primary/5 rounded-full blur-3xl -z-10"></div>
 </header>
-<div class="grid grid-cols-2 gap-4 mb-8">
-<button class="flex items-center justify-center gap-2 px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors duration-200 shadow-sm">
-<img alt="Google" class="w-5 h-5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFSMyDTmLqM6JquEooO7-0kXHACkccZ3df1MJ66QGGlvf01WhVpS-JWMf1aVLns2KoZqDdaTjzBNoZyPKTY-faIyg3VpjdcA0zVfjhMYApUJhNzmPkzBXWywj6IhJyTpDxEJJttoMjiFxa6HR7uhFc_URAR3Cw4aYf8fp2G3a83XpR9eFPI0OkfaUUl-9lTiD1nd2bh_qxPHcOQ0ednjhFAuWs0skdAsgHBbFJpPolpIlDiZI4V_-erN40Y8-myBifVLJTi_2mjLJa"/>
-<span class="text-sm font-semibold text-slate-700 dark:text-slate-300">Google</span>
+<section class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+<button class="group relative flex flex-col items-center justify-center p-10 bg-white dark:bg-slate-900 rounded-[3rem] shadow-sm hover:shadow-2xl transition-all hover:-translate-y-2 overflow-hidden">
+<div class="pentagon-shape bg-[#FBBF24] w-28 h-28 flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-4xl">add</span>
+</div>
+<span class="font-bold text-xl">New Note</span>
+<div class="absolute top-4 right-4 text-[10px] font-bold text-slate-300 group-hover:text-primary">CTRL + N</div>
 </button>
-<button class="flex items-center justify-center gap-2 px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors duration-200 shadow-sm">
-<img alt="Apple" class="w-5 h-5 dark:invert" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAgmycMs_L7F8j-vKUJ9XJ8CiPEJdVGPcqJz3zjYXZT5fJGnQPTW8UKknl6FgVn-OdpwKDM3KyRtRYClKBlu2IGKESC6kqjwpXJlRye9K8Do2mwWIOpweEpZ66OzGHVq0fMQc5tiYWCW9ERV2xVCJoINMoHU66ZGCp-YCeblPF4fnFglDjm2cVa5DbY0d2NZzPgqIUzFqTe_5p5SROzBJF6wujRpr9iZO0czT7E4BdEIyF-ik_VV-Y8dLg9WA-mC3nHHjzVaRVu71IY"/>
-<span class="text-sm font-semibold text-slate-700 dark:text-slate-300">Apple</span>
+<button class="group relative flex flex-col items-center justify-center p-10 bg-white dark:bg-slate-900 rounded-[3rem] shadow-sm hover:shadow-2xl transition-all hover:-translate-y-2 overflow-hidden">
+<div class="w-28 h-28 rounded-full bg-[#10B981] flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-4xl">mic</span>
+</div>
+<span class="font-bold text-xl">Voice Record</span>
+<div class="absolute top-4 right-4 text-[10px] font-bold text-slate-300 group-hover:text-primary">REC</div>
 </button>
+<button class="group relative flex flex-col items-center justify-center p-10 bg-white dark:bg-slate-900 rounded-[3rem] shadow-sm hover:shadow-2xl transition-all hover:-translate-y-2 overflow-hidden">
+<div class="blob-shape bg-[#A78BFA] w-28 h-28 flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-4xl">auto_awesome</span>
 </div>
-<div class="relative flex py-5 items-center">
-<div class="flex-grow border-t border-slate-100 dark:border-slate-800"></div>
-<span class="flex-shrink mx-4 text-slate-400 text-xs font-bold uppercase tracking-widest handwritten text-lg">or email</span>
-<div class="flex-grow border-t border-slate-100 dark:border-slate-800"></div>
+<span class="font-bold text-xl">AI Generate</span>
+<div class="absolute top-2 right-2 flex space-x-1">
+<span class="bg-primary/20 text-primary text-[8px] px-2 py-0.5 rounded-full font-black">PRO</span>
 </div>
-<form class="space-y-6" onsubmit="event.preventDefault();">
-<div class="group">
-<label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-1" for="name">Full Name</label>
-<input class="w-full ruled-input focus:ring-0 text-slate-800 dark:text-white placeholder-slate-300 dark:placeholder-slate-600" id="name" placeholder="Type your name..." type="text"/>
+</button>
+</section>
+<section class="mb-16 bg-gradient-to-br from-slate-900 to-indigo-950 dark:from-indigo-600 dark:to-primary rounded-[3.5rem] p-12 text-white relative overflow-hidden">
+<div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-12">
+<div class="max-w-md">
+<h2 class="text-3xl font-bold mb-4 leading-tight">Elevate your study game with Notepaper Pro</h2>
+<p class="text-white/70 mb-8 leading-relaxed">Unlock unlimited AI generation, handwriting recognition, and smart quiz generation from your voice recordings.</p>
+<div class="flex items-center space-x-2 bg-white/10 p-1.5 rounded-2xl w-fit mb-8 border border-white/20">
+<button class="px-6 py-2 bg-white text-slate-900 rounded-xl font-bold text-sm shadow-lg">Monthly</button>
+<button class="px-6 py-2 text-white/80 hover:text-white rounded-xl font-bold text-sm">Yearly <span class="text-[10px] bg-green-500/30 text-green-300 px-2 py-0.5 rounded-full ml-1">-20%</span></button>
 </div>
-<div class="group">
-<label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-1" for="email">Email Address</label>
-<input class="w-full ruled-input focus:ring-0 text-slate-800 dark:text-white placeholder-slate-300 dark:placeholder-slate-600" id="email" placeholder="you@example.com" type="email"/>
-</div>
-<div class="group">
-<div class="flex justify-between mb-1">
-<label class="block text-xs font-bold text-slate-400 uppercase tracking-widest" for="password">Password</label>
-<a class="text-xs font-semibold text-primary hover:underline handwritten text-base" href="#">Forgot?</a>
+<ul class="space-y-4 mb-8">
+<li class="flex items-center space-x-3">
+<span class="material-symbols-outlined text-primary-light">check_circle</span>
+<span class="text-sm font-medium">Unlimited Cloud Storage</span>
+</li>
+<li class="flex items-center space-x-3">
+<span class="material-symbols-outlined text-primary-light">check_circle</span>
+<span class="text-sm font-medium">Advanced AI Summaries</span>
+</li>
+<li class="flex items-center space-x-3">
+<span class="material-symbols-outlined text-primary-light">check_circle</span>
+<span class="text-sm font-medium">No-Ads Experience</span>
+</li>
+</ul>
+<button class="bg-primary hover:bg-primary/90 text-white dark:bg-white dark:text-primary px-10 py-4 rounded-2xl font-bold text-lg shadow-xl shadow-indigo-500/20 transition-all flex items-center space-x-3">
+<span>Get Started Now</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
 </div>
 <div class="relative">
-<input class="w-full ruled-input focus:ring-0 text-slate-800 dark:text-white placeholder-slate-300 dark:placeholder-slate-600" id="password" placeholder="••••••••" type="password"/>
-<button class="absolute right-0 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600" type="button">
-<span class="material-symbols-outlined text-lg">visibility</span>
+<div class="grid grid-cols-2 gap-4 w-80 lg:w-96">
+<div class="bg-white/10 backdrop-blur-md p-6 rounded-[2rem] border border-white/20 transform -rotate-3 hover:rotate-0 transition-all">
+<div class="w-10 h-10 bg-yellow-400 rounded-full mb-3 flex items-center justify-center">
+<span class="material-symbols-outlined text-white">psychology</span>
+</div>
+<div class="h-2 w-12 bg-white/30 rounded-full mb-2"></div>
+<div class="h-2 w-full bg-white/10 rounded-full"></div>
+</div>
+<div class="bg-white/10 backdrop-blur-md p-6 rounded-[2rem] border border-white/20 transform rotate-6 translate-y-8 hover:rotate-0 transition-all">
+<div class="w-10 h-10 bg-green-400 rounded-full mb-3 flex items-center justify-center">
+<span class="material-symbols-outlined text-white">data_saver_on</span>
+</div>
+<div class="h-2 w-12 bg-white/30 rounded-full mb-2"></div>
+<div class="h-2 w-full bg-white/10 rounded-full"></div>
+</div>
+<div class="bg-white/10 backdrop-blur-md p-6 rounded-[2rem] border border-white/20 transform -translate-y-4 hover:rotate-0 transition-all">
+<div class="w-10 h-10 bg-purple-400 rounded-full mb-3 flex items-center justify-center">
+<span class="material-symbols-outlined text-white">draw</span>
+</div>
+<div class="h-2 w-12 bg-white/30 rounded-full mb-2"></div>
+<div class="h-2 w-full bg-white/10 rounded-full"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="absolute top-0 right-0 w-96 h-96 bg-primary opacity-20 blur-3xl -z-0"></div>
+<div class="absolute -bottom-24 -left-24 w-64 h-64 bg-indigo-400 opacity-20 blur-3xl -z-0"></div>
+</section>
+<div class="grid grid-cols-1 xl:grid-cols-4 gap-8">
+<div class="xl:col-span-3">
+<div class="flex justify-between items-center mb-8">
+<h2 class="text-3xl font-bold flex items-center">
+                        Recent Notes
+                        <span class="material-symbols-outlined ml-3 text-primary">arrow_outward</span>
+</h2>
+<a class="text-primary font-bold hover:underline bg-primary/5 px-4 py-2 rounded-xl transition-all" href="#">View Library</a>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="polaroid-card bg-white dark:bg-slate-900 p-4 pb-10 transform -rotate-2">
+<div class="aspect-[4/5] bg-slate-50 dark:bg-slate-800 mb-4 overflow-hidden rounded-sm relative border dark:border-slate-700">
+<div class="absolute inset-0 p-4 font-handwriting text-slate-600 dark:text-slate-300 text-xl leading-relaxed">
+                                buy more oil paints and the new canvas for the sunset series.
+                            </div>
+</div>
+<h3 class="font-bold text-slate-800 dark:text-slate-100">Weekly Supplies</h3>
+<p class="text-[10px] text-slate-400 uppercase font-black tracking-widest mt-1">Oct 12, 2023</p>
+</div>
+<div class="polaroid-card bg-white dark:bg-slate-900 p-4 pb-10 transform rotate-1">
+<div class="aspect-[4/5] bg-slate-50 dark:bg-slate-800 mb-4 overflow-hidden rounded-sm relative border dark:border-slate-700">
+<div class="absolute inset-0 p-4 font-handwriting text-slate-600 dark:text-slate-300 text-xl leading-relaxed">
+                                dashboard that feels like a physical desk with scraps of...
+                            </div>
+</div>
+<h3 class="font-bold text-slate-800 dark:text-slate-100">Project Concept</h3>
+<p class="text-[10px] text-slate-400 uppercase font-black tracking-widest mt-1">Oct 10, 2023</p>
+</div>
+<div class="polaroid-card bg-white dark:bg-slate-900 p-4 pb-10 transform -rotate-1">
+<div class="aspect-[4/5] bg-slate-50 dark:bg-slate-800 mb-4 overflow-hidden rounded-sm relative border dark:border-slate-700">
+<div class="absolute inset-0 p-4 font-handwriting text-slate-600 dark:text-slate-300 text-xl leading-relaxed">
+                                for coffee at 3pm to discuss the upcoming semester plan.
+                            </div>
+</div>
+<h3 class="font-bold text-slate-800 dark:text-slate-100">Coffee Chat</h3>
+<p class="text-[10px] text-slate-400 uppercase font-black tracking-widest mt-1">Oct 09, 2023</p>
+</div>
+<div class="polaroid-card bg-white dark:bg-slate-900 p-4 pb-10 transform rotate-3">
+<div class="aspect-[4/5] bg-slate-50 dark:bg-slate-800 mb-4 overflow-hidden rounded-sm relative border dark:border-slate-700">
+<div class="absolute inset-0 p-4 font-handwriting text-slate-600 dark:text-slate-300 text-xl leading-relaxed italic">
+                                "The only way to do great work is to love what you do."
+                            </div>
+</div>
+<h3 class="font-bold text-slate-800 dark:text-slate-100">Daily Quote</h3>
+<p class="text-[10px] text-slate-400 uppercase font-black tracking-widest mt-1">Oct 08, 2023</p>
+</div>
+</div>
+</div>
+<div class="xl:col-span-1">
+<h2 class="text-2xl font-bold mb-8">Upcoming Quizzes</h2>
+<div class="space-y-4">
+<div class="bg-white dark:bg-slate-900 p-5 rounded-[2rem] border border-slate-100 dark:border-slate-800 hover:border-primary/50 transition-colors shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<div class="w-10 h-10 rounded-2xl bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600">
+<span class="material-symbols-outlined">science</span>
+</div>
+<span class="bg-orange-100 text-orange-600 text-[10px] font-black px-3 py-1 rounded-full uppercase">Tomorrow</span>
+</div>
+<h4 class="font-bold text-slate-900 dark:text-white">Organic Chemistry</h4>
+<p class="text-slate-500 text-sm mt-1">Chapter 4: Molecular Bonds</p>
+<div class="mt-4 flex items-center text-xs text-slate-400">
+<span class="material-symbols-outlined text-sm mr-1">schedule</span>
+                            10:00 AM • 45 mins
+                        </div>
+</div>
+<div class="bg-white dark:bg-slate-900 p-5 rounded-[2rem] border border-slate-100 dark:border-slate-800 hover:border-primary/50 transition-colors shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<div class="w-10 h-10 rounded-2xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600">
+<span class="material-symbols-outlined">history_edu</span>
+</div>
+<span class="bg-blue-100 text-blue-600 text-[10px] font-black px-3 py-1 rounded-full uppercase">Oct 15</span>
+</div>
+<h4 class="font-bold text-slate-900 dark:text-white">World History</h4>
+<p class="text-slate-500 text-sm mt-1">The Renaissance Period</p>
+<div class="mt-4 flex items-center text-xs text-slate-400">
+<span class="material-symbols-outlined text-sm mr-1">schedule</span>
+                            2:30 PM • 30 mins
+                        </div>
+</div>
+<button class="w-full py-5 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2rem] text-slate-400 hover:text-primary hover:border-primary transition-all flex items-center justify-center space-x-2">
+<span class="material-symbols-outlined">add_circle</span>
+<span class="font-bold">Add to Plan</span>
 </button>
 </div>
 </div>
-<div class="flex items-center gap-2 py-2">
-<input class="rounded-sm text-primary focus:ring-primary border-slate-300" id="terms" type="checkbox"/>
-<label class="text-xs text-slate-500 dark:text-slate-400" for="terms">
-                        I agree to the <a class="text-primary font-semibold" href="#">Terms</a> and <a class="text-primary font-semibold" href="#">Privacy</a>.
-                    </label>
 </div>
-<div class="relative pt-4">
-<div class="absolute -top-6 right-0 scribbled-arrow pointer-events-none hidden md:block">
-<span class="scribble text-primary text-xl rotate-12 inline-block">Start here!</span>
-<svg class="w-12 h-12 text-primary -rotate-45 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-<path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path>
-</svg>
-</div>
-<button class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/20 transition-all active:scale-[0.98]" type="submit">
-                        Create Free Account
-                    </button>
-</div>
-</form>
-<footer class="mt-8 text-center">
-<p class="text-slate-500 dark:text-slate-400 text-sm">
-                    Already have an account? 
-                    <a class="text-primary font-bold hover:underline handwritten text-lg ml-1" href="#">Log in here</a>
-</p>
-</footer>
-</div>
-<div class="absolute bottom-6 left-0 right-0 text-center text-[10px] text-slate-400 dark:text-slate-600 px-4">
-            © 2024 Notepaper AI Inc. Crafted with care for creative minds.
-        </div>
-</section>
 </main>
-<button class="fixed bottom-6 right-6 w-12 h-12 bg-white dark:bg-slate-800 rounded-full shadow-lg flex items-center justify-center text-slate-700 dark:text-slate-200 hover:scale-110 transition-transform" onclick="document.documentElement.classList.toggle('dark')">
+<button class="fixed bottom-8 right-8 w-16 h-16 bg-primary text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-30">
+<span class="material-symbols-outlined text-3xl">auto_fix_high</span>
+</button>
+<button class="fixed bottom-8 left-8 p-3 bg-white dark:bg-slate-800 rounded-full shadow-lg text-slate-600 dark:text-slate-400 z-30" onclick="document.documentElement.classList.toggle('dark')">
 <span class="material-symbols-outlined dark:hidden">dark_mode</span>
 <span class="material-symbols-outlined hidden dark:block">light_mode</span>
 </button>
+</div>
 
 </body></html>
