@@ -4,7 +4,7 @@ import { Sidebar } from "../components/user/Sidebar";
 const UpgradePage = () => {
   return (
     <div className="flex min-h-screen">
-      <Sidebar />
+      <Sidebar activePage="/lockedin/upgrade" />
       <PricingLayout />
     
     </div>

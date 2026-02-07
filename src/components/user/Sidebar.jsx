@@ -2,8 +2,17 @@ import { Link } from "react-router-dom";
 import { logo } from "../../assets/assets";
 import { useState } from "react";
 
-export const Sidebar = () => {
+export const Sidebar = ({ activePage }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const navItems = [
+    { path: '/lockedin', icon: 'grid_view', label: 'Dashboard' },
+    { path: '/lockedin/notes', icon: 'description', label: 'My Notes' },
+    { path: '/lockedin/recordings', icon: 'mic', label: 'Recordings' },
+    { path: '/lockedin/study-plan', icon: 'event_note', label: 'Study Plan' },
+    { path: '/lockedin/quizzes', icon: 'quiz', label: 'Quizzes' },
+    { path: '/lockedin/settings', icon: 'settings', label: 'Settings' }
+  ];
 
   return (
     <>
@@ -55,59 +64,30 @@ export const Sidebar = () => {
 
         {/* Navigation */}
         <nav className="flex-1 px-4 space-y-4 mt-4 overflow-visible">
-          
-           <Link className="relative group flex items-center space-x-3 px-6 py-3 text-white nav-active-blob transition-all"
-            to={'/lockedin'}
-            onClick={() => setIsMobileMenuOpen(false)}
-            >
-            <span className="material-icons-round relative z-10">grid_view</span>
-            <span className="font-semibold relative z-10">Dashboard</span>
-          </Link>
-
-          
-             <Link className="group flex items-center space-x-3 px-6 py-3 text-slate-500 dark:text-slate-400 hover:text-purple-500 transition-all"
-            to={'/lockedin/notes'}
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            <span className="material-icons-round">description</span>
-            <span>My Notes</span>
-          </Link>
-
-          
-            <Link  className="group flex items-center space-x-3 px-6 py-3 text-slate-500 dark:text-slate-400 hover:text-purple-500 transition-all"
-             to={'/lockedin/recordings'}
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            <span className="material-icons-round">mic</span>
-            <span>Recordings</span>
-          </Link>
-
-          
-           <Link  className="group flex items-center space-x-3 px-6 py-3 text-slate-500 dark:text-slate-400 hover:text-purple-500 transition-all"
-             to={'/lockedin/study-plan'}
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            <span className="material-icons-round">event_note</span>
-            <span>Study Plan</span>
-          </Link>
-
-          
-            <Link className="group flex items-center space-x-3 px-6 py-3 text-slate-500 dark:text-slate-400 hover:text-purple-500 transition-all"
-             to={'/lockedin/quizzes'}
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            <span className="material-icons-round">quiz</span>
-            <span>Quizzes</span>
-          </Link>
-
-          
-            <Link className="group flex items-center space-x-3 px-6 py-3 text-slate-500 dark:text-slate-400 hover:text-purple-500 transition-all"
-            to={'/lockedin/settings'}
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            <span className="material-icons-round">settings</span>
-            <span>Settings</span>
-          </Link>
+          {navItems.map((item) => {
+            const isActive = activePage === item.path;
+            return (
+              <Link
+                key={item.path}
+                className={`
+                  flex items-center space-x-3 px-6 py-3 transition-all
+                  ${isActive 
+                    ? 'relative group text-white nav-active-blob' 
+                    : 'group text-slate-500 dark:text-slate-400 hover:text-purple-500'
+                  }
+                `}
+                to={item.path}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <span className={`material-icons-round ${isActive ? 'relative z-10' : ''}`}>
+                  {item.icon}
+                </span>
+                <span className={isActive ? 'font-semibold relative z-10' : ''}>
+                  {item.label}
+                </span>
+              </Link>
+            );
+          })}
         </nav>
 
         {/* Pro Plan Card */}

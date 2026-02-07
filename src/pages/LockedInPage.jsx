@@ -5,7 +5,7 @@ import { Sidebar } from "../components/user/Sidebar";
 const LockedInPage = () => {
   return (
     <div className="flex min-h-screen">
-      <Sidebar />
+       <Sidebar activePage="/lockedin" />
       <DashboardContent />
       <FloatingAIButton />
     
