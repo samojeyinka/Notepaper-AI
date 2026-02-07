@@ -1,9 +1,7 @@
-import { DashboardContent } from "../components/user/DashboardContent";
-import { FloatingAIButton } from "../components/user/FloatingAIButton";
 import { PricingLayout } from "../components/user/PricingLayout";
 import { Sidebar } from "../components/user/Sidebar";
 
-const LockedInPage = () => {
+const UpgradePage = () => {
   return (
     <div className="flex min-h-screen">
       <Sidebar />
@@ -13,4 +11,4 @@ const LockedInPage = () => {
   );
 };
 
-export default LockedInPage;
+export default UpgradePage;

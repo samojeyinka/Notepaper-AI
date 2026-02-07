@@ -56,58 +56,58 @@ export const Sidebar = () => {
         {/* Navigation */}
         <nav className="flex-1 px-4 space-y-4 mt-4 overflow-visible">
           
-           <a className="relative group flex items-center space-x-3 px-6 py-3 text-white nav-active-blob transition-all"
-            href="#"
+           <Link className="relative group flex items-center space-x-3 px-6 py-3 text-white nav-active-blob transition-all"
+            to={'/lockedin'}
             onClick={() => setIsMobileMenuOpen(false)}
             >
             <span className="material-icons-round relative z-10">grid_view</span>
             <span className="font-semibold relative z-10">Dashboard</span>
-          </a>
+          </Link>
 
           
-             <a className="group flex items-center space-x-3 px-6 py-3 text-slate-500 dark:text-slate-400 hover:text-purple-500 transition-all"
-            href="#"
+             <Link className="group flex items-center space-x-3 px-6 py-3 text-slate-500 dark:text-slate-400 hover:text-purple-500 transition-all"
+            to={'/lockedin/notes'}
             onClick={() => setIsMobileMenuOpen(false)}
           >
             <span className="material-icons-round">description</span>
             <span>My Notes</span>
-          </a>
+          </Link>
 
           
-            <a  className="group flex items-center space-x-3 px-6 py-3 text-slate-500 dark:text-slate-400 hover:text-purple-500 transition-all"
-            href="#"
+            <Link  className="group flex items-center space-x-3 px-6 py-3 text-slate-500 dark:text-slate-400 hover:text-purple-500 transition-all"
+             to={'/lockedin/recordings'}
             onClick={() => setIsMobileMenuOpen(false)}
           >
             <span className="material-icons-round">mic</span>
             <span>Recordings</span>
-          </a>
+          </Link>
 
           
-           <a  className="group flex items-center space-x-3 px-6 py-3 text-slate-500 dark:text-slate-400 hover:text-purple-500 transition-all"
-            href="#"
+           <Link  className="group flex items-center space-x-3 px-6 py-3 text-slate-500 dark:text-slate-400 hover:text-purple-500 transition-all"
+             to={'/lockedin/study-plan'}
             onClick={() => setIsMobileMenuOpen(false)}
           >
             <span className="material-icons-round">event_note</span>
             <span>Study Plan</span>
-          </a>
+          </Link>
 
           
-            <a className="group flex items-center space-x-3 px-6 py-3 text-slate-500 dark:text-slate-400 hover:text-purple-500 transition-all"
-            href="#"
+            <Link className="group flex items-center space-x-3 px-6 py-3 text-slate-500 dark:text-slate-400 hover:text-purple-500 transition-all"
+             to={'/lockedin/quizzes'}
             onClick={() => setIsMobileMenuOpen(false)}
           >
             <span className="material-icons-round">quiz</span>
             <span>Quizzes</span>
-          </a>
+          </Link>
 
           
-            <a className="group flex items-center space-x-3 px-6 py-3 text-slate-500 dark:text-slate-400 hover:text-purple-500 transition-all"
-            href="#"
+            <Link className="group flex items-center space-x-3 px-6 py-3 text-slate-500 dark:text-slate-400 hover:text-purple-500 transition-all"
+            to={'/lockedin/settings'}
             onClick={() => setIsMobileMenuOpen(false)}
           >
             <span className="material-icons-round">settings</span>
             <span>Settings</span>
-          </a>
+          </Link>
         </nav>
 
         {/* Pro Plan Card */}
@@ -116,9 +116,9 @@ export const Sidebar = () => {
             <div className="relative z-10">
               <p className="text-xs font-medium opacity-80 mb-1">PRO PLAN</p>
               <p className="font-bold mb-3 leading-tight">Unlock AI Insights</p>
-              <button className="bg-white/20 hover:bg-white/30 text-white text-sm py-2 px-4 rounded-xl transition-all">
+              <Link to={'/lockedin/upgrade'} className="bg-white/20 hover:bg-white/30 text-white text-sm py-2 px-4 rounded-xl transition-all">
                 Upgrade
-              </button>
+              </Link>
             </div>
             <span className="material-icons-round absolute -right-4 -bottom-4 text-white/10 text-8xl group-hover:scale-110 transition-transform">
               bolt
