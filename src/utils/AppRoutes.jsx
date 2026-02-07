@@ -2,7 +2,8 @@ import { createBrowserRouter } from 'react-router-dom';
 
 import { LandingPage,PricingPage,SignUpPage,
     SignInPage,ForgotPasswordPage,CheckMailPage,AboutUsPage,FeaturesPage,
-    ContactUsPage, HowItWorksPage,OurStoryPage,PrivacyPage, LockedInPage } from '../pages/pages';
+    ContactUsPage, HowItWorksPage,OurStoryPage,PrivacyPage,
+     LockedInPage,UpgradePage } from '../pages/pages';
 import ScrollToTop from './ScrollToTop';
 
 const AppRoutes = createBrowserRouter([
@@ -97,6 +98,14 @@ const AppRoutes = createBrowserRouter([
         </ScrollToTop>,       
     },
     
+     {
+        path: '/lockedin/upgrade',
+        element:<ScrollToTop>
+        <UpgradePage/>
+        </ScrollToTop>,       
+    },
+
+
 ]);
 
 export default AppRoutes;

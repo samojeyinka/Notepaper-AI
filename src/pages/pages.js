@@ -10,7 +10,8 @@ import ContactUsPage from './ContactUsPage';
 import HowItWorksPage from './HowItWorksPage';
 import OurStoryPage from './OurStoryPage';
 import PrivacyPage from './PrivacyPage';
-import LockedInPage from './LockedInPage'
+import LockedInPage from './LockedInPage';
+import UpgradePage from './UpgradePage'
 
 export{
     LandingPage,
@@ -25,6 +26,7 @@ export{
     HowItWorksPage,
     OurStoryPage,
     PrivacyPage,
-    LockedInPage
+    LockedInPage,
+    UpgradePage
     
 }
