@@ -178,3 +178,63 @@ body {
         .dark .glass-card {
             background: rgba(30, 41, 59, 0.7);
         }
+
+
+
+
+        .material-symbols-outlined {
+            font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24
+        }
+        .paper-card {
+            background-color: #fff;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
+            position: relative;
+            border: 1px solid rgba(0,0,0,0.02);
+        }
+        .ruled-lines {
+            background-image: linear-gradient(transparent 39px, #e2e8f0 39px);
+            background-size: 100% 40px;
+        }
+        .dark .ruled-lines {
+            background-image: linear-gradient(transparent 39px, #334155 39px);
+        }
+        .washi-tape {
+            background: repeating-linear-gradient(
+                45deg,
+                var(--tw-gradient-from),
+                var(--tw-gradient-from) 10px,
+                var(--tw-gradient-to) 10px,
+                var(--tw-gradient-to) 20px
+            );
+            mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 20" xmlns="http://www.w3.org/2000/svg"><path d="M0 0 L5 2 L10 0 L15 2 L20 0 L25 2 L30 0 L35 2 L40 0 L45 2 L50 0 L55 2 L60 0 L65 2 L70 0 L75 2 L80 0 L85 2 L90 0 L95 2 L100 0 V20 L95 18 L90 20 L85 18 L80 20 L75 18 L70 20 L65 18 L60 20 L55 18 L50 20 L45 18 L40 20 L35 18 L30 20 L25 18 L20 20 L15 18 L10 20 L5 18 L0 20 Z" fill="black"/></svg>');
+            mask-size: 100% 100%;
+        }
+        .sketch-decoration {
+            position: fixed;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.12;
+            color: #64748b;
+        }
+        .dark .sketch-decoration {
+            opacity: 0.05;
+            color: #ffffff;
+        }
+        .paid-stamp {
+            border: 3px solid #ef4444;
+            color: #ef4444;
+            transform: rotate(-15deg);
+            padding: 2px 8px;
+            font-weight: 900;
+            text-transform: uppercase;
+            border-radius: 4px;
+            font-family: 'Indie Flower', cursive;
+            opacity: 0.6;
+        }
+        .paper-tab {
+            clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
+            transition: all 0.2s ease;
+        }
+        .paper-tab-active {
+            filter: drop-shadow(0 -2px 5px rgba(0,0,0,0.05));
+        }
