@@ -12,7 +12,8 @@ import OurStoryPage from './OurStoryPage';
 import PrivacyPage from './PrivacyPage';
 import LockedInPage from './LockedInPage';
 import UpgradePage from './UpgradePage';
-import StudyPlanPage from './StudyPlanPage'
+import StudyPlanPage from './StudyPlanPage';
+import LibraryPage from './LibraryPage';
 
 export{
     LandingPage,
@@ -29,6 +30,7 @@ export{
     PrivacyPage,
     LockedInPage,
     UpgradePage,
-    StudyPlanPage
+    StudyPlanPage,
+    LibraryPage
     
 }

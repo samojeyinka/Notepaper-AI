@@ -3,7 +3,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import { LandingPage,PricingPage,SignUpPage,
     SignInPage,ForgotPasswordPage,CheckMailPage,AboutUsPage,FeaturesPage,
     ContactUsPage, HowItWorksPage,OurStoryPage,PrivacyPage,
-     LockedInPage,UpgradePage, StudyPlanPage } from '../pages/pages';
+     LockedInPage,UpgradePage, StudyPlanPage,LibraryPage } from '../pages/pages';
 import ScrollToTop from './ScrollToTop';
 
 const AppRoutes = createBrowserRouter([
@@ -95,6 +95,13 @@ const AppRoutes = createBrowserRouter([
         path: '/lockedin',
         element:<ScrollToTop>
         <LockedInPage/>
+        </ScrollToTop>,       
+    },
+
+     {
+        path: '/lockedin/library',
+        element:<ScrollToTop>
+        <LibraryPage/>
         </ScrollToTop>,       
     },
     
