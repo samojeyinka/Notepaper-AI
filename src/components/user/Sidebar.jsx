@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { logo } from "../../assets/assets";
 import { useState } from "react";
+import UserProfileCard from "./UserProfileCard";
 
 export const Sidebar = ({ activePage }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -50,7 +51,7 @@ export const Sidebar = ({ activePage }) => {
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         {/* Logo - Desktop Only */}
-        <div className="p-6 hidden lg:block">
+        <div className="p-4 hidden lg:block">
           <Link to="/" className="flex items-center gap-2">
             <img src={logo} alt="Notepaper AI" className="w-10"/>
             <span className="text-xl font-bold tracking-tight font-serif-elegant text-ink-black">
@@ -90,13 +91,16 @@ export const Sidebar = ({ activePage }) => {
           })}
         </nav>
 
+
+     
+
         {/* Pro Plan Card */}
-        <div className="p-6">
-          <div className="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-3xl p-4 text-white relative overflow-hidden group">
+        <div className="p-4">
+          <div className="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl p-2 text-white relative overflow-hidden group">
             <div className="relative z-10">
-              <p className="text-xs font-medium opacity-80 mb-1">PRO PLAN</p>
-              <p className="font-bold mb-3 leading-tight">Unlock AI Insights</p>
-              <Link to={'/lockedin/upgrade'} className="bg-white/20 hover:bg-white/30 text-white text-sm py-2 px-4 rounded-xl transition-all">
+              <p className="text-[10px] font-medium opacity-80 mb-1">PRO PLAN</p>
+              <p className="font-semibold mb-1.5 leading-tight text-[15px]">Unlock AI Insights</p>
+              <Link to={'/lockedin/upgrade'} className="bg-white/20 hover:bg-white/30 text-white text-[12px] py-1 px-2 rounded-md transition-all">
                 Upgrade
               </Link>
             </div>
@@ -105,6 +109,8 @@ export const Sidebar = ({ activePage }) => {
             </span>
           </div>
         </div>
+
+           <UserProfileCard/>
       </aside>
     </>
   );
