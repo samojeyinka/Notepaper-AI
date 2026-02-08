@@ -1,6 +1,6 @@
 import { Plus } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 // Header Component
 export const SupportArchiveHeader = () => {
@@ -80,7 +80,7 @@ export const TicketCard = ({ ticketId, status, title, lastActivity, isResolved =
             <div className="relative bg-[#FFFDF9] p-3 rounded-sm border border-slate-200 shadow-sm flex items-center justify-between">
                 <div className="flex flex-col space-y-1">
                     <div className="flex items-center space-x-3">
-                        <span className="text-[10px] font-normal tracking-widest text-slate-400 uppercase">{ticketId}</span>
+                        <span className="text-[10px] font-normal tracking-widest text-slate-400 uppercase">#{ticketId}</span>
                         {status !== 'Resolved' ? (
                             <div className="relative">
                                 <div className="blob-highlight-t absolute -inset-2 z-0"></div>
@@ -112,6 +112,8 @@ export const TicketCard = ({ ticketId, status, title, lastActivity, isResolved =
 
 // Ticket List Component
 export const TicketList = ({ tickets }) => {
+
+    const navigate = useNavigate();
     return (
         <div className="space-y-2 relative">
             {tickets.map((ticket, index) => (
@@ -122,7 +124,7 @@ export const TicketList = ({ tickets }) => {
                     title={ticket.title}
                     lastActivity={ticket.lastActivity}
                     isResolved={ticket.status === 'Resolved'}
-                    onClick={() => console.log('Clicked ticket:', ticket.id)}
+                    onClick={() => navigate(`/lockedin/support-tickets/show/${ticket.id}`)}
                 />
             ))}
         </div>
@@ -156,25 +158,25 @@ export const TicketPagination = ({ currentPage, totalPages, onPageChange }) => {
 export const SupportArchiveContent = ({ activeTab, onTabChange }) => {
     const allTickets = [
         {
-            id: '#NP-8821',
+            id: 'NP-8821',
             status: 'Awaiting Response',
             title: 'Markdown formatting issues in dark mode',
             lastActivity: 'Last activity: Today at 2:45 PM',
         },
         {
-            id: '#NP-8794',
+            id: 'NP-8794',
             status: 'Under Review',
             title: 'Integration request: Notion to Notepaper',
             lastActivity: 'Last activity: Yesterday at 10:15 AM',
         },
         {
-            id: '#NP-8412',
+            id: 'NP-8412',
             status: 'Resolved',
             title: 'Login issues with Apple ID',
             lastActivity: 'Last activity: Oct 12, 2023',
         },
         {
-            id: '#NP-8201',
+            id: 'NP-8201',
             status: 'Open',
             title: 'Billing cycle clarification needed',
             lastActivity: 'Last activity: Oct 20, 2023',

@@ -22,6 +22,8 @@ import NotificationsPage from './NotificationsPage';
 import HelpSupportPage from './HelpSupportPage';
 import SupportTicketsPage from './SupportTicketsPage';
 import NewSupportTicketsPage from './NewSupportTicketsPage';
+import SupportTicketPage from './SupportTicketPage';
+
 export{
     LandingPage,
     PricingPage,
@@ -46,6 +48,7 @@ export{
     ApplicationSettingsPage,
     NotificationsPage,
     SupportTicketsPage,
-    NewSupportTicketsPage
+    NewSupportTicketsPage,
+    SupportTicketPage
     
 }
