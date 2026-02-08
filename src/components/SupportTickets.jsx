@@ -1,5 +1,6 @@
 import { Plus } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 // Header Component
 export const SupportArchiveHeader = () => {
@@ -14,13 +15,13 @@ export const SupportArchiveHeader = () => {
             </div>
             <div className="flex items-center space-x-3">
                 <div className="relative group">
-                    <button
-                        onClick={handleOpenNewTicket}
+                    <Link
+                        to={`/lockedin/support-tickets/new`}
                         className="bg-primary text-white text-[15px] px-3 py-1.5 rounded-full font-medium shadow-md hover:shadow-primary/40 hover:-translate-y-0.5 transition-all flex items-center space-x-2"
                     >
                         <span className="material-symbols-outlined">add</span>
                         <span>Open New Ticket</span>
-                    </button>
+                    </Link>
                     <div className="absolute -left-32 top-10 flex flex-col items-center rotate-[-12deg] pointer-events-none">
                         <svg className="w-12 h-8 text-primary/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path
@@ -45,8 +46,8 @@ export const SupportTab = ({ icon, label, count, isActive, onClick }) => {
         <button
             onClick={onClick}
             className={`pb-4 px-2 font-medium transition-all flex items-center space-x-2 border-b-2 ${isActive
-                    ? 'text-primary border-primary'
-                    : 'text-slate-400 hover:text-slate-600 border-transparent'
+                ? 'text-primary border-primary'
+                : 'text-slate-400 hover:text-slate-600 border-transparent'
                 }`}
         >
             <span className="material-symbols-outlined text-[15px]">{icon}</span>
@@ -63,9 +64,9 @@ export const SupportTab = ({ icon, label, count, isActive, onClick }) => {
 // Ticket Card Component - Reusable
 export const TicketCard = ({ ticketId, status, title, lastActivity, isResolved = false, onClick }) => {
     const statusColors = {
-        'Awaiting Response': 'text-primary-700 dark:text-primary-300',
-        'Under Review': 'text-primary-700 dark:text-primary-300',
-        Open: 'text-primary-700 dark:text-primary-300',
+        'Awaiting Response': 'text-primary-700',
+        'Under Review': 'text-primary-700',
+        Open: 'text-primary-700',
         Resolved: 'text-slate-400',
     };
 
@@ -76,7 +77,7 @@ export const TicketCard = ({ ticketId, status, title, lastActivity, isResolved =
         >
             <div className={`absolute inset-0 bg-slate-50 translate-x-0.5 translate-y-1 rounded-sm transition-transform group-hover:rotate-0 ${Math.random() > 0.5 ? '-rotate-1' : 'rotate-0.5'
                 }`}></div>
-            <div className="relative bg-white p-3 rounded-sm border border-slate-200 shadow-sm flex items-center justify-between">
+            <div className="relative bg-[#FFFDF9] p-3 rounded-sm border border-slate-200 shadow-sm flex items-center justify-between">
                 <div className="flex flex-col space-y-1">
                     <div className="flex items-center space-x-3">
                         <span className="text-[10px] font-normal tracking-widest text-slate-400 uppercase">{ticketId}</span>
@@ -93,8 +94,8 @@ export const TicketCard = ({ ticketId, status, title, lastActivity, isResolved =
                     </div>
                     <h3
                         className={`text-[15px] font-medium transition-colors ${isResolved
-                                ? 'text-slate-400 line-through decoration-slate-300'
-                                : 'text-slate-800 group-hover:text-primary'
+                            ? 'text-slate-400 line-through decoration-slate-300'
+                            : 'text-slate-800 group-hover:text-primary'
                             }`}
                     >
                         {title}
@@ -139,8 +140,8 @@ export const TicketPagination = ({ currentPage, totalPages, onPageChange }) => {
                         key={i + 1}
                         onClick={() => onPageChange(i + 1)}
                         className={`w-8 h-8 rounded flex items-center justify-center transition-all ${currentPage === i + 1
-                                ? 'bg-slate-100 text-slate-600 font-bold'
-                                : 'border border-slate-200 text-slate-600 hover:border-primary hover:text-primary'
+                            ? 'bg-slate-100 text-slate-600 font-bold'
+                            : 'border border-slate-200 text-slate-600 hover:border-primary hover:text-primary'
                             }`}
                     >
                         {i + 1}
@@ -224,10 +225,12 @@ export const SupportArchiveContent = ({ activeTab, onTabChange }) => {
 // Floating Action Buttons
 export const SupportFloatingButtons = () => {
     return (
-        <button className="fixed bottom-8 right-8 w-14 h-14 bg-primary text-white rounded-full shadow-md flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-30 group">
+        <Link
+            to={`/lockedin/support-tickets/new`}
+            className="fixed bottom-8 right-8 w-14 h-14 bg-primary text-white rounded-full shadow-md flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-30 group">
             <span className="material-symbols-outlined text-3xl"><Plus /></span>
 
-        </button>
+        </Link>
     );
 };
 

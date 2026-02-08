@@ -5,7 +5,7 @@ import { LandingPage,PricingPage,SignUpPage,
     ContactUsPage, HowItWorksPage,OurStoryPage,PrivacyPage,
      LockedInPage,UpgradePage, StudyPlanPage,LibraryPage,
      BillingPage,ProfileSettingsPage,ChangePasswordPage,ApplicationSettingsPage,
-      NotificationsPage, HelpSupportPage,SupportTicketsPage } from '../pages/pages';
+      NotificationsPage, HelpSupportPage,SupportTicketsPage,NewSupportTicketsPage } from '../pages/pages';
 import ScrollToTop from './ScrollToTop';
 
 const AppRoutes = createBrowserRouter([
@@ -167,6 +167,13 @@ const AppRoutes = createBrowserRouter([
         path: '/lockedin/support-tickets',
         element:<ScrollToTop>
         <SupportTicketsPage/>
+        </ScrollToTop>,       
+    },
+
+    {
+        path: '/lockedin/support-tickets/new',
+        element:<ScrollToTop>
+        <NewSupportTicketsPage/>
         </ScrollToTop>,       
     },
 

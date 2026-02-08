@@ -20,8 +20,8 @@ import ChangePasswordPage from './ChangePasswordPage';
 import ApplicationSettingsPage from './ApplicationSettingsPage';
 import NotificationsPage from './NotificationsPage';
 import HelpSupportPage from './HelpSupportPage';
-import SupportTicketsPage from './SupportTicketsPage'
-
+import SupportTicketsPage from './SupportTicketsPage';
+import NewSupportTicketsPage from './NewSupportTicketsPage';
 export{
     LandingPage,
     PricingPage,
@@ -45,6 +45,7 @@ export{
     ChangePasswordPage,
     ApplicationSettingsPage,
     NotificationsPage,
-    SupportTicketsPage
+    SupportTicketsPage,
+    NewSupportTicketsPage
     
 }
