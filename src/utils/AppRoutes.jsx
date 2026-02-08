@@ -4,7 +4,8 @@ import { LandingPage,PricingPage,SignUpPage,
     SignInPage,ForgotPasswordPage,CheckMailPage,AboutUsPage,FeaturesPage,
     ContactUsPage, HowItWorksPage,OurStoryPage,PrivacyPage,
      LockedInPage,UpgradePage, StudyPlanPage,LibraryPage,
-     BillingPage,ProfileSettingsPage,ChangePasswordPage,ApplicationSettingsPage, NotificationsPage } from '../pages/pages';
+     BillingPage,ProfileSettingsPage,ChangePasswordPage,ApplicationSettingsPage,
+      NotificationsPage, HelpSupportPage } from '../pages/pages';
 import ScrollToTop from './ScrollToTop';
 
 const AppRoutes = createBrowserRouter([
@@ -61,6 +62,13 @@ const AppRoutes = createBrowserRouter([
         path: '/privacy',
         element:<ScrollToTop>
         <PrivacyPage/>
+        </ScrollToTop>,       
+    },
+
+    {
+        path: '/help-&-support',
+        element:<ScrollToTop>
+        <HelpSupportPage/>
         </ScrollToTop>,       
     },
 

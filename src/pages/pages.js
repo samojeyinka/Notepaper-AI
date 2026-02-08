@@ -18,7 +18,8 @@ import BillingPage from './BillingPage';
 import ProfileSettingsPage from './ProfileSettingsPage';
 import ChangePasswordPage from './ChangePasswordPage';
 import ApplicationSettingsPage from './ApplicationSettingsPage';
-import NotificationsPage from './NotificationsPage'
+import NotificationsPage from './NotificationsPage';
+import HelpSupportPage from './HelpSupportPage';
 
 export{
     LandingPage,
@@ -28,6 +29,7 @@ export{
     ForgotPasswordPage,
     CheckMailPage,
     AboutUsPage,
+    HelpSupportPage,
     FeaturesPage,
     ContactUsPage,
     HowItWorksPage,

@@ -437,3 +437,37 @@ body {
             border: 2px solid #94a3b8;
             border-radius: 5px;
         }
+
+/* 
+        //help and support */
+
+        .paper-texture-h {
+            background-color: var(--paper-cream);
+            background-image: radial-gradient(#e5e7eb 0.5px, transparent 0.5px);
+            background-size: 24px 24px;
+        }
+        .blob-shape-h {
+            border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+        }
+        .pentagon-shape-h {
+            clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+        }
+        .ruled-page-h {
+            background-image: repeating-linear-gradient(transparent, transparent 31px, #e2e8f0 31px, #e2e8f0 32px);
+            line-height: 32px;
+        }
+        .hand-drawn-border-h {
+            border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+            border: 2px solid var(--ink);
+        }
+        .paper-shadow-h {
+            box-shadow: 2px 4px 12px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .stack-layer-1-h { transform: rotate(-1deg) translate(2px, 2px); }
+        .stack-layer-2-h { transform: rotate(1.5deg) translate(-2px, -1px); }
+        .desk-sketch-h {
+            position: absolute;
+            opacity: 0.1;
+            pointer-events: none;
+            z-index: 0;
+        }

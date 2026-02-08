@@ -9,7 +9,7 @@ export const UserProfileCard = ({ userName = 'Ojeyinka Samuel', userStatus = 'Pr
     {
       icon: 'person',
       label: 'Profile Settings',
-      href:'profile-settings',
+      href:'lockedin/profile-settings',
       onClick: () => {
         console.log('Profile settings clicked');
         setIsMenuOpen(false);
@@ -18,7 +18,7 @@ export const UserProfileCard = ({ userName = 'Ojeyinka Samuel', userStatus = 'Pr
     {
       icon: 'receipt',
       label: 'Invoices & Billing',
-      href:'invoices-&-billing',
+      href:'lockedin/invoices-&-billing',
       onClick: () => {
         console.log('Invoices clicked');
         setIsMenuOpen(false);
@@ -82,7 +82,7 @@ export const UserProfileCard = ({ userName = 'Ojeyinka Samuel', userStatus = 'Pr
             {menuItems.map((item, index) => (
               <Link
                 key={index}
-                to={`/lockedin/${item.href}`}
+                to={`/${item.href}`}
                 onClick={item.onClick}
                 className="w-full px-3 py-1.5 flex items-center gap-3 text-slate-500 hover:bg-slate-50 transition-colors text-sm font-normal"
               >

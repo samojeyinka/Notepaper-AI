@@ -19,6 +19,7 @@ export default function Footer() {
     { label: 'About Us ', href: 'about-us' },
      { label: 'How It Works', href: 'how-it-works' },
     { label: 'Plans', href: 'pricing' },
+     { label: 'Help & Support', href: 'help-&-support' },
     
   ]
 
