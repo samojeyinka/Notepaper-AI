@@ -12,7 +12,7 @@ export const Sidebar = ({ activePage }) => {
     { path: '/lockedin/recordings', icon: 'mic', label: 'Recordings' },
     { path: '/lockedin/study-plan', icon: 'event_note', label: 'Study Plan' },
     { path: '/lockedin/quizzes', icon: 'quiz', label: 'Quizzes' },
-    { path: '/lockedin/settings', icon: 'settings', label: 'Settings' }
+    { path: '/lockedin/application-settings', icon: 'settings', label: 'Settings' }
   ];
 
   return (

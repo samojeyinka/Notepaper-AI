@@ -325,3 +325,45 @@ body {
   opacity: 0.05;
   color: #ffffff;
 }
+
+
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 10px;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+
+.paper-grid {
+  background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.dark .paper-grid {
+  background-image: radial-gradient(#334155 1px, transparent 1px);
+}
+
+.paper-lined {
+  background-image: linear-gradient(#cbd5e1 1px, transparent 1px);
+  background-size: 100% 28px;
+}
+
+.dark .paper-lined {
+  background-image: linear-gradient(#334155 1px, transparent 1px);
+}
+
+.blob-shape {
+  border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
+}
+

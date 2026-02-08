@@ -16,7 +16,8 @@ import StudyPlanPage from './StudyPlanPage';
 import LibraryPage from './LibraryPage';
 import BillingPage from './BillingPage';
 import ProfileSettingsPage from './ProfileSettingsPage';
-import ChangePasswordPage from './ChangePasswordPage'
+import ChangePasswordPage from './ChangePasswordPage';
+import ApplicationSettingsPage from './ApplicationSettingsPage';
 
 export{
     LandingPage,
@@ -37,6 +38,7 @@ export{
     LibraryPage,
     BillingPage,
     ProfileSettingsPage,
-    ChangePasswordPage
+    ChangePasswordPage,
+    ApplicationSettingsPage
     
 }

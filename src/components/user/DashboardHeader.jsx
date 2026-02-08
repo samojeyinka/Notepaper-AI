@@ -32,7 +32,7 @@ export const DashboardHeader = () => {
         </Link>
 
         {/* Profile Picture */}
-       <Link to={'/lockedin/profile'} className="w-10 h-10 rounded-full bg-slate-200 overflow-hidden border-2 border-purple-500">
+       <Link to={'/lockedin/profile-settings'} className="w-10 h-10 rounded-full bg-slate-200 overflow-hidden border-2 border-purple-500">
           <img
             alt="User Profile"
             className="w-full h-full object-cover"
