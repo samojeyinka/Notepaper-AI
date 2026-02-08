@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { paypal, paystack } from '../../assets/assets';
 
 // Tab Component - Reusable
 export const BillingTab = ({ isActive, label, onClick }) => {
@@ -74,7 +76,7 @@ export const PaymentButton = ({ label, icon, onClick, variant = 'primary' }) => 
 
   return (
     <button onClick={onClick} className={`${baseClasses} ${variantClasses[variant]}`}>
-      <span className="material-symbols-outlined">{icon}</span>
+      <img src={icon} className="w-7"/>
       {label}
     </button>
   );
@@ -185,13 +187,13 @@ export const SubscriptionTab = () => {
           <div className="md:w-[50%] grid grid-cols-1 md:grid-cols-2 gap-4">
             <PaymentButton
               label="Pay with PayStack"
-              icon="payment"
+              icon={paystack}
               onClick={() => console.log('PayStack payment')}
               variant="primary"
             />
             <PaymentButton
               label="Pay with PayPal"
-              icon="account_balance_wallet"
+              icon={paypal}
               onClick={() => console.log('PayPal payment')}
               variant="secondary"
 
@@ -325,7 +327,12 @@ export const BillingHistoryTab = () => {
 
 // Main Billing Page
 export const Billing = () => {
-  const [activeTab, setActiveTab] = useState('subscription');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabParam = searchParams.get('tab') || 'subscription';
+
+  const handleTabChange = (tab) => {
+    setSearchParams({ tab });
+  };
 
   return (
     <main className="flex-1 lg:ml-64 p-3 lg:p-8 pt-20 lg:pt-8 flex flex-col gap-4 overflow-y-auto max-w-5xl mx-auto w-full z-10 relative">
@@ -334,20 +341,20 @@ export const Billing = () => {
       {/* Tabs */}
       <div className="flex gap-2 px-4 translate-y-px z-20">
         <BillingTab
-          isActive={activeTab === 'subscription'}
+          isActive={tabParam === 'subscription'}
           label="Subscription"
-          onClick={() => setActiveTab('subscription')}
+          onClick={() => handleTabChange('subscription')}
         />
         <BillingTab
-          isActive={activeTab === 'billing'}
+          isActive={tabParam === 'billing-history'}
           label="Billing History"
-          onClick={() => setActiveTab('billing')}
+          onClick={() => handleTabChange('billing-history')}
         />
       </div>
 
       {/* Tab Content */}
-      {activeTab === 'subscription' && <SubscriptionTab />}
-      {activeTab === 'billing' && <BillingHistoryTab />}
+      {tabParam === 'subscription' && <SubscriptionTab />}
+      {tabParam === 'billing-history' && <BillingHistoryTab />}
     </main>
   );
 };

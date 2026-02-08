@@ -3,7 +3,8 @@ import { createBrowserRouter } from 'react-router-dom';
 import { LandingPage,PricingPage,SignUpPage,
     SignInPage,ForgotPasswordPage,CheckMailPage,AboutUsPage,FeaturesPage,
     ContactUsPage, HowItWorksPage,OurStoryPage,PrivacyPage,
-     LockedInPage,UpgradePage, StudyPlanPage,LibraryPage,BillingPage } from '../pages/pages';
+     LockedInPage,UpgradePage, StudyPlanPage,LibraryPage,
+     BillingPage,ProfileSettingsPage,ChangePasswordPage } from '../pages/pages';
 import ScrollToTop from './ScrollToTop';
 
 const AppRoutes = createBrowserRouter([
@@ -126,6 +127,22 @@ const AppRoutes = createBrowserRouter([
         </ScrollToTop>,       
     },
 
+     {
+        path: '/lockedin/profile-settings',
+        element:<ScrollToTop>
+        <ProfileSettingsPage/>
+        </ScrollToTop>,       
+    },
+
+     {
+        path: '/lockedin/change-password',
+        element:<ScrollToTop>
+        <ChangePasswordPage/>
+        </ScrollToTop>,       
+    },
+
+
+    
 
     
 ]);

@@ -14,7 +14,9 @@ import LockedInPage from './LockedInPage';
 import UpgradePage from './UpgradePage';
 import StudyPlanPage from './StudyPlanPage';
 import LibraryPage from './LibraryPage';
-import BillingPage from './BillingPage'
+import BillingPage from './BillingPage';
+import ProfileSettingsPage from './ProfileSettingsPage';
+import ChangePasswordPage from './ChangePasswordPage'
 
 export{
     LandingPage,
@@ -33,6 +35,8 @@ export{
     UpgradePage,
     StudyPlanPage,
     LibraryPage,
-    BillingPage
+    BillingPage,
+    ProfileSettingsPage,
+    ChangePasswordPage
     
 }

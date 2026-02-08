@@ -30,6 +30,7 @@ export default {
         handwritten: ["Architects Daughter", "cursive"],
         handwriting2: ["Caveat", "cursive"],
         sketch: ["Shadows Into Light", "cursive"],
+        casual: ["Shadows Into Light", "cursive"],
       },
       boxShadow: {
         paper: "2px 2px 5px rgba(0,0,0,0.05), 5px 15px 30px rgba(0,0,0,0.07)",
