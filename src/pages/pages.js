@@ -20,6 +20,7 @@ import ChangePasswordPage from './ChangePasswordPage';
 import ApplicationSettingsPage from './ApplicationSettingsPage';
 import NotificationsPage from './NotificationsPage';
 import HelpSupportPage from './HelpSupportPage';
+import SupportTicketsPage from './SupportTicketsPage'
 
 export{
     LandingPage,
@@ -43,6 +44,7 @@ export{
     ProfileSettingsPage,
     ChangePasswordPage,
     ApplicationSettingsPage,
-    NotificationsPage
+    NotificationsPage,
+    SupportTicketsPage
     
 }
