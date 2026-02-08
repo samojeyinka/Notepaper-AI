@@ -18,6 +18,7 @@ import BillingPage from './BillingPage';
 import ProfileSettingsPage from './ProfileSettingsPage';
 import ChangePasswordPage from './ChangePasswordPage';
 import ApplicationSettingsPage from './ApplicationSettingsPage';
+import NotificationsPage from './NotificationsPage'
 
 export{
     LandingPage,
@@ -39,6 +40,7 @@ export{
     BillingPage,
     ProfileSettingsPage,
     ChangePasswordPage,
-    ApplicationSettingsPage
+    ApplicationSettingsPage,
+    NotificationsPage
     
 }

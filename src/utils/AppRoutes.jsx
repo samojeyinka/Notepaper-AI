@@ -4,7 +4,7 @@ import { LandingPage,PricingPage,SignUpPage,
     SignInPage,ForgotPasswordPage,CheckMailPage,AboutUsPage,FeaturesPage,
     ContactUsPage, HowItWorksPage,OurStoryPage,PrivacyPage,
      LockedInPage,UpgradePage, StudyPlanPage,LibraryPage,
-     BillingPage,ProfileSettingsPage,ChangePasswordPage,ApplicationSettingsPage } from '../pages/pages';
+     BillingPage,ProfileSettingsPage,ChangePasswordPage,ApplicationSettingsPage, NotificationsPage } from '../pages/pages';
 import ScrollToTop from './ScrollToTop';
 
 const AppRoutes = createBrowserRouter([
@@ -141,9 +141,6 @@ const AppRoutes = createBrowserRouter([
         </ScrollToTop>,       
     },
 
-
-  
-    
     {
         path: '/lockedin/application-settings',
         element:<ScrollToTop>
@@ -151,6 +148,12 @@ const AppRoutes = createBrowserRouter([
         </ScrollToTop>,       
     },
 
+     {
+        path: '/lockedin/notifications',
+        element:<ScrollToTop>
+        <NotificationsPage/>
+        </ScrollToTop>,       
+    },
     
 ]);
 
