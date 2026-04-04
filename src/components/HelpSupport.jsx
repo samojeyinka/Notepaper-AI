@@ -209,7 +209,7 @@ export const SupportTicketCard = () => {
           If you couldn't find what you were looking for, our team is ready to help you manually.
         </p>
         <Link
-        to={`/lockedin/tickets/new`}
+        to={`/lockedin/support-tickets/new`}
           className="w-full py-2 bg-slate-900 text-white rounded-xl font-medium hover:shadow-xl hover:-translate-y-1 transition-all flex items-center justify-center space-x-2"
         >
           <span className="material-symbols-outlined">confirmation_number</span>

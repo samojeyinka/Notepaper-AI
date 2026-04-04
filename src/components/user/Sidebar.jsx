@@ -9,7 +9,7 @@ export const Sidebar = ({ activePage }) => {
   const navItems = [
     { path: '/lockedin', icon: 'grid_view', label: 'Dashboard' },
     { path: '/lockedin/library', icon: 'folder', label: 'Library' },
-    { path: '/lockedin/recordings', icon: 'mic', label: 'Recordings' },
+    { path: '/lockedin/assets', icon: 'store', label: 'Assets' },
     { path: '/lockedin/study-plan', icon: 'event_note', label: 'Study Plan' },
     { path: '/lockedin/support-tickets', icon: 'chat', label: 'Support Tickets' },
     { path: '/lockedin/application-settings', icon: 'settings', label: 'Settings' }
