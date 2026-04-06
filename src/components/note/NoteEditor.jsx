@@ -25,11 +25,28 @@ export const NoteEditor = forwardRef(({
     
     const fontClass = fontMapping[fontFamily] || 'font-sans';
 
+    const lastContentRef = useRef(content);
+
     useEffect(() => {
-        if (editorEl.current && editorEl.current.innerHTML !== content) {
-            editorEl.current.innerText = content;
+        // Only update the DOM if the content prop changes from an EXTERNAL source
+        // (i.e. not from the user typing in this component)
+        if (editorEl.current && content !== lastContentRef.current) {
+            editorEl.current.innerHTML = content;
+            lastContentRef.current = content;
         }
     }, [content]);
+
+    const handleInput = (e) => {
+        const newContent = e.currentTarget.innerHTML;
+        lastContentRef.current = newContent;
+        onContentChange(newContent);
+    };
+
+    useEffect(() => {
+        if (editorEl.current) {
+            editorEl.current.innerHTML = content;
+        }
+    }, []); // Initialize on mount
 
     return (
         <div className="flex-1 bg-slate-50 p-8 md:p-12 overflow-y-auto custom-scrollbar relative">
@@ -52,9 +69,13 @@ export const NoteEditor = forwardRef(({
 
                 <div className={`prose prose-slate max-w-none ${fontClass}`} style={{ color: textColor }}>
                     <div
-                        ref={editorEl}
+                        ref={(node) => {
+                            editorEl.current = node;
+                            if (typeof ref === 'function') ref(node);
+                            else if (ref) ref.current = node;
+                        }}
                         contentEditable
-                        onInput={(e) => onContentChange(e.currentTarget.innerText)}
+                        onInput={handleInput}
                         className="w-full min-h-[100vh] outline-none focus:ring-0 text-xl leading-relaxed whitespace-pre-wrap break-words"
                         style={{ 
                             fontSize: `${fontSize}px`, 
