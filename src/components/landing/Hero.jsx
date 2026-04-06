@@ -9,7 +9,7 @@ export default function Hero() {
       </div>
 
       <div className="max-w-4xl px-6 space-y-10 mb-20 relative">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-100 text-slate-600 font-medium text-sm border border-slate-200">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 text-slate-600 font-medium text-sm underline">
           <span className="material-symbols-outlined text-sm">auto_awesome</span>
           The soul of paper, the mind of AI
         </div>

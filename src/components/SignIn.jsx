@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { BsFacebook, BsGoogle } from 'react-icons/bs';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Alert from './globals/Alert';
 import Toast from './globals/Toast';
+import { SocialButton } from './SocialButtons';
 
 export default function SignIn() {
   const { login } = useAuth();
@@ -158,16 +158,7 @@ export default function SignIn() {
           </header>
 
           {/* Social Buttons */}
-          <div className="grid grid-cols-2 gap-4 mb-8">
-            <button className="flex items-center justify-center gap-2 px-4 py-3 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors duration-200 shadow-sm">
-              <BsGoogle/>
-              <span className="text-sm font-semibold text-slate-700">Google</span>
-            </button>
-            <button className="flex items-center justify-center gap-2 px-4 py-3 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors duration-200 shadow-sm">
-             <BsFacebook/>
-              <span className="text-sm font-semibold text-slate-700">Facebook</span>
-            </button>
-          </div>
+            <SocialButton/>
 
           {/* Divider */}
           <div className="relative flex py-5 items-center">
