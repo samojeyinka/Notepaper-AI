@@ -95,7 +95,7 @@ export const Sidebar = ({ activePage }) => {
      
 
         {/* Pro Plan Card */}
-        <div className="p-4">
+        {/* <div className="p-4">
           <div className="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl p-2 text-white relative overflow-hidden group">
             <div className="relative z-10">
               <p className="text-[10px] font-medium opacity-80 mb-1">PRO PLAN</p>
@@ -108,7 +108,7 @@ export const Sidebar = ({ activePage }) => {
               bolt
             </span>
           </div>
-        </div>
+        </div> */}
 
            <UserProfileCard/>
       </aside>

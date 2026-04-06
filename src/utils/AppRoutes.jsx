@@ -1,12 +1,13 @@
 import { createBrowserRouter } from 'react-router-dom';
 
 import { LandingPage,PricingPage,SignUpPage,
-    SignInPage,ForgotPasswordPage,CheckMailPage,AboutUsPage,FeaturesPage,
+    SignInPage,ForgotPasswordPage,ResetPasswordPage,RestoreAccountPage,RestoreAccountFinalPage,DeleteAccountPage,CheckMailPage,VerifyEmailPage,TwoFactorPage,AboutUsPage,FeaturesPage,
     ContactUsPage, HowItWorksPage,OurStoryPage,PrivacyPage,
      LockedInPage,UpgradePage, StudyPlanPage,LibraryPage,
      BillingPage,ProfileSettingsPage,ChangePasswordPage,ApplicationSettingsPage,
       NotificationsPage, HelpSupportPage,SupportTicketsPage,NewSupportTicketsPage,SupportTicketPage } from '../pages/pages';
 import ScrollToTop from './ScrollToTop';
+import ProtectedRoute, { GuestRoute } from './ProtectedRoute';
 
 const AppRoutes = createBrowserRouter([
     {
@@ -74,118 +75,152 @@ const AppRoutes = createBrowserRouter([
 
      {
         path: '/signup',
-        element:<ScrollToTop>
+        element:<GuestRoute><ScrollToTop>
         <SignUpPage/>
-        </ScrollToTop>,       
+        </ScrollToTop></GuestRoute>,       
     },
      {
         path: '/signin',
-        element:<ScrollToTop>
+        element:<GuestRoute><ScrollToTop>
         <SignInPage/>
-        </ScrollToTop>,       
+        </ScrollToTop></GuestRoute>,       
     },
     {
         path: '/forgot-password',
-        element:<ScrollToTop>
+        element:<GuestRoute><ScrollToTop>
         <ForgotPasswordPage/>
-        </ScrollToTop>,       
+        </ScrollToTop></GuestRoute>,       
     },
-     {
+    {
+        path: '/forgot-password/token',
+        element:<GuestRoute><ScrollToTop>
+        <ResetPasswordPage/>
+        </ScrollToTop></GuestRoute>,       
+    },
+    {
         path: '/forgot-password/check-email',
-        element:<ScrollToTop>
+        element:<GuestRoute><ScrollToTop>
         <CheckMailPage/>
+        </ScrollToTop></GuestRoute>,       
+    },
+    {
+        path: '/restore-account',
+        element:<GuestRoute><ScrollToTop>
+        <RestoreAccountPage/>
+        </ScrollToTop></GuestRoute>,       
+    },
+    {
+        path: '/account-restore/token',
+        element:<GuestRoute><ScrollToTop>
+        <RestoreAccountFinalPage/>
+        </ScrollToTop></GuestRoute>,       
+    },
+    {
+        path: '/verify/email/:token',
+        element:<ScrollToTop>
+        <VerifyEmailPage/>
         </ScrollToTop>,       
     },
+    {
+        path: '/auth/2fa',
+        element:<GuestRoute><ScrollToTop>
+        <TwoFactorPage/>
+        </ScrollToTop></GuestRoute>,       
+    },
 
-
-    // user
+    // user (protected — require valid in-memory token)
 
     {
         path: '/lockedin',
-        element:<ScrollToTop>
+        element:<ProtectedRoute><ScrollToTop>
         <LockedInPage/>
-        </ScrollToTop>,       
+        </ScrollToTop></ProtectedRoute>,       
     },
 
      {
         path: '/lockedin/library',
-        element:<ScrollToTop>
+        element:<ProtectedRoute><ScrollToTop>
         <LibraryPage/>
-        </ScrollToTop>,       
+        </ScrollToTop></ProtectedRoute>,       
     },
     
      {
         path: '/lockedin/upgrade',
-        element:<ScrollToTop>
+        element:<ProtectedRoute><ScrollToTop>
         <UpgradePage/>
-        </ScrollToTop>,       
+        </ScrollToTop></ProtectedRoute>,       
     },
 
     {
         path: '/lockedin/study-plan',
-        element:<ScrollToTop>
+        element:<ProtectedRoute><ScrollToTop>
         <StudyPlanPage/>
-        </ScrollToTop>,       
+        </ScrollToTop></ProtectedRoute>,       
     },
 
      {
         path: '/lockedin/invoices-&-billing',
-        element:<ScrollToTop>
+        element:<ProtectedRoute><ScrollToTop>
         <BillingPage/>
-        </ScrollToTop>,       
+        </ScrollToTop></ProtectedRoute>,       
+    },
+
+    {
+        path: '/lockedin/delete-account',
+        element:<ProtectedRoute><ScrollToTop>
+        <DeleteAccountPage/>
+        </ScrollToTop></ProtectedRoute>,       
     },
 
      {
         path: '/lockedin/profile-settings',
-        element:<ScrollToTop>
+        element:<ProtectedRoute><ScrollToTop>
         <ProfileSettingsPage/>
-        </ScrollToTop>,       
+        </ScrollToTop></ProtectedRoute>,       
     },
 
      {
         path: '/lockedin/change-password',
-        element:<ScrollToTop>
+        element:<ProtectedRoute><ScrollToTop>
         <ChangePasswordPage/>
-        </ScrollToTop>,       
+        </ScrollToTop></ProtectedRoute>,       
     },
 
     {
         path: '/lockedin/application-settings',
-        element:<ScrollToTop>
+        element:<ProtectedRoute><ScrollToTop>
         <ApplicationSettingsPage/>
-        </ScrollToTop>,       
+        </ScrollToTop></ProtectedRoute>,       
     },
 
      {
         path: '/lockedin/notifications',
-        element:<ScrollToTop>
+        element:<ProtectedRoute><ScrollToTop>
         <NotificationsPage/>
-        </ScrollToTop>,       
+        </ScrollToTop></ProtectedRoute>,       
     },
 
      {
         path: '/lockedin/support-tickets',
-        element:<ScrollToTop>
+        element:<ProtectedRoute><ScrollToTop>
         <SupportTicketsPage/>
-        </ScrollToTop>,       
+        </ScrollToTop></ProtectedRoute>,       
     },
 
     {
         path: '/lockedin/support-tickets/new',
-        element:<ScrollToTop>
+        element:<ProtectedRoute><ScrollToTop>
         <NewSupportTicketsPage/>
-        </ScrollToTop>,       
+        </ScrollToTop></ProtectedRoute>,       
     },
 
      {
         path: '/lockedin/support-tickets/show/:id',
-        element:<ScrollToTop>
+        element:<ProtectedRoute><ScrollToTop>
         <SupportTicketPage/>
-        </ScrollToTop>,       
+        </ScrollToTop></ProtectedRoute>,       
     },
 
-
-    
 ]);
 
 export default AppRoutes;

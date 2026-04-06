@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { logo } from '../../assets/assets';
+import { useAuth } from '../../context/AuthContext';
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { isAuthenticated, logout } = useAuth();
 
   const navLinks = [
     { label: 'Features', href: 'features' },
@@ -40,12 +42,28 @@ export default function Header() {
 
           {/* Desktop Buttons */}
           <div className="flex items-center gap-4">
-            <Link to={'/signin'} className="hidden sm:block font-semibold px-6 py-2 rounded-full border border-slate-300 hover:bg-slate-50 transition-all text-ink-black">
-              Log in
-            </Link>
-            <Link to={'/signup'} className="hand-drawn-border bg-white px-8 py-2 font-bold hover:scale-105 transition-transform text-ink-black">
-              Get Started
-            </Link>
+            {isAuthenticated ? (
+              <>
+                <Link to={'/lockedin'} className="hidden sm:block font-semibold px-6 py-2 rounded-full border border-slate-300 hover:bg-slate-50 transition-all text-ink-black">
+                  Dashboard
+                </Link>
+                <button 
+                  onClick={logout} 
+                  className="hand-drawn-border bg-white px-8 py-2 font-bold hover:scale-105 transition-transform text-ink-black"
+                >
+                  Log out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link to={'/signin'} className="hidden sm:block font-semibold px-6 py-2 rounded-full border border-slate-300 hover:bg-slate-50 transition-all text-ink-black">
+                  Log in
+                </Link>
+                <Link to={'/signup'} className="hand-drawn-border bg-white px-8 py-2 font-bold hover:scale-105 transition-transform text-ink-black">
+                  Get Started
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Toggle */}
@@ -81,12 +99,40 @@ export default function Header() {
               <div className="border-t border-slate-200/50 my-4"></div>
 
               <div className="flex flex-col gap-3">
-                <button className="w-full py-3 text-sm font-semibold text-ink-black hover:bg-slate-50 rounded-lg border border-slate-300">
-                  Log in
-                </button>
-                <button className="w-full py-3 hand-drawn-border bg-white font-bold text-ink-black hover:scale-105">
-                  Get Started
-                </button>
+                {isAuthenticated ? (
+                  <>
+                    <Link 
+                      to={'/lockedin'} 
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="w-full py-3 text-center text-sm font-semibold text-ink-black hover:bg-slate-50 rounded-lg border border-slate-300"
+                    >
+                      Dashboard
+                    </Link>
+                    <button 
+                      onClick={() => { logout(); setMobileMenuOpen(false); }}
+                      className="w-full py-3 hand-drawn-border bg-white font-bold text-ink-black hover:scale-105"
+                    >
+                      Log out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link 
+                      to={'/signin'} 
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="w-full py-3 text-center text-sm font-semibold text-ink-black hover:bg-slate-50 rounded-lg border border-slate-300"
+                    >
+                      Log in
+                    </Link>
+                    <Link 
+                      to={'/signup'} 
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="w-full py-3 text-center hand-drawn-border bg-white font-bold text-ink-black hover:scale-105"
+                    >
+                      Get Started
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </div>

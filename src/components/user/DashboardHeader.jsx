@@ -1,7 +1,13 @@
 import { Link } from "react-router-dom";
-
+import { useAuth } from "../../context/AuthContext";
 
 export const DashboardHeader = () => {
+  const { user } = useAuth();
+
+  const initials = user?.full_name
+    ? user.full_name.split(' ').map((n) => n[0]).slice(0, 2).join('').toUpperCase()
+    : '?';
+
   return (
     <header className="flex justify-between items-center mb-10">
       {/* Title */}
@@ -24,7 +30,6 @@ export const DashboardHeader = () => {
           />
         </div>
 
-
       <div className="flex items-center gap-6 md:gap-10">
         {/* Notifications */}
         <Link to={'/lockedin/notifications'} className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-slate-600 hover:text-purple-500 transition-colors">
@@ -32,15 +37,19 @@ export const DashboardHeader = () => {
         </Link>
 
         {/* Profile Picture */}
-       <Link to={'/lockedin/profile-settings'} className="w-10 h-10 rounded-full bg-slate-200 overflow-hidden border-2 border-purple-500">
-          <img
-            alt="User Profile"
-            className="w-full h-full object-cover"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHdJM_IMxFny9z7zuCwC5G3fA4cSdflQJCZ0oXsjNmvii6OpAxNxz85wKVeKDROwx_AJQ1dIAYh-ayH4r9SNVH6FU8DFzjEdOKhhMbylDqhjNrW0DI_7b2Az66SNvIOIE4wpVHwmcXgI8a3bqW7lYnE9O3LywNyVoY3hJ4hdcRcKIGIgJmd939vyINbr7NqwWTY4PT0mhjYB9RaZajxt1ocASHOaeQv-eCEQ2wPYlYQa4smpAp_fdkUpVD9T6l3smacr_vcy3_mSzi"
-          />
+        <Link to={'/lockedin/profile-settings'} className="w-10 h-10 rounded-full bg-slate-200 overflow-hidden border-2 border-purple-500 flex items-center justify-center">
+          {user?.profile_picture ? (
+            <img
+              alt={user.full_name || 'User Profile'}
+              className="w-full h-full object-cover"
+              src={user.profile_picture}
+            />
+          ) : (
+            <span className="text-sm font-bold text-slate-600">{initials}</span>
+          )}
         </Link>
         </div>
       </div>
     </header>
   );
-};
+};

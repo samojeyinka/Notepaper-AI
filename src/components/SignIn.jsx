@@ -1,30 +1,62 @@
 import React, { useState } from 'react';
 import { BsFacebook, BsGoogle } from 'react-icons/bs';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import Alert from './globals/Alert';
+import Toast from './globals/Toast';
 
 export default function SignIn() {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  // Where to go after login — set by ProtectedRoute when redirecting
+  const from = location.state?.from?.pathname || '/lockedin';
+
+  const [formData, setFormData] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [id]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form submitted:', { ...formData, rememberMe });
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const result = await login({ ...formData, remember_me: rememberMe });
+
+      if (result.requires2fa) {
+        // Pass temp_token to 2FA page via state (not URL — keeps it off the address bar)
+        navigate('/auth/2fa', { state: { tempToken: result.tempToken }, replace: true });
+        return;
+      }
+
+      setSuccess({ message: 'Welcome back! Taking you in...' });
+      setTimeout(() => navigate(from, { replace: true }), 1500);
+    } catch (err) {
+      if (err?.message?.toLowerCase().includes('restore') || err?.message?.toLowerCase().includes('trashed')) {
+        navigate('/restore-account', { state: { email: formData.email } });
+        return;
+      }
+      let details = [];
+      if (err?.errors) details = Object.values(err.errors).flat();
+      setError({ message: err?.message || 'Login failed. Please check your credentials.', details });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <main className="w-full max-w-6xl mx-auto flex flex-col md:flex-row overflow-hidden bg-white  min-h-[85vh]">
+    <>
+      <main className="w-full max-w-6xl mx-auto flex flex-col md:flex-row overflow-hidden bg-white min-h-[85vh]">
       {/* Left Section - Decorative */}
       <section className="hidden md:flex flex-1 relative p-12 overflow-hidden items-center justify-center border-r border-stone-200" style={{
         backgroundColor: '#fdfaf3',
@@ -40,10 +72,10 @@ export default function SignIn() {
               filter: 'drop-shadow(2px 4px 6px rgba(0,0,0,0.1))',
               border: '1px solid #e7e2d5',
             }}>
-              <h1 className="text-4xl md:text-5xl font-extrabold text-slate-800 mb-6 leading-tight">
+              <h1 className="text-3xl md:text-4xl font-bold text-slate-800 mb-6 leading-tight">
                 Turn thoughts into <span className="font-display italic text-purple-600">masterpieces.</span>
               </h1>
-              <p className="text-slate-600 text-lg font-medium opacity-90">
+              <p className="text-slate-600 text-[16px] font-normal opacity-90">
                 The AI-powered creative hub for modern thinkers, students, and professionals.
               </p>
             </div>
@@ -73,7 +105,7 @@ export default function SignIn() {
                 boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
                 backdropFilter: 'blur(1px)',
               }}></div>
-              <p className="handwritten text-xl leading-none text-rose-800 pt-2">
+              <p className="handwritten text-[15px] leading-none text-rose-800 pt-2">
                 "This app changed my whole workflow..."
               </p>
               <div className="flex items-center gap-2 mt-2">
@@ -82,7 +114,7 @@ export default function SignIn() {
                   className="w-6 h-6 rounded-full border border-rose-200"
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8Xu1OjV5L3VKF6dwYX_LVs0lUBVgEl1Sx4GZuWU6dUCKTUS_XQh8zRjTZZeJUri_YHl0bjKdpUKlVdVq3RxPasgqwThglTNPNhmd8XNNCTgYhjRspL6nKRF9M7e41p3z74BDxIcbegQoXDl86RONwEg-n8DrL3n5Gl_4I3uf8GWyGZ6YOJFK08FWIFKSs6VsLduzQCXF2AtEpTxkh7t4y5O7yDRV448fhgFjR7BRgjsD9q4_0ev69zQaKbFhzs8ufQzi6K-b2LFHU"
                 />
-                <span className="text-[10px] uppercase tracking-wider font-bold text-rose-700">Alex R.</span>
+                <span className="text-[10px] uppercase tracking-wider font-bold text-rose-700">Sam O.</span>
               </div>
             </div>
 
@@ -121,7 +153,7 @@ export default function SignIn() {
 
           {/* Header */}
           <header className="mb-10">
-            <h2 className="text-3xl font-extrabold text-slate-900 mb-2">Welcome Back</h2>
+            <h2 className="text-3xl font-bold text-slate-900 mb-2">Welcome Back</h2>
             <p className="text-slate-500">Continue your creative journey.</p>
           </header>
 
@@ -148,6 +180,8 @@ export default function SignIn() {
 
           {/* Form */}
           <form className="space-y-6" onSubmit={handleSubmit}>
+            {error && <Alert type="error" message={error.message} details={error.details} />}
+
             {/* Email Input */}
             <div className="group">
               <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-1" htmlFor="email">
@@ -240,13 +274,12 @@ export default function SignIn() {
                 </svg>
               </div>
               <button
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-[0.98]"
-                style={{
-                  boxShadow: '0 20px 25px -5px rgba(147, 51, 234, 0.2)',
-                }}
+                className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
+                style={{ boxShadow: '0 20px 25px -5px rgba(147, 51, 234, 0.2)' }}
                 type="submit"
+                disabled={loading}
               >
-                Log In
+                {loading ? 'Signing in...' : 'Log In'}
               </button>
             </div>
           </form>
@@ -255,16 +288,18 @@ export default function SignIn() {
           <footer className="mt-8 text-center">
             <p className="text-slate-500 text-sm">
               Don't have an account?{' '}
-              <Link to={'/signup'} className="text-purple-600 font-bold hover:underline handwritten text-lg ml-1" href="#">
+              <Link to={'/signup'} className="text-purple-600 font-medium hover:underline handwritten text-lg ml-1" href="#">
                 Sign up here
               </Link>
             </p>
           </footer>
         </div>
 
-    
       </section>
-      
+
     </main>
+
+    <Toast message={success?.message} type="success" onClose={() => setSuccess(null)} />
+    </>
   );
 }

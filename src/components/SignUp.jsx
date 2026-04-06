@@ -1,15 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BsFacebook, BsGoogle } from 'react-icons/bs';
 import { Link } from 'react-router-dom';
+import { authService } from '../api/authService';
+import { userService } from '../api/userService';
+import Alert from './globals/Alert';
+import Toast from './globals/Toast';
+import UserTypeSelect from './globals/UserTypeSelect';
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
-    name: '',
+    full_name: '',
     email: '',
     password: '',
+    type: '',
   });
   const [showPassword, setShowPassword] = useState(false);
   const [agreeToTerms, setAgreeToTerms] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+  const [userTypes, setUserTypes] = useState([]);
+  const [loadingTypes, setLoadingTypes] = useState(true);
+
+  useEffect(() => {
+    const fetchUserTypes = async () => {
+      try {
+        const response = await userService.getUserTypes();
+        const types = response.data || response;
+        if (Array.isArray(types)) {
+          setUserTypes(types);
+        } else {
+          console.error('Expected array of user types, got:', response);
+        }
+      } catch (err) {
+        console.error('Failed to load user types:', err);
+      } finally {
+        setLoadingTypes(false);
+      }
+    };
+    fetchUserTypes();
+  }, []);
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
@@ -19,9 +49,44 @@ export default function SignUp() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
+    
+    if (!formData.type) {
+      setError({ message: 'Please select a user type' });
+      return;
+    }
+    
+    if (!agreeToTerms) {
+      setError({ message: 'You must agree to the Terms and Privacy Policy' });
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
+    
+    try {
+      const payload = {
+        ...formData,
+        agreeToTerms: agreeToTerms,
+      };
+      const response = await authService.signup(payload);
+      setSuccess({ message: response.message || 'Success! Please check your email to verify your account.' });
+    } catch (err) {
+      console.error('Signup error:', err);
+      let details = [];
+      if (err?.errors) {
+        details = Object.values(err.errors).flat();
+      }
+      
+      setError({ 
+        message: err?.message || 'An error occurred during signup',
+        details: details
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -41,10 +106,10 @@ export default function SignUp() {
               filter: 'drop-shadow(2px 4px 6px rgba(0,0,0,0.1))',
               border: '1px solid #e7e2d5',
             }}>
-              <h1 className="text-4xl md:text-5xl font-extrabold text-slate-800 mb-6 leading-tight">
+              <h1 className="text-3xl md:text-4xl font-bold text-slate-800 mb-6 leading-tight">
                 Turn thoughts into <span className="font-display italic text-purple-600">masterpieces.</span>
               </h1>
-              <p className="text-slate-600 text-lg font-medium opacity-90">
+              <p className="text-slate-600 text-[16px] font-normal opacity-90">
                 The AI-powered creative hub for modern thinkers, students, and professionals.
               </p>
             </div>
@@ -74,7 +139,7 @@ export default function SignUp() {
                 boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
                 backdropFilter: 'blur(1px)',
               }}></div>
-              <p className="handwritten text-xl leading-none text-rose-800 pt-2">
+              <p className="handwritten text-[15px] leading-none text-rose-800 pt-2">
                 "This app changed my whole workflow..."
               </p>
               <div className="flex items-center gap-2 mt-2">
@@ -83,7 +148,7 @@ export default function SignUp() {
                   className="w-6 h-6 rounded-full border border-rose-200"
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8Xu1OjV5L3VKF6dwYX_LVs0lUBVgEl1Sx4GZuWU6dUCKTUS_XQh8zRjTZZeJUri_YHl0bjKdpUKlVdVq3RxPasgqwThglTNPNhmd8XNNCTgYhjRspL6nKRF9M7e41p3z74BDxIcbegQoXDl86RONwEg-n8DrL3n5Gl_4I3uf8GWyGZ6YOJFK08FWIFKSs6VsLduzQCXF2AtEpTxkh7t4y5O7yDRV448fhgFjR7BRgjsD9q4_0ev69zQaKbFhzs8ufQzi6K-b2LFHU"
                 />
-                <span className="text-[10px] uppercase tracking-wider font-bold text-rose-700">Alex R.</span>
+                <span className="text-[10px] uppercase tracking-wider font-bold text-rose-700">Sam O.</span>
               </div>
             </div>
 
@@ -121,7 +186,7 @@ export default function SignUp() {
        
           {/* Header */}
           <header className="mb-10">
-            <h2 className="text-3xl font-extrabold text-slate-900 mb-2">Join the Hub</h2>
+            <h2 className="text-3xl font-bold text-slate-900 mb-2">Join the Hub</h2>
             <p className="text-slate-500">Start your creative journey in seconds.</p>
           </header>
 
@@ -148,17 +213,21 @@ export default function SignUp() {
 
           {/* Form */}
           <form className="space-y-6" onSubmit={handleSubmit}>
+            {error && (
+              <Alert type="error" message={error.message} details={error.details} />
+            )}
+
             {/* Name Input */}
             <div className="group">
-              <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-1" htmlFor="name">
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-1" htmlFor="full_name">
                 Full Name
               </label>
               <input
                 className="w-full ruled-input focus:ring-0 text-slate-800 placeholder-slate-300"
-                id="name"
+                id="full_name"
                 placeholder="Type your name..."
                 type="text"
-                value={formData.name}
+                value={formData.full_name}
                 onChange={handleInputChange}
                 style={{
                   border: 'none',
@@ -191,6 +260,16 @@ export default function SignUp() {
                   paddingRight: 0,
                   borderRadius: 0,
                 }}
+              />
+            </div>
+
+            {/* Type Input */}
+            <div className="relative">
+              <UserTypeSelect
+                value={formData.type}
+                onChange={(val) => setFormData((prev) => ({ ...prev, type: val }))}
+                options={userTypes}
+                loading={loadingTypes}
               />
             </div>
 
@@ -240,17 +319,17 @@ export default function SignUp() {
                 checked={agreeToTerms}
                 onChange={(e) => setAgreeToTerms(e.target.checked)}
               />
-              <label className="text-xs text-slate-500" htmlFor="terms">
+              <a href="/privacy" className="text-xs text-slate-500" htmlFor="terms">
                 I agree to the{' '}
-                <a className="text-purple-600 font-semibold" href="#">
-                  Terms
-                </a>{' '}
-                and{' '}
-                <a className="text-purple-600 font-semibold" href="#">
+                <span className="text-purple-600 font-semibold" href="#">
                   Privacy
-                </a>
+                </span>{' '}
+                and{' '}
+                <span className="text-purple-600 font-semibold" href="#">
+                  Data security
+                </span>
                 .
-              </label>
+              </a>
             </div>
 
             {/* Submit Button */}
@@ -267,13 +346,14 @@ export default function SignUp() {
                 </svg>
               </div>
               <button
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-[0.98]"
+                className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
                 style={{
                   boxShadow: '0 20px 25px -5px rgba(147, 51, 234, 0.2)',
                 }}
                 type="submit"
+                disabled={loading}
               >
-                Create Free Account
+                {loading ? 'Creating Account...' : 'Create Free Account'}
               </button>
             </div>
           </form>
@@ -282,7 +362,7 @@ export default function SignUp() {
           <footer className="mt-8 text-center">
             <p className="text-slate-500 text-sm">
               Already have an account?{' '}
-              <Link to={'/signin'} className="text-purple-600 font-bold hover:underline handwritten text-lg ml-1" href="#">
+              <Link to={'/signin'} className="text-purple-600 font-medium hover:underline handwritten text-lg ml-1" href="#">
                 Log in here
               </Link>
             </p>
@@ -291,6 +371,13 @@ export default function SignUp() {
 
        
       </section>
+
+      {/* Success Toast */}
+      <Toast 
+        message={success?.message} 
+        type="success" 
+        onClose={() => setSuccess(null)} 
+      />
     </main>
   );
 }

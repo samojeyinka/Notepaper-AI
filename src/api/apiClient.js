@@ -1,20 +1,26 @@
 /**
  * Base API Client
- * This is where you configure your base URL, headers, and interceptors.
- * You can easily swap 'fetch' for 'axios' here if needed.
+ * Token is stored in memory only (not localStorage/cookies).
+ * AuthContext injects the token via setApiToken() after login.
  */
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
-export const apiClient = async (endpoint, { body, ...customConfig } = {}) => {
-  const headers = { 'Content-Type': 'application/json' };
-  
-  // You can add auth tokens here from localStorage/context
-  // const token = localStorage.getItem('token');
-  // if (token) headers.Authorization = `Bearer ${token}`;
+// Token is no longer kept in memory or headers! 
+// It is securely sent to the backend as an HttpOnly cookie automatically.
+
+export const apiClient = async (endpoint, { body, method, ...customConfig } = {}) => {
+  const headers = {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  };
+
+  // We NO LONGER set 'Authorization: Bearer' manually.
+  // The browser automatically attaches the HttpOnly cookie.
 
   const config = {
-    method: body ? 'POST' : 'GET',
+    method: method || (body ? 'POST' : 'GET'),
+    credentials: 'include', // <--- CRITICAL for sending cookies cross-origin
     ...customConfig,
     headers: {
       ...headers,
@@ -29,13 +35,13 @@ export const apiClient = async (endpoint, { body, ...customConfig } = {}) => {
   try {
     const response = await fetch(`${BASE_URL}${endpoint}`, config);
     const data = await response.json();
-    
+
     if (response.ok) {
       return data;
     }
-    
-    throw new Error(data.message || 'Something went wrong');
+
+    return Promise.reject(data);
   } catch (error) {
-    return Promise.reject(error.message || error);
+    return Promise.reject(error);
   }
 };

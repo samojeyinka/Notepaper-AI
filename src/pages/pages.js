@@ -4,6 +4,8 @@ import SignUpPage from './SignUpPage';
 import SignInPage from './SignInPage';
 import ForgotPasswordPage from './ForgotPasswordPage';
 import CheckMailPage from './CheckMailPage';
+import VerifyEmailPage from './VerifyEmailPage';
+import TwoFactorPage from './TwoFactorPage';
 import AboutUsPage from './AboutUsPage';
 import FeaturesPage from './FeaturesPage';
 import ContactUsPage from './ContactUsPage';
@@ -23,6 +25,10 @@ import HelpSupportPage from './HelpSupportPage';
 import SupportTicketsPage from './SupportTicketsPage';
 import NewSupportTicketsPage from './NewSupportTicketsPage';
 import SupportTicketPage from './SupportTicketPage';
+import ResetPasswordPage from './ResetPasswordPage';
+import RestoreAccountPage from './RestoreAccountPage';
+import RestoreAccountFinalPage from './RestoreAccountFinalPage';
+import DeleteAccountPage from './DeleteAccountPage';
 
 export{
     LandingPage,
@@ -30,7 +36,13 @@ export{
     SignUpPage,
     SignInPage,
     ForgotPasswordPage,
+    ResetPasswordPage,
+    RestoreAccountPage,
+    RestoreAccountFinalPage,
+    DeleteAccountPage,
     CheckMailPage,
+    VerifyEmailPage,
+    TwoFactorPage,
     AboutUsPage,
     HelpSupportPage,
     FeaturesPage,
