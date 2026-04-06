@@ -25,6 +25,15 @@ export const Note = () => {
     const [textColor, setTextColor] = useState("#1e293b");
     const [paperColor, setPaperColor] = useState("#ffffff");
     const [lineColor, setLineColor] = useState("#cbd5e1");
+    const [recentColors, setRecentColors] = useState(["#ffffff", "#FDFBF7", "#F0FDF4", "#F0F9FF", "#A78BFA", "#F472B6"]);
+
+    const addRecentColor = (color) => {
+        if (!color) return;
+        setRecentColors(prev => {
+            const filtered = prev.filter(c => c.toLowerCase() !== color.toLowerCase());
+            return [color, ...filtered].slice(0, 6);
+        });
+    };
 
     const editorRef = useRef(null);
 
@@ -102,6 +111,7 @@ export const Note = () => {
                     textColor={textColor} setTextColor={setTextColor}
                     paperColor={paperColor} setPaperColor={setPaperColor}
                     lineColor={lineColor} setLineColor={setLineColor}
+                    recentColors={recentColors} onAddRecentColor={addRecentColor}
                 />
             </div>
         </div>

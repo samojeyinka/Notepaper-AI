@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
+import { FontFamilySelect } from "./FontFamilySelect";
+import { HexColorPicker } from "react-colorful";
 
 export const NoteSettingsSidebar = ({ 
     isOpen, 
@@ -16,7 +18,9 @@ export const NoteSettingsSidebar = ({
     paperColor,
     setPaperColor,
     lineColor,
-    setLineColor
+    setLineColor,
+    recentColors,
+    onAddRecentColor
 }) => {
   const paperOptions = [
     { id: "plain", name: "Plain", pattern: "" },
@@ -31,24 +35,59 @@ export const NoteSettingsSidebar = ({
     { id: "fun", name: "Fun (Indie Flower)", class: "font-handwriting3" },
   ];
 
-  const colorPresets = [
-    { id: "white", color: "#ffffff" },
-    { id: "cream", color: "#FDFBF7" },
-    { id: "mint", color: "#F0FDF4" },
-    { id: "sky", color: "#F0F9FF" },
-  ];
+  const [activePicker, setActivePicker] = useState(null); // 'paper', 'line', 'text' or null
 
-  const ColorInput = ({ label, value, onChange }) => (
-    <div className="flex items-center justify-between gap-4 p-3 bg-slate-50 border border-slate-100 rounded-xl">
-        <label className="text-xs font-bold text-slate-500 uppercase">{label}</label>
-        <input 
-            type="color" 
-            value={value} 
-            onChange={(e) => onChange(e.target.value)}
-            className="w-8 h-8 rounded cursor-pointer border-none p-0 bg-transparent"
-        />
-    </div>
-  );
+  const ColorInput = ({ label, id, value, onChange }) => {
+    const isExpanded = activePicker === id;
+    const pickerRef = React.useRef(null);
+
+    React.useEffect(() => {
+        if (!isExpanded) return;
+        const handleClickOutside = (e) => {
+            if (pickerRef.current && !pickerRef.current.contains(e.target)) {
+                onAddRecentColor(value);
+                setActivePicker(null);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [isExpanded, value]);
+
+    return (
+        <div ref={pickerRef} className="space-y-3 p-4 bg-slate-50 border border-slate-100 rounded-2xl transition-all">
+            <div className="flex items-center justify-between cursor-pointer" onClick={() => setActivePicker(isExpanded ? null : id)}>
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{label}</label>
+                <div className="flex items-center gap-3">
+                    <span className="text-xs font-mono text-slate-500 uppercase">{value}</span>
+                    <div className="w-8 h-8 rounded-lg shadow-sm border-2 border-white" style={{ backgroundColor: value }} />
+                </div>
+            </div>
+            
+            {isExpanded && (
+                <div className="space-y-4 py-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="custom-color-picker">
+                        <HexColorPicker 
+                            color={value} 
+                            onChange={(color) => {
+                                onChange(color);
+                            }} 
+                        />
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <span className="text-slate-400 text-xs font-bold px-2">HEX</span>
+                        <input 
+                            type="text"
+                            value={value}
+                            onChange={(e) => onChange(e.target.value)}
+                            onBlur={() => onAddRecentColor(value)}
+                            className="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm font-mono text-slate-700 outline-none focus:border-primary uppercase"
+                        />
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+  };
 
   const SliderInput = ({ label, value, min, max, unit, onChange }) => (
     <div className="space-y-2">
@@ -68,13 +107,13 @@ export const NoteSettingsSidebar = ({
 
   return (
     <div className="fixed inset-0 z-[60] flex justify-end">
-      <div className="absolute inset-0 bg-slate-900/20 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-slate-900/10 backdrop-blur-[2px]" onClick={onClose} />
       
-      <aside className="relative w-80 bg-white h-full shadow-2xl p-6 flex flex-col gap-8 animate-in slide-in-from-right duration-300 overflow-y-auto custom-scrollbar">
+      <aside className="relative w-80 bg-white h-full shadow-2xl p-6 flex flex-col gap-8 animate-in slide-in-from-right duration-300 overflow-y-auto custom-scrollbar border-l border-slate-100">
         <div className="flex items-center justify-between">
           <h3 className="text-xl font-bold font-display text-slate-900">Note Preferences</h3>
-          <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
-            <span className="material-icons-round text-slate-500">close</span>
+          <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400">
+             <span className="material-icons-round">close</span>
           </button>
         </div>
 
@@ -85,7 +124,7 @@ export const NoteSettingsSidebar = ({
               <button
                 key={option.id}
                 onClick={() => setPaperStyle(option.id)}
-                className={`p-3 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${paperStyle === option.id ? "border-primary bg-primary/5 shadow-md shadow-primary/20" : "border-slate-100 hover:border-slate-200"}`}
+                className={`p-3 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 ${paperStyle === option.id ? "border-primary bg-primary/5 shadow-md shadow-primary/10" : "border-slate-50 hover:border-slate-100"}`}
               >
                 <div className={`w-8 h-8 rounded bg-white shadow-sm border border-slate-100 ${option.pattern}`} />
                 <span className="text-[10px] font-bold uppercase tracking-tighter text-slate-600">{option.name}</span>
@@ -100,41 +139,68 @@ export const NoteSettingsSidebar = ({
         </section>
 
         <section>
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Typography</p>
-          <div className="grid grid-cols-1 gap-2">
-            {fontOptions.map((option) => (
-              <button
-                key={option.id}
-                onClick={() => setFontFamily(option.id)}
-                className={`w-full p-3 rounded-xl border-2 transition-all text-left flex items-center justify-between ${fontFamily === option.id ? "border-primary bg-primary/5" : "border-slate-100 hover:border-slate-200"}`}
-              >
-                <span className={`${option.class} text-[15px] text-slate-700`}>{option.name}</span>
-                {fontFamily === option.id && <span className="material-icons-round text-primary text-sm">check_circle</span>}
-              </button>
-            ))}
-          </div>
+          <FontFamilySelect value={fontFamily} onChange={setFontFamily} options={fontOptions} />
         </section>
 
         <section className="space-y-4">
             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Color Customization</p>
-            <ColorInput label="Paper Color" value={paperColor} onChange={setPaperColor} />
-            <ColorInput label="Line Color" value={lineColor} onChange={setLineColor} />
-            <ColorInput label="Initial Ink" value={textColor} onChange={setTextColor} />
-            <div className="flex gap-2 pt-2">
-                {colorPresets.map((preset) => (
-                    <button key={preset.id} onClick={() => setPaperColor(preset.color)} className={`w-8 h-8 rounded-full border-2 transition-all p-0.5 ${paperColor === preset.color ? "border-primary" : "border-transparent"}`}>
-                        <div className="w-full h-full rounded-full shadow-inner border border-slate-200" style={{ backgroundColor: preset.color }} />
-                    </button>
-                ))}
+            <ColorInput label="Paper Color" id="paper" value={paperColor} onChange={setPaperColor} />
+            <ColorInput label="Line Color" id="line" value={lineColor} onChange={setLineColor} />
+            <ColorInput label="Initial Ink" id="text" value={textColor} onChange={setTextColor} />
+            
+            <div className="pt-4 border-t border-slate-100">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Latest Used Colors</p>
+                <div className="flex flex-wrap gap-2.5">
+                    {recentColors.map((color, idx) => (
+                        <button 
+                            key={`${color}-${idx}`} 
+                            onClick={() => {
+                                if (activePicker === 'paper') setPaperColor(color);
+                                else if (activePicker === 'line') setLineColor(color);
+                                else if (activePicker === 'text') setTextColor(color);
+                                else setPaperColor(color); // Default
+                            }} 
+                            className="group relative"
+                        >
+                            <div 
+                                className="w-8 h-8 rounded-full shadow-inner border-2 border-white transition-transform hover:scale-110 active:scale-95" 
+                                style={{ backgroundColor: color }} 
+                            />
+                            <div className="absolute -top-8 left-1/2 -translate-x-1/2 hidden group-hover:block bg-slate-800 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap z-50">
+                                {color}
+                            </div>
+                        </button>
+                    ))}
+                </div>
             </div>
         </section>
 
         <div className="mt-auto py-4 border-t border-slate-100">
-          <button onClick={onClose} className="w-full bg-slate-900 text-white py-3 rounded-xl font-bold shadow-lg hover:bg-black transition-all">
-            Done
+          <button onClick={onClose} className="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:bg-black transition-all active:scale-[0.98]">
+            Apply Changes
           </button>
         </div>
       </aside>
+
+      <style>{`
+        .custom-color-picker .react-colorful {
+            width: 100% !important;
+            height: 160px !important;
+            border-radius: 12px;
+        }
+        .custom-color-picker .react-colorful__saturation {
+            border-bottom: 8px solid #f8fafc;
+            border-radius: 12px 12px 0 0;
+        }
+        .custom-color-picker .react-colorful__hue {
+            height: 12px !important;
+            border-radius: 0 0 12px 12px;
+        }
+        .custom-color-picker .react-colorful__pointer {
+            width: 18px !important;
+            height: 18px !important;
+        }
+      `}</style>
     </div>
   );
 };
