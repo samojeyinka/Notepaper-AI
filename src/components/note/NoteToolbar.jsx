@@ -5,6 +5,8 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
   const [showTextColor, setShowTextColor] = useState(false);
   const [showHighlight, setShowHighlight] = useState(false);
   const [showFontSize, setShowFontSize] = useState(false);
+  const [showUrlInput, setShowUrlInput] = useState(false);
+  const [url, setUrl] = useState("");
 
   const fontSizeOptions = [
     { label: 'Small', value: '1', icon: 'text_fields' },
@@ -13,9 +15,15 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
     { label: 'XL', value: '7', icon: 'text_fields' },
   ];
 
-  const ToolbarButton = ({ icon, action, active, disabled, title }) => (
+  const ToolbarButton = ({ icon, action, active, disabled, title, onClick }) => (
     <button 
-      onMouseDown={(e) => { e.preventDefault(); !disabled && onAction(action); }}
+      onMouseDown={(e) => { 
+        e.preventDefault(); 
+        if (!disabled) {
+          if (onClick) onClick();
+          else onAction(action); 
+        }
+      }}
       className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all active:scale-90 relative
         ${active ? 'bg-primary text-white shadow-lg shadow-primary/30' : 'bg-slate-100/50 text-slate-600 hover:bg-slate-200'}
         ${disabled ? 'opacity-40 cursor-not-allowed' : ''}`}
@@ -23,6 +31,37 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
     >
       <span className="material-icons-round text-[20px]">{icon}</span>
     </button>
+  );
+
+  const UrlInputPopover = () => (
+    <div 
+      className="absolute left-full ml-3 top-0 bg-white border border-slate-100 rounded-2xl shadow-2xl p-4 z-50 w-64 animate-in slide-in-from-left-2 duration-150 flex flex-col gap-3"
+      onMouseDown={(e) => e.preventDefault()} 
+    >
+      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Insert Link</p>
+      <input 
+        type="text"
+        placeholder="Paste URL here..."
+        value={url}
+        autoFocus
+        onChange={(e) => setUrl(e.target.value)}
+        className="w-full bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 text-xs text-slate-700 outline-none focus:border-primary"
+      />
+      <div className="flex gap-2">
+        <button 
+          onMouseDown={(e) => { e.preventDefault(); onAction('createLink', url); setShowUrlInput(false); setUrl(""); }}
+          className="flex-1 bg-primary text-white py-2 rounded-xl text-[11px] font-bold"
+        >
+          Insert
+        </button>
+        <button 
+          onMouseDown={(e) => { e.preventDefault(); setShowUrlInput(false); }}
+          className="bg-slate-100 text-slate-500 px-3 py-2 rounded-xl text-[11px] font-bold"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
   );
 
   const AdvancedColorPicker = ({ color, onChange, onClose, title }) => {
@@ -99,7 +138,7 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
   };
 
   return (
-    <aside className="w-16 border-r border-slate-200 bg-white flex flex-col items-center py-6 gap-5 relative z-30 shrink-0 select-none">
+    <aside className="w-16 border-r border-slate-200 bg-white flex flex-col items-center py-6 gap-5 relative z-30 shrink-0 select-none overflow-y-auto custom-scrollbar overflow-x-visible">
       <style>{`
         .custom-toolbar-picker .react-colorful {
             width: 100% !important;
@@ -121,7 +160,7 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
       `}</style>
 
       {/* 1. Basic Formatting */}
-      <div className="flex flex-col gap-2.3">
+      <div className="flex flex-col gap-2">
         <ToolbarButton 
           icon="format_bold" action="bold" active={activeState?.bold} title="Bold" 
         />
@@ -131,6 +170,30 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
         <ToolbarButton 
           icon="format_underlined" action="underline" active={activeState?.underline} title="Underline" 
         />
+        <div className="relative">
+          <ToolbarButton 
+            icon="link" action="link" active={showUrlInput} title="Link" onClick={() => setShowUrlInput(!showUrlInput)}
+          />
+          {showUrlInput && <UrlInputPopover />}
+        </div>
+      </div>
+
+      <div className="h-px w-8 bg-slate-100" />
+
+      {/* 2. Alignment tools */}
+      <div className="flex flex-col gap-2">
+        <ToolbarButton 
+          icon="format_align_left" action="justifyLeft" active={activeState?.align === 'left'} title="Align Left" 
+        />
+        <ToolbarButton 
+          icon="format_align_center" action="justifyCenter" active={activeState?.align === 'center'} title="Align Center" 
+        />
+        <ToolbarButton 
+          icon="format_align_right" action="justifyRight" active={activeState?.align === 'right'} title="Align Right" 
+        />
+        <ToolbarButton 
+          icon="format_align_justify" action="justifyFull" active={activeState?.align === 'justify'} title="Justify" 
+        />
       </div>
 
       <div className="h-px w-8 bg-slate-100" />
@@ -139,7 +202,7 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
       <div className="flex flex-col gap-2.5">
         <div className="relative">
           <button 
-            onMouseDown={(e) => { e.preventDefault(); setShowFontSize(!showFontSize); setShowTextColor(false); setShowHighlight(false); }}
+            onMouseDown={(e) => { e.preventDefault(); setShowFontSize(!showFontSize); setShowTextColor(false); setShowHighlight(false); setShowUrlInput(false); }}
             className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all
               ${showFontSize ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/20' : 'bg-slate-100/50 text-slate-600 hover:bg-slate-200'}`}
             title="Text Scale"
@@ -186,7 +249,7 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
       <div className="flex flex-col gap-2.5 relative">
         <div className="relative">
           <button 
-            onMouseDown={(e) => { e.preventDefault(); setShowTextColor(!showTextColor); setShowHighlight(false); setShowFontSize(false); }}
+            onMouseDown={(e) => { e.preventDefault(); setShowTextColor(!showTextColor); setShowHighlight(false); setShowFontSize(false); setShowUrlInput(false); }}
             className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${showTextColor ? 'bg-slate-900 text-white' : 'bg-slate-100/50 text-slate-600 hover:bg-slate-200'}`}
             title="Text Color"
           >
@@ -204,7 +267,7 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
 
         <div className="relative">
           <button 
-            onMouseDown={(e) => { e.preventDefault(); setShowHighlight(!showHighlight); setShowTextColor(false); setShowFontSize(false); }}
+            onMouseDown={(e) => { e.preventDefault(); setShowHighlight(!showHighlight); setShowTextColor(false); setShowFontSize(false); setShowUrlInput(false); }}
             className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${showHighlight ? 'bg-slate-900 text-white' : 'bg-slate-100/50 text-slate-600 hover:bg-slate-200'}`}
             title="Highlight"
           >
@@ -234,13 +297,14 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
       </div>
 
       {/* Outside Click Helper */}
-      {(showTextColor || showHighlight || showFontSize) && (
+      {(showTextColor || showHighlight || showFontSize || showUrlInput) && (
         <div 
           className="fixed inset-0 z-10" 
           onMouseDown={() => {
             setShowTextColor(false);
             setShowHighlight(false);
             setShowFontSize(false);
+            setShowUrlInput(false);
           }} 
         />
       )}

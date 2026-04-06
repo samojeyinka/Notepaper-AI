@@ -4,18 +4,23 @@ import { NoteToolbar } from "./NoteToolbar";
 import { NoteEditor } from "./NoteEditor";
 import { NoteAISidebar } from "./NoteAISidebar";
 import { NoteSettingsSidebar } from "./NoteSettingsSidebar";
+import { NotePageSidebar } from "./NotePageSidebar";
 import * as htmlToImage from 'html-to-image';
 import { jsPDF } from "jspdf";
 
 export const Note = () => {
     // Note Data
     const [title, setTitle] = useState("Architecture Lecture Notes");
-    const [content, setContent] = useState(`Modernism in Late 20th Century Architecture...`);
+    const [pages, setPages] = useState([
+        "<h1>Modernism in Late 20th Century Architecture</h1><p>The late 20th century saw a shift from the rigid functionalism of early modernism to something more expressive...</p>"
+    ]);
+    const [activePageIndex, setActivePageIndex] = useState(0);
     const [isSaved, setIsSaved] = useState(true);
 
     // Layout State
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-    const [isAISidebarOpen, setIsAISidebarOpen] = useState(true);
+    const [isAISidebarOpen, setIsAISidebarOpen] = useState(false);
+    const [isPageSidebarOpen, setIsPageSidebarOpen] = useState(true);
 
     // Style State
     const [paperStyle, setPaperStyle] = useState("ruled");
@@ -40,10 +45,11 @@ export const Note = () => {
         italic: false,
         underline: false,
         heading: 'p',
+        align: 'left',
         list: null
     });
 
-    const editorRef = useRef(null);
+    const activeEditorRef = useRef(null);
 
     // Track selection changes to update toolbar icons
     useEffect(() => {
@@ -59,22 +65,32 @@ export const Note = () => {
         };
 
         const handleSelectionChange = () => {
-            if (!editorRef.current) return;
-            
             const selection = window.getSelection();
-            if (selection.rangeCount > 0) {
-                const range = selection.getRangeAt(0);
-                if (!editorRef.current.contains(range.commonAncestorContainer)) return;
-            }
+            if (selection.rangeCount === 0) return;
+            
+            const range = selection.getRangeAt(0);
+            
+            // Check if selection is within the pages container
+            const pagesContainer = document.querySelector('.pages-container');
+            if (pagesContainer && !pagesContainer.contains(range.commonAncestorContainer)) return;
 
             const foreColor = document.queryCommandValue('foreColor');
             const hiliteColor = document.queryCommandValue('hiliteColor') || document.queryCommandValue('backColor');
+            
+            const getAlignment = () => {
+                if (document.queryCommandState('justifyLeft')) return 'left';
+                if (document.queryCommandState('justifyCenter')) return 'center';
+                if (document.queryCommandState('justifyRight')) return 'right';
+                if (document.queryCommandState('justifyFull')) return 'justify';
+                return 'left';
+            };
 
             setActiveToolbarState({
                 bold: document.queryCommandState('bold'),
                 italic: document.queryCommandState('italic'),
                 underline: document.queryCommandState('underline'),
                 heading: getHeadingState(),
+                align: getAlignment(),
                 foreColor: rgbToHex(foreColor),
                 hiliteColor: rgbToHex(hiliteColor),
                 list: document.queryCommandState('insertUnorderedList') ? 'ul' : 
@@ -97,25 +113,56 @@ export const Note = () => {
         setIsSaved(false);
         const timer = setTimeout(() => setIsSaved(true), 1500);
         return () => clearTimeout(timer);
-    }, [title, content, fontSize, lineSpacing, textColor, paperColor, lineColor, paperStyle, fontFamily]);
+    }, [title, pages, fontSize, lineSpacing, textColor, paperColor, lineColor, paperStyle, fontFamily]);
 
     // Formatting Commands
     const handleCommand = (command, value = null) => {
-        if (editorRef.current) {
-            editorRef.current.focus();
-        }
         document.execCommand('styleWithCSS', false, true);
-        document.execCommand(command, false, value);
-        if (editorRef.current) {
-            setContent(editorRef.current.innerHTML);
+        
+        if (command === 'createLink') {
+            if (!value) return;
+            document.execCommand(command, false, value);
+        } else {
+            document.execCommand(command, false, value);
         }
+        
+        // Sync content back to state
+        syncAllPages();
+    };
+
+    const syncAllPages = () => {
+        const pageElements = document.querySelectorAll('.page-content-area');
+        const newPages = Array.from(pageElements).map(el => el.innerHTML);
+        setPages(newPages);
+    };
+
+    const handlePageOverflow = (index) => {
+        // Only trigger if it's the last page OR if we want to support mid-document overflow (complex)
+        // For now, if the current page overflows, we ensure there is a next page
+        if (index === pages.length - 1) {
+            setPages([...pages, ""]);
+            setActivePageIndex(index + 1);
+        }
+    };
+
+    const handleAddPage = () => {
+        setPages([...pages, ""]);
+        setActivePageIndex(pages.length);
+    };
+
+    const handleRemovePage = (index) => {
+        if (pages.length <= 1) return;
+        const newPages = pages.filter((_, i) => i !== index);
+        setPages(newPages);
+        setActivePageIndex(Math.min(activePageIndex, newPages.length - 1));
     };
 
     // Export Logic
     const handleExport = async (format) => {
-        if (!editorRef.current) return;
+        const editorEl = document.querySelector('.pages-container');
+        if (!editorEl) return;
         try {
-            const dataUrl = await htmlToImage.toPng(editorRef.current, { quality: 1.0, pixelRatio: 2 });
+            const dataUrl = await htmlToImage.toPng(editorEl, { quality: 1.0, pixelRatio: 2 });
             if (format === 'png') {
                 const link = document.createElement('a');
                 link.download = `${title.replace(/\s+/g, '-').toLowerCase()}.png`;
@@ -125,9 +172,9 @@ export const Note = () => {
                 const pdf = new jsPDF({
                     orientation: 'portrait',
                     unit: 'px',
-                    format: [editorRef.current.offsetWidth, editorRef.current.offsetHeight]
+                    format: [editorEl.offsetWidth, editorEl.offsetHeight]
                 });
-                pdf.addImage(dataUrl, 'PNG', 0, 0, editorRef.current.offsetWidth, editorRef.current.offsetHeight);
+                pdf.addImage(dataUrl, 'PNG', 0, 0, editorEl.offsetWidth, editorEl.offsetHeight);
                 pdf.save(`${title.replace(/\s+/g, '-').toLowerCase()}.pdf`);
             }
         } catch (error) {
@@ -144,6 +191,8 @@ export const Note = () => {
                 onExportImage={() => handleExport('png')}
                 onCopy={() => alert('Copied!')}
                 onShare={() => alert('Shared!')}
+                onToggleAI={() => setIsAISidebarOpen(!isAISidebarOpen)}
+                isAIOpen={isAISidebarOpen}
             />
 
             <div className="flex flex-1 overflow-hidden relative">
@@ -154,17 +203,52 @@ export const Note = () => {
                     onAddRecentColor={addRecentColor}
                 />
 
-                <NoteEditor 
-                    ref={editorRef} content={content} onContentChange={setContent}
-                    paperStyle={paperStyle} fontFamily={fontFamily} fontSize={fontSize}
-                    lineSpacing={lineSpacing} textColor={textColor} paperColor={paperColor} lineColor={lineColor}
-                />
+                <div className="flex-1 overflow-hidden flex">
+                    <NoteEditor 
+                        pages={pages} 
+                        onContentChange={(index, content) => {
+                            const newPages = [...pages];
+                            newPages[index] = content;
+                            setPages(newPages);
+                        }}
+                        paperStyle={paperStyle} 
+                        fontFamily={fontFamily} 
+                        fontSize={fontSize}
+                        lineSpacing={lineSpacing} 
+                        textColor={textColor} 
+                        paperColor={paperColor} 
+                        lineColor={lineColor}
+                        activePageIndex={activePageIndex}
+                        setActivePageIndex={setActivePageIndex}
+                        onPageOverflow={handlePageOverflow}
+                    />
+
+                    {isPageSidebarOpen && (
+                        <NotePageSidebar 
+                            pages={pages}
+                            activePageIndex={activePageIndex}
+                            onAddPage={handleAddPage}
+                            onRemovePage={handleRemovePage}
+                            onSelectPage={setActivePageIndex}
+                            onCollapse={() => setIsPageSidebarOpen(false)}
+                        />
+                    )}
+                    
+                    {!isPageSidebarOpen && (
+                        <button 
+                            onClick={() => setIsPageSidebarOpen(true)}
+                            className="absolute right-0 top-1/2 -translate-y-1/2 w-6 h-20 bg-white border border-slate-200 rounded-l-xl flex items-center justify-center hover:bg-slate-50 transition-colors z-20"
+                        >
+                            <span className="material-icons-round text-slate-400">chevron_left</span>
+                        </button>
+                    )}
+                </div>
 
                 {isAISidebarOpen && <NoteAISidebar />}
 
                 <button 
                     onClick={() => setIsSettingsOpen(true)}
-                    className="fixed bottom-10 right-80 z-50 w-12 h-12 bg-white border-2 border-primary text-primary rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform"
+                    className="fixed bottom-10 right-10 z-50 w-12 h-12 bg-white border-2 border-primary text-primary rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform"
                 >
                     <span className="material-icons-round">settings</span>
                 </button>

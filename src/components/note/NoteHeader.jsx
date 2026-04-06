@@ -7,7 +7,9 @@ export const NoteHeader = ({
     onExportPDF,
     onExportImage,
     onCopy,
-    onShare 
+    onShare,
+    onToggleAI,
+    isAIOpen
 }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -40,12 +42,32 @@ export const NoteHeader = ({
             </div>
             <div className="flex items-center gap-3">
                 <div className="flex items-center bg-slate-100 rounded-full p-1 mr-4 relative">
-                    <button className="p-2 hover:bg-white rounded-full text-slate-600 transition-all">
-                        <span className="material-icons-round">grid_view</span>
+                    <button 
+                        onClick={onToggleAI}
+                        className={`p-2 rounded-full transition-all duration-500 relative flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95
+                            ${isAIOpen 
+                                ? 'bg-primary text-white shadow-xl shadow-primary/40' 
+                                : 'text-slate-400 hover:bg-white hover:text-primary hover:shadow-lg animate-glow'}`}
+                    >
+                        <span className="material-icons-round text-[20px]">auto_awesome</span>
+                        {!isAIOpen && (
+                            <span className="absolute inset-0 rounded-full border-2 border-primary/20 animate-ping opacity-30 pointer-events-none" />
+                        )}
                     </button>
-                    <button className="p-2 bg-white shadow-sm rounded-full text-primary transition-all">
+                    
+                    <style>{`
+                        @keyframes glow {
+                            0% { box-shadow: 0 0 0 0 rgba(167, 139, 250, 0); }
+                            50% { box-shadow: 0 0 15px 2px rgba(167, 139, 250, 0.3); }
+                            100% { box-shadow: 0 0 0 0 rgba(167, 139, 250, 0); }
+                        }
+                        .animate-glow {
+                            animation: glow 2.5s infinite ease-in-out;
+                        }
+                    `}</style>
+                    {/* <button className="p-2 bg-white shadow-sm rounded-full text-primary transition-all">
                         <span className="material-icons-round">notes</span>
-                    </button>
+                    </button> */}
                     
                     <div className="relative">
                         <button 
