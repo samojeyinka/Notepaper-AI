@@ -6,6 +6,7 @@ import { LandingPage,PricingPage,SignUpPage,
      LockedInPage,UpgradePage, StudyPlanPage,LibraryPage,
      BillingPage,ProfileSettingsPage,ChangePasswordPage,ApplicationSettingsPage,
       NotificationsPage, HelpSupportPage,SupportTicketsPage,NewSupportTicketsPage,SupportTicketPage } from '../pages/pages';
+import NotePage from '../pages/NotePage';
 import ScrollToTop from './ScrollToTop';
 import ProtectedRoute, { GuestRoute } from './ProtectedRoute';
 
@@ -193,7 +194,7 @@ const AppRoutes = createBrowserRouter([
         </ScrollToTop></ProtectedRoute>,       
     },
 
-     {
+    {
         path: '/lockedin/notifications',
         element:<ProtectedRoute><ScrollToTop>
         <NotificationsPage/>
@@ -218,6 +219,13 @@ const AppRoutes = createBrowserRouter([
         path: '/lockedin/support-tickets/show/:id',
         element:<ProtectedRoute><ScrollToTop>
         <SupportTicketPage/>
+        </ScrollToTop></ProtectedRoute>,       
+    },
+
+     {
+        path: '/lockedin/notes/new',
+        element:<ProtectedRoute><ScrollToTop>
+        <NotePage/>
         </ScrollToTop></ProtectedRoute>,       
     },
 

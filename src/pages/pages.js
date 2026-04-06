@@ -29,6 +29,7 @@ import ResetPasswordPage from './ResetPasswordPage';
 import RestoreAccountPage from './RestoreAccountPage';
 import RestoreAccountFinalPage from './RestoreAccountFinalPage';
 import DeleteAccountPage from './DeleteAccountPage';
+import NotePage from './NotePage';
 
 export{
     LandingPage,
@@ -61,6 +62,6 @@ export{
     NotificationsPage,
     SupportTicketsPage,
     NewSupportTicketsPage,
-    SupportTicketPage
-    
+    SupportTicketPage,
+    NotePage
 }

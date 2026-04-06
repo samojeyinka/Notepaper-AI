@@ -1,0 +1,109 @@
+import React, { useState, useEffect, useRef } from "react";
+import { NoteHeader } from "./NoteHeader";
+import { NoteToolbar } from "./NoteToolbar";
+import { NoteEditor } from "./NoteEditor";
+import { NoteAISidebar } from "./NoteAISidebar";
+import { NoteSettingsSidebar } from "./NoteSettingsSidebar";
+import * as htmlToImage from 'html-to-image';
+import { jsPDF } from "jspdf";
+
+export const Note = () => {
+    // Note Data
+    const [title, setTitle] = useState("Architecture Lecture Notes");
+    const [content, setContent] = useState(`Modernism in Late 20th Century Architecture...`);
+    const [isSaved, setIsSaved] = useState(true);
+
+    // Layout State
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const [isAISidebarOpen, setIsAISidebarOpen] = useState(true);
+
+    // Style State
+    const [paperStyle, setPaperStyle] = useState("ruled");
+    const [fontFamily, setFontFamily] = useState("sans");
+    const [fontSize, setFontSize] = useState(18);
+    const [lineSpacing, setLineSpacing] = useState(32);
+    const [textColor, setTextColor] = useState("#1e293b");
+    const [paperColor, setPaperColor] = useState("#ffffff");
+    const [lineColor, setLineColor] = useState("#cbd5e1");
+
+    const editorRef = useRef(null);
+
+    // Handle autosave simulation
+    useEffect(() => {
+        setIsSaved(false);
+        const timer = setTimeout(() => setIsSaved(true), 1500);
+        return () => clearTimeout(timer);
+    }, [title, content, fontSize, lineSpacing, textColor, paperColor, lineColor, paperStyle, fontFamily]);
+
+    // Formatting Commands
+    const handleCommand = (command, value = null) => {
+        document.execCommand(command, false, value);
+    };
+
+    // Export Logic
+    const handleExport = async (format) => {
+        if (!editorRef.current) return;
+        try {
+            const dataUrl = await htmlToImage.toPng(editorRef.current, { quality: 1.0, pixelRatio: 2 });
+            if (format === 'png') {
+                const link = document.createElement('a');
+                link.download = `${title.replace(/\s+/g, '-').toLowerCase()}.png`;
+                link.href = dataUrl;
+                link.click();
+            } else if (format === 'pdf') {
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'px',
+                    format: [editorRef.current.offsetWidth, editorRef.current.offsetHeight]
+                });
+                pdf.addImage(dataUrl, 'PNG', 0, 0, editorRef.current.offsetWidth, editorRef.current.offsetHeight);
+                pdf.save(`${title.replace(/\s+/g, '-').toLowerCase()}.pdf`);
+            }
+        } catch (error) {
+            console.error('Export failed:', error);
+            alert('Failed to export. Please try again.');
+        }
+    };
+
+    return (
+        <div className="flex flex-col flex-1 h-screen overflow-hidden bg-white border-l border-slate-200 lg:ml-64 pt-16 lg:pt-0">
+            <NoteHeader 
+                title={title} onTitleChange={setTitle} isSaved={isSaved}
+                onExportPDF={() => handleExport('pdf')}
+                onExportImage={() => handleExport('png')}
+                onCopy={() => alert('Copied!')}
+                onShare={() => alert('Shared!')}
+            />
+
+            <div className="flex flex-1 overflow-hidden relative">
+                <NoteToolbar onAction={handleCommand} />
+
+                <NoteEditor 
+                    ref={editorRef} content={content} onContentChange={setContent}
+                    paperStyle={paperStyle} fontFamily={fontFamily} fontSize={fontSize}
+                    lineSpacing={lineSpacing} textColor={textColor} paperColor={paperColor} lineColor={lineColor}
+                />
+
+                {isAISidebarOpen && <NoteAISidebar />}
+
+                <button 
+                    onClick={() => setIsSettingsOpen(true)}
+                    className="fixed bottom-10 right-80 z-50 w-12 h-12 bg-white border-2 border-primary text-primary rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform"
+                >
+                    <span className="material-icons-round">settings</span>
+                </button>
+
+                <NoteSettingsSidebar 
+                    isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)}
+                    paperStyle={paperStyle} setPaperStyle={setPaperStyle}
+                    fontFamily={fontFamily} setFontFamily={setFontFamily}
+                    fontSize={fontSize} setFontSize={setFontSize}
+                    lineSpacing={lineSpacing} setLineSpacing={setLineSpacing}
+                    textColor={textColor} setTextColor={setTextColor}
+                    paperColor={paperColor} setPaperColor={setPaperColor}
+                    lineColor={lineColor} setLineColor={setLineColor}
+                />
+            </div>
+        </div>
+    );
+};
