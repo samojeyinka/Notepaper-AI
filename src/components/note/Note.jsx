@@ -126,22 +126,34 @@ export const Note = () => {
             document.execCommand(command, false, value);
         }
         
-        // Sync content back to state
-        syncAllPages();
-    };
-
-    const syncAllPages = () => {
-        const pageElements = document.querySelectorAll('.page-content-area');
-        const newPages = Array.from(pageElements).map(el => el.innerHTML);
-        setPages(newPages);
+        // Sync the current active editor's content
+        if (activeEditorRef.current) {
+            const newPages = [...pages];
+            newPages[activePageIndex] = activeEditorRef.current.innerHTML;
+            setPages(newPages);
+        }
     };
 
     const handlePageOverflow = (index) => {
-        // Only trigger if it's the last page OR if we want to support mid-document overflow (complex)
-        // For now, if the current page overflows, we ensure there is a next page
+        // Only trigger if it's the last page to prevent infinite loops
         if (index === pages.length - 1) {
             setPages([...pages, ""]);
             setActivePageIndex(index + 1);
+        }
+    };
+
+    const handleNoteKeyDown = (e, index) => {
+        if (e.key === 'Backspace') {
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                // If at the very start of the page (except first page), move to previous page
+                if (range.startOffset === 0 && range.collapsed && index > 0) {
+                    e.preventDefault();
+                    setActivePageIndex(index - 1);
+                    // Selection move logic will happen via focusing the previous editor
+                }
+            }
         }
     };
 
@@ -157,7 +169,6 @@ export const Note = () => {
         setActivePageIndex(Math.min(activePageIndex, newPages.length - 1));
     };
 
-    // Export Logic
     const handleExport = async (format) => {
         const editorEl = document.querySelector('.pages-container');
         if (!editorEl) return;
@@ -169,12 +180,20 @@ export const Note = () => {
                 link.href = dataUrl;
                 link.click();
             } else if (format === 'pdf') {
-                const pdf = new jsPDF({
-                    orientation: 'portrait',
-                    unit: 'px',
-                    format: [editorEl.offsetWidth, editorEl.offsetHeight]
-                });
-                pdf.addImage(dataUrl, 'PNG', 0, 0, editorEl.offsetWidth, editorEl.offsetHeight);
+                const pageWidth = 816;
+                const pageHeight = 1056;
+                const pdf = new jsPDF('p', 'px', [pageWidth, pageHeight]);
+                
+                const pageElems = document.querySelectorAll('.page-paper');
+                for (let i = 0; i < pageElems.length; i++) {
+                    const canvas = await htmlToImage.toCanvas(pageElems[i], {
+                        width: pageWidth,
+                        height: pageHeight,
+                        pixelRatio: 2
+                    });
+                    if (i > 0) pdf.addPage();
+                    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, pageWidth, pageHeight);
+                }
                 pdf.save(`${title.replace(/\s+/g, '-').toLowerCase()}.pdf`);
             }
         } catch (error) {
@@ -205,6 +224,7 @@ export const Note = () => {
 
                 <div className="flex-1 overflow-hidden flex">
                     <NoteEditor 
+                        ref={activeEditorRef}
                         pages={pages} 
                         onContentChange={(index, content) => {
                             const newPages = [...pages];
@@ -221,6 +241,7 @@ export const Note = () => {
                         activePageIndex={activePageIndex}
                         setActivePageIndex={setActivePageIndex}
                         onPageOverflow={handlePageOverflow}
+                        onKeyDown={handleNoteKeyDown}
                     />
 
                     {isPageSidebarOpen && (
