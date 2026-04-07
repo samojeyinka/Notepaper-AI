@@ -340,6 +340,7 @@ export const NoteEditor = forwardRef(function NoteEditor(
     drawMode,
     drawingData = [],
     onDrawingChange,
+    onPageRefsReady,
   },
   ref
 ) {
@@ -632,7 +633,12 @@ export const NoteEditor = forwardRef(function NoteEditor(
       {pages.map((content, index) => (
         <div
           key={index}
-          ref={(el) => { pageRefs.current[index] = el; }}
+          ref={(el) => {
+            pageRefs.current[index] = el;
+            if (index === pages.length - 1 && onPageRefsReady) {
+              onPageRefsReady(pageRefs.current.slice(0, pages.length));
+            }
+          }}
         >
           <NotePage
             index={index}
