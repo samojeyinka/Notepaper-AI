@@ -197,6 +197,12 @@ const NotePage = ({
         backgroundSize: `${lineSpacing}px ${lineSpacing}px`,
       };
     }
+    if (paperStyle === 'dotted') {
+      return {
+        backgroundImage: `radial-gradient(circle, ${lineColor} 1.5px, transparent 1.5px)`,
+        backgroundSize: `${lineSpacing}px ${lineSpacing}px`,
+      };
+    }
     return null;
   })();
 

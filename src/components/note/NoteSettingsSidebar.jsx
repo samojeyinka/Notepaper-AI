@@ -26,7 +26,11 @@ export const NoteSettingsSidebar = ({
     { id: "plain", name: "Plain", pattern: "" },
     { id: "ruled", name: "Ruled", pattern: "paper-ruled" },
     { id: "grid", name: "Grid", pattern: "paper-grid" },
+    { id: "dotted", name: "Dotted", pattern: "paper-dotted" },
   ];
+
+  const [paperPage, setPaperPage] = useState(0);
+  const PAPERS_PER_PAGE = 3;
 
   const fontOptions = [
     { id: "sans", name: "Modern Sans", class: "font-sans" },
@@ -119,17 +123,35 @@ export const NoteSettingsSidebar = ({
 
         <section>
           <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Paper Layout</p>
-          <div className="grid grid-cols-3 gap-3">
-            {paperOptions.map((option) => (
-              <button
-                key={option.id}
-                onClick={() => setPaperStyle(option.id)}
-                className={`p-3 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 ${paperStyle === option.id ? "border-primary bg-primary/5 shadow-md shadow-primary/10" : "border-slate-50 hover:border-slate-100"}`}
-              >
-                <div className={`w-8 h-8 rounded bg-white shadow-sm border border-slate-100 ${option.pattern}`} />
-                <span className="text-[10px] font-bold uppercase tracking-tighter text-slate-600">{option.name}</span>
-              </button>
-            ))}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setPaperPage(p => Math.max(0, p - 1))}
+              disabled={paperPage === 0}
+              className="w-7 h-7 rounded-lg flex items-center justify-center bg-slate-100 text-slate-500 hover:bg-slate-200 disabled:opacity-30 disabled:cursor-not-allowed shrink-0 transition-colors"
+            >
+              <span className="material-icons-round text-[16px]">chevron_left</span>
+            </button>
+
+            <div className="grid grid-cols-3 gap-3 flex-1">
+              {paperOptions.slice(paperPage * PAPERS_PER_PAGE, paperPage * PAPERS_PER_PAGE + PAPERS_PER_PAGE).map((option) => (
+                <button
+                  key={option.id}
+                  onClick={() => setPaperStyle(option.id)}
+                  className={`p-3 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 ${paperStyle === option.id ? "border-primary bg-primary/5 shadow-md shadow-primary/10" : "border-slate-50 hover:border-slate-100"}`}
+                >
+                  <div className={`w-8 h-8 rounded bg-white shadow-sm border border-slate-100 ${option.pattern}`} />
+                  <span className="text-[10px] font-bold uppercase tracking-tighter text-slate-600">{option.name}</span>
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={() => setPaperPage(p => Math.min(Math.ceil(paperOptions.length / PAPERS_PER_PAGE) - 1, p + 1))}
+              disabled={paperPage >= Math.ceil(paperOptions.length / PAPERS_PER_PAGE) - 1}
+              className="w-7 h-7 rounded-lg flex items-center justify-center bg-slate-100 text-slate-500 hover:bg-slate-200 disabled:opacity-30 disabled:cursor-not-allowed shrink-0 transition-colors"
+            >
+              <span className="material-icons-round text-[16px]">chevron_right</span>
+            </button>
           </div>
         </section>
 
