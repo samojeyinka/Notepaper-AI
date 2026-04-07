@@ -317,6 +317,15 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
     };
   }, [showTextColor, showHighlight, showFontSize, showUrlInput]);
 
+  // Returns the <a> element wrapping the current selection, if any
+  const getSelectedAnchor = () => {
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0) return null;
+    let node = sel.getRangeAt(0).commonAncestorContainer;
+    if (node.nodeType === Node.TEXT_NODE) node = node.parentNode;
+    return node.closest?.('a') ?? null;
+  };
+
   const saveSelection = () => {
     const sel = window.getSelection();
     if (sel && sel.rangeCount > 0) {
@@ -332,7 +341,11 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
       sel.addRange(savedRangeRef.current);
       savedRangeRef.current = null;
     }
-    if (url.trim()) onAction('createLink', url.trim());
+    if (url.trim()) {
+      let href = url.trim();
+      if (href && !/^https?:\/\//i.test(href)) href = 'https://' + href;
+      onAction('createLink', href);
+    }
     setShowUrlInput(false);
     setUrl("");
   };
@@ -377,7 +390,12 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
               title="Insert Link"
               onAction={onAction}
               onClick={() => {
-                if (!showUrlInput) saveSelection();
+                if (!showUrlInput) {
+                  saveSelection();
+                  // Pre-fill with existing href if cursor is inside a link
+                  const anchor = getSelectedAnchor();
+                  setUrl(anchor ? anchor.getAttribute('href') || '' : '');
+                }
                 setShowUrlInput(v => !v);
                 setShowTextColor(false);
                 setShowHighlight(false);

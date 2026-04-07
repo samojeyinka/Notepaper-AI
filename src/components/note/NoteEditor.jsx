@@ -1,4 +1,5 @@
-import { forwardRef, useEffect, useRef, useCallback } from "react";
+import { forwardRef, useEffect, useRef, useCallback, useState } from "react";
+import { createPortal } from "react-dom";
 
 // US Letter dimensions at 96 dpi: 816 × 1056 px
 const PAGE_HEIGHT = 1056;
@@ -362,7 +363,100 @@ export const NoteEditor = forwardRef(function NoteEditor(
     }
   }, [activePageIndex]);
 
+  // Link hover tooltip
+  const [linkTooltip, setLinkTooltip] = useState(null);
+  const tooltipHideTimer = useRef(null);
+  const currentAnchorRef = useRef(null);
+
+  const scheduleHide = useCallback(() => {
+    clearTimeout(tooltipHideTimer.current);
+    tooltipHideTimer.current = setTimeout(() => setLinkTooltip(null), 400);
+  }, []);
+
+  const cancelHide = useCallback(() => {
+    clearTimeout(tooltipHideTimer.current);
+  }, []);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleMouseOver = (e) => {
+      const anchor = e.target.closest('a[href]');
+      if (!anchor) return;
+
+      // Detach from previous anchor before switching
+      if (currentAnchorRef.current && currentAnchorRef.current !== anchor) {
+        currentAnchorRef.current.removeEventListener('mouseleave', scheduleHide);
+      }
+
+      // Always re-attach so it works after re-hovering the same anchor
+      anchor.removeEventListener('mouseleave', scheduleHide);
+      anchor.addEventListener('mouseleave', scheduleHide);
+      currentAnchorRef.current = anchor;
+
+      cancelHide();
+      const rect = anchor.getBoundingClientRect();
+      setLinkTooltip({
+        href: anchor.getAttribute('href'),
+        anchor,
+        x: rect.left,
+        y: rect.bottom + 6,
+      });
+    };
+
+    container.addEventListener('mouseover', handleMouseOver);
+    return () => {
+      container.removeEventListener('mouseover', handleMouseOver);
+      clearTimeout(tooltipHideTimer.current);
+    };
+  }, [cancelHide, scheduleHide]);
+
   return (
+    <>
+    {linkTooltip && createPortal(
+      <div
+        style={{ position: 'fixed', top: linkTooltip.y, left: linkTooltip.x, zIndex: 9999 }}
+        className="flex items-center gap-1 bg-slate-900 text-white rounded-xl px-3 py-2 shadow-2xl text-[11px] max-w-xs"
+        onMouseEnter={cancelHide}
+        onMouseLeave={scheduleHide}
+      >
+        <span className="material-icons-round text-[13px] text-slate-400 shrink-0">link</span>
+        <span className="truncate flex-1 text-slate-200 max-w-[180px]">{linkTooltip.href}</span>
+        <button
+          onMouseDown={(e) => { e.preventDefault(); window.open(linkTooltip.href, '_blank', 'noopener'); }}
+          className="ml-1 p-1 rounded-lg hover:bg-slate-700 transition-colors shrink-0"
+          title="Open link"
+        >
+          <span className="material-icons-round text-[13px]">open_in_new</span>
+        </button>
+        <button
+          onMouseDown={(e) => { e.preventDefault(); navigator.clipboard.writeText(linkTooltip.href); }}
+          className="p-1 rounded-lg hover:bg-slate-700 transition-colors shrink-0"
+          title="Copy link"
+        >
+          <span className="material-icons-round text-[13px]">content_copy</span>
+        </button>
+        <button
+          onMouseDown={(e) => {
+            e.preventDefault();
+            // Select the anchor text, then remove the link
+            const sel = window.getSelection();
+            const range = document.createRange();
+            range.selectNodeContents(linkTooltip.anchor);
+            sel.removeAllRanges();
+            sel.addRange(range);
+            document.execCommand('unlink');
+            setLinkTooltip(null);
+          }}
+          className="p-1 rounded-lg hover:bg-red-600 transition-colors shrink-0"
+          title="Remove link"
+        >
+          <span className="material-icons-round text-[13px]">link_off</span>
+        </button>
+      </div>,
+      document.body
+    )}
     <div
       ref={containerRef}
       className="flex-1 overflow-y-auto custom-scrollbar"
@@ -405,5 +499,6 @@ export const NoteEditor = forwardRef(function NoteEditor(
       ))}
       <div style={{ height: '80px', flexShrink: 0 }} />
     </div>
+    </>
   );
 });
