@@ -87,6 +87,23 @@ const NotePage = ({
     }
   }, [index, activePageIndex, editorRef]);
 
+  // When this page becomes active and doesn't already have focus (i.e. overflow
+  // moved us here, not a user click), focus it and place cursor at the start.
+  useEffect(() => {
+    if (index !== activePageIndex) return;
+    if (!pageRef.current) return;
+    if (pageRef.current.contains(document.activeElement)) return; // user clicked, leave cursor alone
+
+    pageRef.current.focus();
+    try {
+      const range = document.createRange();
+      range.setStart(pageRef.current, 0);
+      range.collapse(true);
+      const sel = window.getSelection();
+      if (sel) { sel.removeAllRanges(); sel.addRange(range); }
+    } catch (_) { /* empty page — no child nodes yet */ }
+  }, [index, activePageIndex]);
+
   const handleInput = (e) => {
     if (isComposingRef.current) return;
     const newContent = e.currentTarget.innerHTML;
@@ -98,12 +115,13 @@ const NotePage = ({
   const handleCompositionStart = () => { isComposingRef.current = true; };
   const handleCompositionEnd = (e) => { isComposingRef.current = false; handleInput(e); };
 
-  const backgroundStyle = (() => {
+  // Lines only render inside a padded region — creates blank space at top and bottom
+  const lineMargin = lineSpacing * 2; // 2 empty line-heights of breathing room
+  const linesStyle = (() => {
     if (paperStyle === 'ruled') {
       return {
         backgroundImage: `linear-gradient(${lineColor} 1px, transparent 1px)`,
         backgroundSize: `100% ${lineSpacing}px`,
-        backgroundPositionY: '72px',
       };
     }
     if (paperStyle === 'grid') {
@@ -112,7 +130,7 @@ const NotePage = ({
         backgroundSize: `${lineSpacing}px ${lineSpacing}px`,
       };
     }
-    return {};
+    return null;
   })();
 
   const isActive = activePageIndex === index;
@@ -122,21 +140,41 @@ const NotePage = ({
       className="relative shrink-0"
       style={{ width: '816px', height: `${PAGE_HEIGHT}px` }}
     >
-      {/* Paper background */}
+      {/* Paper base — color + shadow/ring only, no lines */}
       <div
         className={`absolute inset-0 rounded-sm transition-all duration-300 ${
           isActive
             ? 'shadow-[0_8px_40px_rgba(0,0,0,0.18)] ring-2 ring-primary ring-offset-4'
             : 'shadow-[0_4px_20px_rgba(0,0,0,0.10)]'
         }`}
-        style={{ backgroundColor: paperColor, ...backgroundStyle }}
+        style={{ backgroundColor: paperColor }}
       />
 
-      {/* Ruled margin line */}
+      {/* Lines layer — clipped so lines don't reach the top/bottom edges */}
+      {linesStyle && (
+        <div
+          className="absolute inset-0 rounded-sm pointer-events-none"
+          style={{
+            ...linesStyle,
+            backgroundClip: 'content-box',
+            padding: `${lineMargin}px 0`,
+            boxSizing: 'border-box',
+          }}
+        />
+      )}
+
+      {/* Ruled margin line — only in the lines region */}
       {paperStyle === 'ruled' && (
         <div
-          className="absolute top-0 bottom-0 pointer-events-none"
-          style={{ left: '72px', width: '1px', backgroundColor: '#fca5a5', opacity: 0.5 }}
+          className="absolute pointer-events-none"
+          style={{
+            left: '72px',
+            top: `${lineMargin}px`,
+            bottom: `${lineMargin}px`,
+            width: '1px',
+            backgroundColor: '#fca5a5',
+            opacity: 0.5,
+          }}
         />
       )}
 
