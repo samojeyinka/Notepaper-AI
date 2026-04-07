@@ -197,6 +197,12 @@ export const Note = () => {
             if (preRange.collapsed) {
                 e.preventDefault();
                 pendingFocusEndRef.current = true;
+
+                // If this page has no meaningful content, remove it entirely
+                const isEmpty = editorEl.textContent.trim() === '';
+                if (isEmpty) {
+                    setPages(prev => prev.filter((_, i) => i !== index));
+                }
                 setActivePageIndex(index - 1);
             }
         } catch (_) { /* cross-boundary edge case — do nothing */ }
