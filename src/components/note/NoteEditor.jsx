@@ -412,8 +412,168 @@ export const NoteEditor = forwardRef(function NoteEditor(
     };
   }, [cancelHide, scheduleHide]);
 
+  // ── Image resize ─────────────────────────────────────────────────────────────
+  const [selectedImg, setSelectedImg] = useState(null); // { el, rect }
+  const resizeDragRef = useRef(null); // { handle, startX, startY, startW, startH }
+
+  // Click inside container — select image or deselect
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const onClick = (e) => {
+      const img = e.target.closest('img[data-resizable]');
+      if (img) {
+        e.preventDefault();
+        const rect = img.getBoundingClientRect();
+        setSelectedImg({ el: img, rect });
+      } else {
+        setSelectedImg(null);
+      }
+    };
+    container.addEventListener('mousedown', onClick);
+    return () => container.removeEventListener('mousedown', onClick);
+  }, []);
+
+  // Keep overlay rect in sync with scroll / resize
+  useEffect(() => {
+    if (!selectedImg) return;
+    const sync = () => {
+      setSelectedImg(prev => prev ? { ...prev, rect: prev.el.getBoundingClientRect() } : null);
+    };
+    const container = containerRef.current;
+    container?.addEventListener('scroll', sync);
+    window.addEventListener('resize', sync);
+    return () => {
+      container?.removeEventListener('scroll', sync);
+      window.removeEventListener('resize', sync);
+    };
+  }, [selectedImg]);
+
+  // Drag handlers for resize
+  useEffect(() => {
+    if (!selectedImg) return;
+
+    const onMove = (e) => {
+      const d = resizeDragRef.current;
+      if (!d) return;
+      const dx = e.clientX - d.startX;
+      const dy = e.clientY - d.startY;
+      const img = selectedImg.el;
+      let w = d.startW, h = d.startH;
+
+      if (d.handle.includes('e')) w = Math.max(40, d.startW + dx);
+      if (d.handle.includes('w')) w = Math.max(40, d.startW - dx);
+      if (d.handle.includes('s')) h = Math.max(40, d.startH + dy);
+      if (d.handle.includes('n')) h = Math.max(40, d.startH - dy);
+
+      // Corner handles — maintain aspect ratio
+      if (d.handle.length === 2) {
+        const ratio = d.startW / d.startH;
+        if (d.handle.includes('e') || d.handle.includes('w')) h = w / ratio;
+        else w = h * ratio;
+      }
+
+      img.style.width = `${Math.round(w)}px`;
+      img.style.height = `${Math.round(h)}px`;
+      setSelectedImg(prev => prev ? { ...prev, rect: img.getBoundingClientRect() } : null);
+    };
+
+    const onUp = () => {
+      resizeDragRef.current = null;
+    };
+
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+    };
+  }, [selectedImg]);
+
+  // 8 handles: corners + edges
+  const HANDLES = ['n','s','e','w','ne','nw','se','sw'];
+  const handleCursor = { n:'ns-resize', s:'ns-resize', e:'ew-resize', w:'ew-resize', ne:'nesw-resize', sw:'nesw-resize', nw:'nwse-resize', se:'nwse-resize' };
+  const handlePos = (h, rect) => {
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const x = h.includes('e') ? rect.right : h.includes('w') ? rect.left : cx;
+    const y = h.includes('s') ? rect.bottom : h.includes('n') ? rect.top : cy;
+    return { left: x - 5, top: y - 5 };
+  };
+  // ─────────────────────────────────────────────────────────────────────────────
+
   return (
     <>
+    {/* Image resize overlay */}
+    {selectedImg && createPortal(
+      <div style={{ position: 'fixed', inset: 0, zIndex: 9998, pointerEvents: 'none' }}>
+        {/* Blue border around image */}
+        <div style={{
+          position: 'fixed',
+          left: selectedImg.rect.left,
+          top: selectedImg.rect.top,
+          width: selectedImg.rect.width,
+          height: selectedImg.rect.height,
+          border: '2px solid #a78bfa',
+          borderRadius: '2px',
+          pointerEvents: 'none',
+        }} />
+        {/* 8 resize handles */}
+        {HANDLES.map(h => {
+          const pos = handlePos(h, selectedImg.rect);
+          return (
+            <div
+              key={h}
+              style={{
+                position: 'fixed',
+                left: pos.left,
+                top: pos.top,
+                width: 10,
+                height: 10,
+                background: 'white',
+                border: '2px solid #a78bfa',
+                borderRadius: '2px',
+                cursor: handleCursor[h],
+                pointerEvents: 'all',
+                zIndex: 9999,
+              }}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                resizeDragRef.current = {
+                  handle: h,
+                  startX: e.clientX,
+                  startY: e.clientY,
+                  startW: selectedImg.el.offsetWidth,
+                  startH: selectedImg.el.offsetHeight,
+                };
+              }}
+            />
+          );
+        })}
+        {/* Delete button */}
+        <div
+          style={{
+            position: 'fixed',
+            left: selectedImg.rect.right - 12,
+            top: selectedImg.rect.top - 12,
+            pointerEvents: 'all',
+          }}
+        >
+          <button
+            onMouseDown={(e) => {
+              e.preventDefault();
+              selectedImg.el.remove();
+              setSelectedImg(null);
+            }}
+            className="w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-red-600"
+          >
+            <span className="material-icons-round text-[13px]">close</span>
+          </button>
+        </div>
+      </div>,
+      document.body
+    )}
     {linkTooltip && createPortal(
       <div
         style={{ position: 'fixed', top: linkTooltip.y, left: linkTooltip.x, zIndex: 9999 }}

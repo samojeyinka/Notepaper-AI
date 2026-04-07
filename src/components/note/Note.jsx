@@ -306,6 +306,19 @@ export const Note = () => {
                     activeState={activeToolbarState}
                     recentColors={recentColors}
                     onAddRecentColor={addRecentColor}
+                    onImageUpload={(url) => {
+                        // Restore saved selection then insert image at cursor
+                        if (activeEditorRef.current) {
+                            activeEditorRef.current.focus();
+                        }
+                        const img = `<img src="${url}" style="max-width:100%;height:auto;display:inline-block;" data-resizable="true" />`;
+                        document.execCommand('insertHTML', false, img);
+                        if (activeEditorRef.current) {
+                            const newPages = [...pages];
+                            newPages[activePageIndex] = activeEditorRef.current.innerHTML;
+                            setPages(newPages);
+                        }
+                    }}
                 />
 
                 <div className="flex-1 overflow-hidden flex" style={{ position: 'relative' }}>

@@ -261,13 +261,15 @@ const DrawPopover = ({ anchorRef, drawMode, onAction }) => {
   );
 };
 
-export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRecentColor }) => {
+export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRecentColor, onImageUpload }) => {
   const [showTextColor, setShowTextColor] = useState(false);
   const [showHighlight, setShowHighlight] = useState(false);
   const [showFontSize, setShowFontSize] = useState(false);
   const [showUrlInput, setShowUrlInput] = useState(false);
   const [showDraw, setShowDraw] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [url, setUrl] = useState("");
+  const fileInputRef = useRef(null);
 
   // Saved selection range — captured before URL input steals focus
   const savedRangeRef = useRef(null);
@@ -525,7 +527,47 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
 
         {/* 7. Special Tools */}
         <div className="flex flex-col gap-2.5">
-          <ToolbarButton icon="image" action="image" disabled title="Coming Soon" onAction={onAction} />
+          {/* Hidden file input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={async (e) => {
+              const file = e.target.files?.[0];
+              e.target.value = '';
+              if (!file) return;
+              setIsUploading(true);
+              try {
+                const data = new FormData();
+                data.append('file', file);
+                data.append('upload_preset', 'foogles');
+                data.append('cloud_name', 'djstk2ukm');
+                const res = await fetch('https://api.cloudinary.com/v1_1/djstk2ukm/image/upload', {
+                  method: 'POST', body: data,
+                });
+                const json = await res.json();
+                if (json.secure_url) onImageUpload(json.secure_url);
+              } catch (err) {
+                console.error('Upload failed', err);
+              } finally {
+                setIsUploading(false);
+              }
+            }}
+          />
+          <button
+            onMouseDown={(e) => {
+              e.preventDefault();
+              saveSelection();
+              fileInputRef.current?.click();
+            }}
+            disabled={isUploading}
+            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all
+              ${isUploading ? 'bg-primary/20 text-primary animate-pulse' : 'bg-slate-100/50 text-slate-600 hover:bg-slate-200'}`}
+            title="Insert Image"
+          >
+            <span className="material-icons-round text-[20px]">{isUploading ? 'hourglass_top' : 'image'}</span>
+          </button>
           <div ref={drawBtnRef}>
             <button
               onMouseDown={(e) => {
