@@ -34,6 +34,26 @@ export const Note = () => {
 
     // Ref to the currently active page's contentEditable div
     const activeEditorRef = useRef(null);
+    // When true, the next activePageIndex change should place cursor at END (backspace nav)
+    const pendingFocusEndRef = useRef(false);
+
+    // After navigating back via backspace, move cursor to end of the previous page.
+    // This runs after NotePage's auto-focus effect (child effects run before parent),
+    // so it safely overrides the "cursor at start" default.
+    useEffect(() => {
+        if (!pendingFocusEndRef.current) return;
+        pendingFocusEndRef.current = false;
+        if (!activeEditorRef.current) return;
+
+        activeEditorRef.current.focus();
+        try {
+            const range = document.createRange();
+            range.selectNodeContents(activeEditorRef.current);
+            range.collapse(false); // false = end
+            const sel = window.getSelection();
+            if (sel) { sel.removeAllRanges(); sel.addRange(range); }
+        } catch (_) {}
+    }, [activePageIndex]);
 
     // Per-page guard — prevents the same page from double-firing overflow,
     // while still allowing cascading overflow across multiple pages.
@@ -159,17 +179,27 @@ export const Note = () => {
     }, []);
 
     const handleNoteKeyDown = useCallback((e, index) => {
-        if (e.key === 'Backspace') {
-            const selection = window.getSelection();
-            if (selection && selection.rangeCount > 0) {
-                const range = selection.getRangeAt(0);
-                if (range.startOffset === 0 && range.collapsed && index > 0) {
-                    // Move focus to end of previous page
-                    e.preventDefault();
-                    setActivePageIndex(index - 1);
-                }
+        if (e.key !== 'Backspace' || index === 0) return;
+
+        const selection = window.getSelection();
+        if (!selection || !selection.rangeCount || !selection.isCollapsed) return;
+
+        const range = selection.getRangeAt(0);
+        const editorEl = e.currentTarget; // the contentEditable div
+
+        // Build a range from the very start of this page to the cursor.
+        // Only if that range is collapsed (nothing before the cursor) should
+        // we jump to the previous page — otherwise let normal backspace handle it.
+        try {
+            const preRange = document.createRange();
+            preRange.setStart(editorEl, 0);
+            preRange.setEnd(range.startContainer, range.startOffset);
+            if (preRange.collapsed) {
+                e.preventDefault();
+                pendingFocusEndRef.current = true;
+                setActivePageIndex(index - 1);
             }
-        }
+        } catch (_) { /* cross-boundary edge case — do nothing */ }
     }, []);
 
     const handleAddPage = () => {
