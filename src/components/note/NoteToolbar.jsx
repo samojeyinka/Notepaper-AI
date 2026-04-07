@@ -1,5 +1,165 @@
-import React, { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { HexColorPicker } from "react-colorful";
+
+// Portal popover — renders into document.body so it escapes any overflow container.
+// Position is computed from anchorRef (the button's wrapper div) via getBoundingClientRect.
+const Popover = ({ anchorRef, children }) => {
+  let top = 0, left = 0;
+  if (anchorRef?.current) {
+    const rect = anchorRef.current.getBoundingClientRect();
+    top = rect.top;
+    left = rect.right + 8;
+  }
+
+  return createPortal(
+    <div
+      className="toolbar-popover bg-white border border-slate-100 rounded-2xl shadow-2xl animate-in slide-in-from-left-2 duration-150"
+      style={{ position: 'fixed', top, left, zIndex: 9999, minWidth: '240px' }}
+      onMouseDown={(e) => e.preventDefault()}
+    >
+      {children}
+    </div>,
+    document.body
+  );
+};
+
+// Defined at module level so React never unmounts/remounts on toolbar re-render.
+const ToolbarButton = ({ icon, action, active, disabled, title, onClick, onAction }) => (
+  <button
+    onMouseDown={(e) => {
+      e.preventDefault();
+      if (!disabled) {
+        if (onClick) onClick();
+        else if (onAction) onAction(action);
+      }
+    }}
+    className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all active:scale-90
+      ${active ? 'bg-primary text-white shadow-lg shadow-primary/30' : 'bg-slate-100/50 text-slate-600 hover:bg-slate-200'}
+      ${disabled ? 'opacity-40 cursor-not-allowed' : ''}`}
+    title={title}
+  >
+    <span className="material-icons-round text-[20px]">{icon}</span>
+  </button>
+);
+
+const UrlInputPopover = ({ anchorRef, url, onUrlChange, onInsert, onCancel }) => (
+  <Popover anchorRef={anchorRef}>
+    <div className="p-4 flex flex-col gap-3">
+      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Insert Link</p>
+      <input
+        type="text"
+        placeholder="Paste URL here..."
+        value={url}
+        autoFocus
+        onChange={(e) => onUrlChange(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') { e.preventDefault(); onInsert(); }
+          if (e.key === 'Escape') { e.preventDefault(); onCancel(); }
+        }}
+        className="w-full bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 text-xs text-slate-700 outline-none focus:border-primary"
+      />
+      <div className="flex gap-2">
+        <button
+          onMouseDown={(e) => { e.preventDefault(); onInsert(); }}
+          className="flex-1 bg-primary text-white py-2 rounded-xl text-[11px] font-bold"
+        >
+          Insert
+        </button>
+        <button
+          onMouseDown={(e) => { e.preventDefault(); onCancel(); }}
+          className="bg-slate-100 text-slate-500 px-3 py-2 rounded-xl text-[11px] font-bold"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </Popover>
+);
+
+const FontSizePopover = ({ anchorRef, options, onSelect }) => (
+  <Popover anchorRef={anchorRef}>
+    <div className="p-2 flex flex-col gap-1 w-36" onMouseDown={(e) => e.preventDefault()}>
+      {options.map((opt) => (
+        <button
+          key={opt.value}
+          onMouseDown={(e) => { e.preventDefault(); onSelect(opt.value); }}
+          className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold uppercase transition-colors text-slate-600 hover:bg-slate-50"
+        >
+          {opt.label}
+          <span
+            className="material-icons-round text-slate-300"
+            style={{ fontSize: opt.value === '1' ? '12px' : opt.value === '3' ? '16px' : opt.value === '5' ? '20px' : '24px' }}
+          >
+            format_size
+          </span>
+        </button>
+      ))}
+    </div>
+  </Popover>
+);
+
+const AdvancedColorPicker = ({ anchorRef, color, onChange, onClose, title, recentColors, onAddRecentColor }) => {
+  const [localColor, setLocalColor] = useState(color || "#000000");
+
+  useEffect(() => {
+    if (color && color !== localColor) setLocalColor(color);
+  }, [color]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  return (
+    <Popover anchorRef={anchorRef}>
+      <div className="p-4 flex flex-col gap-4 w-64">
+        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{title}</p>
+
+        <div className="custom-toolbar-picker" onMouseDown={(e) => e.stopPropagation()}>
+          <HexColorPicker
+            color={localColor}
+            onChange={(newColor) => { setLocalColor(newColor); onChange(newColor); }}
+          />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            value={localColor}
+            onChange={(e) => {
+              const val = e.target.value;
+              setLocalColor(val);
+              if (/^#[0-9A-F]{6}$/i.test(val)) onChange(val);
+            }}
+            onBlur={() => onAddRecentColor(localColor)}
+            className="flex-1 bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 text-xs font-mono text-slate-700 outline-none focus:border-primary uppercase"
+          />
+          <div className="w-8 h-8 rounded-lg border border-slate-100 shrink-0" style={{ backgroundColor: localColor }} />
+        </div>
+
+        {recentColors.length > 0 && (
+          <div className="pt-2 border-t border-slate-50">
+            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-3">Latest Used</p>
+            <div className="flex flex-wrap gap-2">
+              {recentColors.map((c, idx) => (
+                <button
+                  key={`${c}-${idx}`}
+                  onMouseDown={(e) => { e.preventDefault(); setLocalColor(c); onChange(c); }}
+                  className="w-6 h-6 rounded-full border border-white shadow-sm transition-transform hover:scale-110 active:scale-90"
+                  style={{ backgroundColor: c }}
+                  title={c}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        <button
+          onMouseDown={(e) => { e.preventDefault(); onAddRecentColor(localColor); onClose(); }}
+          className="w-full bg-slate-900 text-white py-2 rounded-xl text-[11px] font-bold"
+        >
+          Done
+        </button>
+      </div>
+    </Popover>
+  );
+};
 
 export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRecentColor }) => {
   const [showTextColor, setShowTextColor] = useState(false);
@@ -8,306 +168,255 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
   const [showUrlInput, setShowUrlInput] = useState(false);
   const [url, setUrl] = useState("");
 
+  // Saved selection range — captured before URL input steals focus
+  const savedRangeRef = useRef(null);
+  const toolbarRef = useRef(null);
+
+  // Refs for anchor-based popover positioning
+  const linkBtnRef = useRef(null);
+  const fontSizeBtnRef = useRef(null);
+  const textColorBtnRef = useRef(null);
+  const highlightBtnRef = useRef(null);
+
   const fontSizeOptions = [
-    { label: 'Small', value: '1', icon: 'text_fields' },
-    { label: 'Normal', value: '3', icon: 'text_fields' },
-    { label: 'Large', value: '5', icon: 'text_fields' },
-    { label: 'XL', value: '7', icon: 'text_fields' },
+    { label: 'Small', value: '1' },
+    { label: 'Normal', value: '3' },
+    { label: 'Large', value: '5' },
+    { label: 'XL', value: '7' },
   ];
 
-  const ToolbarButton = ({ icon, action, active, disabled, title, onClick }) => (
-    <button 
-      onMouseDown={(e) => { 
-        e.preventDefault(); 
-        if (!disabled) {
-          if (onClick) onClick();
-          else onAction(action); 
-        }
-      }}
-      className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all active:scale-90 relative
-        ${active ? 'bg-primary text-white shadow-lg shadow-primary/30' : 'bg-slate-100/50 text-slate-600 hover:bg-slate-200'}
-        ${disabled ? 'opacity-40 cursor-not-allowed' : ''}`}
-      title={title}
-    >
-      <span className="material-icons-round text-[20px]">{icon}</span>
-    </button>
-  );
+  const closeAllPopovers = () => {
+    setShowTextColor(false);
+    setShowHighlight(false);
+    setShowFontSize(false);
+    setShowUrlInput(false);
+  };
 
-  const UrlInputPopover = () => (
-    <div 
-      className="absolute left-full ml-3 top-0 bg-white border border-slate-100 rounded-2xl shadow-2xl p-4 z-50 w-64 animate-in slide-in-from-left-2 duration-150 flex flex-col gap-3"
-      onMouseDown={(e) => e.preventDefault()} 
-    >
-      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Insert Link</p>
-      <input 
-        type="text"
-        placeholder="Paste URL here..."
-        value={url}
-        autoFocus
-        onChange={(e) => setUrl(e.target.value)}
-        className="w-full bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 text-xs text-slate-700 outline-none focus:border-primary"
-      />
-      <div className="flex gap-2">
-        <button 
-          onMouseDown={(e) => { e.preventDefault(); onAction('createLink', url); setShowUrlInput(false); setUrl(""); }}
-          className="flex-1 bg-primary text-white py-2 rounded-xl text-[11px] font-bold"
-        >
-          Insert
-        </button>
-        <button 
-          onMouseDown={(e) => { e.preventDefault(); setShowUrlInput(false); }}
-          className="bg-slate-100 text-slate-500 px-3 py-2 rounded-xl text-[11px] font-bold"
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-  );
+  // Close on outside click or toolbar scroll
+  useEffect(() => {
+    const isAnyOpen = showTextColor || showHighlight || showFontSize || showUrlInput;
+    if (!isAnyOpen) return;
 
-  const AdvancedColorPicker = ({ color, onChange, onClose, title }) => {
-    const [localColor, setLocalColor] = useState(color || "#000000");
+    const handleOutside = (e) => {
+      const insideToolbar = toolbarRef.current?.contains(e.target);
+      const insidePopover = e.target.closest?.('.toolbar-popover');
+      if (!insideToolbar && !insidePopover) closeAllPopovers();
+    };
 
-    // Sync local color with selection color if it changes from outside
-    React.useEffect(() => {
-        if (color && color !== localColor) {
-            setLocalColor(color);
-        }
-    }, [color]);
+    const handleScroll = () => closeAllPopovers();
+    const toolbar = toolbarRef.current;
 
-    return (
-      <div 
-        className="absolute left-full ml-3 top-0 bg-white border border-slate-100 rounded-3xl shadow-2xl p-4 z-50 w-64 animate-in slide-in-from-left-2 duration-150 flex flex-col gap-4"
-        onMouseDown={(e) => e.preventDefault()} 
-      >
-        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{title}</p>
-        
-        <div className="custom-toolbar-picker" onMouseDown={(e) => e.stopPropagation()}>
-          <HexColorPicker 
-            color={localColor} 
-            onChange={(newColor) => {
-              setLocalColor(newColor);
-              onChange(newColor);
-            }} 
-          />
-        </div>
+    document.addEventListener("mousedown", handleOutside);
+    toolbar?.addEventListener("scroll", handleScroll);
+    return () => {
+      document.removeEventListener("mousedown", handleOutside);
+      toolbar?.removeEventListener("scroll", handleScroll);
+    };
+  }, [showTextColor, showHighlight, showFontSize, showUrlInput]);
 
-        <div className="flex items-center gap-2">
-          <input 
-            type="text"
-            value={localColor}
-            onChange={(e) => {
-                const val = e.target.value;
-                setLocalColor(val);
-                if (/^#[0-9A-F]{6}$/i.test(val)) onChange(val);
-            }}
-            onBlur={() => onAddRecentColor(localColor)}
-            className="flex-1 bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 text-xs font-mono text-slate-700 outline-none focus:border-primary uppercase"
-          />
-          <div className="w-8 h-8 rounded-lg border border-slate-100" style={{ backgroundColor: localColor }} />
-        </div>
+  const saveSelection = () => {
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount > 0) {
+      savedRangeRef.current = sel.getRangeAt(0).cloneRange();
+    }
+  };
 
-        {recentColors.length > 0 && (
-          <div className="pt-2 border-t border-slate-50">
-            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-3">Latest Used</p>
-            <div className="flex flex-wrap gap-2">
-                {recentColors.map((c, idx) => (
-                    <button 
-                        key={`${c}-${idx}`} 
-                        onMouseDown={(e) => {
-                            e.preventDefault();
-                            setLocalColor(c);
-                            onChange(c);
-                        }} 
-                        className="w-6 h-6 rounded-full border border-white shadow-sm transition-transform hover:scale-110 active:scale-90" 
-                        style={{ backgroundColor: c }} 
-                        title={c}
-                    />
-                ))}
-            </div>
-          </div>
-        )}
-
-        <button 
-            onMouseDown={(e) => { e.preventDefault(); onAddRecentColor(localColor); onClose(); }}
-            className="w-full bg-slate-900 text-white py-2 rounded-xl text-[11px] font-bold mt-1"
-        >
-            Done
-        </button>
-      </div>
-    );
+  const restoreAndInsertLink = () => {
+    // Restore saved selection before executing createLink
+    if (savedRangeRef.current) {
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(savedRangeRef.current);
+      savedRangeRef.current = null;
+    }
+    if (url.trim()) onAction('createLink', url.trim());
+    setShowUrlInput(false);
+    setUrl("");
   };
 
   return (
-    <aside className="w-16 border-r border-slate-200 bg-white flex flex-col items-center py-6 gap-5 relative z-30 shrink-0 select-none overflow-y-auto custom-scrollbar overflow-x-visible">
+    <>
       <style>{`
         .custom-toolbar-picker .react-colorful {
-            width: 100% !important;
-            height: 140px !important;
-            border-radius: 12px;
+          width: 100% !important;
+          height: 140px !important;
+          border-radius: 12px;
         }
         .custom-toolbar-picker .react-colorful__saturation {
-            border-bottom: 6px solid #f8fafc;
-            border-radius: 10px 10px 0 0;
+          border-bottom: 6px solid #f8fafc;
+          border-radius: 10px 10px 0 0;
         }
         .custom-toolbar-picker .react-colorful__hue {
-            height: 10px !important;
-            border-radius: 0 0 10px 10px;
+          height: 10px !important;
+          border-radius: 0 0 10px 10px;
         }
         .custom-toolbar-picker .react-colorful__pointer {
-            width: 16px !important;
-            height: 16px !important;
+          width: 16px !important;
+          height: 16px !important;
         }
       `}</style>
 
-      {/* 1. Basic Formatting */}
-      <div className="flex flex-col gap-2">
-        <ToolbarButton 
-          icon="format_bold" action="bold" active={activeState?.bold} title="Bold" 
-        />
-        <ToolbarButton 
-          icon="format_italic" action="italic" active={activeState?.italic} title="Italic" 
-        />
-        <ToolbarButton 
-          icon="format_underlined" action="underline" active={activeState?.underline} title="Underline" 
-        />
-        <div className="relative">
-          <ToolbarButton 
-            icon="link" action="link" active={showUrlInput} title="Link" onClick={() => setShowUrlInput(!showUrlInput)}
-          />
-          {showUrlInput && <UrlInputPopover />}
+      {/* Sidebar is now properly scrollable — popovers escape via portals */}
+      <aside
+        ref={toolbarRef}
+        className="w-16 border-r border-slate-200 bg-white flex flex-col items-center py-6 gap-5 shrink-0 select-none overflow-y-auto custom-scrollbar"
+        style={{ position: 'relative', zIndex: 100 }}
+      >
+        {/* 1. Basic Formatting */}
+        <div className="flex flex-col gap-2">
+          <ToolbarButton icon="format_bold" action="bold" active={activeState?.bold} title="Bold" onAction={onAction} />
+          <ToolbarButton icon="format_italic" action="italic" active={activeState?.italic} title="Italic" onAction={onAction} />
+          <ToolbarButton icon="format_underlined" action="underline" active={activeState?.underline} title="Underline" onAction={onAction} />
+          <div ref={linkBtnRef}>
+            <ToolbarButton
+              icon="link"
+              active={showUrlInput}
+              title="Insert Link"
+              onAction={onAction}
+              onClick={() => {
+                if (!showUrlInput) saveSelection();
+                setShowUrlInput(v => !v);
+                setShowTextColor(false);
+                setShowHighlight(false);
+                setShowFontSize(false);
+              }}
+            />
+          </div>
         </div>
-      </div>
 
-      <div className="h-px w-8 bg-slate-100" />
+        {showUrlInput && (
+          <UrlInputPopover
+            anchorRef={linkBtnRef}
+            url={url}
+            onUrlChange={setUrl}
+            onInsert={restoreAndInsertLink}
+            onCancel={() => { setShowUrlInput(false); setUrl(""); }}
+          />
+        )}
 
-      {/* 2. Alignment tools */}
-      <div className="flex flex-col gap-2">
-        <ToolbarButton 
-          icon="format_align_left" action="justifyLeft" active={activeState?.align === 'left'} title="Align Left" 
-        />
-        <ToolbarButton 
-          icon="format_align_center" action="justifyCenter" active={activeState?.align === 'center'} title="Align Center" 
-        />
-        <ToolbarButton 
-          icon="format_align_right" action="justifyRight" active={activeState?.align === 'right'} title="Align Right" 
-        />
-        <ToolbarButton 
-          icon="format_align_justify" action="justifyFull" active={activeState?.align === 'justify'} title="Justify" 
-        />
-      </div>
+        <div className="h-px w-8 bg-slate-100 shrink-0" />
 
-      <div className="h-px w-8 bg-slate-100" />
+        {/* 2. Alignment */}
+        <div className="flex flex-col gap-2">
+          <ToolbarButton icon="format_align_left" action="justifyLeft" active={activeState?.align === 'left'} title="Align Left" onAction={onAction} />
+          <ToolbarButton icon="format_align_center" action="justifyCenter" active={activeState?.align === 'center'} title="Align Center" onAction={onAction} />
+          <ToolbarButton icon="format_align_right" action="justifyRight" active={activeState?.align === 'right'} title="Align Right" onAction={onAction} />
+          <ToolbarButton icon="format_align_justify" action="justifyFull" active={activeState?.align === 'justify'} title="Justify" onAction={onAction} />
+        </div>
 
-      {/* 2. Text Scale Tool */}
-      <div className="flex flex-col gap-2.5">
-        <div className="relative">
-          <button 
-            onMouseDown={(e) => { e.preventDefault(); setShowFontSize(!showFontSize); setShowTextColor(false); setShowHighlight(false); setShowUrlInput(false); }}
-            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all
-              ${showFontSize ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/20' : 'bg-slate-100/50 text-slate-600 hover:bg-slate-200'}`}
-            title="Text Scale"
-          >
-            <span className="material-icons-round text-[22px]">text_fields</span>
-          </button>
-          
+        <div className="h-px w-8 bg-slate-100 shrink-0" />
+
+        {/* 3. Headings */}
+        <div className="flex flex-col gap-2">
+          <ToolbarButton icon="title" action="formatBlock" active={activeState?.heading === 'h1'} title="Heading 1" onAction={onAction} onClick={() => onAction('formatBlock', 'h1')} />
+          <ToolbarButton icon="format_h2" action="formatBlock" active={activeState?.heading === 'h2'} title="Heading 2" onAction={onAction} onClick={() => onAction('formatBlock', 'h2')} />
+          <ToolbarButton icon="format_h3" action="formatBlock" active={activeState?.heading === 'h3'} title="Heading 3" onAction={onAction} onClick={() => onAction('formatBlock', 'h3')} />
+        </div>
+
+        <div className="h-px w-8 bg-slate-100 shrink-0" />
+
+        {/* 4. Text Scale */}
+        <div className="flex flex-col gap-2.5">
+          <div ref={fontSizeBtnRef}>
+            <button
+              onMouseDown={(e) => {
+                e.preventDefault();
+                setShowFontSize(v => !v);
+                setShowTextColor(false);
+                setShowHighlight(false);
+                setShowUrlInput(false);
+              }}
+              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all
+                ${showFontSize ? 'bg-slate-900 text-white shadow-lg' : 'bg-slate-100/50 text-slate-600 hover:bg-slate-200'}`}
+              title="Text Size"
+            >
+              <span className="material-icons-round text-[22px]">text_fields</span>
+            </button>
+          </div>
           {showFontSize && (
-            <div className="absolute left-full ml-3 top-0 bg-white border border-slate-100 rounded-2xl shadow-2xl p-2 z-50 flex flex-col gap-1 w-32 animate-in slide-in-from-left-2 duration-150">
-              {fontSizeOptions.map((opt) => (
-                <button
-                  key={opt.value}
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    onAction('fontSize', opt.value);
-                    setShowFontSize(false);
-                  }}
-                  className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold uppercase transition-colors text-slate-600 hover:bg-slate-50"
-                >
-                  {opt.label}
-                  <span className="material-icons-round text-slate-300" style={{ fontSize: opt.value === '1' ? '12px' : opt.value === '3' ? '16px' : opt.value === '5' ? '20px' : '24px' }}>format_size</span>
-                </button>
-              ))}
-            </div>
+            <FontSizePopover
+              anchorRef={fontSizeBtnRef}
+              options={fontSizeOptions}
+              onSelect={(val) => { onAction('fontSize', val); setShowFontSize(false); }}
+            />
           )}
         </div>
-      </div>
 
-      <div className="h-px w-8 bg-slate-100" />
+        <div className="h-px w-8 bg-slate-100 shrink-0" />
 
-      {/* 3. Lists */}
-      <div className="flex flex-col gap-2.5">
-        <ToolbarButton 
-          icon="format_list_bulleted" action="insertUnorderedList" active={activeState?.list === 'ul'} title="Bulleted List" 
-        />
-        <ToolbarButton 
-          icon="format_list_numbered" action="insertOrderedList" active={activeState?.list === 'ol'} title="Numbered List" 
-        />
-      </div>
+        {/* 5. Lists */}
+        <div className="flex flex-col gap-2.5">
+          <ToolbarButton icon="format_list_bulleted" action="insertUnorderedList" active={activeState?.list === 'ul'} title="Bulleted List" onAction={onAction} />
+          <ToolbarButton icon="format_list_numbered" action="insertOrderedList" active={activeState?.list === 'ol'} title="Numbered List" onAction={onAction} />
+        </div>
 
-      <div className="h-px w-8 bg-slate-100" />
+        <div className="h-px w-8 bg-slate-100 shrink-0" />
 
-      {/* 4. Colors */}
-      <div className="flex flex-col gap-2.5 relative">
-        <div className="relative">
-          <button 
-            onMouseDown={(e) => { e.preventDefault(); setShowTextColor(!showTextColor); setShowHighlight(false); setShowFontSize(false); setShowUrlInput(false); }}
-            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${showTextColor ? 'bg-slate-900 text-white' : 'bg-slate-100/50 text-slate-600 hover:bg-slate-200'}`}
-            title="Text Color"
-          >
-            <span className="material-icons-round text-[22px]">format_color_text</span>
-          </button>
+        {/* 6. Colors */}
+        <div className="flex flex-col gap-2.5">
+          <div ref={textColorBtnRef}>
+            <button
+              onMouseDown={(e) => {
+                e.preventDefault();
+                setShowTextColor(v => !v);
+                setShowHighlight(false);
+                setShowFontSize(false);
+                setShowUrlInput(false);
+              }}
+              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${showTextColor ? 'bg-slate-900 text-white' : 'bg-slate-100/50 text-slate-600 hover:bg-slate-200'}`}
+              title="Text Color"
+            >
+              <span className="material-icons-round text-[22px]">format_color_text</span>
+            </button>
+          </div>
           {showTextColor && (
-            <AdvancedColorPicker 
-              color={activeState?.foreColor || "#000000"} 
+            <AdvancedColorPicker
+              anchorRef={textColorBtnRef}
+              color={activeState?.foreColor || "#000000"}
               title="Text Color"
               onClose={() => setShowTextColor(false)}
               onChange={(color) => onAction('foreColor', color)}
+              recentColors={recentColors}
+              onAddRecentColor={onAddRecentColor}
             />
           )}
-        </div>
 
-        <div className="relative">
-          <button 
-            onMouseDown={(e) => { e.preventDefault(); setShowHighlight(!showHighlight); setShowTextColor(false); setShowFontSize(false); setShowUrlInput(false); }}
-            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${showHighlight ? 'bg-slate-900 text-white' : 'bg-slate-100/50 text-slate-600 hover:bg-slate-200'}`}
-            title="Highlight"
-          >
-            <span className="material-icons-round text-[22px]">draw</span>
-          </button>
+          <div ref={highlightBtnRef}>
+            <button
+              onMouseDown={(e) => {
+                e.preventDefault();
+                setShowHighlight(v => !v);
+                setShowTextColor(false);
+                setShowFontSize(false);
+                setShowUrlInput(false);
+              }}
+              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${showHighlight ? 'bg-slate-900 text-white' : 'bg-slate-100/50 text-slate-600 hover:bg-slate-200'}`}
+              title="Highlight"
+            >
+              <span className="material-icons-round text-[22px]">draw</span>
+            </button>
+          </div>
           {showHighlight && (
-            <AdvancedColorPicker 
-              color={activeState?.hiliteColor || "transparent"} 
+            <AdvancedColorPicker
+              anchorRef={highlightBtnRef}
+              color={activeState?.hiliteColor || "transparent"}
               title="Highlight"
               onClose={() => setShowHighlight(false)}
               onChange={(color) => onAction('hiliteColor', color)}
+              recentColors={recentColors}
+              onAddRecentColor={onAddRecentColor}
             />
           )}
         </div>
-      </div>
 
-      <div className="h-px w-8 bg-slate-100" />
+        <div className="h-px w-8 bg-slate-100 shrink-0" />
 
-      {/* 5. Special Tools */}
-      <div className="flex flex-col gap-2.5">
-        <ToolbarButton 
-          icon="image" action="image" disabled title="Coming Soon" 
-        />
-        <ToolbarButton 
-          icon="gesture" action="draw" disabled title="Coming Soon" 
-        />
-      </div>
-
-      {/* Outside Click Helper */}
-      {(showTextColor || showHighlight || showFontSize || showUrlInput) && (
-        <div 
-          className="fixed inset-0 z-10" 
-          onMouseDown={() => {
-            setShowTextColor(false);
-            setShowHighlight(false);
-            setShowFontSize(false);
-            setShowUrlInput(false);
-          }} 
-        />
-      )}
-    </aside>
+        {/* 7. Special Tools */}
+        <div className="flex flex-col gap-2.5">
+          <ToolbarButton icon="image" action="image" disabled title="Coming Soon" onAction={onAction} />
+          <ToolbarButton icon="gesture" action="draw" disabled title="Coming Soon" onAction={onAction} />
+        </div>
+      </aside>
+    </>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { NoteHeader } from "./NoteHeader";
 import { NoteToolbar } from "./NoteToolbar";
 import { NoteEditor } from "./NoteEditor";
@@ -32,6 +32,13 @@ export const Note = () => {
     const [lineColor, setLineColor] = useState("#cbd5e1");
     const [recentColors, setRecentColors] = useState(["#ffffff", "#FDFBF7", "#F0FDF4", "#F0F9FF", "#A78BFA", "#F472B6"]);
 
+    // Ref to the currently active page's contentEditable div
+    const activeEditorRef = useRef(null);
+
+    // Per-page guard — prevents the same page from double-firing overflow,
+    // while still allowing cascading overflow across multiple pages.
+    const overflowGuardRef = useRef(new Set());
+
     const addRecentColor = (color) => {
         if (!color) return;
         setRecentColors(prev => {
@@ -49,40 +56,37 @@ export const Note = () => {
         list: null
     });
 
-    const activeEditorRef = useRef(null);
-
-    // Track selection changes to update toolbar icons
+    // Track selection changes to update toolbar state
     useEffect(() => {
         const rgbToHex = (rgb) => {
             if (!rgb) return "#000000";
             if (rgb.startsWith("#")) return rgb;
             const match = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
             if (!match) return "#000000";
-            const r = parseInt(match[1]);
-            const g = parseInt(match[2]);
-            const b = parseInt(match[3]);
-            return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+            return "#" + [match[1], match[2], match[3]]
+                .map(n => parseInt(n).toString(16).padStart(2, '0'))
+                .join('').toUpperCase();
         };
 
         const handleSelectionChange = () => {
             const selection = window.getSelection();
-            if (selection.rangeCount === 0) return;
-            
+            if (!selection || selection.rangeCount === 0) return;
+
             const range = selection.getRangeAt(0);
-            
-            // Check if selection is within the pages container
-            const pagesContainer = document.querySelector('.pages-container');
+            const pagesContainer = document.querySelector('.note-pages-container');
             if (pagesContainer && !pagesContainer.contains(range.commonAncestorContainer)) return;
 
-            const foreColor = document.queryCommandValue('foreColor');
-            const hiliteColor = document.queryCommandValue('hiliteColor') || document.queryCommandValue('backColor');
-            
             const getAlignment = () => {
-                if (document.queryCommandState('justifyLeft')) return 'left';
                 if (document.queryCommandState('justifyCenter')) return 'center';
                 if (document.queryCommandState('justifyRight')) return 'right';
                 if (document.queryCommandState('justifyFull')) return 'justify';
                 return 'left';
+            };
+
+            const getHeadingState = () => {
+                const block = document.queryCommandValue('formatBlock');
+                if (['h1', 'h2', 'h3'].includes(block)) return block;
+                return 'p';
             };
 
             setActiveToolbarState({
@@ -91,100 +95,105 @@ export const Note = () => {
                 underline: document.queryCommandState('underline'),
                 heading: getHeadingState(),
                 align: getAlignment(),
-                foreColor: rgbToHex(foreColor),
-                hiliteColor: rgbToHex(hiliteColor),
-                list: document.queryCommandState('insertUnorderedList') ? 'ul' : 
-                      document.queryCommandState('insertOrderedList') ? 'ol' : null
+                foreColor: rgbToHex(document.queryCommandValue('foreColor')),
+                hiliteColor: rgbToHex(document.queryCommandValue('hiliteColor') || document.queryCommandValue('backColor')),
+                list: document.queryCommandState('insertUnorderedList') ? 'ul'
+                    : document.queryCommandState('insertOrderedList') ? 'ol' : null
             });
-        };
-
-        const getHeadingState = () => {
-            const block = document.queryCommandValue('formatBlock');
-            if (['h1', 'h2', 'h3'].includes(block)) return block;
-            return 'p';
         };
 
         document.addEventListener('selectionchange', handleSelectionChange);
         return () => document.removeEventListener('selectionchange', handleSelectionChange);
     }, []);
 
-    // Handle autosave simulation
+    // Autosave simulation
     useEffect(() => {
         setIsSaved(false);
         const timer = setTimeout(() => setIsSaved(true), 1500);
         return () => clearTimeout(timer);
     }, [title, pages, fontSize, lineSpacing, textColor, paperColor, lineColor, paperStyle, fontFamily]);
 
-    // Formatting Commands
-    const handleCommand = (command, value = null) => {
+    // Formatting commands — always operate on the currently focused contentEditable
+    const handleCommand = useCallback((command, value = null) => {
+        // Make sure focus is in the editor
+        if (activeEditorRef.current) {
+            activeEditorRef.current.focus();
+        }
+
         document.execCommand('styleWithCSS', false, true);
-        
+
         if (command === 'createLink') {
             if (!value) return;
             document.execCommand(command, false, value);
         } else {
             document.execCommand(command, false, value);
         }
-        
-        // Sync the current active editor's content
+
+        // Sync changes back to state
         if (activeEditorRef.current) {
             const newPages = [...pages];
             newPages[activePageIndex] = activeEditorRef.current.innerHTML;
             setPages(newPages);
         }
-    };
+    }, [pages, activePageIndex]);
 
-    const handlePageOverflow = (index) => {
-        // Only trigger if it's the last page to prevent infinite loops
-        if (index === pages.length - 1) {
-            setPages([...pages, ""]);
-            setActivePageIndex(index + 1);
-        }
-    };
+    // Handle overflow: split content moves to the next page (or a new page).
+    // The per-page Set guard prevents the same page from double-firing while
+    // still allowing cascading: page 1 → page 2 → page 3, etc.
+    const handlePageOverflow = useCallback((index, overflowContent = "") => {
+        if (overflowGuardRef.current.has(index)) return;
 
-    const handleNoteKeyDown = (e, index) => {
+        overflowGuardRef.current.add(index);
+        setPages(prev => {
+            const newPages = [...prev];
+            if (index >= newPages.length - 1) {
+                newPages.push(overflowContent);
+            } else {
+                newPages[index + 1] = overflowContent + (newPages[index + 1] || '');
+            }
+            return newPages;
+        });
+        setActivePageIndex(index + 1);
+
+        setTimeout(() => { overflowGuardRef.current.delete(index); }, 300);
+    }, []);
+
+    const handleNoteKeyDown = useCallback((e, index) => {
         if (e.key === 'Backspace') {
             const selection = window.getSelection();
-            if (selection.rangeCount > 0) {
+            if (selection && selection.rangeCount > 0) {
                 const range = selection.getRangeAt(0);
-                // If at the very start of the page (except first page), move to previous page
                 if (range.startOffset === 0 && range.collapsed && index > 0) {
+                    // Move focus to end of previous page
                     e.preventDefault();
                     setActivePageIndex(index - 1);
-                    // Selection move logic will happen via focusing the previous editor
                 }
             }
         }
-    };
+    }, []);
 
     const handleAddPage = () => {
-        setPages([...pages, ""]);
+        setPages(prev => [...prev, ""]);
         setActivePageIndex(pages.length);
     };
 
     const handleRemovePage = (index) => {
         if (pages.length <= 1) return;
-        const newPages = pages.filter((_, i) => i !== index);
-        setPages(newPages);
-        setActivePageIndex(Math.min(activePageIndex, newPages.length - 1));
+        setPages(prev => {
+            const newPages = prev.filter((_, i) => i !== index);
+            return newPages;
+        });
+        setActivePageIndex(prev => Math.min(prev, pages.length - 2));
     };
 
     const handleExport = async (format) => {
-        const editorEl = document.querySelector('.pages-container');
-        if (!editorEl) return;
         try {
-            const dataUrl = await htmlToImage.toPng(editorEl, { quality: 1.0, pixelRatio: 2 });
-            if (format === 'png') {
-                const link = document.createElement('a');
-                link.download = `${title.replace(/\s+/g, '-').toLowerCase()}.png`;
-                link.href = dataUrl;
-                link.click();
-            } else if (format === 'pdf') {
+            if (format === 'pdf') {
+                const pageElems = document.querySelectorAll('.note-page-paper');
                 const pageWidth = 816;
                 const pageHeight = 1056;
                 const pdf = new jsPDF('p', 'px', [pageWidth, pageHeight]);
-                
-                const pageElems = document.querySelectorAll('.page-paper');
+
                 for (let i = 0; i < pageElems.length; i++) {
                     const canvas = await htmlToImage.toCanvas(pageElems[i], {
                         width: pageWidth,
@@ -195,6 +204,14 @@ export const Note = () => {
                     pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, pageWidth, pageHeight);
                 }
                 pdf.save(`${title.replace(/\s+/g, '-').toLowerCase()}.pdf`);
+            } else if (format === 'png') {
+                const container = document.querySelector('.note-pages-container');
+                if (!container) return;
+                const dataUrl = await htmlToImage.toPng(container, { quality: 1.0, pixelRatio: 2 });
+                const link = document.createElement('a');
+                link.download = `${title.replace(/\s+/g, '-').toLowerCase()}.png`;
+                link.href = dataUrl;
+                link.click();
             }
         } catch (error) {
             console.error('Export failed:', error);
@@ -204,7 +221,7 @@ export const Note = () => {
 
     return (
         <div className="flex flex-col flex-1 h-screen overflow-hidden bg-white border-l border-slate-200 lg:ml-64 pt-16 lg:pt-0">
-            <NoteHeader 
+            <NoteHeader
                 title={title} onTitleChange={setTitle} isSaved={isSaved}
                 onExportPDF={() => handleExport('pdf')}
                 onExportImage={() => handleExport('png')}
@@ -215,37 +232,41 @@ export const Note = () => {
             />
 
             <div className="flex flex-1 overflow-hidden relative">
-                <NoteToolbar 
-                    onAction={handleCommand} 
-                    activeState={activeToolbarState} 
+                <NoteToolbar
+                    onAction={handleCommand}
+                    activeState={activeToolbarState}
                     recentColors={recentColors}
                     onAddRecentColor={addRecentColor}
                 />
 
-                <div className="flex-1 overflow-hidden flex">
-                    <NoteEditor 
-                        ref={activeEditorRef}
-                        pages={pages} 
-                        onContentChange={(index, content) => {
-                            const newPages = [...pages];
-                            newPages[index] = content;
-                            setPages(newPages);
-                        }}
-                        paperStyle={paperStyle} 
-                        fontFamily={fontFamily} 
-                        fontSize={fontSize}
-                        lineSpacing={lineSpacing} 
-                        textColor={textColor} 
-                        paperColor={paperColor} 
-                        lineColor={lineColor}
-                        activePageIndex={activePageIndex}
-                        setActivePageIndex={setActivePageIndex}
-                        onPageOverflow={handlePageOverflow}
-                        onKeyDown={handleNoteKeyDown}
-                    />
+                <div className="flex-1 overflow-hidden flex" style={{ position: 'relative' }}>
+                    <div className="note-pages-container flex-1 overflow-hidden flex">
+                        <NoteEditor
+                            ref={activeEditorRef}
+                            pages={pages}
+                            onContentChange={(index, content) => {
+                                setPages(prev => {
+                                    const newPages = [...prev];
+                                    newPages[index] = content;
+                                    return newPages;
+                                });
+                            }}
+                            paperStyle={paperStyle}
+                            fontFamily={fontFamily}
+                            fontSize={fontSize}
+                            lineSpacing={lineSpacing}
+                            textColor={textColor}
+                            paperColor={paperColor}
+                            lineColor={lineColor}
+                            activePageIndex={activePageIndex}
+                            setActivePageIndex={setActivePageIndex}
+                            onPageOverflow={handlePageOverflow}
+                            onKeyDown={handleNoteKeyDown}
+                        />
+                    </div>
 
                     {isPageSidebarOpen && (
-                        <NotePageSidebar 
+                        <NotePageSidebar
                             pages={pages}
                             activePageIndex={activePageIndex}
                             onAddPage={handleAddPage}
@@ -254,9 +275,9 @@ export const Note = () => {
                             onCollapse={() => setIsPageSidebarOpen(false)}
                         />
                     )}
-                    
+
                     {!isPageSidebarOpen && (
-                        <button 
+                        <button
                             onClick={() => setIsPageSidebarOpen(true)}
                             className="absolute right-0 top-1/2 -translate-y-1/2 w-6 h-20 bg-white border border-slate-200 rounded-l-xl flex items-center justify-center hover:bg-slate-50 transition-colors z-20"
                         >
@@ -267,14 +288,14 @@ export const Note = () => {
 
                 {isAISidebarOpen && <NoteAISidebar />}
 
-                <button 
+                <button
                     onClick={() => setIsSettingsOpen(true)}
                     className="fixed bottom-10 right-10 z-50 w-12 h-12 bg-white border-2 border-primary text-primary rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform"
                 >
                     <span className="material-icons-round">settings</span>
                 </button>
 
-                <NoteSettingsSidebar 
+                <NoteSettingsSidebar
                     isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)}
                     paperStyle={paperStyle} setPaperStyle={setPaperStyle}
                     fontFamily={fontFamily} setFontFamily={setFontFamily}
