@@ -4,18 +4,23 @@ import { HexColorPicker } from "react-colorful";
 
 // Portal popover — renders into document.body so it escapes any overflow container.
 // Position is computed from anchorRef (the button's wrapper div) via getBoundingClientRect.
+const POPOVER_MAX_HEIGHT = 520; // rough max height of any popover
+const POPOVER_MARGIN = 8;
+
 const Popover = ({ anchorRef, children }) => {
   let top = 0, left = 0;
   if (anchorRef?.current) {
     const rect = anchorRef.current.getBoundingClientRect();
-    top = rect.top;
-    left = rect.right + 8;
+    left = rect.right + POPOVER_MARGIN;
+    // Prefer aligning to the button's top, but clamp so it never goes below the viewport
+    const maxTop = window.innerHeight - POPOVER_MAX_HEIGHT - POPOVER_MARGIN;
+    top = Math.max(POPOVER_MARGIN, Math.min(rect.top, maxTop));
   }
 
   return createPortal(
     <div
       className="toolbar-popover bg-white border border-slate-100 rounded-2xl shadow-2xl animate-in slide-in-from-left-2 duration-150"
-      style={{ position: 'fixed', top, left, zIndex: 9999, minWidth: '240px' }}
+      style={{ position: 'fixed', top, left, zIndex: 9999, minWidth: '240px', maxHeight: `${POPOVER_MAX_HEIGHT}px`, overflowY: 'auto' }}
       onMouseDown={(e) => e.preventDefault()}
     >
       {children}
@@ -161,11 +166,107 @@ const AdvancedColorPicker = ({ anchorRef, color, onChange, onClose, title, recen
   );
 };
 
+const DrawPopover = ({ anchorRef, drawMode, onAction }) => {
+  const [localColor, setLocalColor] = useState(drawMode?.color || '#1e293b');
+  const thicknesses = [2, 4, 6, 10, 16];
+
+  return (
+    <Popover anchorRef={anchorRef}>
+      <div className="p-4 flex flex-col gap-4 w-64">
+        <div className="flex items-center justify-between">
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Draw Mode</p>
+          <button
+            onMouseDown={(e) => { e.preventDefault(); onAction('drawToggle'); }}
+            className={`px-3 py-1 rounded-lg text-[11px] font-bold transition-colors ${
+              drawMode?.active ? 'bg-primary text-white' : 'bg-slate-100 text-slate-500'
+            }`}
+          >
+            {drawMode?.active ? 'On' : 'Off'}
+          </button>
+        </div>
+
+        {/* Pen / Eraser toggle */}
+        <div className="flex gap-2">
+          <button
+            onMouseDown={(e) => { e.preventDefault(); onAction('drawEraser', false); }}
+            className={`flex-1 flex items-center justify-center gap-1 py-2 rounded-xl text-[11px] font-bold transition-colors ${
+              !drawMode?.eraser ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-500'
+            }`}
+          >
+            <span className="material-icons-round text-[14px]">edit</span> Pen
+          </button>
+          <button
+            onMouseDown={(e) => { e.preventDefault(); onAction('drawEraser', true); }}
+            className={`flex-1 flex items-center justify-center gap-1 py-2 rounded-xl text-[11px] font-bold transition-colors ${
+              drawMode?.eraser ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-500'
+            }`}
+          >
+            <span className="material-icons-round text-[14px]">auto_fix_normal</span> Eraser
+          </button>
+        </div>
+
+        {/* Thickness */}
+        <div>
+          <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-3">Thickness</p>
+          <div className="flex items-center gap-2">
+            {thicknesses.map(t => (
+              <button
+                key={t}
+                onMouseDown={(e) => { e.preventDefault(); onAction('drawThickness', t); }}
+                className={`flex items-center justify-center rounded-full transition-all ${
+                  drawMode?.thickness === t ? 'bg-primary' : 'bg-slate-200 hover:bg-slate-300'
+                }`}
+                style={{ width: `${t + 16}px`, height: `${t + 16}px` }}
+                title={`${t}px`}
+              >
+                <div
+                  className="rounded-full"
+                  style={{
+                    width: `${t}px`, height: `${t}px`,
+                    backgroundColor: drawMode?.thickness === t ? 'white' : '#475569'
+                  }}
+                />
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Color */}
+        {!drawMode?.eraser && (
+          <div>
+            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-3">Color</p>
+            <div className="custom-toolbar-picker" onMouseDown={(e) => e.stopPropagation()}>
+              <HexColorPicker
+                color={localColor}
+                onChange={(c) => { setLocalColor(c); onAction('drawColor', c); }}
+              />
+            </div>
+            <div className="flex items-center gap-2 mt-2">
+              <input
+                type="text"
+                value={localColor}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setLocalColor(v);
+                  if (/^#[0-9A-F]{6}$/i.test(v)) onAction('drawColor', v);
+                }}
+                className="flex-1 bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 text-xs font-mono text-slate-700 outline-none focus:border-primary uppercase"
+              />
+              <div className="w-8 h-8 rounded-lg border border-slate-100 shrink-0" style={{ backgroundColor: localColor }} />
+            </div>
+          </div>
+        )}
+      </div>
+    </Popover>
+  );
+};
+
 export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRecentColor }) => {
   const [showTextColor, setShowTextColor] = useState(false);
   const [showHighlight, setShowHighlight] = useState(false);
   const [showFontSize, setShowFontSize] = useState(false);
   const [showUrlInput, setShowUrlInput] = useState(false);
+  const [showDraw, setShowDraw] = useState(false);
   const [url, setUrl] = useState("");
 
   // Saved selection range — captured before URL input steals focus
@@ -177,6 +278,7 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
   const fontSizeBtnRef = useRef(null);
   const textColorBtnRef = useRef(null);
   const highlightBtnRef = useRef(null);
+  const drawBtnRef = useRef(null);
 
   const fontSizeOptions = [
     { label: 'Small', value: '1' },
@@ -190,11 +292,12 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
     setShowHighlight(false);
     setShowFontSize(false);
     setShowUrlInput(false);
+    setShowDraw(false);
   };
 
   // Close on outside click or toolbar scroll
   useEffect(() => {
-    const isAnyOpen = showTextColor || showHighlight || showFontSize || showUrlInput;
+    const isAnyOpen = showTextColor || showHighlight || showFontSize || showUrlInput || showDraw;
     if (!isAnyOpen) return;
 
     const handleOutside = (e) => {
@@ -306,15 +409,6 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
 
         <div className="h-px w-8 bg-slate-100 shrink-0" />
 
-        {/* 3. Headings */}
-        <div className="flex flex-col gap-2">
-          <ToolbarButton icon="title" action="formatBlock" active={activeState?.heading === 'h1'} title="Heading 1" onAction={onAction} onClick={() => onAction('formatBlock', 'h1')} />
-          <ToolbarButton icon="format_h2" action="formatBlock" active={activeState?.heading === 'h2'} title="Heading 2" onAction={onAction} onClick={() => onAction('formatBlock', 'h2')} />
-          <ToolbarButton icon="format_h3" action="formatBlock" active={activeState?.heading === 'h3'} title="Heading 3" onAction={onAction} onClick={() => onAction('formatBlock', 'h3')} />
-        </div>
-
-        <div className="h-px w-8 bg-slate-100 shrink-0" />
-
         {/* 4. Text Scale */}
         <div className="flex flex-col gap-2.5">
           <div ref={fontSizeBtnRef}>
@@ -414,7 +508,31 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
         {/* 7. Special Tools */}
         <div className="flex flex-col gap-2.5">
           <ToolbarButton icon="image" action="image" disabled title="Coming Soon" onAction={onAction} />
-          <ToolbarButton icon="gesture" action="draw" disabled title="Coming Soon" onAction={onAction} />
+          <div ref={drawBtnRef}>
+            <button
+              onMouseDown={(e) => {
+                e.preventDefault();
+                setShowDraw(v => !v);
+                setShowTextColor(false);
+                setShowHighlight(false);
+                setShowFontSize(false);
+                setShowUrlInput(false);
+              }}
+              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all
+                ${activeState?.drawMode?.active ? 'bg-primary text-white shadow-lg shadow-primary/30' : 'bg-slate-100/50 text-slate-600 hover:bg-slate-200'}
+                ${showDraw ? 'ring-2 ring-primary ring-offset-1' : ''}`}
+              title="Draw"
+            >
+              <span className="material-icons-round text-[20px]">gesture</span>
+            </button>
+          </div>
+          {showDraw && (
+            <DrawPopover
+              anchorRef={drawBtnRef}
+              drawMode={activeState?.drawMode}
+              onAction={onAction}
+            />
+          )}
         </div>
       </aside>
     </>

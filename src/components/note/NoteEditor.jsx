@@ -34,6 +34,9 @@ const NotePage = ({
   fontFamily,
   textColor,
   editorRef,
+  drawMode,
+  drawingDataUrl,
+  onDrawingChange,
 }) => {
   const pageRef = useRef(null);
   const isComposingRef = useRef(false);
@@ -114,6 +117,69 @@ const NotePage = ({
 
   const handleCompositionStart = () => { isComposingRef.current = true; };
   const handleCompositionEnd = (e) => { isComposingRef.current = false; handleInput(e); };
+
+  // ── Canvas drawing ──────────────────────────────────────────────────────────
+  const canvasRef = useRef(null);
+  const isDrawingRef = useRef(false);
+  const lastPosRef = useRef({ x: 0, y: 0 });
+
+  // Restore saved drawing when data URL changes from outside (e.g. page load)
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    if (!drawingDataUrl) {
+      canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+      return;
+    }
+    const img = new Image();
+    img.onload = () => canvas.getContext('2d').drawImage(img, 0, 0);
+    img.src = drawingDataUrl;
+  }, [drawingDataUrl]);
+
+  const getPos = (e) => {
+    const rect = canvasRef.current.getBoundingClientRect();
+    const scaleX = canvasRef.current.width / rect.width;
+    const scaleY = canvasRef.current.height / rect.height;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY };
+  };
+
+  const startDraw = (e) => {
+    if (!drawMode?.active) return;
+    e.preventDefault();
+    isDrawingRef.current = true;
+    lastPosRef.current = getPos(e);
+  };
+
+  const draw = (e) => {
+    if (!drawMode?.active || !isDrawingRef.current) return;
+    e.preventDefault();
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const pos = getPos(e);
+
+    if (drawMode.eraser) {
+      ctx.clearRect(pos.x - drawMode.thickness * 4, pos.y - drawMode.thickness * 4, drawMode.thickness * 8, drawMode.thickness * 8);
+    } else {
+      ctx.beginPath();
+      ctx.moveTo(lastPosRef.current.x, lastPosRef.current.y);
+      ctx.lineTo(pos.x, pos.y);
+      ctx.strokeStyle = drawMode.color;
+      ctx.lineWidth = drawMode.thickness;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.stroke();
+    }
+    lastPosRef.current = pos;
+  };
+
+  const endDraw = () => {
+    if (!isDrawingRef.current) return;
+    isDrawingRef.current = false;
+    onDrawingChange(index, canvasRef.current.toDataURL());
+  };
+  // ────────────────────────────────────────────────────────────────────────────
 
   // Lines only render inside a padded region — creates blank space at top and bottom
   const lineMargin = lineSpacing * 2; // 2 empty line-heights of breathing room
@@ -225,6 +291,31 @@ const NotePage = ({
           zIndex: 1,
         }}
       />
+
+      {/* Drawing canvas — sits above text, only captures pointer when draw mode is on */}
+      <canvas
+        ref={canvasRef}
+        width={816}
+        height={PAGE_HEIGHT}
+        onMouseDown={startDraw}
+        onMouseMove={draw}
+        onMouseUp={endDraw}
+        onMouseLeave={endDraw}
+        onTouchStart={startDraw}
+        onTouchMove={draw}
+        onTouchEnd={endDraw}
+        style={{
+          position: 'absolute',
+          inset: 0,
+          zIndex: 2,
+          borderRadius: '2px',
+          cursor: drawMode?.active
+            ? drawMode.eraser ? 'cell' : 'crosshair'
+            : 'none',
+          pointerEvents: drawMode?.active ? 'all' : 'none',
+          touchAction: 'none',
+        }}
+      />
     </div>
   );
 };
@@ -245,6 +336,9 @@ export const NoteEditor = forwardRef(function NoteEditor(
     setActivePageIndex,
     onPageOverflow,
     onKeyDown,
+    drawMode,
+    drawingData = [],
+    onDrawingChange,
   },
   ref
 ) {
@@ -303,6 +397,9 @@ export const NoteEditor = forwardRef(function NoteEditor(
             fontFamily={fontFamily}
             textColor={textColor}
             editorRef={ref}
+            drawMode={drawMode}
+            drawingDataUrl={drawingData[index] ?? ""}
+            onDrawingChange={onDrawingChange}
           />
         </div>
       ))}

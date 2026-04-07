@@ -224,9 +224,9 @@ const AppRoutes = createBrowserRouter([
 
      {
         path: '/lockedin/notes/new',
-        element:<ProtectedRoute><ScrollToTop>
+        element:<ScrollToTop>
         <NotePage/>
-        </ScrollToTop></ProtectedRoute>,       
+        </ScrollToTop>,       
     },
 
 ]);

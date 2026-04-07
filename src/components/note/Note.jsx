@@ -22,6 +22,10 @@ export const Note = () => {
     const [isAISidebarOpen, setIsAISidebarOpen] = useState(false);
     const [isPageSidebarOpen, setIsPageSidebarOpen] = useState(true);
 
+    // Draw Mode
+    const [drawMode, setDrawMode] = useState({ active: false, color: '#1e293b', thickness: 4, eraser: false });
+    const [drawingData, setDrawingData] = useState([""]); // data URL per page, "" = blank
+
     // Style State
     const [paperStyle, setPaperStyle] = useState("ruled");
     const [fontFamily, setFontFamily] = useState("sans");
@@ -109,7 +113,7 @@ export const Note = () => {
                 return 'p';
             };
 
-            setActiveToolbarState({
+            setActiveToolbarState(prev => ({
                 bold: document.queryCommandState('bold'),
                 italic: document.queryCommandState('italic'),
                 underline: document.queryCommandState('underline'),
@@ -118,13 +122,28 @@ export const Note = () => {
                 foreColor: rgbToHex(document.queryCommandValue('foreColor')),
                 hiliteColor: rgbToHex(document.queryCommandValue('hiliteColor') || document.queryCommandValue('backColor')),
                 list: document.queryCommandState('insertUnorderedList') ? 'ul'
-                    : document.queryCommandState('insertOrderedList') ? 'ol' : null
-            });
+                    : document.queryCommandState('insertOrderedList') ? 'ol' : null,
+                drawMode: prev.drawMode, // preserve draw mode across selection changes
+            }));
         };
 
         document.addEventListener('selectionchange', handleSelectionChange);
         return () => document.removeEventListener('selectionchange', handleSelectionChange);
     }, []);
+
+    // Keep drawMode reflected in activeToolbarState so the toolbar reads it
+    useEffect(() => {
+        setActiveToolbarState(prev => ({ ...prev, drawMode }));
+    }, [drawMode]);
+
+    // Grow/shrink drawingData array in sync with pages
+    useEffect(() => {
+        setDrawingData(prev => {
+            if (prev.length === pages.length) return prev;
+            if (prev.length < pages.length) return [...prev, ...Array(pages.length - prev.length).fill("")];
+            return prev.slice(0, pages.length);
+        });
+    }, [pages.length]);
 
     // Autosave simulation
     useEffect(() => {
@@ -133,23 +152,37 @@ export const Note = () => {
         return () => clearTimeout(timer);
     }, [title, pages, fontSize, lineSpacing, textColor, paperColor, lineColor, paperStyle, fontFamily]);
 
-    // Formatting commands — always operate on the currently focused contentEditable
+    // Formatting commands — also handles draw mode commands
     const handleCommand = useCallback((command, value = null) => {
-        // Make sure focus is in the editor
+        // Draw mode commands
+        if (command === 'drawToggle') {
+            setDrawMode(prev => ({ ...prev, active: !prev.active }));
+            return;
+        }
+        if (command === 'drawColor') {
+            setDrawMode(prev => ({ ...prev, color: value }));
+            return;
+        }
+        if (command === 'drawThickness') {
+            setDrawMode(prev => ({ ...prev, thickness: value }));
+            return;
+        }
+        if (command === 'drawEraser') {
+            setDrawMode(prev => ({ ...prev, eraser: value }));
+            return;
+        }
+
+        // Standard formatting — needs editor focus
         if (activeEditorRef.current) {
             activeEditorRef.current.focus();
         }
-
         document.execCommand('styleWithCSS', false, true);
-
         if (command === 'createLink') {
             if (!value) return;
             document.execCommand(command, false, value);
         } else {
             document.execCommand(command, false, value);
         }
-
-        // Sync changes back to state
         if (activeEditorRef.current) {
             const newPages = [...pages];
             newPages[activePageIndex] = activeEditorRef.current.innerHTML;
@@ -298,6 +331,15 @@ export const Note = () => {
                             setActivePageIndex={setActivePageIndex}
                             onPageOverflow={handlePageOverflow}
                             onKeyDown={handleNoteKeyDown}
+                            drawMode={drawMode}
+                            drawingData={drawingData}
+                            onDrawingChange={(index, dataUrl) => {
+                                setDrawingData(prev => {
+                                    const next = [...prev];
+                                    next[index] = dataUrl;
+                                    return next;
+                                });
+                            }}
                         />
                     </div>
 
