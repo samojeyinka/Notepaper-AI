@@ -53,7 +53,7 @@ export const NoteHeader = ({
                     placeholder="Untitled Note"
                 />
                 {status.label && (
-                    <span className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-300 ${status.cls}`}>
+                    <span className={`flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium uppercase tracking-wider transition-all duration-300 ${status.cls}`}>
                         <span className={`material-icons-round text-[14px] ${saveStatus === 'saving' ? 'animate-spin' : ''}`}>{status.icon}</span>
                         {status.label}
                     </span>
