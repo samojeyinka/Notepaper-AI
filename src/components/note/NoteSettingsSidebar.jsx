@@ -33,10 +33,12 @@ export const NoteSettingsSidebar = ({
   const PAPERS_PER_PAGE = 3;
 
   const fontOptions = [
-    { id: "sans", name: "Modern Sans", class: "font-sans" },
-    { id: "handwriting", name: "Elegant (Kalam)", class: "font-handwriting" },
-    { id: "casual", name: "Casual (Caveat)", class: "font-handwriting2" },
-    { id: "fun", name: "Fun (Indie Flower)", class: "font-handwriting3" },
+    { id: "sans",        name: "Modern (Inter)",               class: "font-sans" },
+    { id: "handwriting", name: "Elegant (Kalam)",              class: "font-handwriting" },
+    { id: "casual",      name: "Casual (Caveat)",              class: "font-handwriting2" },
+    { id: "fun",         name: "Fun (Indie Flower)",           class: "font-handwriting3" },
+    { id: "shadows",     name: "Sketchy (Shadows Into Light)", class: "font-sketch" },
+    { id: "dancing",     name: "Script (Dancing Script)",      class: "font-dancing" },
   ];
 
   const [activePicker, setActivePicker] = useState(null); // 'paper', 'line', 'text' or null

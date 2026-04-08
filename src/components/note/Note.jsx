@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { NoteHeader } from "./NoteHeader";
 import { NoteToolbar } from "./NoteToolbar";
 import { NoteEditor } from "./NoteEditor";
@@ -8,15 +9,18 @@ import { NotePageSidebar } from "./NotePageSidebar";
 import * as htmlToImage from 'html-to-image';
 import { jsPDF } from "jspdf";
 import JSZip from 'jszip';
+import { useNoteSync } from "../../hooks/useNoteSync";
+import { deserializeNote } from "../../api/noteService";
 
 export const Note = () => {
+    const { id: routeId } = useParams();
+    const navigate = useNavigate();
+
     // Note Data
-    const [title, setTitle] = useState("Architecture Lecture Notes");
-    const [pages, setPages] = useState([
-        "<h1>Modernism in Late 20th Century Architecture</h1><p>The late 20th century saw a shift from the rigid functionalism of early modernism to something more expressive...</p>"
-    ]);
+    const [noteId, setNoteId] = useState(routeId ?? null);
+    const [title, setTitle] = useState("Untitled Note");
+    const [pages, setPages] = useState([""]);
     const [activePageIndex, setActivePageIndex] = useState(0);
-    const [isSaved, setIsSaved] = useState(true);
 
     // Layout State
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -43,6 +47,20 @@ export const Note = () => {
     const pageRefsRef = useRef([]);
     // When true, the next activePageIndex change should place cursor at END (backspace nav)
     const pendingFocusEndRef = useRef(false);
+
+    // Ctrl+S — instant save (forceFlush is stable, defined after useNoteSync below,
+    // so we use a ref to avoid a stale closure here)
+    const forceFlushRef = useRef(null);
+    useEffect(() => {
+        const handler = (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                forceFlushRef.current?.();
+            }
+        };
+        window.addEventListener('keydown', handler);
+        return () => window.removeEventListener('keydown', handler);
+    }, []);
 
     // After navigating back via backspace, move cursor to end of the previous page.
     // This runs after NotePage's auto-focus effect (child effects run before parent),
@@ -148,12 +166,47 @@ export const Note = () => {
         });
     }, [pages.length]);
 
-    // Autosave simulation
+    // ── Note sync ──────────────────────────────────────────────────────────────
+    // getState is a stable ref — always returns the latest state without
+    // being a useCallback dependency (avoids stale closure on the hook).
+    const latestStateRef = useRef({});
+    latestStateRef.current = {
+        title, pages, fontSize, lineSpacing, drawingData,
+        paperStyle, paperColor, lineColor, textColor, fontFamily,
+    };
+    const getState = useCallback(() => latestStateRef.current, []);
+
+    const { saveStatus, markDirty, forceFlush, loadNote } = useNoteSync(
+        getState,
+        noteId,
+        (id) => {
+            setNoteId(id);
+            // Update URL to /lockedin/notes/:id without a page reload
+            navigate(`/lockedin/notes/${id}`, { replace: true });
+        }
+    );
+
+    // Keep the Ctrl+S handler in sync with the latest forceFlush
+    forceFlushRef.current = forceFlush;
+
+    // Load existing note on mount
     useEffect(() => {
-        setIsSaved(false);
-        const timer = setTimeout(() => setIsSaved(true), 1500);
-        return () => clearTimeout(timer);
-    }, [title, pages, fontSize, lineSpacing, textColor, paperColor, lineColor, paperStyle, fontFamily]);
+        if (!noteId) return;
+        loadNote(noteId, (serverNote) => {
+            const s = deserializeNote(serverNote);
+            setTitle(s.title);
+            setPages(s.pages);
+            setFontSize(s.fontSize);
+            setLineSpacing(s.lineSpacing);
+            setDrawingData(s.drawingData);
+            setPaperStyle(s.paperStyle);
+            setPaperColor(s.paperColor);
+            setLineColor(s.lineColor);
+            setTextColor(s.textColor);
+            setFontFamily(s.fontFamily);
+        });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     // Formatting commands — also handles draw mode commands
     const handleCommand = useCallback((command, value = null) => {
@@ -190,8 +243,9 @@ export const Note = () => {
             const newPages = [...pages];
             newPages[activePageIndex] = activeEditorRef.current.innerHTML;
             setPages(newPages);
+            markDirty('content');
         }
-    }, [pages, activePageIndex]);
+    }, [pages, activePageIndex, markDirty]);
 
     // Handle overflow: split content moves to the next page (or a new page).
     // The per-page Set guard prevents the same page from double-firing while
@@ -210,9 +264,10 @@ export const Note = () => {
             return newPages;
         });
         setActivePageIndex(index + 1);
+        markDirty('content');
 
         setTimeout(() => { overflowGuardRef.current.delete(index); }, 300);
-    }, []);
+    }, [markDirty]);
 
     const handleNoteKeyDown = useCallback((e, index) => {
         if (e.key !== 'Backspace' || index === 0) return;
@@ -238,6 +293,7 @@ export const Note = () => {
                 const isEmpty = editorEl.textContent.trim() === '';
                 if (isEmpty) {
                     setPages(prev => prev.filter((_, i) => i !== index));
+                    markDirty('content');
                 }
                 setActivePageIndex(index - 1);
             }
@@ -247,15 +303,14 @@ export const Note = () => {
     const handleAddPage = () => {
         setPages(prev => [...prev, ""]);
         setActivePageIndex(pages.length);
+        markDirty('content');
     };
 
     const handleRemovePage = (index) => {
         if (pages.length <= 1) return;
-        setPages(prev => {
-            const newPages = prev.filter((_, i) => i !== index);
-            return newPages;
-        });
+        setPages(prev => prev.filter((_, i) => i !== index));
         setActivePageIndex(prev => Math.min(prev, pages.length - 2));
+        markDirty('content');
     };
 
     const slug = () => title.replace(/\s+/g, '-').toLowerCase() || 'note';
@@ -328,9 +383,12 @@ export const Note = () => {
     return (
         <div className="flex flex-col flex-1 h-screen overflow-hidden bg-white border-l border-slate-200 lg:ml-64 pt-16 lg:pt-0">
             <NoteHeader
-                title={title} onTitleChange={setTitle} isSaved={isSaved}
-                onExportPDF={() => handleExport('pdf')}
-                onExportImage={() => handleExport('png')}
+                title={title}
+                onTitleChange={(v) => { setTitle(v); markDirty('title'); }}
+                saveStatus={saveStatus}
+                onSave={forceFlush}
+                onExportPDF={async () => { await forceFlush(); handleExport('pdf'); }}
+                onExportImage={async () => { await forceFlush(); handleExport('png'); }}
                 onCopy={() => alert('Copied!')}
                 onShare={() => alert('Shared!')}
                 onToggleAI={() => setIsAISidebarOpen(!isAISidebarOpen)}
@@ -344,16 +402,14 @@ export const Note = () => {
                     recentColors={recentColors}
                     onAddRecentColor={addRecentColor}
                     onImageUpload={(url) => {
-                        // Restore saved selection then insert image at cursor
-                        if (activeEditorRef.current) {
-                            activeEditorRef.current.focus();
-                        }
+                        if (activeEditorRef.current) activeEditorRef.current.focus();
                         const img = `<img src="${url}" style="max-width:100%;height:auto;display:inline-block;" data-resizable="true" />`;
                         document.execCommand('insertHTML', false, img);
                         if (activeEditorRef.current) {
                             const newPages = [...pages];
                             newPages[activePageIndex] = activeEditorRef.current.innerHTML;
                             setPages(newPages);
+                            markDirty('content');
                         }
                     }}
                 />
@@ -369,6 +425,7 @@ export const Note = () => {
                                     newPages[index] = content;
                                     return newPages;
                                 });
+                                markDirty('content');
                             }}
                             paperStyle={paperStyle}
                             fontFamily={fontFamily}
@@ -390,6 +447,7 @@ export const Note = () => {
                                     next[index] = dataUrl;
                                     return next;
                                 });
+                                markDirty('drawingData');
                             }}
                         />
                     </div>
@@ -426,13 +484,13 @@ export const Note = () => {
 
                 <NoteSettingsSidebar
                     isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)}
-                    paperStyle={paperStyle} setPaperStyle={setPaperStyle}
-                    fontFamily={fontFamily} setFontFamily={setFontFamily}
-                    fontSize={fontSize} setFontSize={setFontSize}
-                    lineSpacing={lineSpacing} setLineSpacing={setLineSpacing}
-                    textColor={textColor} setTextColor={setTextColor}
-                    paperColor={paperColor} setPaperColor={setPaperColor}
-                    lineColor={lineColor} setLineColor={setLineColor}
+                    paperStyle={paperStyle} setPaperStyle={(v) => { setPaperStyle(v); markDirty('paperStyle'); }}
+                    fontFamily={fontFamily} setFontFamily={(v) => { setFontFamily(v); markDirty('fontFamily'); }}
+                    fontSize={fontSize} setFontSize={(v) => { setFontSize(v); markDirty('fontSize'); }}
+                    lineSpacing={lineSpacing} setLineSpacing={(v) => { setLineSpacing(v); markDirty('lineSpacing'); }}
+                    textColor={textColor} setTextColor={(v) => { setTextColor(v); markDirty('textColor'); }}
+                    paperColor={paperColor} setPaperColor={(v) => { setPaperColor(v); markDirty('paperColor'); }}
+                    lineColor={lineColor} setLineColor={(v) => { setLineColor(v); markDirty('lineColor'); }}
                     recentColors={recentColors} onAddRecentColor={addRecentColor}
                 />
             </div>

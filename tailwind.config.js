@@ -28,15 +28,18 @@ export default {
         }
       },
       fontFamily: {
-        display: ["Plus Jakarta Sans", "sans-serif"],
-        "serif-elegant": ["Crimson Pro", "serif"],
-        handwritten: ["Architects Daughter", "cursive"],
-        handwriting2: ["Caveat", "cursive"],
-        sketch: ["Shadows Into Light", "cursive"],
-        casual: ["Shadows Into Light", "cursive"],
-        handwriting1: ["Dancing Script", "cursive"],
-
-        handwriting3: ["Shadows Into Light", "cursive"],
+        display:        ["Plus Jakarta Sans", "sans-serif"],
+        "serif-elegant":["Crimson Pro", "serif"],
+        handwritten:    ["Architects Daughter", "cursive"],
+        // Note editor fonts — ids match frontend fontFamily state
+        handwriting:    ["Kalam", "cursive"],           // id: handwriting
+        handwriting2:   ["Caveat", "cursive"],          // id: casual
+        handwriting3:   ["Indie Flower", "cursive"],    // id: fun
+        sketch:         ["Shadows Into Light", "cursive"], // id: shadows
+        dancing:        ["Dancing Script", "cursive"],  // id: dancing
+        // legacy aliases kept for backwards compat
+        handwriting1:   ["Dancing Script", "cursive"],
+        casual:         ["Caveat", "cursive"],
       },
       boxShadow: {
         paper: "2px 2px 5px rgba(0,0,0,0.05), 5px 15px 30px rgba(0,0,0,0.07)",
