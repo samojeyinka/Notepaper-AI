@@ -11,6 +11,7 @@ import { jsPDF } from "jspdf";
 import JSZip from 'jszip';
 import { useNoteSync } from "../../hooks/useNoteSync";
 import { deserializeNote } from "../../api/noteService";
+import { NoteVersionSidebar } from "./NoteVersionSidebar";
 
 export const Note = () => {
     const { id: routeId } = useParams();
@@ -25,6 +26,7 @@ export const Note = () => {
     // Layout State
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [isAISidebarOpen, setIsAISidebarOpen] = useState(false);
+    const [isVersionSidebarOpen, setIsVersionSidebarOpen] = useState(false);
     const [isPageSidebarOpen, setIsPageSidebarOpen] = useState(true);
 
     // Draw Mode
@@ -393,6 +395,8 @@ export const Note = () => {
                 onShare={() => alert('Shared!')}
                 onToggleAI={() => setIsAISidebarOpen(!isAISidebarOpen)}
                 isAIOpen={isAISidebarOpen}
+                onToggleHistory={() => setIsVersionSidebarOpen(v => !v)}
+                isHistoryOpen={isVersionSidebarOpen}
             />
 
             <div className="flex flex-1 overflow-hidden relative">
@@ -474,6 +478,31 @@ export const Note = () => {
                 </div>
 
                 {isAISidebarOpen && <NoteAISidebar />}
+
+                {isVersionSidebarOpen && (
+                    <NoteVersionSidebar
+                        noteId={noteId}
+                        onClose={() => setIsVersionSidebarOpen(false)}
+                        paperStyle={paperStyle}
+                        paperColor={paperColor}
+                        lineColor={lineColor}
+                        textColor={textColor}
+                        fontFamily={fontFamily}
+                        onRevert={(revertedNote) => {
+                            const s = deserializeNote(revertedNote);
+                            setTitle(s.title);
+                            setPages(s.pages);
+                            setFontSize(s.fontSize);
+                            setLineSpacing(s.lineSpacing);
+                            setDrawingData(s.drawingData);
+                            setPaperStyle(s.paperStyle);
+                            setPaperColor(s.paperColor);
+                            setLineColor(s.lineColor);
+                            setTextColor(s.textColor);
+                            setFontFamily(s.fontFamily);
+                        }}
+                    />
+                )}
 
                 <button
                     onClick={() => setIsSettingsOpen(true)}

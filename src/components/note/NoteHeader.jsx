@@ -18,7 +18,9 @@ export const NoteHeader = ({
     onCopy,
     onShare,
     onToggleAI,
-    isAIOpen
+    isAIOpen,
+    onToggleHistory,
+    isHistoryOpen,
 }) => {
     const status = STATUS_CONFIG[saveStatus] ?? STATUS_CONFIG.idle;
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -68,7 +70,18 @@ export const NoteHeader = ({
             </div>
             <div className="flex items-center gap-3">
                 <div className="flex items-center bg-slate-100 rounded-full p-1 mr-4 relative">
-                    <button 
+                    <button
+                        onClick={onToggleHistory}
+                        title="Version history"
+                        className={`p-2 rounded-full transition-all duration-200 flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95
+                            ${isHistoryOpen
+                                ? 'bg-primary text-white shadow-xl shadow-primary/40'
+                                : 'text-slate-400 hover:bg-white hover:text-primary hover:shadow-lg'}`}
+                    >
+                        <span className="material-icons-round text-[20px]">history</span>
+                    </button>
+
+                    <button
                         onClick={onToggleAI}
                         className={`p-2 rounded-full transition-all duration-500 relative flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95
                             ${isAIOpen 
