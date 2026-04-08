@@ -21,6 +21,10 @@ export const NoteHeader = ({
     isAIOpen,
     onToggleHistory,
     isHistoryOpen,
+    canUndo,
+    canRedo,
+    onUndo,
+    onRedo,
 }) => {
     const status = STATUS_CONFIG[saveStatus] ?? STATUS_CONFIG.idle;
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -42,7 +46,7 @@ export const NoteHeader = ({
         <header className="h-20 border-b border-slate-200 bg-white/80 backdrop-blur-md flex items-center justify-between px-8 sticky top-0 z-40">
             <div className="flex items-center gap-4">
                 <input
-                    className="bg-transparent border-none text-xl font-display font-semibold focus:ring-0 w-64 md:w-96 text-slate-900"
+                    className="bg-transparent border-none text-[17px] font-display font-semibold focus:ring-0 w-64 md:w-96 text-slate-900"
                     type="text"
                     value={title}
                     onChange={(e) => onTitleChange(e.target.value)}
@@ -58,7 +62,7 @@ export const NoteHeader = ({
                     onClick={onSave}
                     disabled={saveStatus === 'saving'}
                     title="Save now (Ctrl+S)"
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-normal transition-all duration-200
                         ${saveStatus === 'saving'
                             ? 'bg-amber-50 text-amber-400 cursor-wait'
                             : 'bg-primary/10 text-primary hover:bg-primary hover:text-white active:scale-95'
@@ -67,28 +71,47 @@ export const NoteHeader = ({
                     <span className="material-icons-round text-[14px]">save</span>
                     Save
                 </button>
+
+                <div className="flex items-center gap-1">
+                    <button
+                        onClick={onUndo}
+                        disabled={!canUndo}
+                        title="Undo (Ctrl+Z)"
+                        className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-90"
+                    >
+                        <span className="material-icons-round text-[17px]">undo</span>
+                    </button>
+                    <button
+                        onClick={onRedo}
+                        disabled={!canRedo}
+                        title="Redo (Ctrl+Y)"
+                        className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-90"
+                    >
+                        <span className="material-icons-round text-[17px]">redo</span>
+                    </button>
+                </div>
             </div>
             <div className="flex items-center gap-3">
                 <div className="flex items-center bg-slate-100 rounded-full p-1 mr-4 relative">
                     <button
                         onClick={onToggleHistory}
                         title="Version history"
-                        className={`p-2 rounded-full transition-all duration-200 flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95
+                        className={`p-1 rounded-full transition-all duration-200 flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95
                             ${isHistoryOpen
-                                ? 'bg-primary text-white shadow-xl shadow-primary/40'
+                                ? 'bg-primary text-white shadow-md shadow-primary/40'
                                 : 'text-slate-400 hover:bg-white hover:text-primary hover:shadow-lg'}`}
                     >
-                        <span className="material-icons-round text-[20px]">history</span>
+                        <span className="material-icons-round text-[17px]">history</span>
                     </button>
 
                     <button
                         onClick={onToggleAI}
-                        className={`p-2 rounded-full transition-all duration-500 relative flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95
+                        className={`p-1 rounded-full transition-all duration-500 relative flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95
                             ${isAIOpen 
                                 ? 'bg-primary text-white shadow-xl shadow-primary/40' 
                                 : 'text-slate-400 hover:bg-white hover:text-primary hover:shadow-lg animate-glow'}`}
                     >
-                        <span className="material-icons-round text-[20px]">auto_awesome</span>
+                        <span className="material-icons-round text-[17px]">auto_awesome</span>
                         {!isAIOpen && (
                             <span className="absolute inset-0 rounded-full border-2 border-primary/20 animate-ping opacity-30 pointer-events-none" />
                         )}
@@ -104,16 +127,14 @@ export const NoteHeader = ({
                             animation: glow 2.5s infinite ease-in-out;
                         }
                     `}</style>
-                    {/* <button className="p-2 bg-white shadow-sm rounded-full text-primary transition-all">
-                        <span className="material-icons-round">notes</span>
-                    </button> */}
+                  
                     
                     <div className="relative">
                         <button 
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
-                            className={`p-2 hover:bg-white rounded-full text-slate-600 transition-all ${isMenuOpen ? 'bg-white shadow-sm' : ''}`}
+                            className={`p-1 hover:bg-white rounded-full text-slate-600 transition-all ${isMenuOpen ? 'bg-white shadow-sm' : ''}`}
                         >
-                            <span className="material-icons-round">more_vert</span>
+                            <span className="material-icons-round text-[17px]">more_vert</span>
                         </button>
                         
                         {isMenuOpen && (
@@ -130,13 +151,13 @@ export const NoteHeader = ({
                         )}
                     </div>
                 </div>
-                <button className="flex items-center gap-2 bg-accent-green text-white px-5 py-2.5 rounded-full font-semibold shadow-lg shadow-accent-green/20 hover:scale-105 active:scale-95 transition-all">
-                    <span className="material-icons-round">mic</span>
-                    <span className="hidden sm:inline">Voice Record</span>
+                <button className="flex items-center gap-1 bg-accent-green text-[13px] text-white px-1.5 py-1.5 rounded-full font-medium shadow-lg shadow-accent-green/20 hover:scale-105 active:scale-95 transition-all">
+                    <span className="material-icons-round text-[17px]">mic</span>
+                    <span className="hidden text-[13px]">Voice Record</span>
                 </button>
-                <button className="bg-primary text-white px-6 py-2.5 rounded-full font-semibold shadow-lg shadow-primary/30 hover:scale-105 active:scale-95 transition-all">
+                {/* <button className="bg-primary text-white text-[13px] px-3 py-1.5 rounded-full font-medium shadow-lg shadow-primary/30 hover:scale-105 active:scale-95 transition-all">
                     Upgrade Pro
-                </button>
+                </button> */}
             </div>
         </header>
     );
