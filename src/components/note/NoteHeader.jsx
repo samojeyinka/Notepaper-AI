@@ -1,9 +1,18 @@
 import React, { useState } from "react";
 
-export const NoteHeader = ({ 
-    title, 
-    onTitleChange, 
-    isSaved,
+const STATUS_CONFIG = {
+    loading: { label: 'Loading...', icon: 'hourglass_top',  cls: 'bg-slate-100 text-slate-400' },
+    saving:  { label: 'Saving...',  icon: 'sync',           cls: 'bg-amber-50  text-amber-500 animate-spin-slow' },
+    saved:   { label: 'Saved',      icon: 'cloud_done',     cls: 'bg-green-50  text-green-600' },
+    error:   { label: 'Unsaved',    icon: 'cloud_off',      cls: 'bg-red-50    text-red-500' },
+    idle:    { label: '',           icon: '',               cls: '' },
+};
+
+export const NoteHeader = ({
+    title,
+    onTitleChange,
+    saveStatus = 'idle',
+    onSave,
     onExportPDF,
     onExportImage,
     onCopy,
@@ -11,6 +20,7 @@ export const NoteHeader = ({
     onToggleAI,
     isAIOpen
 }) => {
+    const status = STATUS_CONFIG[saveStatus] ?? STATUS_CONFIG.idle;
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const MenuButton = ({ icon, label, onClick }) => (
@@ -36,9 +46,25 @@ export const NoteHeader = ({
                     onChange={(e) => onTitleChange(e.target.value)}
                     placeholder="Untitled Note"
                 />
-                <span className={`px-2 py-1 bg-slate-100 text-slate-500 text-xs rounded-lg uppercase tracking-wider font-bold transition-opacity duration-300 ${isSaved ? 'opacity-100' : 'opacity-0'}`}>
-                    Saved
-                </span>
+                {status.label && (
+                    <span className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-300 ${status.cls}`}>
+                        <span className={`material-icons-round text-[14px] ${saveStatus === 'saving' ? 'animate-spin' : ''}`}>{status.icon}</span>
+                        {status.label}
+                    </span>
+                )}
+                <button
+                    onClick={onSave}
+                    disabled={saveStatus === 'saving'}
+                    title="Save now (Ctrl+S)"
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200
+                        ${saveStatus === 'saving'
+                            ? 'bg-amber-50 text-amber-400 cursor-wait'
+                            : 'bg-primary/10 text-primary hover:bg-primary hover:text-white active:scale-95'
+                        }`}
+                >
+                    <span className="material-icons-round text-[14px]">save</span>
+                    Save
+                </button>
             </div>
             <div className="flex items-center gap-3">
                 <div className="flex items-center bg-slate-100 rounded-full p-1 mr-4 relative">

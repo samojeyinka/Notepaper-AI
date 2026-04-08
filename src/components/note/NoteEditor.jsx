@@ -281,15 +281,13 @@ const NotePage = ({
           lineHeight: `${lineSpacing}px`,
           color: textColor,
           fontFamily:
-            fontFamily === 'sans'
-              ? 'Inter, ui-sans-serif, sans-serif'
-              : fontFamily === 'handwriting'
-              ? 'Kalam, cursive'
-              : fontFamily === 'casual'
-              ? 'Caveat, cursive'
-              : fontFamily === 'fun'
-              ? '"Indie Flower", cursive'
-              : 'inherit',
+            fontFamily === 'sans'        ? 'Inter, ui-sans-serif, sans-serif' :
+            fontFamily === 'handwriting' ? 'Kalam, cursive' :
+            fontFamily === 'casual'      ? 'Caveat, cursive' :
+            fontFamily === 'fun'         ? '"Indie Flower", cursive' :
+            fontFamily === 'shadows'     ? '"Shadows Into Light", cursive' :
+            fontFamily === 'dancing'     ? '"Dancing Script", cursive' :
+            'inherit',
           wordBreak: 'break-word',
           overflowWrap: 'break-word',
           overflow: 'hidden',
@@ -351,11 +349,12 @@ export const NoteEditor = forwardRef(function NoteEditor(
   ref
 ) {
   const fontMapping = {
-    sans: 'font-sans',
-    handwriting: 'font-handwriting',
-    casual: 'font-handwriting2',
-    neat: 'font-handwriting',
-    fun: 'font-handwriting3',
+    sans:        'font-sans',
+    handwriting: 'font-handwriting',  // Kalam
+    casual:      'font-handwriting2', // Caveat
+    fun:         'font-handwriting3', // Indie Flower
+    shadows:     'font-sketch',       // Shadows Into Light
+    dancing:     'font-dancing',      // Dancing Script
   };
   const fontClass = fontMapping[fontFamily] || 'font-sans';
 
