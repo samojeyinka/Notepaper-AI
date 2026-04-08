@@ -253,7 +253,7 @@ const NotePage = ({
       )}
 
       {/* Page number badge */}
-      <div className="absolute -left-14 top-6 w-10 h-10 rounded-2xl bg-white border border-slate-100 flex items-center justify-center shadow-sm text-xs font-bold text-slate-400 select-none">
+      <div className="absolute -left-5 top-6 w-7 h-7 rounded-xl bg-white border border-slate-200 flex items-center justify-center shadow-sm text-xs font-medium text-slate-400 select-none">
         {index + 1}
       </div>
 

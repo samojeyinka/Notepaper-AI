@@ -104,7 +104,7 @@ const FontSizePopover = ({ anchorRef, options, onSelect }) => (
   </Popover>
 );
 
-const AdvancedColorPicker = ({ anchorRef, color, onChange, onClose, title, recentColors, onAddRecentColor }) => {
+const AdvancedColorPicker = ({ anchorRef, color, onChange, onClose, title, recentColors, onAddRecentColor, showNone, onNone }) => {
   const [localColor, setLocalColor] = useState(color || "#000000");
 
   useEffect(() => {
@@ -114,7 +114,23 @@ const AdvancedColorPicker = ({ anchorRef, color, onChange, onClose, title, recen
   return (
     <Popover anchorRef={anchorRef}>
       <div className="p-4 flex flex-col gap-4 w-64">
-        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{title}</p>
+        <div className="flex items-center justify-between">
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{title}</p>
+          {showNone && (
+            <button
+              onMouseDown={(e) => {
+                e.preventDefault();
+                onNone?.();
+                onClose();
+              }}
+              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-red-50 hover:text-red-500 text-slate-500 text-[10px] font-bold transition-colors"
+              title="Remove background color"
+            >
+              <span className="material-icons-round text-[12px]">format_color_reset</span>
+              None
+            </button>
+          )}
+        </div>
 
         <div className="custom-toolbar-picker" onMouseDown={(e) => e.stopPropagation()}>
           <HexColorPicker
@@ -513,12 +529,19 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
           {showHighlight && (
             <AdvancedColorPicker
               anchorRef={highlightBtnRef}
-              color={activeState?.hiliteColor || "transparent"}
-              title="Highlight"
+              color={activeState?.hiliteColor || "#ffffff"}
+              title="Text Background"
               onClose={() => setShowHighlight(false)}
               onChange={(color) => onAction('hiliteColor', color)}
               recentColors={recentColors}
               onAddRecentColor={onAddRecentColor}
+              showNone
+              onNone={() => {
+                // removeFormat only removes colour if we target backColor specifically
+                document.execCommand('styleWithCSS', false, true);
+                document.execCommand('hiliteColor', false, 'transparent');
+                onAction('hiliteColor', 'transparent');
+              }}
             />
           )}
         </div>

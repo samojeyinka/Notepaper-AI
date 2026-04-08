@@ -1,13 +1,14 @@
+import { Link } from "react-router-dom";
 
 
-export const ActionCard = ({ icon, label, shapeClass, bgColor }) => {
+export const ActionCard = ({ icon, label, shapeClass, bgColor,url }) => {
   return (
-    <button className="group flex flex-col items-center justify-center p-2 md:p-4 bg-white rounded-2xl  hover:shadow-sm transition-all hover:-translate-y-1">
+    <Link to={`/lockedin/${url}`} className="group flex flex-col items-center justify-center p-2 md:p-4 bg-white rounded-2xl  hover:shadow-sm transition-all hover:-translate-y-1">
       <div className={`${shapeClass} ${bgColor} w-10 h-10 md:w-24 md:h-24 flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform`}>
         <span className="material-icons-round text-[16px] md:text-3xl">{icon}</span>
       </div>
       <span className="font-semibold text-[14px] md:text-lg">{label}</span>
-    </button>
+    </Link>
   );
 };
 
@@ -20,18 +21,21 @@ export const ActionCardsSection = () => {
         label="New Note"
         shapeClass="pentagon-shape"
         bgColor="bg-yellow-400"
+        url="/notes/new"
       />
       <ActionCard
         icon="mic"
         label="Voice Record"
         shapeClass="rounded-full"
         bgColor="bg-green-500"
+        url="/notes/new"
       />
       <ActionCard
         icon="auto_awesome"
         label="AI Generate"
         shapeClass="blob-shape"
         bgColor="bg-purple-500"
+        url="/notes/new"
       />
     </section>
   );

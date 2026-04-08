@@ -11,7 +11,7 @@ export const NotePageSidebar = ({
     return (
         <aside className="w-64 border-l border-slate-200 bg-white flex flex-col p-6 gap-6 relative z-20 shrink-0 animate-in slide-in-from-right duration-300">
             <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Pages</h3>
+                <h3 className="text-[13px] font-medium text-slate-800 uppercase tracking-wider">Pages</h3>
                 <button 
                     onClick={onCollapse}
                     className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 transition-colors"
@@ -64,12 +64,12 @@ export const NotePageSidebar = ({
                 className="mt-auto w-full group flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white py-3 rounded-2xl transition-all shadow-lg shadow-slate-900/20 active:scale-95"
             >
                 <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center group-hover:rotate-90 transition-transform">
-                    <span className="material-icons-round text-sm">add</span>
+                    <span className="material-icons-round text-[14px]">add</span>
                 </div>
-                <span className="text-xs font-bold uppercase tracking-widest">New Page</span>
+                <span className="text-[10px] font-medium uppercase tracking-widest">New Page</span>
             </button>
 
-            <div className="flex items-center justify-center gap-2 text-slate-400 text-[10px] font-bold uppercase tracking-widest border-t border-slate-50 pt-4">
+            <div className="flex items-center justify-center gap-2 text-slate-400 text-[10px] font-normal uppercase tracking-widest border-t border-slate-50 pt-2">
                 <span className="material-icons-round text-[14px]">description</span>
                 {pages.length} Pages Total
             </div>

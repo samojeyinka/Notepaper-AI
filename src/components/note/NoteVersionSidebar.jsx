@@ -399,7 +399,7 @@ export const NoteVersionSidebar = ({
                 {loading && (
                     <div className="flex flex-col items-center justify-center py-16 gap-3 text-slate-400">
                         <span className="material-icons-round text-[32px] animate-spin">sync</span>
-                        <p className="text-xs font-medium">Loading history…</p>
+                        <p className="text-xs font-normal">Loading history…</p>
                     </div>
                 )}
 
@@ -413,7 +413,7 @@ export const NoteVersionSidebar = ({
                 {!loading && !error && versions.length === 0 && (
                     <div className="flex flex-col items-center justify-center py-16 gap-3 px-6 text-center">
                         <span className="material-icons-round text-[36px] text-slate-200">history_toggle_off</span>
-                        <p className="text-xs font-medium text-slate-400">No versions yet. Keep writing — snapshots are saved every 5 minutes.</p>
+                        <p className="text-[10px] font-normal text-slate-400">No versions yet. Keep writing — snapshots are saved every 5 minutes.</p>
                     </div>
                 )}
 
