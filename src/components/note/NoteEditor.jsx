@@ -2,6 +2,7 @@ import { forwardRef, useEffect, useRef, useCallback, useState } from "react";
 import { createPortal } from "react-dom";
 
 // US Letter dimensions at 96 dpi: 816 × 1056 px
+const PAGE_WIDTH  = 816;
 const PAGE_HEIGHT = 1056;
 
 // Remove child nodes from the end of `el` until its scrollHeight fits within
@@ -361,6 +362,23 @@ export const NoteEditor = forwardRef(function NoteEditor(
   const containerRef = useRef(null);
   const pageRefs = useRef([]);
 
+  // Dynamically scale pages so they always fit the available container width.
+  // GAP is the total horizontal breathing room we want around the scaled page.
+  const GAP = 48;
+  const [pageScale, setPageScale] = useState(1);
+
+  useEffect(() => {
+    const measure = () => {
+      if (!containerRef.current) return;
+      const available = containerRef.current.clientWidth - GAP;
+      setPageScale(Math.min(1, available / PAGE_WIDTH));
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    if (containerRef.current) ro.observe(containerRef.current);
+    return () => ro.disconnect();
+  }, []);
+
   // Auto-scroll to active page when it changes
   useEffect(() => {
     const pageEl = pageRefs.current[activePageIndex];
@@ -628,16 +646,25 @@ export const NoteEditor = forwardRef(function NoteEditor(
       className="flex-1 overflow-y-auto custom-scrollbar"
       style={{
         background: '#f1f5f9',
-        padding: '48px 80px',
+        padding: '32px 0',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: '40px',
+        gap: `${Math.round(40 * pageScale)}px`,
       }}
     >
       {pages.map((content, index) => (
+        // Outer wrapper collapses to the SCALED dimensions so the scrollable
+        // container doesn't overflow horizontally, while the inner page renders
+        // at its true 816 × 1056 size and is scaled via transform.
         <div
           key={index}
+          style={{
+            width:  `${Math.round(PAGE_WIDTH  * pageScale)}px`,
+            height: `${Math.round(PAGE_HEIGHT * pageScale)}px`,
+            flexShrink: 0,
+            position: 'relative',
+          }}
           ref={(el) => {
             pageRefs.current[index] = el;
             if (index === pages.length - 1 && onPageRefsReady) {
@@ -645,30 +672,39 @@ export const NoteEditor = forwardRef(function NoteEditor(
             }
           }}
         >
-          <NotePage
-            index={index}
-            content={content}
-            activePageIndex={activePageIndex}
-            onContentChange={onContentChange}
-            onFocus={setActivePageIndex}
-            onHeightOverflow={onPageOverflow}
-            onKeyDown={onKeyDown}
-            paperStyle={paperStyle}
-            paperColor={paperColor}
-            lineColor={lineColor}
-            lineSpacing={lineSpacing}
-            fontClass={fontClass}
-            fontSize={fontSize}
-            fontFamily={fontFamily}
-            textColor={textColor}
-            editorRef={ref}
-            drawMode={drawMode}
-            drawingDataUrl={drawingData[index] ?? ""}
-            onDrawingChange={onDrawingChange}
-          />
+          <div
+            style={{
+              transform: `scale(${pageScale})`,
+              transformOrigin: 'top left',
+              width:  `${PAGE_WIDTH}px`,
+              height: `${PAGE_HEIGHT}px`,
+            }}
+          >
+            <NotePage
+              index={index}
+              content={content}
+              activePageIndex={activePageIndex}
+              onContentChange={onContentChange}
+              onFocus={setActivePageIndex}
+              onHeightOverflow={onPageOverflow}
+              onKeyDown={onKeyDown}
+              paperStyle={paperStyle}
+              paperColor={paperColor}
+              lineColor={lineColor}
+              lineSpacing={lineSpacing}
+              fontClass={fontClass}
+              fontSize={fontSize}
+              fontFamily={fontFamily}
+              textColor={textColor}
+              editorRef={ref}
+              drawMode={drawMode}
+              drawingDataUrl={drawingData[index] ?? ""}
+              onDrawingChange={onDrawingChange}
+            />
+          </div>
         </div>
       ))}
-      <div style={{ height: '80px', flexShrink: 0 }} />
+      <div style={{ height: '32px', flexShrink: 0 }} />
     </div>
     </>
   );

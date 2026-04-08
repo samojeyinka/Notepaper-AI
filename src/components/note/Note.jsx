@@ -10,6 +10,7 @@ import * as htmlToImage from 'html-to-image';
 import { jsPDF } from "jspdf";
 import JSZip from 'jszip';
 import { useNoteSync } from "../../hooks/useNoteSync";
+import { useUndoHistory } from "../../hooks/useUndoHistory";
 import { deserializeNote } from "../../api/noteService";
 import { NoteVersionSidebar } from "./NoteVersionSidebar";
 
@@ -43,6 +44,15 @@ export const Note = () => {
     const [lineColor, setLineColor] = useState("#cbd5e1");
     const [recentColors, setRecentColors] = useState(["#ffffff", "#FDFBF7", "#F0FDF4", "#F0F9FF", "#A78BFA", "#F472B6"]);
 
+    // ── Undo / Redo refs (functions assigned after markDirty is available) ───
+    const { push: historyPush, undo: historyUndo, redo: historyRedo, canUndo, canRedo } = useUndoHistory();
+    const isHistoryApplyingRef = useRef(false);
+    const contentSessionRef    = useRef(false);
+    const contentIdleTimerRef  = useRef(null);
+    const handleUndoRef        = useRef(null);
+    const handleRedoRef        = useRef(null);
+    // ─────────────────────────────────────────────────────────────────────────
+
     // Ref to the currently active page's contentEditable div
     const activeEditorRef = useRef(null);
     // Live refs to each page's wrapper DOM node (used for export)
@@ -55,10 +65,12 @@ export const Note = () => {
     const forceFlushRef = useRef(null);
     useEffect(() => {
         const handler = (e) => {
-            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-                e.preventDefault();
-                forceFlushRef.current?.();
-            }
+            if (!(e.ctrlKey || e.metaKey)) return;
+            if (e.key === 's') { e.preventDefault(); forceFlushRef.current?.(); return; }
+            // Undo/redo outside contentEditable — inside the editor the browser handles native text undo
+            if (document.activeElement?.isContentEditable) return;
+            if (e.key === 'z' && !e.shiftKey) { e.preventDefault(); handleUndoRef.current?.(); }
+            if (e.key === 'y' || (e.key === 'z' && e.shiftKey)) { e.preventDefault(); handleRedoRef.current?.(); }
         };
         window.addEventListener('keydown', handler);
         return () => window.removeEventListener('keydown', handler);
@@ -190,6 +202,49 @@ export const Note = () => {
 
     // Keep the Ctrl+S handler in sync with the latest forceFlush
     forceFlushRef.current = forceFlush;
+
+    // ── Undo / Redo implementation (markDirty now available) ─────────────────
+
+    // Restore a full state snapshot (undo, redo, or version revert)
+    const applySnapshot = useCallback((snapshot) => {
+        if (!snapshot) return;
+        isHistoryApplyingRef.current = true;
+        setTitle(snapshot.title);
+        setPages(snapshot.pages);
+        setFontSize(snapshot.fontSize);
+        setLineSpacing(snapshot.lineSpacing);
+        setDrawingData(snapshot.drawingData);
+        setPaperStyle(snapshot.paperStyle);
+        setPaperColor(snapshot.paperColor);
+        setLineColor(snapshot.lineColor);
+        setTextColor(snapshot.textColor);
+        setFontFamily(snapshot.fontFamily);
+        isHistoryApplyingRef.current = false;
+        markDirty(['title','content','paperStyle','paperColor','lineColor','textColor','fontFamily','fontSize','lineSpacing','drawingData']);
+    }, [markDirty]);
+
+    // Push snapshot BEFORE a discrete action (style/title/page-ops)
+    const pushNow = useCallback(() => {
+        if (isHistoryApplyingRef.current) return;
+        historyPush({ ...latestStateRef.current });
+    }, [historyPush]);
+
+    // Debounced push for continuous input (typing, drawing) — records once per edit session
+    const pushBeforeContent = useCallback(() => {
+        if (isHistoryApplyingRef.current) return;
+        if (!contentSessionRef.current) {
+            contentSessionRef.current = true;
+            historyPush({ ...latestStateRef.current });
+        }
+        clearTimeout(contentIdleTimerRef.current);
+        contentIdleTimerRef.current = setTimeout(() => { contentSessionRef.current = false; }, 800);
+    }, [historyPush]);
+
+    // Assign to stable refs every render so the keyboard listener always calls the latest closures
+    handleUndoRef.current = () => applySnapshot(historyUndo({ ...latestStateRef.current }));
+    handleRedoRef.current = () => applySnapshot(historyRedo({ ...latestStateRef.current }));
+
+    // ─────────────────────────────────────────────────────────────────────────
 
     // Load existing note on mount
     useEffect(() => {
@@ -386,7 +441,7 @@ export const Note = () => {
         <div className="flex flex-col flex-1 h-screen overflow-hidden bg-white border-l border-slate-200 lg:ml-64 pt-16 lg:pt-0">
             <NoteHeader
                 title={title}
-                onTitleChange={(v) => { setTitle(v); markDirty('title'); }}
+                onTitleChange={(v) => { pushNow(); setTitle(v); markDirty('title'); }}
                 saveStatus={saveStatus}
                 onSave={forceFlush}
                 onExportPDF={async () => { await forceFlush(); handleExport('pdf'); }}
@@ -397,6 +452,10 @@ export const Note = () => {
                 isAIOpen={isAISidebarOpen}
                 onToggleHistory={() => setIsVersionSidebarOpen(v => !v)}
                 isHistoryOpen={isVersionSidebarOpen}
+                canUndo={canUndo}
+                canRedo={canRedo}
+                onUndo={() => handleUndoRef.current?.()}
+                onRedo={() => handleRedoRef.current?.()}
             />
 
             <div className="flex flex-1 overflow-hidden relative">
@@ -424,6 +483,7 @@ export const Note = () => {
                             ref={activeEditorRef}
                             pages={pages}
                             onContentChange={(index, content) => {
+                                pushBeforeContent();
                                 setPages(prev => {
                                     const newPages = [...prev];
                                     newPages[index] = content;
@@ -446,6 +506,7 @@ export const Note = () => {
                             drawMode={drawMode}
                             drawingData={drawingData}
                             onDrawingChange={(index, dataUrl) => {
+                                pushBeforeContent();
                                 setDrawingData(prev => {
                                     const next = [...prev];
                                     next[index] = dataUrl;
@@ -513,13 +574,13 @@ export const Note = () => {
 
                 <NoteSettingsSidebar
                     isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)}
-                    paperStyle={paperStyle} setPaperStyle={(v) => { setPaperStyle(v); markDirty('paperStyle'); }}
-                    fontFamily={fontFamily} setFontFamily={(v) => { setFontFamily(v); markDirty('fontFamily'); }}
-                    fontSize={fontSize} setFontSize={(v) => { setFontSize(v); markDirty('fontSize'); }}
-                    lineSpacing={lineSpacing} setLineSpacing={(v) => { setLineSpacing(v); markDirty('lineSpacing'); }}
-                    textColor={textColor} setTextColor={(v) => { setTextColor(v); markDirty('textColor'); }}
-                    paperColor={paperColor} setPaperColor={(v) => { setPaperColor(v); markDirty('paperColor'); }}
-                    lineColor={lineColor} setLineColor={(v) => { setLineColor(v); markDirty('lineColor'); }}
+                    paperStyle={paperStyle} setPaperStyle={(v) => { pushNow(); setPaperStyle(v); markDirty('paperStyle'); }}
+                    fontFamily={fontFamily} setFontFamily={(v) => { pushNow(); setFontFamily(v); markDirty('fontFamily'); }}
+                    fontSize={fontSize} setFontSize={(v) => { pushNow(); setFontSize(v); markDirty('fontSize'); }}
+                    lineSpacing={lineSpacing} setLineSpacing={(v) => { pushNow(); setLineSpacing(v); markDirty('lineSpacing'); }}
+                    textColor={textColor} setTextColor={(v) => { pushNow(); setTextColor(v); markDirty('textColor'); }}
+                    paperColor={paperColor} setPaperColor={(v) => { pushNow(); setPaperColor(v); markDirty('paperColor'); }}
+                    lineColor={lineColor} setLineColor={(v) => { pushNow(); setLineColor(v); markDirty('lineColor'); }}
                     recentColors={recentColors} onAddRecentColor={addRecentColor}
                 />
             </div>
