@@ -1,395 +1,485 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { folderService } from '../api/folderService';
+import { noteService } from '../api/noteService';
+import { workspaceCache } from '../api/workspaceCache';
+import { FolderShape, CreateFolderModal } from './user/FloatingAIButton';
 
-// Header Component
-export const LibraryHeader = () => {
-  return (
-    <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-5">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight mb-1">Library & Folders</h1>
-        <p className="text-slate-500 text-[14px] font-normal">Manage your creative knowledge base.</p>
-      </div>
-      <div className="hidden md:flex items-center gap-3">
-        <button className="bg-primary hover:bg-indigo-500 text-white px-3 py-1.5 rounded-xl text-[15px] font-normal transition-all shadow-lg shadow-primary/25 flex items-center gap-2">
-          <span className="material-symbols-rounded">add</span>
-          New
-        </button>
-      </div>
-    </header>
-  );
+// ── helpers ───────────────────────────────────────────────────────────────────
+const timeAgo = (dateStr) => {
+    if (!dateStr) return '';
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'Just now';
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h ago`;
+    const days = Math.floor(hrs / 24);
+    if (days < 7) return `${days}d ago`;
+    return new Date(dateStr).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
 };
 
-// Search Bar Component
-export const SearchBar = ({ onSearch, onAdvancedFilter }) => {
-  const [searchQuery, setSearchQuery] = useState('');
+const extractSnippet = (raw) => {
+    if (!raw) return '';
+    try {
+        const parsed = JSON.parse(raw);
+        const html = (parsed.pages ?? [])[0] ?? '';
+        if (!html.trim()) return '';
+        const div = document.createElement('div');
+        div.innerHTML = html;
+        return (div.textContent ?? div.innerText ?? '').trim().slice(0, 120);
+    } catch {
+        return raw.replace(/<[^>]+>/g, '').trim().slice(0, 120);
+    }
+};
 
-  const handleChange = (e) => {
-    const value = e.target.value;
-    setSearchQuery(value);
-    onSearch(value);
-  };
-
-  return (
+// ── Search Bar ────────────────────────────────────────────────────────────────
+const SearchBar = ({ value, onChange }) => (
     <section className="mb-4">
-      <div className="relative max-w-4xl mx-auto">
-        {/* Search Icon */}
-        <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none">
-          <span className="material-symbols-rounded text-slate-400 text-[16px]">search</span>
-        </div>
-
-        {/* Input */}
-        <input
-          className="w-full bg-surface-light border-none rounded-xl py-2 pl-16 pr-24 shadow-sm focus:ring-2 focus:ring-primary text-[14px] placeholder-slate-400"
-          placeholder="Search across all notes, tags, or content..."
-          type="text"
-          value={searchQuery}
-          onChange={handleChange}
-        />
-
-        {/* Advanced Filters Button */}
-        <div className="absolute inset-y-0 right-4 flex items-center">
-          <button
-            onClick={onAdvancedFilter}
-            className="bg-slate-100 text-slate-500 text-[13px] font-normal px-2 py-1 rounded-xl hover:bg-slate-200 transition-colors"
-          >
-          <span className="material-symbols-rounded text-slate-400 text-[17px]">sort</span>
-          </button>
-        </div>
-      </div>
-    </section>
-  );
-};
-
-// Tag Pill Component - Reusable
-export const TagPill = ({ label, bgColor, textColor, borderColor, onClick }) => {
-  return (
-    <button
-      onClick={onClick}
-      className={`px-1.5 py-0.5 md:px-2.5 md:py-1 ${bgColor} ${textColor} rounded-full text-[10px] md:text-[12px] font-normal border ${borderColor} hover:shadow-md transition-all`}
-    >
-      {label}
-    </button>
-  );
-};
-
-// Recent Tags Section
-export const RecentTagsSection = ({ onTagClick }) => {
-  const tags = [
-    {
-      label: '#philosophy',
-      bgColor: 'bg-amber-100',
-      textColor: 'text-amber-700',
-      borderColor: 'border-amber-200',
-    },
-    {
-      label: '#biology',
-      bgColor: 'bg-emerald-100',
-      textColor: 'text-emerald-700',
-      borderColor: 'border-emerald-200',
-    },
-    {
-      label: '#design-systems',
-      bgColor: 'bg-sky-100',
-      textColor: 'text-sky-700',
-      borderColor: 'border-sky-200',
-    },
-    {
-      label: '#financial-reporting',
-      bgColor: 'bg-rose-100',
-      textColor: 'text-rose-700',
-      borderColor: 'border-rose-200',
-    },
-  ];
-
-  return (
-    <div className="flex flex-wrap items-center justify-center gap-3 mt-6">
-      <span className="text-[12px] md:text-sm font-medium text-slate-400 mr-2 uppercase tracking-widest">Recent Tags:</span>
-      {tags.map((tag, index) => (
-        <TagPill
-          key={index}
-          label={tag.label}
-          bgColor={tag.bgColor}
-          textColor={tag.textColor}
-          borderColor={tag.borderColor}
-          onClick={() => onTagClick(tag.label)}
-        />
-      ))}
-    </div>
-  );
-};
-
-// Folder Card Component - Reusable
-export const FolderCard = ({ icon, title, itemCount, lastUpdated, bgColor, shapeClass, textColor }) => {
-  return (
-    <div className="group cursor-pointer">
-      <div className="aspect-square bg-surface-light rounded-xl md:rounded-3xl p-2 md:p-8 flex flex-col items-center justify-center relative overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/10">
-        <div className={`w-16 h-16 md:w-20 md:h-20 ${bgColor} ${shapeClass} flex items-center justify-center text-white mb-6 transform group-hover:rotate-12 transition-transform duration-500`}>
-          <span className="material-symbols-rounded text-4xl">{icon}</span>
-        </div>
-        <h3 className="text-[15px] md:text-lg font-medium md:font-semibold text-center">{title}</h3>
-        <p className="text-slate-500 text-[10px] md:text-[12px] mt-1">
-          {itemCount} items · Updated {lastUpdated}
-        </p>
-        <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-          <span className={`material-symbols-rounded ${textColor}`}>arrow_forward</span>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Folders Section with Display Toggle
-export const FoldersSection = () => {
-  const [displayMode, setDisplayMode] = useState('grid');
-
-  const folders = [
-    {
-      icon: 'school',
-      title: 'University Finals',
-      itemCount: 24,
-      lastUpdated: '2h ago',
-      bgColor: 'bg-amber-400',
-      shapeClass: 'organic-shape-1',
-      textColor: 'text-amber-400',
-    },
-    {
-      icon: 'code',
-      title: 'Web Dev Notes',
-      itemCount: 112,
-      lastUpdated: '1d ago',
-      bgColor: 'bg-emerald-500',
-      shapeClass: 'organic-shape-2',
-      textColor: 'text-emerald-500',
-    },
-    {
-      icon: 'favorite',
-      title: 'Daily Journaling',
-      itemCount: 365,
-      lastUpdated: 'today',
-      bgColor: 'bg-rose-400',
-      shapeClass: 'organic-shape-3',
-      textColor: 'text-rose-400',
-    },
-    {
-      icon: 'auto_awesome',
-      title: 'AI Generated',
-      itemCount: 12,
-      lastUpdated: '3d ago',
-      bgColor: 'bg-indigo-500',
-      shapeClass: 'organic-shape-4',
-      textColor: 'text-indigo-500',
-    },
-  ];
-
-  return (
-    <section className="mb-8">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-[17px] font-semibold flex items-center gap-3">
-          <span className="w-1 h-5 bg-primary rounded-full"></span>
-          Folders
-        </h2>
-        <div className="flex gap-2">
-          <button
-            onClick={() => setDisplayMode('grid')}
-            className={`p-2 transition-colors ${
-              displayMode === 'grid'
-                ? 'text-primary'
-                : 'text-slate-400 hover:text-primary'
-            }`}
-          >
-            <span className="material-symbols-rounded">grid_view</span>
-          </button>
-          <button
-            onClick={() => setDisplayMode('list')}
-            className={`p-2 transition-colors ${
-              displayMode === 'list'
-                ? 'text-primary'
-                : 'text-slate-400 hover:text-primary'
-            }`}
-          >
-            <span className="material-symbols-rounded">view_list</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Grid View */}
-      {displayMode === 'grid' && (
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {folders.map((folder, index) => (
-            <FolderCard
-              key={index}
-              icon={folder.icon}
-              title={folder.title}
-              itemCount={folder.itemCount}
-              lastUpdated={folder.lastUpdated}
-              bgColor={folder.bgColor}
-              shapeClass={folder.shapeClass}
-              textColor={folder.textColor}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* List View */}
-      {displayMode === 'list' && (
-        <div className="space-y-4">
-          {folders.map((folder, index) => (
-            <div
-              key={index}
-              className="bg-surface-light p-3 rounded-3xl border border-slate-100 hover:border-primary/50 transition-all flex items-center justify-between group cursor-pointer"
-            >
-              <div className="flex items-center gap-4">
-                <div className={`w-14 h-14 ${folder.bgColor} ${folder.shapeClass} flex items-center justify-center text-white`}>
-                  <span className="material-symbols-rounded text-2xl">{folder.icon}</span>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-lg">{folder.title}</h3>
-                  <p className="text-slate-500 text-sm">
-                    {folder.itemCount} items · Updated {folder.lastUpdated}
-                  </p>
-                </div>
-              </div>
-              <span className={`material-symbols-rounded ${folder.textColor} opacity-0 group-hover:opacity-100 transition-opacity`}>
-                arrow_forward
-              </span>
+        <div className="relative max-w-4xl mx-auto">
+            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                <span className="material-icons-round text-slate-400 text-[18px]">search</span>
             </div>
-          ))}
+            <input
+                className="w-full bg-surface-light border border-slate-200 rounded-xl py-2.5 pl-11 pr-10 shadow-sm focus:ring-2 focus:ring-primary focus:border-primary text-[14px] placeholder-slate-400 outline-none transition-all"
+                placeholder="Search folders and notes…"
+                type="text"
+                value={value}
+                onChange={e => onChange(e.target.value)}
+            />
+            {value && (
+                <button onClick={() => onChange('')} className="absolute inset-y-0 right-4 flex items-center text-slate-400 hover:text-slate-600 transition-colors">
+                    <span className="material-icons-round text-[16px]">close</span>
+                </button>
+            )}
         </div>
-      )}
     </section>
-  );
+);
+
+// ── Folder card (grid) ────────────────────────────────────────────────────────
+const FolderGridCard = ({ folder, onClick }) => (
+    <button onClick={onClick} className="text-left group focus:outline-none w-full">
+        <div className="aspect-square bg-surface-light rounded-2xl p-5 flex flex-col items-center justify-center relative overflow-hidden transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-primary/10 border border-slate-100">
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity" style={{ backgroundColor: folder.color ?? '#A78BFA' }} />
+            <FolderShape shape={folder.shape ?? 'squircle'} color={folder.color ?? '#A78BFA'} icon={folder.icon ?? 'folder'} size={60} />
+            <h3 className="text-[14px] font-semibold text-slate-800 text-center mt-4 leading-tight line-clamp-2">{folder.name}</h3>
+            <p className="text-slate-400 text-[11px] mt-1">Updated {timeAgo(folder.updated_at)}</p>
+            <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                <span className="material-icons-round text-[16px]" style={{ color: folder.color ?? '#A78BFA' }}>arrow_forward</span>
+            </div>
+        </div>
+    </button>
+);
+
+// ── Folder card (list) ────────────────────────────────────────────────────────
+const FolderListRow = ({ folder, onClick }) => (
+    <button onClick={onClick} className="w-full text-left group focus:outline-none">
+        <div className="bg-surface-light p-3 rounded-2xl border border-slate-100 hover:border-primary/30 hover:shadow-md transition-all flex items-center gap-4">
+            <FolderShape shape={folder.shape ?? 'squircle'} color={folder.color ?? '#A78BFA'} icon={folder.icon ?? 'folder'} size={48} />
+            <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-[15px] text-slate-800 truncate">{folder.name}</h3>
+                {folder.description && <p className="text-slate-400 text-[12px] truncate">{folder.description}</p>}
+                <p className="text-slate-400 text-[11px]">Updated {timeAgo(folder.updated_at)}</p>
+            </div>
+            <span className="material-icons-round text-slate-300 group-hover:text-primary transition-colors text-[20px]">chevron_right</span>
+        </div>
+    </button>
+);
+
+// ── Folders Section ───────────────────────────────────────────────────────────
+const FoldersSection = ({ folders, loading, onFolderClick, onCreateFolder, search, sort, sortOptions, onSortChange }) => {
+    const scrollRef = useRef(null);
+
+    const scroll = (dir) => {
+        if (!scrollRef.current) return;
+        scrollRef.current.scrollBy({ left: dir * 220, behavior: 'smooth' });
+    };
+
+    return (
+        <section className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+                <h2 className="text-[17px] font-semibold flex items-center gap-3">
+                    <span className="w-1 h-5 bg-primary rounded-full" />
+                    Folders
+                    {folders.length > 0 && (
+                        <span className="text-[12px] font-normal text-slate-400 ml-1">({folders.length})</span>
+                    )}
+                </h2>
+                <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5">
+                    <span className="material-icons-round text-slate-400 text-[15px]">sort</span>
+                    <select
+                        value={sort}
+                        onChange={e => onSortChange(e.target.value)}
+                        className="bg-transparent text-[13px] text-slate-600 outline-none cursor-pointer"
+                    >
+                        {sortOptions.map(o => (
+                            <option key={o.value} value={o.value}>{o.label}</option>
+                        ))}
+                    </select>
+                </div>
+            </div>
+
+            {loading ? (
+                <div className="flex justify-center py-10">
+                    <span className="material-icons-round text-primary text-[30px] animate-spin">sync</span>
+                </div>
+            ) : folders.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-10 gap-3 text-center">
+                    <span className="material-icons-round text-slate-200 text-[48px]">folder_open</span>
+                    <p className="text-sm text-slate-400">
+                        {search ? 'No folders match your search.' : 'No folders yet.'}
+                    </p>
+                    {!search && (
+                        <button
+                            onClick={onCreateFolder}
+                            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white text-sm font-semibold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all"
+                        >
+                            <span className="material-icons-round text-[16px]">create_new_folder</span>
+                            Create Folder
+                        </button>
+                    )}
+                </div>
+            ) : (
+                <>
+                    <style>{`.folder-scroll::-webkit-scrollbar { display: none; }`}</style>
+                    <div className="relative flex items-center gap-2 min-w-0">
+                        {/* Left arrow */}
+                        <button
+                            onClick={() => scroll(-1)}
+                            className="shrink-0 w-9 h-9 flex items-center justify-center rounded-full bg-white border border-slate-200 text-slate-500 shadow-sm hover:border-primary hover:text-primary transition-all active:scale-90"
+                        >
+                            <span className="material-icons-round text-[20px]">chevron_left</span>
+                        </button>
+
+                        {/* Scroll strip */}
+                        <div
+                            ref={scrollRef}
+                            className="folder-scroll flex gap-4 overflow-x-auto pb-1 flex-1"
+                            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                        >
+                            {folders.map(f => (
+                                <div key={f.id} className="shrink-0 w-[150px]">
+                                    <FolderGridCard folder={f} onClick={() => onFolderClick(f.id)} />
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Right arrow */}
+                        <button
+                            onClick={() => scroll(1)}
+                            className="shrink-0 w-9 h-9 flex items-center justify-center rounded-full bg-white border border-slate-200 text-slate-500 shadow-sm hover:border-primary hover:text-primary transition-all active:scale-90"
+                        >
+                            <span className="material-icons-round text-[20px]">chevron_right</span>
+                        </button>
+                    </div>
+                </>
+            )}
+        </section>
+    );
 };
 
-// Note Card Component - Reusable
-export const NoteCard = ({ icon, title, content, date, bgColor, iconColor }) => {
-  return (
-    <div className="bg-surface-light p-3 rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
-      <div className="flex justify-between items-start mb-4">
-        <div className={`w-10 h-10 rounded-xl ${bgColor} flex items-center justify-center`}>
-          <span className={`material-symbols-rounded ${iconColor} text-xl`}>{icon}</span>
-        </div>
-        <button className="text-slate-300 hover:text-slate-500 transition-colors">
-          <span className="material-symbols-rounded">more_horiz</span>
+// ── Note card ─────────────────────────────────────────────────────────────────
+const NoteCard = ({ note, onClick }) => {
+    const snippet = extractSnippet(note.snippet ?? note.content ?? '');
+
+    return (
+        <button onClick={onClick} className="text-left group focus:outline-none w-full">
+            <div className="bg-surface-light p-4 rounded-xl border border-slate-100 shadow-sm hover:shadow-md hover:border-primary/20 transition-all h-full flex flex-col">
+                <div className="flex justify-between items-start mb-3">
+                    <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                        <span className="material-icons-round text-primary text-[18px]">description</span>
+                    </div>
+                    <span className="text-[10px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded-lg">{timeAgo(note.updated_at)}</span>
+                </div>
+                <h4 className="font-semibold text-[14px] text-slate-800 mb-1.5 line-clamp-1">
+                    {note.title || 'Untitled Note'}
+                </h4>
+                <p className="text-slate-400 text-[12px] line-clamp-3 font-serif italic leading-relaxed flex-1">
+                    {snippet || 'No content yet.'}
+                </p>
+                {note.folder && (
+                    <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-slate-100">
+                        <div className="w-3.5 h-3.5 rounded-sm shrink-0" style={{ backgroundColor: note.folder.color ?? '#A78BFA' }} />
+                        <span className="text-[11px] text-slate-400 truncate">{note.folder.name}</span>
+                    </div>
+                )}
+            </div>
         </button>
-      </div>
-      <h4 className="font-semibold text-[16px] mb-2 line-clamp-1">{title}</h4>
-      <p className="text-slate-500 text-[12px] line-clamp-3 mb-4 font-serif italic leading-relaxed">
-        {content}
-      </p>
-      <div className="flex items-center gap-2 mt-auto">
-        <span className="text-[10px] font-normal px-1 py-0.5 bg-slate-100 rounded-lg text-slate-500">
-          {date}
-        </span>
-      </div>
-    </div>
-  );
+    );
 };
 
-// Recent Notes Section
-export const RecentNotesSection = () => {
-  const notes = [
-    {
-      icon: 'description',
-      title: 'Philosophy Exam Review',
-      content:
-        '"The unexamined life is not worth living." — Socrates. Reviewing the core tenets of Greek philosophy...',
-      date: 'Oct 12, 2023',
-      bgColor: 'bg-amber-50',
-      iconColor: 'text-amber-500',
-    },
-    {
-      icon: 'mic',
-      title: 'Standup Meeting Audio',
-      content:
-        'Summarized: Tasks for today include debugging the folder navigation and refining the dark mode toggle...',
-      date: 'Oct 11, 2023',
-      bgColor: 'bg-emerald-50',
-      iconColor: 'text-emerald-500',
-    },
-    {
-      icon: 'palette',
-      title: 'Color Palette Ideas',
-      content:
-        'Focus on organic shapes and soft pastels. Use a mix of geometric and fluid elements for a modern feel...',
-      date: 'Oct 10, 2023',
-      bgColor: 'bg-rose-50',
-      iconColor: 'text-rose-500',
-    },
-  ];
-
-  return (
+// ── Recent Notes Section ──────────────────────────────────────────────────────
+const RecentNotesSection = ({ notes, loading, onNoteClick, onCreateNote, search, meta, onLoadMore, sort, sortOptions, onSortChange }) => (
     <section>
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-[17px] font-semibold flex items-center gap-3">
-          <span className="w-1 h-5 bg-slate-300 rounded-full"></span>
-          Recent Notes
-        </h2>
-        <a className="text-sm font-medium text-primary hover:underline" href="#">
-          View All Library
-        </a>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-        {notes.map((note, index) => (
-          <NoteCard
-            key={index}
-            icon={note.icon}
-            title={note.title}
-            content={note.content}
-            date={note.date}
-            bgColor={note.bgColor}
-            iconColor={note.iconColor}
-          />
-        ))}
-        {/* Create New Note Card */}
-        <div className="border-2 border-dashed border-slate-200 p-3 rounded-xl flex flex-col items-center justify-center text-slate-400 hover:text-primary hover:border-primary transition-all cursor-pointer group">
-          <span className="material-symbols-rounded text-3xl mb-2 group-hover:scale-110 transition-transform">
-            add_circle
-          </span>
-          <span className="font-semibold">Create New Note</span>
+        <div className="flex items-center justify-between mb-4">
+            <h2 className="text-[17px] font-semibold flex items-center gap-3">
+                <span className="w-1 h-5 bg-slate-300 rounded-full" />
+                {search ? 'Notes' : 'Recent Notes'}
+                {meta?.total != null && (
+                    <span className="text-[12px] font-normal text-slate-400 ml-1">({meta.total})</span>
+                )}
+            </h2>
+            <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5">
+                <span className="material-icons-round text-slate-400 text-[15px]">sort</span>
+                <select
+                    value={sort}
+                    onChange={e => onSortChange(e.target.value)}
+                    className="bg-transparent text-[13px] text-slate-600 outline-none cursor-pointer"
+                >
+                    {sortOptions.map(o => (
+                        <option key={o.value} value={o.value}>{o.label}</option>
+                    ))}
+                </select>
+            </div>
         </div>
-      </div>
+
+        {loading && notes.length === 0 ? (
+            <div className="flex justify-center py-10">
+                <span className="material-icons-round text-primary text-[30px] animate-spin">sync</span>
+            </div>
+        ) : notes.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-10 gap-3 text-center">
+                <span className="material-icons-round text-slate-200 text-[48px]">{search ? 'search_off' : 'note_add'}</span>
+                <p className="text-sm text-slate-400">
+                    {search ? 'No notes match your search.' : 'No notes yet.'}
+                </p>
+                {!search && (
+                    <button
+                        onClick={onCreateNote}
+                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white text-sm font-semibold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all"
+                    >
+                        <span className="material-icons-round text-[16px]">note_add</span>
+                        New Note
+                    </button>
+                )}
+            </div>
+        ) : (
+            <>
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+                    {notes.map(note => (
+                        <NoteCard key={note.id} note={note} onClick={() => onNoteClick(note.id)} />
+                    ))}
+                    {!search && (
+                        <button
+                            onClick={onCreateNote}
+                            className="border-2 border-dashed border-slate-200 rounded-xl flex flex-col items-center justify-center text-slate-300 hover:text-primary hover:border-primary transition-all cursor-pointer group py-8 gap-2"
+                        >
+                            <span className="material-icons-round text-[30px] group-hover:scale-110 transition-transform">add_circle</span>
+                            <span className="text-sm font-semibold">New Note</span>
+                        </button>
+                    )}
+                </div>
+
+                {meta && meta.last_page > 1 && meta.current_page < meta.last_page && (
+                    <div className="flex justify-center mt-6">
+                        <button
+                            onClick={onLoadMore}
+                            disabled={loading}
+                            className="flex items-center gap-2 px-6 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:border-primary hover:text-primary disabled:opacity-40 transition-colors"
+                        >
+                            {loading
+                                ? <><span className="material-icons-round text-[15px] animate-spin">sync</span>Loading…</>
+                                : <>Load more notes</>
+                            }
+                        </button>
+                    </div>
+                )}
+            </>
+        )}
     </section>
-  );
-};
+);
 
-// Floating Action Button
-export const FloatingCreateButton = () => {
-  return (
-    <div className="fixed bottom-8 right-8 z-50">
-      <button className="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center shadow-2xl shadow-primary/40 hover:scale-110 transition-transform active:scale-95">
-        <span className="material-symbols-rounded text-3xl">create</span>
-      </button>
-    </div>
-  );
-};
+const FOLDER_SORT_OPTIONS = [
+    { value: 'sort=updated_at:desc', label: 'Last updated' },
+    { value: 'sort=updated_at:asc',  label: 'Oldest first' },
+    { value: 'sort=name:asc',        label: 'Name A → Z' },
+    { value: 'sort=name:desc',       label: 'Name Z → A' },
+];
 
-// Main Library Content
+const NOTE_SORT_OPTIONS = [
+    { value: 'updated_at:desc', label: 'Last updated' },
+    { value: 'updated_at:asc',  label: 'Oldest first' },
+    { value: 'title:asc',       label: 'Title A → Z' },
+    { value: 'title:desc',      label: 'Title Z → A' },
+];
+
+// ── Main Library Content ──────────────────────────────────────────────────────
 export const LibraryContent = () => {
-  const [filteredSearch, setFilteredSearch] = useState('');
+    const navigate = useNavigate();
 
-  const handleSearch = (query) => {
-    setFilteredSearch(query);
-    console.log('Searching for:', query);
-  };
+    // Data
+    const [folders, setFolders]           = useState([]);
+    const [notes, setNotes]               = useState([]);
+    const [notesMeta, setNotesMeta]       = useState(null);
+    const [notesPage, setNotesPage]       = useState(1);
 
-  const handleAdvancedFilter = () => {
-    console.log('Advanced filters opened');
-    // Can open a modal or filter panel
-  };
+    // Loading
+    const [foldersLoading, setFoldersLoading] = useState(true);
+    const [notesLoading, setNotesLoading]     = useState(true);
 
-  const handleTagClick = (tag) => {
-    console.log('Clicked tag:', tag);
-    setFilteredSearch(tag);
-  };
+    // Sort & search
+    const [search, setSearch]           = useState('');
+    const [folderSort, setFolderSort]   = useState(FOLDER_SORT_OPTIONS[0].value);
+    const [noteSort, setNoteSort]       = useState(NOTE_SORT_OPTIONS[0].value);
+    const [showCreateFolder, setShowCreateFolder] = useState(false);
+    const debounceRef = useRef(null);
 
-  return (
-    <main className="flex-1 lg:ml-64 p-3 lg:p-8 pt-20 lg:pt-8">
-      <LibraryHeader />
-      <SearchBar onSearch={handleSearch} onAdvancedFilter={handleAdvancedFilter} />
-      <RecentTagsSection onTagClick={handleTagClick} />
-      <FoldersSection />
-      <RecentNotesSection />
-      <FloatingCreateButton />
-    </main>
-  );
+    // ── Fetch folders ─────────────────────────────────────────────────────────
+    const loadFolders = useCallback(async ({ q = '', sortVal = FOLDER_SORT_OPTIONS[0].value, force = false } = {}) => {
+        // Use cache when no filter is active and not forced
+        if (!force && !q.trim() && sortVal === FOLDER_SORT_OPTIONS[0].value) {
+            const cached = workspaceCache.getFolders();
+            if (cached) { setFolders(cached); setFoldersLoading(false); return; }
+        }
+        setFoldersLoading(true);
+        try {
+            const qp = [sortVal];
+            if (q.trim()) qp.push(`searching=${encodeURIComponent(q.trim())}`);
+            const res = await folderService.list(qp.join('&'));
+            const data = res.data ?? res;
+            const rows = data.data ?? [];
+            setFolders(rows);
+            // Only cache the default (unfiltered) result
+            if (!q.trim() && sortVal === FOLDER_SORT_OPTIONS[0].value) {
+                workspaceCache.setFolders(rows);
+            }
+        } catch {
+            // non-fatal
+        } finally {
+            setFoldersLoading(false);
+        }
+    }, []);
+
+    // ── Fetch notes ───────────────────────────────────────────────────────────
+    const loadNotes = useCallback(async ({ page = 1, q = '', sortVal = NOTE_SORT_OPTIONS[0].value, append = false, force = false } = {}) => {
+        // Use cache for the default first page only
+        if (!force && !q.trim() && page === 1 && sortVal === NOTE_SORT_OPTIONS[0].value) {
+            const cached = workspaceCache.getNotes();
+            if (cached) { setNotes(cached.data); setNotesMeta(cached.meta); setNotesPage(1); setNotesLoading(false); return; }
+        }
+        setNotesLoading(true);
+        try {
+            const [sortField, sortDir] = sortVal.split(':');
+            const qp = [`page=${page}`];
+            if (q.trim()) qp.push(`searching=${encodeURIComponent(q.trim())}`);
+            if (sortField === 'updated_at') qp.push(`updated_at=${sortDir}`);
+            if (sortField === 'title')      qp.push(`title=${sortDir}`);
+            const res = await noteService.list(qp.join('&'));
+            const data = res.data ?? res;
+            const rows = data.data ?? [];
+            const meta = data.meta ?? null;
+            setNotes(append ? prev => [...prev, ...rows] : rows);
+            setNotesMeta(meta);
+            setNotesPage(page);
+            // Only cache the default (unfiltered, page 1) result
+            if (!q.trim() && page === 1 && sortVal === NOTE_SORT_OPTIONS[0].value) {
+                workspaceCache.setNotes(rows, meta);
+            }
+        } catch {
+            // non-fatal
+        } finally {
+            setNotesLoading(false);
+        }
+    }, []);
+
+    // Initial load — reads from cache instantly if available
+    useEffect(() => {
+        loadFolders({});
+        loadNotes({});
+    }, [loadFolders, loadNotes]);
+
+    // Search — debounced 400ms
+    const handleSearchChange = (value) => {
+        setSearch(value);
+        clearTimeout(debounceRef.current);
+        debounceRef.current = setTimeout(() => {
+            loadFolders({ q: value, sortVal: folderSort });
+            loadNotes({ page: 1, q: value, sortVal: noteSort });
+        }, 400);
+    };
+
+    const handleFolderSortChange = (val) => {
+        setFolderSort(val);
+        loadFolders({ q: search, sortVal: val });
+    };
+
+    const handleNoteSortChange = (val) => {
+        setNoteSort(val);
+        loadNotes({ page: 1, q: search, sortVal: val });
+    };
+
+    const handleLoadMoreNotes = () => {
+        loadNotes({ page: notesPage + 1, q: search, sortVal: noteSort, append: true });
+    };
+
+    const handleFolderCreated = (folder) => {
+        setShowCreateFolder(false);
+        workspaceCache.invalidateFolders();
+        navigate(`/lockedin/folders/${folder.id}`);
+    };
+
+    return (
+        <main className="flex-1 lg:ml-64 p-4 lg:p-8 pt-20 lg:pt-8 min-w-0 overflow-x-hidden">
+            {/* Header */}
+            <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                <div>
+                    <h1 className="text-2xl font-semibold tracking-tight mb-1">Library & Folders</h1>
+                    <p className="text-slate-500 text-[14px]">Manage your creative knowledge base.</p>
+                </div>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => navigate('/lockedin/notes/new')}
+                        className="flex items-center gap-2 bg-slate-100 text-slate-700 px-3 py-2 rounded-xl text-[14px] font-medium transition-all hover:bg-slate-200 active:scale-95"
+                    >
+                        <span className="material-icons-round text-[17px]">note_add</span>
+                        New Note
+                    </button>
+                    <button
+                        onClick={() => setShowCreateFolder(true)}
+                        className="flex items-center gap-2 bg-primary text-white px-3 py-2 rounded-xl text-[14px] font-medium transition-all shadow-lg shadow-primary/25 hover:bg-primary/90 active:scale-95"
+                    >
+                        <span className="material-icons-round text-[17px]">create_new_folder</span>
+                        New Folder
+                    </button>
+                </div>
+            </header>
+
+            {/* Search */}
+            <SearchBar value={search} onChange={handleSearchChange} />
+
+            {/* Folders */}
+            <FoldersSection
+                folders={folders}
+                loading={foldersLoading}
+                sort={folderSort}
+                sortOptions={FOLDER_SORT_OPTIONS}
+                onSortChange={handleFolderSortChange}
+                onFolderClick={(id) => navigate(`/lockedin/folders/${id}`)}
+                onCreateFolder={() => setShowCreateFolder(true)}
+                search={search}
+            />
+
+            {/* Notes */}
+            <RecentNotesSection
+                notes={notes}
+                loading={notesLoading}
+                meta={notesMeta}
+                sort={noteSort}
+                sortOptions={NOTE_SORT_OPTIONS}
+                onSortChange={handleNoteSortChange}
+                onNoteClick={(id) => navigate(`/lockedin/notes/${id}`)}
+                onCreateNote={() => navigate('/lockedin/notes/new')}
+                onLoadMore={handleLoadMoreNotes}
+                search={search}
+            />
+
+            {/* Create Folder Modal */}
+            {showCreateFolder && (
+                <CreateFolderModal
+                    onClose={() => setShowCreateFolder(false)}
+                    onCreated={handleFolderCreated}
+                />
+            )}
+        </main>
+    );
 };
-

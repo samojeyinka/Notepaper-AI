@@ -39,6 +39,7 @@ const NotePage = ({
   drawMode,
   drawingDataUrl,
   onDrawingChange,
+  readOnly,
 }) => {
   const pageRef = useRef(null);
   const isComposingRef = useRef(false);
@@ -266,15 +267,15 @@ const NotePage = ({
             else editorRef.current = node;
           }
         }}
-        contentEditable
+        contentEditable={!readOnly}
         suppressContentEditableWarning
-        onInput={handleInput}
-        onCompositionStart={handleCompositionStart}
-        onCompositionEnd={handleCompositionEnd}
-        onFocus={() => onFocus(index)}
-        onKeyDown={(e) => onKeyDown && onKeyDown(e, index)}
-        spellCheck={true}
-        className={`relative w-full outline-none prose prose-slate max-w-none page-content-area ${fontClass}`}
+        onInput={readOnly ? undefined : handleInput}
+        onCompositionStart={readOnly ? undefined : handleCompositionStart}
+        onCompositionEnd={readOnly ? undefined : handleCompositionEnd}
+        onFocus={() => !readOnly && onFocus(index)}
+        onKeyDown={(e) => !readOnly && onKeyDown && onKeyDown(e, index)}
+        spellCheck={!readOnly}
+        className={`relative w-full outline-none prose prose-slate max-w-none page-content-area ${fontClass} ${readOnly ? 'cursor-wait select-none' : ''}`}
         style={{
           height: `${PAGE_HEIGHT}px`,
           padding: '72px 80px',
@@ -346,6 +347,7 @@ export const NoteEditor = forwardRef(function NoteEditor(
     drawingData = [],
     onDrawingChange,
     onPageRefsReady,
+    readOnly = false,
   },
   ref
 ) {
@@ -700,6 +702,7 @@ export const NoteEditor = forwardRef(function NoteEditor(
               drawMode={drawMode}
               drawingDataUrl={drawingData[index] ?? ""}
               onDrawingChange={onDrawingChange}
+              readOnly={readOnly}
             />
           </div>
         </div>

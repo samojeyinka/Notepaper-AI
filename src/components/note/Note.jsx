@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+// useSearchParams is used below to read ?folder= on new-note creation
 import { NoteHeader } from "./NoteHeader";
 import { NoteToolbar } from "./NoteToolbar";
 import { NoteEditor } from "./NoteEditor";
@@ -17,9 +18,13 @@ import { NoteVersionSidebar } from "./NoteVersionSidebar";
 export const Note = () => {
     const { id: routeId } = useParams();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
 
     // Note Data
     const [noteId, setNoteId] = useState(routeId ?? null);
+    // folderId — set from ?folder= query param on new notes, or from loaded note
+    const [folderId, setFolderId] = useState(() => searchParams.get('folder') ?? null);
+    const [folder, setFolder]     = useState(null);
     const [title, setTitle] = useState("Untitled Note");
     const [pages, setPages] = useState([""]);
     const [activePageIndex, setActivePageIndex] = useState(0);
@@ -187,6 +192,7 @@ export const Note = () => {
     latestStateRef.current = {
         title, pages, fontSize, lineSpacing, drawingData,
         paperStyle, paperColor, lineColor, textColor, fontFamily,
+        folderId,
     };
     const getState = useCallback(() => latestStateRef.current, []);
 
@@ -246,6 +252,12 @@ export const Note = () => {
 
     // ─────────────────────────────────────────────────────────────────────────
 
+    // On a new note with ?folder=, mark folderId dirty so it's sent on first save
+    useEffect(() => {
+        if (!noteId && folderId) markDirty('folderId');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     // Load existing note on mount
     useEffect(() => {
         if (!noteId) return;
@@ -261,6 +273,8 @@ export const Note = () => {
             setLineColor(s.lineColor);
             setTextColor(s.textColor);
             setFontFamily(s.fontFamily);
+            if (s.folderId) setFolderId(s.folderId);
+            if (s.folder)   setFolder(s.folder);
         });
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -444,6 +458,7 @@ export const Note = () => {
                 onTitleChange={(v) => { pushNow(); setTitle(v); markDirty('title'); }}
                 saveStatus={saveStatus}
                 onSave={forceFlush}
+                folderId={folderId}
                 onExportPDF={async () => { await forceFlush(); handleExport('pdf'); }}
                 onExportImage={async () => { await forceFlush(); handleExport('png'); }}
                 onCopy={() => alert('Copied!')}
@@ -478,6 +493,15 @@ export const Note = () => {
                 />
 
                 <div className="flex-1 overflow-hidden flex" style={{ position: 'relative' }}>
+                    {/* Loading overlay — blocks interaction while note data is being fetched */}
+                    {saveStatus === 'loading' && (
+                        <div style={{ position: 'absolute', inset: 0, zIndex: 20, pointerEvents: 'all', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(241,245,249,0.7)', backdropFilter: 'blur(2px)' }}>
+                            <div className="flex flex-col items-center gap-3">
+                                <span className="material-icons-round text-primary text-[40px] animate-spin">sync</span>
+                                <p className="text-xs font-semibold text-slate-500 tracking-wide">Loading note…</p>
+                            </div>
+                        </div>
+                    )}
                     <div className="note-pages-container flex-1 overflow-hidden flex">
                         <NoteEditor
                             ref={activeEditorRef}
@@ -503,6 +527,7 @@ export const Note = () => {
                             onPageOverflow={handlePageOverflow}
                             onKeyDown={handleNoteKeyDown}
                             onPageRefsReady={(refs) => { pageRefsRef.current = refs; }}
+                            readOnly={saveStatus === 'loading'}
                             drawMode={drawMode}
                             drawingData={drawingData}
                             onDrawingChange={(index, dataUrl) => {

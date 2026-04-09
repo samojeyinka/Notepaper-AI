@@ -7,6 +7,7 @@ import { LandingPage,PricingPage,SignUpPage,
      BillingPage,ProfileSettingsPage,ChangePasswordPage,ApplicationSettingsPage,
       NotificationsPage, HelpSupportPage,SupportTicketsPage,NewSupportTicketsPage,SupportTicketPage } from '../pages/pages';
 import NotePage from '../pages/NotePage';
+import FolderPage from '../pages/FolderPage';
 import ScrollToTop from './ScrollToTop';
 import ProtectedRoute, { GuestRoute } from './ProtectedRoute';
 
@@ -222,6 +223,10 @@ const AppRoutes = createBrowserRouter([
         </ScrollToTop></ProtectedRoute>,       
     },
 
+    {
+        path: '/lockedin/folders/:id',
+        element: <ProtectedRoute><ScrollToTop><FolderPage /></ScrollToTop></ProtectedRoute>,
+    },
     {
         path: '/lockedin/notes/new',
         element: <ProtectedRoute><ScrollToTop><NotePage /></ScrollToTop></ProtectedRoute>,

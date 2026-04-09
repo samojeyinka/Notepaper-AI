@@ -1,5 +1,6 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { noteService, serializeNote } from '../api/noteService';
+import { workspaceCache } from '../api/workspaceCache';
 
 const DEBOUNCE_MS = 1500;
 const DRAFT_PREFIX = 'note_draft_';
@@ -95,6 +96,7 @@ export const useNoteSync = (getState, noteId, setNoteId) => {
         if (!isMountedRef.current) return;
         currentId = res.data.id;
         setNoteId(currentId);
+        workspaceCache.invalidateNotes();
         // Move the draft from the "new" key to the real id key
         const newDraft = loadDraft(null);
         if (newDraft) {
@@ -103,6 +105,7 @@ export const useNoteSync = (getState, noteId, setNoteId) => {
         }
       } else {
         await noteService.update(currentId, payload);
+        workspaceCache.invalidateNotes();
       }
 
       if (!isMountedRef.current) return;
@@ -158,8 +161,9 @@ export const useNoteSync = (getState, noteId, setNoteId) => {
         const serverTime = new Date(serverNote.updated_at).getTime();
         if (draft._savedAt > serverTime) {
           // Draft is newer — restore it, mark everything dirty for re-sync
+          // Merge server-only fields (folder relation) that drafts don't carry
           const { _savedAt, ...draftState } = draft;
-          applyState(draftState);
+          applyState({ ...draftState, folder: serverNote.folder ?? null, folder_id: serverNote.folder_id ?? null });
           ['title','content','paperStyle','paperColor','lineColor','textColor','fontFamily',
            'fontSize','lineSpacing','drawingData'].forEach(f => dirtyRef.current.add(f));
           setSaveStatus('saved'); // will re-save on next markDirty

@@ -76,6 +76,9 @@ export const serializeNote = (state, dirtyFields) => {
   if (dirtyFields.has('fontFamily'))
     payload.font_style = FONT_MAP[state.fontFamily] ?? 'Caveat';
 
+  if (dirtyFields.has('folderId') && state.folderId)
+    payload.folder_id = state.folderId;
+
   return payload;
 };
 
@@ -113,6 +116,8 @@ export const deserializeNote = (note) => {
     lineColor: note.paper_line_color ?? '#cbd5e1',
     textColor: note.text_color ?? '#1e293b',
     fontFamily: FONT_MAP_REVERSE[note.font_style] ?? 'sans',
+    folderId: note.folder_id ?? null,
+    folder: note.folder ?? null,
     updatedAt: note.updated_at,
   };
 };
