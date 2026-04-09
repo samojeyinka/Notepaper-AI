@@ -182,7 +182,7 @@ const VersionPreviewModal = ({
                     <div className="flex items-center gap-3">
                         <span className="material-icons-round text-primary text-[22px]">history</span>
                         <div>
-                            <h2 className="font-display font-bold text-slate-900 text-base leading-tight">Version History</h2>
+                            <h2 className="font-display font-semibold text-slate-900 text-base leading-tight">Version History</h2>
                             <p className="text-[11px] text-slate-400 mt-0.5">Preview a version, then restore it if it's the one you want.</p>
                         </div>
                     </div>
@@ -199,7 +199,7 @@ const VersionPreviewModal = ({
 
                     {/* Left: version list */}
                     <div className="w-56 border-r border-slate-100 flex flex-col shrink-0 overflow-y-auto custom-scrollbar bg-slate-50/60">
-                        <p className="px-4 pt-4 pb-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Snapshots</p>
+                        <p className="px-4 pt-4 pb-2 text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Snapshots</p>
                         <div className="flex flex-col gap-0.5 px-2 pb-4">
                             {versions.map((v, i) => {
                                 const isActive = i === selectedIdx;
@@ -208,17 +208,17 @@ const VersionPreviewModal = ({
                                     <button
                                         key={v.id}
                                         onClick={() => onSelectIdx(i)}
-                                        className={`w-full text-left rounded-xl px-3 py-3 transition-all duration-150 flex items-start gap-2.5
+                                        className={`w-full text-left rounded-xl px-1.5 py-1.5 transition-all duration-150 flex items-center gap-2.5
                                             ${isActive
                                                 ? 'bg-primary text-white shadow-md shadow-primary/20'
                                                 : 'hover:bg-white hover:shadow-sm text-slate-700'}`}
                                     >
                                         {/* timeline dot */}
                                         <div className="mt-0.5 flex flex-col items-center shrink-0">
-                                            <div className={`w-2 h-2 rounded-full border-2 shrink-0 ${isActive ? 'border-white bg-white' : isLatest ? 'border-primary bg-primary' : 'border-slate-300 bg-white'}`} />
+                                            <div className={`w-1.5 h-1.5 rounded-full border-2 shrink-0 ${isActive ? 'border-white bg-white' : isLatest ? 'border-primary bg-primary' : 'border-slate-300 bg-white'}`} />
                                         </div>
                                         <div className="min-w-0">
-                                            <p className={`text-xs font-bold truncate ${isActive ? 'text-white' : 'text-slate-700'}`}>
+                                            <p className={`text-xs font-medium truncate ${isActive ? 'text-white' : 'text-slate-700'}`}>
                                                 {isLatest ? 'Latest snapshot' : `Version ${versions.length - i}`}
                                             </p>
                                             <p className={`text-[10px] mt-0.5 ${isActive ? 'text-white/70' : 'text-slate-400'}`}>{timeAgo(v.created_at)}</p>
@@ -234,7 +234,7 @@ const VersionPreviewModal = ({
                         {/* Version label bar */}
                         <div className="flex items-center justify-between px-6 py-3 border-b border-slate-200 bg-white shrink-0">
                             <div>
-                                <span className="text-sm font-bold text-slate-800">{label}</span>
+                                <span className="text-sm font-semibold text-slate-800">{label}</span>
                                 <span className="ml-3 text-xs text-slate-400">{timeAgo(version?.created_at)}</span>
                             </div>
                             {pages.length > 1 && (
@@ -304,7 +304,7 @@ const VersionPreviewModal = ({
                         <button
                             onClick={() => onRevert(version.id)}
                             disabled={reverting === version?.id}
-                            className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary text-white text-sm font-bold hover:bg-primary/90 active:scale-95 transition-all disabled:opacity-60 shadow-lg shadow-primary/20"
+                            className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary/90 active:scale-95 transition-all disabled:opacity-60 shadow-lg shadow-primary/20"
                         >
                             {reverting === version?.id ? (
                                 <><span className="material-icons-round text-[15px] animate-spin">sync</span> Restoring…</>
@@ -425,24 +425,22 @@ export const NoteVersionSidebar = ({
                                 <button
                                     key={v.id}
                                     onClick={() => setPreviewIdx(i)}
-                                    className="w-full flex items-center gap-3 px-3 py-3 rounded-2xl text-left border border-transparent hover:border-slate-100 hover:bg-slate-50 transition-all duration-150 group"
+                                    className="w-full flex items-center gap-3 px-1.5 py-1.5 rounded-xl text-left border border-transparent hover:border-slate-100 hover:bg-slate-50 transition-all duration-150 group"
                                 >
                                     {/* Timeline dot */}
                                     <div className="flex flex-col items-center shrink-0">
-                                        <div className={`w-2.5 h-2.5 rounded-full border-2 ${isFirst ? 'border-primary bg-primary' : 'border-slate-300 bg-white'}`} />
+                                        <div className={`w-1.5 h-1.5 rounded-full border-2 ${isFirst ? 'border-primary bg-primary' : 'border-slate-300 bg-white'}`} />
                                         {i < versions.length - 1 && <div className="w-px flex-1 min-h-[20px] bg-slate-100 mt-1" />}
                                     </div>
 
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-xs font-bold text-slate-700 truncate">
+                                        <p className="text-xs font-medium text-slate-700 truncate">
                                             {isFirst ? 'Latest snapshot' : `Version ${versions.length - i}`}
                                         </p>
                                         <p className="text-[10px] text-slate-400 mt-0.5">{timeAgo(v.created_at)}</p>
                                     </div>
 
-                                    <span className="material-icons-round text-[16px] text-slate-300 group-hover:text-primary transition-colors">
-                                        visibility
-                                    </span>
+                                    
                                 </button>
                             );
                         })}

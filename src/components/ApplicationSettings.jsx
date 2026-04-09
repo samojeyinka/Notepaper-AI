@@ -12,14 +12,7 @@ export const SettingsHeader = () => {
                 <h1 className="text-xl font-semibold tracking-tight">Application Settings</h1>
                 <p className="text-slate-500 mt-1 text-[14px]">Customize your AI-powered creative space</p>
             </div>
-            <div className="flex items-center gap-4">
-                <button
-                    onClick={handleSaveChanges}
-                    className="px-3 py-1.5 bg-primary text-white font-medium text-[15px] rounded-xl shadow-md shadow-primary/30 hover:shadow-primary/40 transition-all flex items-center gap-2"
-                >
-                    Save Changes
-                </button>
-            </div>
+          
         </header>
     );
 };
@@ -209,6 +202,7 @@ export const PaperPreferencesSection = () => {
             </div>
 
             {/* Color Selection - Background & Lines */}
+            
             <div className="space-y-4 border-t border-slate-100 pt-4">
                 {/* Background Color */}
                 <div>
@@ -279,32 +273,12 @@ export const PaperPreferencesSection = () => {
                 </div>
             </div>
 
-            {/* Toggle Options */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-slate-100 pt-8 mt-8">
-                <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
-                    <div>
-                        <p className="text-sm font-medium">Dark Mode Paper</p>
-                        <p className="text-xs text-slate-400">Match canvas to theme</p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" defaultChecked className="sr-only peer" />
-                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                    </label>
-                </div>
-                <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
-                    <div>
-                        <p className="text-sm font-medium">Auto-Correction</p>
-                        <p className="text-xs text-slate-400">Straighten lines automatically</p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" className="sr-only peer" />
-                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                    </label>
-                </div>
-            </div>
+           
         </section>
     );
 };
+
+
 
 // System & Sync Section
 export const SystemSyncSection = () => {
@@ -438,14 +412,32 @@ export const ApplicationSettings = () => {
 
             <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
                 <div className="xl:col-span-7 space-y-8">
-                    <HandwritingStylesSection />
-                    <PaperPreferencesSection />
+                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-slate-100 pt-8 mt-8">
+                <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
+                    <div>
+                        <p className="text-sm font-medium">Dark Mode Paper</p>
+                        <p className="text-xs text-slate-400">Match canvas to theme</p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" defaultChecked className="sr-only peer" />
+                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                    </label>
+                </div>
+                <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
+                    <div>
+                        <p className="text-sm font-medium">Auto-Correction</p>
+                        <p className="text-xs text-slate-400">Straighten lines automatically</p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" className="sr-only peer" />
+                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                    </label>
+                </div>
+            </div>
                     <SystemSyncSection />
                 </div>
 
-                <div className="xl:col-span-5">
-                    <LivePreview selectedFont={selectedFont} backgroundColor={backgroundColor} lineColor={lineColor} />
-                </div>
+              
             </div>
 
 
