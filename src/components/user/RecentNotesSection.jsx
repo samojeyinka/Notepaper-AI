@@ -64,7 +64,7 @@ export default function RecentNotesSection() {
       .then(res => {
         const data = res.data ?? res;
         const rows = data.data ?? [];
-        workspaceCache.setNotes(rows, data.meta ?? null);
+        workspaceCache.setNotes(rows, data.current_page != null ? { current_page: data.current_page, last_page: data.last_page, total: data.total, per_page: data.per_page } : null);
         setNotes(rows.slice(0, 4));
       })
       .catch(() => {})

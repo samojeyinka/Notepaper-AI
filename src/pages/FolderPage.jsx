@@ -143,7 +143,7 @@ const FolderPage = () => {
             const data = res.data ?? res;
             const rows = data.data ?? [];
             setNotes(append ? prev => [...prev, ...rows] : rows);
-            setMeta(data.meta ?? null);
+            setMeta(data.current_page != null ? { current_page: data.current_page, last_page: data.last_page, total: data.total, per_page: data.per_page } : null);
             setCurrentPage(page);
         } catch {
             // non-fatal
