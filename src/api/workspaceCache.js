@@ -8,8 +8,8 @@ const cache = {
 };
 
 export const workspaceCache = {
-    getFolders: () => cache.folders?.data ?? null,
-    setFolders: (data) => { cache.folders = { data, fetchedAt: Date.now() }; },
+    getFolders: () => cache.folders ?? null,
+    setFolders: (payload) => { cache.folders = { ...payload, fetchedAt: Date.now() }; },
 
     getNotes: () => cache.notes ? { data: cache.notes.data, meta: cache.notes.meta } : null,
     setNotes: (data, meta) => { cache.notes = { data, meta, fetchedAt: Date.now() }; },

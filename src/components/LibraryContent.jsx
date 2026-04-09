@@ -87,7 +87,7 @@ const FolderListRow = ({ folder, onClick }) => (
 );
 
 // ── Folders Section ───────────────────────────────────────────────────────────
-const FoldersSection = ({ folders, loading, onFolderClick, onCreateFolder, search, sort, sortOptions, onSortChange }) => {
+const FoldersSection = ({ folders, loading, onFolderClick, onCreateFolder, search, sort, sortOptions, onSortChange, meta, onLoadMore, onLoadLess }) => {
     const scrollRef = useRef(null);
 
     const scroll = (dir) => {
@@ -95,14 +95,17 @@ const FoldersSection = ({ folders, loading, onFolderClick, onCreateFolder, searc
         scrollRef.current.scrollBy({ left: dir * 220, behavior: 'smooth' });
     };
 
+    const hasMore = meta && meta.current_page < meta.last_page;
+    const hasLess = meta && meta.current_page > 1;
+
     return (
         <section className="mb-8">
             <div className="flex items-center justify-between mb-4">
                 <h2 className="text-[17px] font-semibold flex items-center gap-3">
                     <span className="w-1 h-5 bg-primary rounded-full" />
                     Folders
-                    {folders.length > 0 && (
-                        <span className="text-[12px] font-normal text-slate-400 ml-1">({folders.length})</span>
+                    {meta?.total > 0 && (
+                        <span className="text-[12px] font-normal text-slate-400 ml-1">({meta.total})</span>
                     )}
                 </h2>
                 <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5">
@@ -143,15 +146,12 @@ const FoldersSection = ({ folders, loading, onFolderClick, onCreateFolder, searc
                 <>
                     <style>{`.folder-scroll::-webkit-scrollbar { display: none; }`}</style>
                     <div className="relative flex items-center gap-2 min-w-0">
-                        {/* Left arrow */}
                         <button
                             onClick={() => scroll(-1)}
                             className="shrink-0 w-9 h-9 flex items-center justify-center rounded-full bg-white border border-slate-200 text-slate-500 shadow-sm hover:border-primary hover:text-primary transition-all active:scale-90"
                         >
                             <span className="material-icons-round text-[20px]">chevron_left</span>
                         </button>
-
-                        {/* Scroll strip */}
                         <div
                             ref={scrollRef}
                             className="folder-scroll flex gap-4 overflow-x-auto pb-1 flex-1"
@@ -163,8 +163,6 @@ const FoldersSection = ({ folders, loading, onFolderClick, onCreateFolder, searc
                                 </div>
                             ))}
                         </div>
-
-                        {/* Right arrow */}
                         <button
                             onClick={() => scroll(1)}
                             className="shrink-0 w-9 h-9 flex items-center justify-center rounded-full bg-white border border-slate-200 text-slate-500 shadow-sm hover:border-primary hover:text-primary transition-all active:scale-90"
@@ -172,6 +170,32 @@ const FoldersSection = ({ folders, loading, onFolderClick, onCreateFolder, searc
                             <span className="material-icons-round text-[20px]">chevron_right</span>
                         </button>
                     </div>
+
+                    {(hasMore || hasLess) && (
+                        <div className="flex items-center justify-center gap-3 mt-3">
+                            {hasLess && (
+                                <button
+                                    onClick={onLoadLess}
+                                    disabled={loading}
+                                    className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl border border-slate-200 text-[13px] font-medium text-slate-500 hover:border-primary hover:text-primary disabled:opacity-40 transition-colors"
+                                >
+                                    <span className="material-icons-round text-[15px]">expand_less</span>
+                                    View less
+                                </button>
+                            )}
+                            {hasMore && (
+                                <button
+                                    onClick={onLoadMore}
+                                    disabled={loading}
+                                    className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl border border-slate-200 text-[13px] font-medium text-slate-500 hover:border-primary hover:text-primary disabled:opacity-40 transition-colors"
+                                >
+                                    {loading ? <span className="material-icons-round text-[15px] animate-spin">sync</span> : <span className="material-icons-round text-[15px]">expand_more</span>}
+                                    View more
+                                </button>
+                            )}
+                            <span className="text-[11px] text-slate-300">Page {meta.current_page} of {meta.last_page}</span>
+                        </div>
+                    )}
                 </>
             )}
         </section>
@@ -209,7 +233,7 @@ const NoteCard = ({ note, onClick }) => {
 };
 
 // ── Recent Notes Section ──────────────────────────────────────────────────────
-const RecentNotesSection = ({ notes, loading, onNoteClick, onCreateNote, search, meta, onLoadMore, sort, sortOptions, onSortChange }) => (
+const RecentNotesSection = ({ notes, loading, onNoteClick, onCreateNote, search, meta, onLoadMore, onLoadLess, sort, sortOptions, onSortChange }) => (
     <section>
         <div className="flex items-center justify-between mb-4">
             <h2 className="text-[17px] font-semibold flex items-center gap-3">
@@ -270,18 +294,29 @@ const RecentNotesSection = ({ notes, loading, onNoteClick, onCreateNote, search,
                     )}
                 </div>
 
-                {meta && meta.last_page > 1 && meta.current_page < meta.last_page && (
-                    <div className="flex justify-center mt-6">
-                        <button
-                            onClick={onLoadMore}
-                            disabled={loading}
-                            className="flex items-center gap-2 px-6 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:border-primary hover:text-primary disabled:opacity-40 transition-colors"
-                        >
-                            {loading
-                                ? <><span className="material-icons-round text-[15px] animate-spin">sync</span>Loading…</>
-                                : <>Load more notes</>
-                            }
-                        </button>
+                {meta && meta.last_page > 1 && (
+                    <div className="flex items-center justify-center gap-3 mt-6">
+                        {meta.current_page > 1 && (
+                            <button
+                                onClick={onLoadLess}
+                                disabled={loading}
+                                className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl border border-slate-200 text-[13px] font-medium text-slate-500 hover:border-primary hover:text-primary disabled:opacity-40 transition-colors"
+                            >
+                                <span className="material-icons-round text-[15px]">expand_less</span>
+                                View less
+                            </button>
+                        )}
+                        {meta.current_page < meta.last_page && (
+                            <button
+                                onClick={onLoadMore}
+                                disabled={loading}
+                                className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl border border-slate-200 text-[13px] font-medium text-slate-500 hover:border-primary hover:text-primary disabled:opacity-40 transition-colors"
+                            >
+                                {loading ? <span className="material-icons-round text-[15px] animate-spin">sync</span> : <span className="material-icons-round text-[15px]">expand_more</span>}
+                                View more
+                            </button>
+                        )}
+                        <span className="text-[11px] text-slate-300">Page {meta.current_page} of {meta.last_page} · {meta.total} total</span>
                     </div>
                 )}
             </>
@@ -310,6 +345,8 @@ export const LibraryContent = () => {
     // Data
     const [folders, setFolders]           = useState([]);
     const [notes, setNotes]               = useState([]);
+    const [foldersMeta, setFoldersMeta]   = useState(null);
+    const [foldersPage, setFoldersPage]   = useState(1);
     const [notesMeta, setNotesMeta]       = useState(null);
     const [notesPage, setNotesPage]       = useState(1);
 
@@ -325,23 +362,25 @@ export const LibraryContent = () => {
     const debounceRef = useRef(null);
 
     // ── Fetch folders ─────────────────────────────────────────────────────────
-    const loadFolders = useCallback(async ({ q = '', sortVal = FOLDER_SORT_OPTIONS[0].value, force = false } = {}) => {
-        // Use cache when no filter is active and not forced
-        if (!force && !q.trim() && sortVal === FOLDER_SORT_OPTIONS[0].value) {
+    const loadFolders = useCallback(async ({ page = 1, q = '', sortVal = FOLDER_SORT_OPTIONS[0].value, append = false, force = false } = {}) => {
+        // Use cache only for the default first page
+        if (!force && !q.trim() && page === 1 && sortVal === FOLDER_SORT_OPTIONS[0].value) {
             const cached = workspaceCache.getFolders();
-            if (cached) { setFolders(cached); setFoldersLoading(false); return; }
+            if (cached) { setFolders(cached.data); setFoldersMeta(cached.meta); setFoldersPage(1); setFoldersLoading(false); return; }
         }
         setFoldersLoading(true);
         try {
-            const qp = [sortVal];
+            const qp = [sortVal, `page=${page}`];
             if (q.trim()) qp.push(`searching=${encodeURIComponent(q.trim())}`);
             const res = await folderService.list(qp.join('&'));
             const data = res.data ?? res;
             const rows = data.data ?? [];
-            setFolders(rows);
-            // Only cache the default (unfiltered) result
-            if (!q.trim() && sortVal === FOLDER_SORT_OPTIONS[0].value) {
-                workspaceCache.setFolders(rows);
+            const meta = data.meta ?? null;
+            setFolders(append ? prev => [...prev, ...rows] : rows);
+            setFoldersMeta(meta);
+            setFoldersPage(page);
+            if (!q.trim() && page === 1 && sortVal === FOLDER_SORT_OPTIONS[0].value) {
+                workspaceCache.setFolders({ data: rows, meta });
             }
         } catch {
             // non-fatal
@@ -393,14 +432,14 @@ export const LibraryContent = () => {
         setSearch(value);
         clearTimeout(debounceRef.current);
         debounceRef.current = setTimeout(() => {
-            loadFolders({ q: value, sortVal: folderSort });
+            loadFolders({ page: 1, q: value, sortVal: folderSort });
             loadNotes({ page: 1, q: value, sortVal: noteSort });
         }, 400);
     };
 
     const handleFolderSortChange = (val) => {
         setFolderSort(val);
-        loadFolders({ q: search, sortVal: val });
+        loadFolders({ page: 1, q: search, sortVal: val });
     };
 
     const handleNoteSortChange = (val) => {
@@ -408,9 +447,11 @@ export const LibraryContent = () => {
         loadNotes({ page: 1, q: search, sortVal: val });
     };
 
-    const handleLoadMoreNotes = () => {
-        loadNotes({ page: notesPage + 1, q: search, sortVal: noteSort, append: true });
-    };
+    const handleLoadMoreFolders = () => loadFolders({ page: foldersPage + 1, q: search, sortVal: folderSort, append: true });
+    const handleLoadLessFolders = () => loadFolders({ page: 1, q: search, sortVal: folderSort });
+
+    const handleLoadMoreNotes = () => loadNotes({ page: notesPage + 1, q: search, sortVal: noteSort, append: true });
+    const handleLoadLessNotes = () => loadNotes({ page: 1, q: search, sortVal: noteSort });
 
     const handleFolderCreated = (folder) => {
         setShowCreateFolder(false);
@@ -451,11 +492,14 @@ export const LibraryContent = () => {
             <FoldersSection
                 folders={folders}
                 loading={foldersLoading}
+                meta={foldersMeta}
                 sort={folderSort}
                 sortOptions={FOLDER_SORT_OPTIONS}
                 onSortChange={handleFolderSortChange}
                 onFolderClick={(id) => navigate(`/lockedin/folders/${id}`)}
                 onCreateFolder={() => setShowCreateFolder(true)}
+                onLoadMore={handleLoadMoreFolders}
+                onLoadLess={handleLoadLessFolders}
                 search={search}
             />
 
@@ -470,6 +514,7 @@ export const LibraryContent = () => {
                 onNoteClick={(id) => navigate(`/lockedin/notes/${id}`)}
                 onCreateNote={() => navigate('/lockedin/notes/new')}
                 onLoadMore={handleLoadMoreNotes}
+                onLoadLess={handleLoadLessNotes}
                 search={search}
             />
 
