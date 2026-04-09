@@ -140,4 +140,7 @@ export const noteService = {
 
   revert: (id, versionId) =>
     apiClient(`${BASE}/${id}/revert/${versionId}`, { method: 'PATCH' }),
+
+  duplicate: (id) =>
+    apiClient(`${BASE}/duplicate/${id}`, { method: 'POST' }),
 };

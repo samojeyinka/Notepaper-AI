@@ -12,7 +12,8 @@ import { jsPDF } from "jspdf";
 import JSZip from 'jszip';
 import { useNoteSync } from "../../hooks/useNoteSync";
 import { useUndoHistory } from "../../hooks/useUndoHistory";
-import { deserializeNote } from "../../api/noteService";
+import { deserializeNote, noteService } from "../../api/noteService";
+import { workspaceCache } from "../../api/workspaceCache";
 import { NoteVersionSidebar } from "./NoteVersionSidebar";
 
 export const Note = () => {
@@ -461,7 +462,19 @@ export const Note = () => {
                 folderId={folderId}
                 onExportPDF={async () => { await forceFlush(); handleExport('pdf'); }}
                 onExportImage={async () => { await forceFlush(); handleExport('png'); }}
-                onCopy={() => alert('Copied!')}
+                onCopy={async () => {
+                    if (!noteId) return;
+                    try {
+                        const res = await noteService.duplicate(noteId);
+                        const newId = res.data?.id;
+                        if (newId) {
+                            workspaceCache.invalidateNotes();
+                            window.open(`/lockedin/notes/${newId}`, '_blank');
+                        }
+                    } catch {
+                        // silent
+                    }
+                }}
                 onShare={() => alert('Shared!')}
                 onToggleAI={() => setIsAISidebarOpen(!isAISidebarOpen)}
                 isAIOpen={isAISidebarOpen}
