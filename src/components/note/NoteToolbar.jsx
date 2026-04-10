@@ -277,7 +277,7 @@ const DrawPopover = ({ anchorRef, drawMode, onAction }) => {
   );
 };
 
-export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRecentColor, onImageUpload }) => {
+export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRecentColor, onImageUpload, onOpenShakespeare }) => {
   const [showTextColor, setShowTextColor] = useState(false);
   const [showHighlight, setShowHighlight] = useState(false);
   const [showFontSize, setShowFontSize] = useState(false);
@@ -396,6 +396,17 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
         className="w-16 border-r border-slate-200 bg-white flex flex-col items-center py-6 gap-5 shrink-0 select-none overflow-y-auto custom-scrollbar"
         style={{ position: 'relative', zIndex: 100 }}
       >
+        {/* 0. Shakespeare AI */}
+        <button
+          onMouseDown={(e) => { e.preventDefault(); onOpenShakespeare?.(); }}
+          title="Shakespeare Assist — AI writing"
+          className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-slate-700 to-black text-white shadow-md hover:opacity-90 active:scale-90 transition-all"
+        >
+          <span className="material-icons-round text-[18px]">auto_fix_high</span>
+        </button>
+
+        <div className="h-px w-8 bg-slate-100 shrink-0" />
+
         {/* 1. Basic Formatting */}
         <div className="flex flex-col gap-2">
           <ToolbarButton icon="format_bold" action="bold" active={activeState?.bold} title="Bold" onAction={onAction} />

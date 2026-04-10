@@ -15,6 +15,7 @@ import { useUndoHistory } from "../../hooks/useUndoHistory";
 import { deserializeNote, noteService } from "../../api/noteService";
 import { workspaceCache } from "../../api/workspaceCache";
 import { NoteVersionSidebar } from "./NoteVersionSidebar";
+import ShakespeareModal from "./ShakespeareModal";
 
 export const Note = () => {
     const { id: routeId } = useParams();
@@ -33,6 +34,7 @@ export const Note = () => {
     // Layout State
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [isAISidebarOpen, setIsAISidebarOpen] = useState(false);
+    const [isShakespeareOpen, setIsShakespeareOpen] = useState(false);
     const savedRangeRef = useRef(null); // saved cursor position before AI sidebar steals focus
     const [isVersionSidebarOpen, setIsVersionSidebarOpen] = useState(false);
     const [isPageSidebarOpen, setIsPageSidebarOpen] = useState(true);
@@ -500,6 +502,11 @@ export const Note = () => {
                     activeState={activeToolbarState}
                     recentColors={recentColors}
                     onAddRecentColor={addRecentColor}
+                    onOpenShakespeare={() => {
+                        const sel = window.getSelection();
+                        savedRangeRef.current = sel && sel.rangeCount > 0 ? sel.getRangeAt(0).cloneRange() : null;
+                        setIsShakespeareOpen(true);
+                    }}
                     onImageUpload={(url) => {
                         if (activeEditorRef.current) activeEditorRef.current.focus();
                         const img = `<img src="${url}" style="max-width:100%;height:auto;display:inline-block;" data-resizable="true" />`;
@@ -585,44 +592,39 @@ export const Note = () => {
                 </div>
 
                 {isAISidebarOpen && (
-                    <NoteAISidebar
-                        onInsertText={(text) => {
+                    <NoteAISidebar />
+                )}
+
+                {isShakespeareOpen && (
+                    <ShakespeareModal
+                        onClose={() => setIsShakespeareOpen(false)}
+                        onInsert={(text) => {
+                            setIsShakespeareOpen(false);
                             const pageEls = document.querySelectorAll('[data-note-page]');
                             const activePage = pageEls[activePageIndex] ?? pageEls[pageEls.length - 1];
                             if (!activePage) return;
-
-                            // Restore the saved cursor range, or place at end of active page
                             activePage.focus();
                             const sel = window.getSelection();
                             sel.removeAllRanges();
-
                             if (savedRangeRef.current) {
-                                // Verify the saved range is still inside this page
                                 try {
                                     if (activePage.contains(savedRangeRef.current.startContainer)) {
                                         sel.addRange(savedRangeRef.current);
-                                    } else {
-                                        throw new Error('out of page');
-                                    }
+                                    } else { throw new Error('out'); }
                                 } catch {
-                                    // Fall back: place cursor at end
-                                    const range = document.createRange();
-                                    range.selectNodeContents(activePage);
-                                    range.collapse(false);
-                                    sel.addRange(range);
+                                    const r = document.createRange();
+                                    r.selectNodeContents(activePage);
+                                    r.collapse(false);
+                                    sel.addRange(r);
                                 }
                             } else {
-                                const range = document.createRange();
-                                range.selectNodeContents(activePage);
-                                range.collapse(false);
-                                sel.addRange(range);
+                                const r = document.createRange();
+                                r.selectNodeContents(activePage);
+                                r.collapse(false);
+                                sel.addRange(r);
                             }
-
-                            // Insert without deleting anything
                             document.execCommand('insertText', false, text);
                             savedRangeRef.current = null;
-
-                            // Sync back to pages state
                             const updatedPages = [...pageEls].map(p => p.innerHTML);
                             setPages(updatedPages);
                             markDirty('content');

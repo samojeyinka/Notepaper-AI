@@ -8,29 +8,19 @@ const google = createGoogleGenerativeAI({
     apiKey: import.meta.env.VITE_GEMINI_API_KEY,
 });
 
-const QUICK_PROMPTS = [
-    'Introduce a topic',
-    'Write a summary',
-    'Explain like I\'m 5',
-    'Write a conclusion',
-    'Write a paragraph',
-    'Give 3 key points',
-];
-
-const SYSTEM_INSTRUCTION = `You are Shakespeare Assist — an eloquent, intelligent writing companion embedded inside a note-taking app called Notepaper.ai.
-Your job is to help users draft, expand, or polish text for their notes.
+const SYSTEM_INSTRUCTION = `You are Shakespeare Assist — an intelligent writing companion inside a note-taking app called Notepaper.ai.
+Help the user draft, expand, or polish text for their notes.
 Rules:
-- Respond ONLY with the requested content — no meta-commentary, no "Here is your text:", no preamble.
+- Respond ONLY with the requested content. No preamble, no "Here is your text:", no meta-commentary.
 - Write in clear, natural prose unless the user asks for a specific style.
-- Match the length to the request. Short request = concise output.
+- Match the length to the request.
 - Never refuse a reasonable writing task.`;
 
 const PREMIUM_PERKS = [
-    { icon: 'bolt',            text: 'More requests per day' },
-    { icon: 'speed',           text: 'Priority generation speed' },
-    { icon: 'psychology',      text: 'Advanced reasoning & longer outputs' },
-    { icon: 'auto_fix_high',   text: 'Rewrite, expand & style tools' },
-    { icon: 'translate',       text: 'Multi-language support' },
+    { icon: 'bolt',           text: 'More requests per day' },
+    { icon: 'speed',          text: 'Priority generation speed' },
+    { icon: 'psychology',     text: 'Advanced reasoning & longer outputs' },
+    { icon: 'translate',      text: 'Multi-language support' },
 ];
 
 const PremiumBadge = () => {
@@ -50,9 +40,9 @@ const PremiumBadge = () => {
                 onClick={() => setOpen(v => !v)}
                 onMouseEnter={() => setOpen(true)}
                 onMouseLeave={() => setOpen(false)}
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-600 text-[11px] font-bold hover:bg-amber-100 transition-colors"
+                className="flex items-center gap-1 px-2 py-1 rounded-lg bg-amber-50 border border-amber-200 text-amber-600 text-[10px] font-bold hover:bg-amber-100 transition-colors"
             >
-                <span className="material-icons-round text-[14px]">workspace_premium</span>
+                <span className="material-icons-round text-[12px]">workspace_premium</span>
                 Pro
             </button>
 
@@ -60,21 +50,21 @@ const PremiumBadge = () => {
                 <div
                     onMouseEnter={() => setOpen(true)}
                     onMouseLeave={() => setOpen(false)}
-                    className="absolute bottom-full right-0 mb-2 w-64 bg-white rounded-2xl shadow-xl border border-slate-100 p-4 z-10 animate-in fade-in zoom-in-95 duration-150"
+                    className="absolute bottom-1 right-0 mb-2 w-60 bg-white rounded-xl shadow-md border border-slate-100 p-2 z-10"
                 >
-                    <p className="text-[11px] font-bold text-slate-700 mb-3 flex items-center gap-1.5">
-                        <span className="material-icons-round text-amber-500 text-[15px]">workspace_premium</span>
+                    <p className="text-[11px] font-semibold text-slate-700 mb-2 flex items-center gap-1.5">
+                        <span className="material-icons-round text-amber-500 text-[13px]">workspace_premium</span>
                         Unlock Pro Shakespeare
                     </p>
-                    <ul className="flex flex-col gap-2 mb-3">
+                    <ul className="flex flex-col gap-1">
                         {PREMIUM_PERKS.map(p => (
-                            <li key={p.text} className="flex items-center gap-2 text-[11px] text-slate-600">
-                                <span className="material-icons-round text-primary text-[14px]">{p.icon}</span>
+                            <li key={p.text} className="flex items-center gap-1 text-[9px] text-slate-600">
+                                <span className="material-icons-round text-primary text-[11px]">{p.icon}</span>
                                 {p.text}
                             </li>
                         ))}
                     </ul>
-                    <button className="w-full py-2 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-white text-[11px] font-bold hover:opacity-90 active:scale-[0.98] transition-all shadow-md shadow-amber-200">
+                    <button className="w-full py-1 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-white text-[10px] font-medium hover:opacity-90 active:scale-[0.98] transition-all shadow-md shadow-amber-200">
                         Upgrade to Pro
                     </button>
                 </div>
@@ -84,31 +74,42 @@ const PremiumBadge = () => {
 };
 
 const ShakespeareModal = ({ onClose, onInsert }) => {
-    const [prompt, setPrompt]       = useState('');
-    const [output, setOutput]       = useState('');
-    const [status, setStatus]       = useState('idle'); // idle | streaming | done | error
-    const abortRef                  = useRef(null);
-    const outputRef                 = useRef(null);
+    const [prompt, setPrompt] = useState('');
+    const [output, setOutput] = useState('');
+    const [status, setStatus] = useState('idle'); // idle | streaming | done | error
+    const [refinePrompt, setRefinePrompt] = useState('');
+    const abortRef = useRef(null);
+    const outputRef = useRef(null);
+    const inputRef = useRef(null);
 
-    // Auto-scroll output as it streams
+    // Focus input on mount
+    useEffect(() => { inputRef.current?.focus(); }, []);
+
+    // Auto-scroll output
     useEffect(() => {
         if (outputRef.current) {
             outputRef.current.scrollTop = outputRef.current.scrollHeight;
         }
     }, [output]);
 
-    const handleGenerate = async () => {
-        if (!prompt.trim() || status === 'streaming') return;
+    // Close on Escape
+    useEffect(() => {
+        const handler = (e) => { if (e.key === 'Escape') onClose(); };
+        document.addEventListener('keydown', handler);
+        return () => document.removeEventListener('keydown', handler);
+    }, [onClose]);
 
+    const runGenerate = async (userPrompt) => {
+        if (!userPrompt.trim() || status === 'streaming') return;
         setOutput('');
         setStatus('streaming');
         abortRef.current = new AbortController();
 
         try {
             const result = streamText({
-                model: google('gemini-2.5-flash'),
+                model: google('gemini-2.5-flash-lite'),
                 system: SYSTEM_INSTRUCTION,
-                messages: [{ role: 'user', content: prompt.trim() }],
+                messages: [{ role: 'user', content: userPrompt.trim() }],
                 temperature: 0.85,
                 maxTokens: 1024,
                 abortSignal: abortRef.current.signal,
@@ -117,7 +118,6 @@ const ShakespeareModal = ({ onClose, onInsert }) => {
             for await (const chunk of result.textStream) {
                 setOutput(prev => prev + chunk);
             }
-
             setStatus('done');
         } catch (err) {
             if (err.name === 'AbortError') {
@@ -129,105 +129,88 @@ const ShakespeareModal = ({ onClose, onInsert }) => {
         }
     };
 
-    const handleStop = () => {
-        abortRef.current?.abort();
+    const handleGenerate = () => runGenerate(prompt);
+
+    const handleRefine = () => {
+        if (!refinePrompt.trim()) return;
+        const combined = `${output.trim()}\n\n---\nRefine instruction: ${refinePrompt.trim()}`;
+        setRefinePrompt('');
+        runGenerate(combined);
     };
+
+    const handleStop = () => { abortRef.current?.abort(); };
 
     const handleInsert = () => {
         if (output.trim() && onInsert) {
             onInsert(output.trim());
-            onClose();
         }
     };
 
     const handleKeyDown = (e) => {
-        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-            handleGenerate();
-        }
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) handleGenerate();
+    };
+
+    const handleRefineKeyDown = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleRefine(); }
     };
 
     return createPortal(
-        <div
-            className="fixed inset-0 z-[100] flex items-center justify-center"
-            style={{ background: 'rgba(15,23,42,0.55)', backdropFilter: 'blur(4px)' }}
-        >
-            <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+        <>
+            {/* Backdrop — clicking outside closes */}
+            <div
+                className="fixed inset-0 z-[99]"
+                onClick={onClose}
+            />
 
+            {/* Popover card */}
+            <div
+                className="fixed z-[100] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[420px] bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden"
+                style={{ maxHeight: '80vh' }}
+                onClick={e => e.stopPropagation()}
+            >
                 {/* Header */}
-                <div className="px-6 pt-6 pb-4 border-b border-slate-100 shrink-0">
-                    <div className="flex items-start justify-between gap-3">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-gray-400 to-black flex items-center justify-center shadow-lg overflow-hidden">
-                                <img src={shakespeare} className="w-full h-full object-cover" alt="Shakespeare" />
-                            </div>
-                            <div>
-                                <h2 className="font-display font-bold text-slate-900 text-base leading-tight">Shakespeare Assist</h2>
-                                <p className="text-[11px] text-slate-400 mt-0.5">Shakespeare writes it — you own it.</p>
-                            </div>
+                <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 shrink-0">
+                    <div className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 rounded-xl bg-gradient-to-br from-gray-400 to-black flex items-center justify-center shadow-sm overflow-hidden shrink-0">
+                            <img src={shakespeare} className="w-full h-full object-cover" alt="" />
                         </div>
-                        <button
-                            onClick={onClose}
-                            className="w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:bg-slate-100 transition-colors shrink-0"
-                        >
-                            <span className="material-icons-round text-[18px]">close</span>
-                        </button>
+                        <div>
+                            <p className="font-semibold text-[12px] text-slate-800 leading-tight">Shakespeare Assist</p>
+                            <p className="text-[9px] text-slate-400">Shakespeare writes it — you own it.</p>
+                        </div>
                     </div>
+                    <button
+                        onClick={onClose}
+                        className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 transition-colors"
+                    >
+                        <span className="material-icons-round text-[16px]">close</span>
+                    </button>
                 </div>
 
                 {/* Body */}
-                <div className="px-6 py-5 flex flex-col gap-4 overflow-y-auto flex-1">
+                <div className="flex flex-col gap-3 px-4 py-3 overflow-y-auto flex-1">
 
-                    {/* Quick prompts */}
-                    <div className="flex flex-wrap gap-2">
-                        {QUICK_PROMPTS.map(q => (
-                            <button
-                                key={q}
-                                onClick={() => setPrompt(q)}
-                                className="px-3 py-1.5 rounded-full bg-slate-100 hover:bg-primary/10 hover:text-primary text-slate-600 text-[11px] font-medium transition-colors"
-                            >
-                                {q}
-                            </button>
-                        ))}
-                    </div>
-
-                    {/* Prompt input */}
-                    <div className="relative">
-                        <textarea
-                            rows={3}
-                            value={prompt}
-                            onChange={e => setPrompt(e.target.value)}
-                            onKeyDown={handleKeyDown}
-                            placeholder="e.g. Write a short paragraph introducing photosynthesis for a biology note…"
-                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm text-slate-700 placeholder-slate-400 outline-none focus:border-primary resize-none leading-relaxed"
-                        />
-                        <p className="text-[10px] text-slate-300 text-right mt-1">Ctrl + Enter to generate</p>
-                    </div>
-
-                    {/* Generate / Stop button */}
-                    {status !== 'streaming' ? (
-                        <button
-                            onClick={handleGenerate}
-                            disabled={!prompt.trim()}
-                            className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl bg-gradient-to-r from-gray-700 to-black text-white text-sm font-bold shadow-lg hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                        >
-                            <span className="material-icons-round text-[17px]">auto_fix_high</span>
-                            Let Shakespeare Write It
-                        </button>
-                    ) : (
-                        <button
-                            onClick={handleStop}
-                            className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl bg-red-50 border border-red-200 text-red-500 text-sm font-semibold hover:bg-red-100 active:scale-[0.98] transition-all"
-                        >
-                            <span className="material-icons-round text-[17px]">stop_circle</span>
-                            Stop
-                        </button>
+                    {/* Prompt input — only shown before first generation */}
+                    {status === 'idle' && (
+                        <>
+                            <textarea
+                                ref={inputRef}
+                                rows={3}
+                                value={prompt}
+                                onChange={e => setPrompt(e.target.value)}
+                                onKeyDown={handleKeyDown}
+                                placeholder="What should Shakespeare write?  e.g. a short intro to photosynthesis…"
+                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-[12px] text-slate-700 placeholder-slate-400 outline-none focus:border-primary resize-none leading-relaxed"
+                            />
+                            
+                        </>
                     )}
 
-                    {/* Streamed output */}
+                    {/* Streaming / done output */}
                     {(output || status === 'streaming') && (
-                        <div className="flex flex-col gap-2">
+                        <div className="flex flex-col gap-1.5">
                             <div className="flex items-center justify-between">
-                                <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">
+                                <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-widest">
                                     {status === 'streaming' ? (
                                         <span className="flex items-center gap-1">
                                             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse inline-block" />
@@ -235,10 +218,10 @@ const ShakespeareModal = ({ onClose, onInsert }) => {
                                         </span>
                                     ) : 'Result'}
                                 </p>
-                                {status === 'done' && output && (
+                                {status === 'done' && (
                                     <button
-                                        onClick={() => { setOutput(''); setStatus('idle'); }}
-                                        className="text-[10px] text-slate-400 hover:text-slate-600 transition-colors"
+                                        onClick={() => { setOutput(''); setStatus('idle'); setPrompt(''); setRefinePrompt(''); }}
+                                        className="text-[9px] text-slate-400 hover:text-slate-600 transition-colors"
                                     >
                                         Clear
                                     </button>
@@ -246,46 +229,83 @@ const ShakespeareModal = ({ onClose, onInsert }) => {
                             </div>
                             <div
                                 ref={outputRef}
-                                className="bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm text-slate-700 leading-relaxed whitespace-pre-wrap max-h-48 overflow-y-auto"
+                                className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-[12px] text-slate-700 leading-relaxed whitespace-pre-wrap max-h-52 overflow-y-auto"
                             >
                                 {output}
                                 {status === 'streaming' && (
-                                    <span className="inline-block w-0.5 h-4 bg-primary ml-0.5 animate-pulse align-text-bottom" />
+                                    <span className="inline-block w-0.5 h-3.5 bg-primary ml-0.5 animate-pulse align-text-bottom" />
                                 )}
                             </div>
                         </div>
                     )}
 
                     {status === 'error' && (
-                        <p className="text-xs text-red-500 flex items-center gap-1">
-                            <span className="material-icons-round text-[14px]">error_outline</span>
+                        <p className="text-[11px] text-red-500 flex items-center gap-1">
+                            <span className="material-icons-round text-[13px]">error_outline</span>
                             Something went wrong. Check your API key or try again.
                         </p>
                     )}
+
+                    {/* Refine input — shown after generation */}
+                    {status === 'done' && (
+                        <div className="flex gap-2 items-center">
+                            <input
+                                type="text"
+                                value={refinePrompt}
+                                onChange={e => setRefinePrompt(e.target.value)}
+                                onKeyDown={handleRefineKeyDown}
+                                placeholder="Refine… e.g. make it shorter, add examples"
+                                className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[11px] text-slate-700 placeholder-slate-400 outline-none focus:border-primary"
+                            />
+                            <button
+                                onClick={handleRefine}
+                                disabled={!refinePrompt.trim()}
+                                className="shrink-0 w-8 h-8 rounded-xl bg-slate-100 hover:bg-primary hover:text-white text-slate-600 flex items-center justify-center transition-colors disabled:opacity-40"
+                            >
+                                <span className="material-icons-round text-[16px]">send</span>
+                            </button>
+                        </div>
+                    )}
                 </div>
 
-                {/* Footer — Insert button */}
-                <div className="px-6 pb-5 pt-2 border-t border-slate-100 shrink-0 flex flex-col gap-3">
-                    <div className="flex items-center gap-3">
-                        <button
-                            onClick={handleInsert}
-                            disabled={!output.trim() || status === 'streaming'}
-                            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-2xl bg-primary text-white text-sm font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                        >
-                            <span className="material-icons-round text-[17px]">note_add</span>
-                            Insert into Note
-                        </button>
-
-                        {/* Premium badge with hover tooltip */}
-                        <PremiumBadge />
+                {/* Footer */}
+                <div className="px-4 pb-3 pt-2 border-t border-slate-100 shrink-0 flex flex-col gap-2">
+                    {/* Action row */}
+                    <div className="flex items-center gap-2 ml-auto">
+                        {status === 'streaming' ? (
+                            <button
+                                onClick={handleStop}
+                                className="w-[fit-conetent] flex items-center justify-center gap-1 p-1 rounded-md bg-red-50 border border-red-200 text-red-500 text-[11px] font-normal hover:bg-red-100 active:scale-[0.98] transition-all"
+                            >
+                        
+                              <span class="material-symbols-outlined">stop_circle</span>
+                            </button>
+                        ) : status === 'done' ? (
+                            <>
+                                <button
+                                    onClick={handleInsert}
+                                    disabled={!output.trim()}
+                                    className="w-[fit-content] flex items-center justify-center gap-1 px-2 py-1 rounded-md bg-primary text-white text-[11px] font-medium shadow shadow-primary/20 hover:bg-primary/90 active:scale-[0.98] transition-all disabled:opacity-40"
+                                >
+                                    Insert
+                                </button>
+                                <PremiumBadge />
+                            </>
+                        ) : (
+                            <button
+                                onClick={handleGenerate}
+                                disabled={!prompt.trim()}
+                                className="w-[fit-content] ml-auto px-4 py-2 rounded-xl bg-gradient-to-r from-gray-700 to-black text-white text-[11px] font-medium shadow hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                            >
+                                Create
+                            </button>
+                        )}
                     </div>
-                    <p className="text-center text-[10px] text-slate-300 flex items-center justify-center gap-1">
-                        <span className="material-icons-round text-[12px]">bolt</span>
-                        Powered by Gemini 2.5 Flash
-                    </p>
+
+                  
                 </div>
             </div>
-        </div>,
+        </>,
         document.body
     );
 };
