@@ -267,6 +267,7 @@ const NotePage = ({
             else editorRef.current = node;
           }
         }}
+        data-note-page={index}
         contentEditable={!readOnly}
         suppressContentEditableWarning
         onInput={readOnly ? undefined : handleInput}

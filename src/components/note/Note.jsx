@@ -33,6 +33,7 @@ export const Note = () => {
     // Layout State
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [isAISidebarOpen, setIsAISidebarOpen] = useState(false);
+    const savedRangeRef = useRef(null); // saved cursor position before AI sidebar steals focus
     const [isVersionSidebarOpen, setIsVersionSidebarOpen] = useState(false);
     const [isPageSidebarOpen, setIsPageSidebarOpen] = useState(true);
 
@@ -476,7 +477,14 @@ export const Note = () => {
                     }
                 }}
                 onShare={() => alert('Shared!')}
-                onToggleAI={() => setIsAISidebarOpen(!isAISidebarOpen)}
+                onToggleAI={() => {
+                    if (!isAISidebarOpen) {
+                        // Save cursor before focus leaves the editor
+                        const sel = window.getSelection();
+                        savedRangeRef.current = sel && sel.rangeCount > 0 ? sel.getRangeAt(0).cloneRange() : null;
+                    }
+                    setIsAISidebarOpen(!isAISidebarOpen);
+                }}
                 isAIOpen={isAISidebarOpen}
                 onToggleHistory={() => setIsVersionSidebarOpen(v => !v)}
                 isHistoryOpen={isVersionSidebarOpen}
@@ -576,7 +584,51 @@ export const Note = () => {
                     )}
                 </div>
 
-                {isAISidebarOpen && <NoteAISidebar />}
+                {isAISidebarOpen && (
+                    <NoteAISidebar
+                        onInsertText={(text) => {
+                            const pageEls = document.querySelectorAll('[data-note-page]');
+                            const activePage = pageEls[activePageIndex] ?? pageEls[pageEls.length - 1];
+                            if (!activePage) return;
+
+                            // Restore the saved cursor range, or place at end of active page
+                            activePage.focus();
+                            const sel = window.getSelection();
+                            sel.removeAllRanges();
+
+                            if (savedRangeRef.current) {
+                                // Verify the saved range is still inside this page
+                                try {
+                                    if (activePage.contains(savedRangeRef.current.startContainer)) {
+                                        sel.addRange(savedRangeRef.current);
+                                    } else {
+                                        throw new Error('out of page');
+                                    }
+                                } catch {
+                                    // Fall back: place cursor at end
+                                    const range = document.createRange();
+                                    range.selectNodeContents(activePage);
+                                    range.collapse(false);
+                                    sel.addRange(range);
+                                }
+                            } else {
+                                const range = document.createRange();
+                                range.selectNodeContents(activePage);
+                                range.collapse(false);
+                                sel.addRange(range);
+                            }
+
+                            // Insert without deleting anything
+                            document.execCommand('insertText', false, text);
+                            savedRangeRef.current = null;
+
+                            // Sync back to pages state
+                            const updatedPages = [...pageEls].map(p => p.innerHTML);
+                            setPages(updatedPages);
+                            markDirty('content');
+                        }}
+                    />
+                )}
 
                 {isVersionSidebarOpen && (
                     <NoteVersionSidebar

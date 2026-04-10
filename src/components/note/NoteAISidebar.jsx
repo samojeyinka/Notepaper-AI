@@ -32,7 +32,7 @@ const premiumFeatures = [
     },
 ];
 
-export const NoteAISidebar = () => {
+export const NoteAISidebar = ({ onInsertText }) => {
     const [showShakespeare, setShowShakespeare] = useState(false);
     const [naomiOpen, setNaomiOpen] = useState(true);
 
@@ -151,7 +151,7 @@ export const NoteAISidebar = () => {
                 </div>
             </aside>
 
-            {showShakespeare && <ShakespeareModal onClose={() => setShowShakespeare(false)} />}
+            {showShakespeare && <ShakespeareModal onClose={() => setShowShakespeare(false)} onInsert={onInsertText} />}
         </>
     );
 };
