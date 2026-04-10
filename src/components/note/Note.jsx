@@ -17,6 +17,49 @@ import { workspaceCache } from "../../api/workspaceCache";
 import { NoteVersionSidebar } from "./NoteVersionSidebar";
 import ShakespeareModal from "./ShakespeareModal";
 
+// ── Markdown → HTML converter for Shakespeare inserts ──────────────────────
+function inlineFormat(text) {
+    return text
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.+?)\*/g, '<em>$1</em>')
+        .replace(/_(.+?)_/g, '<em>$1</em>')
+        .replace(/`(.+?)`/g, '<code>$1</code>');
+}
+
+function markdownToHtml(md) {
+    const lines = md.split('\n');
+    const out = [];
+    let inUl = false, inOl = false;
+
+    const closeList = () => {
+        if (inUl) { out.push('</ul>'); inUl = false; }
+        if (inOl) { out.push('</ol>'); inOl = false; }
+    };
+
+    for (const raw of lines) {
+        const line = raw.trimEnd();
+        if (/^### /.test(line))       { closeList(); out.push(`<h3>${inlineFormat(line.slice(4))}</h3>`); }
+        else if (/^## /.test(line))   { closeList(); out.push(`<h2>${inlineFormat(line.slice(3))}</h2>`); }
+        else if (/^# /.test(line))    { closeList(); out.push(`<h1>${inlineFormat(line.slice(2))}</h1>`); }
+        else if (/^[-*] /.test(line)) {
+            if (!inUl) { closeList(); out.push('<ul>'); inUl = true; }
+            out.push(`<li>${inlineFormat(line.slice(2))}</li>`);
+        } else if (/^\d+\. /.test(line)) {
+            if (!inOl) { closeList(); out.push('<ol>'); inOl = true; }
+            out.push(`<li>${inlineFormat(line.replace(/^\d+\. /, ''))}</li>`);
+        } else if (/^-{3,}$/.test(line.trim())) {
+            closeList(); out.push('<hr>');
+        } else if (line.trim() === '') {
+            closeList(); out.push('<br>');
+        } else {
+            closeList(); out.push(`<div>${inlineFormat(line)}</div>`);
+        }
+    }
+    closeList();
+    return out.join('');
+}
+
 export const Note = () => {
     const { id: routeId } = useParams();
     const navigate = useNavigate();
@@ -603,6 +646,7 @@ export const Note = () => {
                             const pageEls = document.querySelectorAll('[data-note-page]');
                             const activePage = pageEls[activePageIndex] ?? pageEls[pageEls.length - 1];
                             if (!activePage) return;
+
                             activePage.focus();
                             const sel = window.getSelection();
                             sel.removeAllRanges();
@@ -623,11 +667,12 @@ export const Note = () => {
                                 r.collapse(false);
                                 sel.addRange(r);
                             }
-                            document.execCommand('insertText', false, text);
+
+                            // Convert markdown → HTML and insert; the input event
+                            // that execCommand fires will trigger handleInput →
+                            // checkOverflow → handlePageOverflow naturally.
+                            document.execCommand('insertHTML', false, markdownToHtml(text));
                             savedRangeRef.current = null;
-                            const updatedPages = [...pageEls].map(p => p.innerHTML);
-                            setPages(updatedPages);
-                            markDirty('content');
                         }}
                     />
                 )}
