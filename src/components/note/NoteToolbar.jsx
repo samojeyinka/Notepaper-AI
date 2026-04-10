@@ -400,7 +400,7 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
         <button
           onMouseDown={(e) => { e.preventDefault(); onOpenShakespeare?.(); }}
           title="Shakespeare Assist — AI writing"
-          className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-slate-700 to-black text-white shadow-md hover:opacity-90 active:scale-90 transition-all"
+          className="w-10 h-10 rounded-xl flex items-center justify-center text-black hover:opacity-90 active:scale-90 transition-all"
         >
           <span className="material-icons-round text-[18px]">auto_fix_high</span>
         </button>

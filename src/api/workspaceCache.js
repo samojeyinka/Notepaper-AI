@@ -5,6 +5,7 @@
 const cache = {
     folders: null,   // { data: [], fetchedAt: timestamp }
     notes:   null,   // { data: [], meta: {}, fetchedAt: timestamp }
+    tickets: null,   // { data: [], fetchedAt: timestamp }
 };
 
 export const workspaceCache = {
@@ -22,4 +23,8 @@ export const workspaceCache = {
 
     /** Call after any mutation that affects both (e.g. moving a note) */
     invalidateAll: () => { cache.folders = null; cache.notes = null; },
+
+    getTickets: () => cache.tickets?.data ?? null,
+    setTickets: (data) => { cache.tickets = { data, fetchedAt: Date.now() }; },
+    invalidateTickets: () => { cache.tickets = null; },
 };
