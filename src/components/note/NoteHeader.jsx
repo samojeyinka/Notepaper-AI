@@ -58,7 +58,10 @@ function useVoiceToText(onResult) {
         recognition.lang            = 'en-US';
 
         recognition.onresult = (e) => {
+            // Slice from e.resultIndex so we only process the NEW segment, not the
+            // full accumulated results list (which would cause text duplication).
             const transcript = Array.from(e.results)
+                .slice(e.resultIndex)
                 .map(r => r[0].transcript)
                 .join(' ');
             onResult(transcript);

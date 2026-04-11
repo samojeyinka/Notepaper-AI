@@ -73,6 +73,9 @@ export const Note = () => {
     const [title, setTitle] = useState("Untitled Note");
     const [pages, setPages] = useState([""]);
     const [activePageIndex, setActivePageIndex] = useState(0);
+    // Always-current ref so callbacks with stale closures (e.g. voice handler) can
+    // read the latest active page index without capturing a stale closure value.
+    const activePageIndexRef = useRef(0);
 
     // Layout State
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -381,7 +384,9 @@ export const Note = () => {
             }
             return newPages;
         });
+        activePageIndexRef.current = index + 1;
         setActivePageIndex(index + 1);
+        pendingFocusEndRef.current = true; // place cursor at end of the new page
         markDirty('content');
 
         setTimeout(() => { overflowGuardRef.current.delete(index); }, 300);
@@ -558,10 +563,15 @@ export const Note = () => {
                         })
                         .filter(Boolean);
 
-                    for (const sentence of sentences) {
-                        const pageEls = document.querySelectorAll('[data-note-page]');
-                        const activePage = pageEls[activePageIndex] ?? pageEls[pageEls.length - 1];
-                        if (!activePage) break;
+                    // Insert all sentences at once so the built-in overflow cascade
+                    // can distribute content across new pages. Inserting one-by-one
+                    // in a synchronous loop races against React state updates and the
+                    // overflow guard, causing text to pile up on a single page.
+                    // Use activePageIndexRef (not the stale closure value) so that
+                    // continued speech after an overflow targets the correct page.
+                    const pageEls = document.querySelectorAll('[data-note-page]');
+                    const activePage = pageEls[activePageIndexRef.current] ?? pageEls[pageEls.length - 1];
+                    if (activePage) {
                         activePage.focus();
                         const sel = window.getSelection();
                         sel.removeAllRanges();
@@ -569,7 +579,8 @@ export const Note = () => {
                         r.selectNodeContents(activePage);
                         r.collapse(false);
                         sel.addRange(r);
-                        document.execCommand('insertHTML', false, `<div>${sentence}</div>`);
+                        const html = sentences.map(s => `<div>${s}</div>`).join('');
+                        document.execCommand('insertHTML', false, html);
                         activePage.dispatchEvent(new Event('input', { bubbles: true }));
                     }
                     savedRangeRef.current = null;
