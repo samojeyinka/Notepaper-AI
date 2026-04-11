@@ -148,12 +148,21 @@ export const NoteHeader = ({
     onRedo,
     folderId,
     onVoiceResult,
+    onVoiceStateChange,
 }) => {
     const status = STATUS_CONFIG[saveStatus] ?? STATUS_CONFIG.idle;
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const { voiceState, toggle: toggleVoice } = useVoiceToText((transcript) => {
         onVoiceResult?.(transcript);
     });
+
+    // Notify parent whenever recording state changes
+    const prevVoiceStateRef = useRef(null);
+    useEffect(() => {
+        if (prevVoiceStateRef.current === voiceState) return;
+        prevVoiceStateRef.current = voiceState;
+        onVoiceStateChange?.(voiceState === 'listening');
+    }, [voiceState, onVoiceStateChange]);
 
     const MenuButton = ({ icon, label, onClick }) => (
         <button 

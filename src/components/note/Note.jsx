@@ -76,6 +76,7 @@ export const Note = () => {
     // Always-current ref so callbacks with stale closures (e.g. voice handler) can
     // read the latest active page index without capturing a stale closure value.
     const activePageIndexRef = useRef(0);
+    const [isRecording, setIsRecording] = useState(false);
 
     // Layout State
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -585,6 +586,7 @@ export const Note = () => {
                     }
                     savedRangeRef.current = null;
                 }}
+                onVoiceStateChange={setIsRecording}
             />
 
             <div className="flex flex-1 overflow-hidden relative">
@@ -621,7 +623,13 @@ export const Note = () => {
                             </div>
                         </div>
                     )}
-                    <div className="note-pages-container flex-1 overflow-hidden flex">
+                    <div className="note-pages-container flex-1 overflow-hidden flex relative">
+                        {/* Block all pointer interaction on the pages while voice recording */}
+                        {isRecording && (
+                            <div
+                                style={{ position: 'absolute', inset: 0, zIndex: 50, cursor: 'not-allowed' }}
+                            />
+                        )}
                         <NoteEditor
                             ref={activeEditorRef}
                             pages={pages}
