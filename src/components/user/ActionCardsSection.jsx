@@ -28,14 +28,14 @@ export const ActionCardsSection = () => {
         label="Voice Record"
         shapeClass="rounded-full"
         bgColor="bg-green-500"
-        url="notes/new"
+        url="voice-to-speech"
       />
       <ActionCard
         icon="auto_awesome"
         label="AI Generate"
         shapeClass="blob-shape"
         bgColor="bg-purple-500"
-        url="notes/new"
+        url="generate"
       />
     </section>
   );

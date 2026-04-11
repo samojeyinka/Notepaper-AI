@@ -8,6 +8,8 @@ import { LandingPage,PricingPage,SignUpPage,
       NotificationsPage, HelpSupportPage,SupportTicketsPage,NewSupportTicketsPage,SupportTicketPage } from '../pages/pages';
 import NotePage from '../pages/NotePage';
 import FolderPage from '../pages/FolderPage';
+import VoiceToSpeechPage from '../pages/VoiceToSpeechPage';
+import GeneratePage from '../pages/GeneratePage';
 import ScrollToTop from './ScrollToTop';
 import ProtectedRoute, { GuestRoute } from './ProtectedRoute';
 
@@ -226,6 +228,14 @@ const AppRoutes = createBrowserRouter([
     {
         path: '/lockedin/folders/:id',
         element: <ProtectedRoute><ScrollToTop><FolderPage /></ScrollToTop></ProtectedRoute>,
+    },
+    {
+        path: '/lockedin/voice-to-speech',
+        element: <ProtectedRoute><ScrollToTop><VoiceToSpeechPage /></ScrollToTop></ProtectedRoute>,
+    },
+    {
+        path: '/lockedin/generate',
+        element: <ProtectedRoute><ScrollToTop><GeneratePage /></ScrollToTop></ProtectedRoute>,
     },
     {
         path: '/lockedin/notes/new',

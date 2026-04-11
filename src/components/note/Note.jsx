@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams, useLocation } from "react-router-dom";
 // useSearchParams is used below to read ?folder= on new-note creation
 import { NoteHeader } from "./NoteHeader";
 import { NoteToolbar } from "./NoteToolbar";
@@ -64,6 +64,7 @@ export const Note = () => {
     const { id: routeId } = useParams();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
+    const location = useLocation();
 
     // Note Data
     const [noteId, setNoteId] = useState(routeId ?? null);
@@ -71,7 +72,16 @@ export const Note = () => {
     const [folderId, setFolderId] = useState(() => searchParams.get('folder') ?? null);
     const [folder, setFolder]     = useState(null);
     const [title, setTitle] = useState("Untitled Note");
-    const [pages, setPages] = useState([""]);
+    const [pages, setPages] = useState(() => {
+        const voiceText = location.state?.voiceText;
+        if (!voiceText) return [""];
+        // Convert plain text lines into div-per-line HTML so the editor renders it correctly
+        const html = voiceText
+            .split('\n')
+            .map(line => line.trim() ? `<div>${line}</div>` : '<div><br></div>')
+            .join('');
+        return [html];
+    });
     const [activePageIndex, setActivePageIndex] = useState(0);
     // Always-current ref so callbacks with stale closures (e.g. voice handler) can
     // read the latest active page index without capturing a stale closure value.
