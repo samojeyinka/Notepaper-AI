@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 
 const STATUS_CONFIG = {
@@ -7,6 +7,123 @@ const STATUS_CONFIG = {
     saved:   { label: 'Saved',      icon: 'cloud_done',     cls: 'bg-green-50  text-green-600' },
     error:   { label: 'Unsaved',    icon: 'cloud_off',      cls: 'bg-red-50    text-red-500' },
     idle:    { label: '',           icon: '',               cls: '' },
+};
+
+// ── Voice-to-text hook ────────────────────────────────────────────────────────
+function useVoiceToText(onResult) {
+    const [voiceState, setVoiceState] = useState('idle'); // idle | countdown | listening | unsupported
+    const recognitionRef = useRef(null);
+    const countdownRef   = useRef(null);
+
+    const supported = typeof window !== 'undefined' &&
+        ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
+
+    const start = () => {
+        if (!supported) { setVoiceState('unsupported'); return; }
+        if (voiceState !== 'idle') return;
+
+        setVoiceState('countdown');
+        let count = 3;
+        countdownRef.current = setInterval(() => {
+            count -= 1;
+            if (count <= 0) {
+                clearInterval(countdownRef.current);
+                beginListening();
+            }
+        }, 1000);
+    };
+
+    const playBeep = () => {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(880, ctx.currentTime);          // A5 — bright ping
+            gain.gain.setValueAtTime(0.4, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+            osc.start(ctx.currentTime);
+            osc.stop(ctx.currentTime + 0.25);
+        } catch (_) { /* AudioContext unavailable — silent fallback */ }
+    };
+
+    const beginListening = () => {
+        playBeep();
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SR();
+        recognition.continuous      = true;
+        recognition.interimResults  = false;
+        recognition.lang            = 'en-US';
+
+        recognition.onresult = (e) => {
+            const transcript = Array.from(e.results)
+                .map(r => r[0].transcript)
+                .join(' ');
+            onResult(transcript);
+        };
+
+        recognition.onend = () => setVoiceState('idle');
+        recognition.onerror = () => setVoiceState('idle');
+
+        recognitionRef.current = recognition;
+        recognition.start();
+        setVoiceState('listening');
+    };
+
+    const stop = () => {
+        clearInterval(countdownRef.current);
+        recognitionRef.current?.stop();
+        setVoiceState('idle');
+    };
+
+    const toggle = () => { voiceState === 'idle' ? start() : stop(); };
+
+    return { voiceState, toggle, supported };
+}
+
+// ── Countdown overlay ─────────────────────────────────────────────────────────
+const VoiceCountdown = ({ voiceState }) => {
+    const [count, setCount] = useState(3);
+
+    useEffect(() => {
+        if (voiceState !== 'countdown') { setCount(3); return; }
+        setCount(3);
+        const t = setInterval(() => setCount(c => c - 1), 1000);
+        return () => clearInterval(t);
+    }, [voiceState]);
+
+    if (voiceState === 'unsupported') return (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+            <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-sm text-center">
+                <span className="material-icons-round text-4xl text-slate-300 mb-3 block">mic_off</span>
+                <p className="font-bold text-slate-800 text-lg mb-1">Not supported</p>
+                <p className="text-slate-500 text-sm">Voice input works in <strong>Chrome</strong> and <strong>Edge</strong>. Safari and Firefox do not support the Web Speech API.</p>
+                <button onClick={() => window.location.reload()} className="mt-5 px-5 py-2 bg-primary text-white rounded-xl text-sm font-semibold">OK</button>
+            </div>
+        </div>
+    );
+
+    if (voiceState === 'countdown') return (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+            <div className="bg-white rounded-3xl shadow-2xl px-12 py-10 text-center">
+                <p className="text-slate-500 text-sm mb-4">Get ready to speak in…</p>
+                <p className="text-8xl font-bold text-primary leading-none">{count}</p>
+                <p className="text-slate-400 text-xs mt-4">Works best in Chrome &amp; Edge</p>
+            </div>
+        </div>
+    );
+
+    if (voiceState === 'listening') return (
+        <div className="fixed bottom-2 left-1/2 -translate-x-1/2 z-[200] flex items-center gap-3 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-2xl">
+            <span className="w-2.5 h-2.5 rounded-full bg-red-400 animate-pulse" />
+            <span className="text-[12px] font-normal">Listening…</span>
+            <span className="text-[10px] text-slate-400">Chrome / Edge</span>
+        </div>
+    );
+
+    return null;
 };
 
 export const NoteHeader = ({
@@ -27,9 +144,13 @@ export const NoteHeader = ({
     onUndo,
     onRedo,
     folderId,
+    onVoiceResult,
 }) => {
     const status = STATUS_CONFIG[saveStatus] ?? STATUS_CONFIG.idle;
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const { voiceState, toggle: toggleVoice } = useVoiceToText((transcript) => {
+        onVoiceResult?.(transcript);
+    });
 
     const MenuButton = ({ icon, label, onClick }) => (
         <button 
@@ -162,12 +283,22 @@ export const NoteHeader = ({
                             )}
                         </div>
                     </div>
-                    <button className="flex items-center gap-1 bg-accent-green text-[13px] text-white px-1.5 py-1.5 rounded-full font-medium shadow-lg shadow-accent-green/20 hover:scale-105 active:scale-95 transition-all">
-                        <span className="material-icons-round text-[17px]">mic</span>
-                        <span className="hidden text-[13px]">Voice Record</span>
+                    <button
+                        onClick={toggleVoice}
+                        title={voiceState === 'listening' ? 'Stop recording' : 'Voice to text (Chrome / Edge)'}
+                        className={`flex items-center gap-1 text-[13px] text-white px-1.5 py-1.5 rounded-full font-medium shadow-lg hover:scale-105 active:scale-95 transition-all
+                            ${voiceState === 'listening'
+                                ? 'bg-red-500 shadow-red-400/30 animate-pulse'
+                                : 'bg-accent-green shadow-accent-green/20'
+                            }`}
+                    >
+                        <span className="material-icons-round text-[17px]">
+                            {voiceState === 'listening' ? 'stop_circle' : 'mic'}
+                        </span>
                     </button>
                 </div>
             </div>
+            <VoiceCountdown voiceState={voiceState} />
         </header>
     );
 };

@@ -537,6 +537,43 @@ export const Note = () => {
                 canRedo={canRedo}
                 onUndo={() => handleUndoRef.current?.()}
                 onRedo={() => handleRedoRef.current?.()}
+                onVoiceResult={(transcript) => {
+                    const sentences = transcript
+                        .split(/(?<=[.!?])\s+|(?<=,)\s+|\s{2,}/)
+                        .flatMap(s => {
+                            if (s.length <= 80) return [s];
+                            const words = s.split(' ');
+                            const chunks = [];
+                            let chunk = '';
+                            for (const w of words) {
+                                if ((chunk + ' ' + w).length > 80) {
+                                    if (chunk) chunks.push(chunk);
+                                    chunk = w;
+                                } else {
+                                    chunk = chunk ? chunk + ' ' + w : w;
+                                }
+                            }
+                            if (chunk) chunks.push(chunk);
+                            return chunks;
+                        })
+                        .filter(Boolean);
+
+                    for (const sentence of sentences) {
+                        const pageEls = document.querySelectorAll('[data-note-page]');
+                        const activePage = pageEls[activePageIndex] ?? pageEls[pageEls.length - 1];
+                        if (!activePage) break;
+                        activePage.focus();
+                        const sel = window.getSelection();
+                        sel.removeAllRanges();
+                        const r = document.createRange();
+                        r.selectNodeContents(activePage);
+                        r.collapse(false);
+                        sel.addRange(r);
+                        document.execCommand('insertHTML', false, `<div>${sentence}</div>`);
+                        activePage.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+                    savedRangeRef.current = null;
+                }}
             />
 
             <div className="flex flex-1 overflow-hidden relative">
