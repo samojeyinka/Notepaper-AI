@@ -16,6 +16,7 @@ import { deserializeNote, noteService } from "../../api/noteService";
 import { workspaceCache } from "../../api/workspaceCache";
 import { NoteVersionSidebar } from "./NoteVersionSidebar";
 import ShakespeareModal from "./ShakespeareModal";
+import YouTubeTranscriptModal from "./YouTubeTranscriptModal";
 
 // ── Markdown → HTML converter for Shakespeare inserts ──────────────────────
 function inlineFormat(text) {
@@ -92,6 +93,7 @@ export const Note = () => {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [isAISidebarOpen, setIsAISidebarOpen] = useState(false);
     const [isShakespeareOpen, setIsShakespeareOpen] = useState(false);
+    const [isYouTubeOpen, setIsYouTubeOpen] = useState(false);
     const savedRangeRef = useRef(null); // saved cursor position before AI sidebar steals focus
     const [isVersionSidebarOpen, setIsVersionSidebarOpen] = useState(false);
     const [isPageSidebarOpen, setIsPageSidebarOpen] = useState(true);
@@ -610,6 +612,11 @@ export const Note = () => {
                         savedRangeRef.current = sel && sel.rangeCount > 0 ? sel.getRangeAt(0).cloneRange() : null;
                         setIsShakespeareOpen(true);
                     }}
+                    onOpenYouTube={() => {
+                        const sel = window.getSelection();
+                        savedRangeRef.current = sel && sel.rangeCount > 0 ? sel.getRangeAt(0).cloneRange() : null;
+                        setIsYouTubeOpen(true);
+                    }}
                     onImageUpload={(url) => {
                         if (activeEditorRef.current) activeEditorRef.current.focus();
                         const img = `<img src="${url}" style="max-width:100%;height:auto;display:inline-block;" data-resizable="true" />`;
@@ -702,6 +709,42 @@ export const Note = () => {
 
                 {isAISidebarOpen && (
                     <NoteAISidebar />
+                )}
+
+                {isYouTubeOpen && (
+                    <YouTubeTranscriptModal
+                        onClose={() => setIsYouTubeOpen(false)}
+                        onInsert={(text) => {
+                            setIsYouTubeOpen(false);
+                            const pageEls = document.querySelectorAll('[data-note-page]');
+                            const activePage = pageEls[activePageIndex] ?? pageEls[pageEls.length - 1];
+                            if (!activePage) return;
+
+                            activePage.focus();
+                            const sel = window.getSelection();
+                            sel.removeAllRanges();
+                            if (savedRangeRef.current) {
+                                try {
+                                    if (activePage.contains(savedRangeRef.current.startContainer)) {
+                                        sel.addRange(savedRangeRef.current);
+                                    } else { throw new Error('out'); }
+                                } catch {
+                                    const r = document.createRange();
+                                    r.selectNodeContents(activePage);
+                                    r.collapse(false);
+                                    sel.addRange(r);
+                                }
+                            } else {
+                                const r = document.createRange();
+                                r.selectNodeContents(activePage);
+                                r.collapse(false);
+                                sel.addRange(r);
+                            }
+
+                            document.execCommand('insertText', false, text);
+                            savedRangeRef.current = null;
+                        }}
+                    />
                 )}
 
                 {isShakespeareOpen && (

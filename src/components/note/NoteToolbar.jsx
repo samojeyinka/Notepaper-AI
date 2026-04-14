@@ -277,7 +277,7 @@ const DrawPopover = ({ anchorRef, drawMode, onAction }) => {
   );
 };
 
-export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRecentColor, onImageUpload, onOpenShakespeare }) => {
+export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRecentColor, onImageUpload, onOpenShakespeare, onOpenYouTube }) => {
   const [showTextColor, setShowTextColor] = useState(false);
   const [showHighlight, setShowHighlight] = useState(false);
   const [showFontSize, setShowFontSize] = useState(false);
@@ -561,6 +561,13 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
 
         {/* 7. Special Tools */}
         <div className="flex flex-col gap-2.5">
+          <button
+            onMouseDown={(e) => { e.preventDefault(); onOpenYouTube?.(); }}
+            title="Web to Text — extract from any article or blog URL"
+            className="w-10 h-10 rounded-xl flex items-center justify-center bg-slate-100/50 text-slate-600 hover:bg-slate-200 active:scale-90 transition-all"
+          >
+            <span className="material-icons-round text-[20px]">article</span>
+          </button>
           {/* Hidden file input */}
           <input
             ref={fileInputRef}
