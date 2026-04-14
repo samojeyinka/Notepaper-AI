@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { useNotifications } from "../../context/NotificationsContext";
 
 export const DashboardHeader = () => {
   const { user } = useAuth();
+  const { unreadCount } = useNotifications();
 
   const initials = user?.full_name
     ? user.full_name.split(' ').map((n) => n[0]).slice(0, 2).join('').toUpperCase()
@@ -32,8 +34,13 @@ export const DashboardHeader = () => {
 
       <div className="flex items-center gap-6 md:gap-10">
         {/* Notifications */}
-        <Link to={'/lockedin/notifications'} className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-slate-600 hover:text-purple-500 transition-colors">
+        <Link to={'/lockedin/notifications'} className="relative w-10 h-10 rounded-full bg-white flex items-center justify-center text-slate-600 hover:text-purple-500 transition-colors">
           <span className="material-icons-round">notifications</span>
+          {unreadCount > 0 && (
+            <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center leading-none">
+              {unreadCount > 99 ? '99+' : unreadCount}
+            </span>
+          )}
         </Link>
 
         {/* Profile Picture */}
