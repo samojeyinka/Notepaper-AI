@@ -102,7 +102,7 @@ export function AuthProvider({ children }) {
   // Don't render until we verify session existence prevents flash of login screen 
   if (!isChecked) return null;
 
-  const isAdmin = user?.roles?.some(r => ['admin', 'super-admin'].includes(r?.name ?? r)) ?? false;
+  const isAdmin = user?.roles?.some(r => ['admin', 'super_admin'].includes(r?.name ?? r)) ?? false;
 
   return (
     <AuthContext.Provider value={{ user, isAuthenticated, isAdmin, login, verify2fa, updateUser, logout }}>
