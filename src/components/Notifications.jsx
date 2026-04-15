@@ -24,6 +24,18 @@ const TYPE_CONFIG = {
         iconColor: 'text-red-500',
         buttonClass: 'bg-red-500 hover:bg-red-600 text-white',
     },
+    'App\\Notifications\\TicketCreated': {
+        icon: 'confirmation_number',
+        iconBgColor: 'bg-blue-50',
+        iconColor: 'text-blue-500',
+        buttonClass: 'bg-blue-500 hover:bg-blue-600 text-white',
+    },
+    'App\\Notifications\\TicketNewMessage': {
+        icon: 'chat',
+        iconBgColor: 'bg-violet-50',
+        iconColor: 'text-violet-500',
+        buttonClass: 'bg-violet-500 hover:bg-violet-600 text-white',
+    },
 };
 
 const DEFAULT_CONFIG = {
@@ -94,6 +106,7 @@ export const NotificationCard = ({
     icon,
     iconBgColor,
     iconColor,
+    buttonClass,
     title,
     description,
     timestamp,
@@ -147,11 +160,7 @@ export const NotificationCard = ({
                         <button
                             key={index}
                             onClick={action.onClick}
-                            className={`text-xs font-normal px-2 py-1 rounded-md transition-all ${
-                                action.variant === 'primary'
-                                    ? 'bg-slate-900 text-white hover:bg-slate-800'
-                                    : 'text-slate-400 hover:text-slate-600'
-                            }`}
+                            className={`text-xs font-normal px-2 py-1 rounded-md transition-all ${buttonClass}`}
                         >
                             {action.label}
                         </button>
@@ -215,6 +224,7 @@ function NotificationList({ items, isUnread, onMarkAsRead, onDelete }) {
                         icon={cfg.icon}
                         iconBgColor={cfg.iconBgColor}
                         iconColor={cfg.iconColor}
+                        buttonClass={cfg.buttonClass}
                         title={cfg.title}
                         description={cfg.description}
                         timestamp={relativeTime(n.created_at)}

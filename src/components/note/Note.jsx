@@ -469,7 +469,7 @@ export const Note = () => {
 
         ctx.font = `300 ${smallSize}px 'DM Sans', sans-serif`;
         ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-        ctx.fillText('Written by', cx, smallY);
+        ctx.fillText('Written with', cx, smallY);
 
         ctx.font = `500 ${largeSize}px 'DM Sans', sans-serif`;
         ctx.fillStyle = 'rgba(0, 0, 0, 0.28)';
