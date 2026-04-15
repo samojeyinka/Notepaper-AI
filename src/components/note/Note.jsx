@@ -451,12 +451,38 @@ export const Note = () => {
 
     const slug = () => title.replace(/\s+/g, '-').toLowerCase() || 'note';
 
+    const applyWatermark = (canvas) => {
+        const ctx = canvas.getContext('2d');
+        const ratio = 2;
+
+        const smallSize = 13 * ratio;
+        const largeSize = 20 * ratio;
+        const lineGap = 8 * ratio;
+        const paddingBottom = 28 * ratio;
+
+        const cx = canvas.width / 2;
+        const largeY = canvas.height - paddingBottom;
+        const smallY = largeY - largeSize - lineGap;
+
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'alphabetic';
+
+        ctx.font = `300 ${smallSize}px 'DM Sans', sans-serif`;
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+        ctx.fillText('Written by', cx, smallY);
+
+        ctx.font = `500 ${largeSize}px 'DM Sans', sans-serif`;
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.28)';
+        ctx.fillText('Notepaper-ai.com', cx, largeY);
+    };
+
     const capturePages = async () => {
         const refs = pageRefsRef.current.filter(Boolean);
         const canvases = [];
         for (const el of refs) {
             // Temporarily make the page's inner contentEditable visible at full scroll height
             const canvas = await htmlToImage.toCanvas(el, { pixelRatio: 2, useCORS: true });
+            applyWatermark(canvas);
             canvases.push(canvas);
         }
         return canvases;
