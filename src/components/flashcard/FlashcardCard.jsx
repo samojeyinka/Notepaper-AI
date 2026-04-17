@@ -3,6 +3,31 @@ import { TEMPLATES, getFontStyle } from './flashcardTemplates';
 
 const MAX_CHARS = 120;
 
+// ── Shared selection store ────────────────────────────────────────────────────
+// Toolbar buttons call execOnCard() to run commands on the active editable
+// even after it has lost DOM focus from the button click.
+let _activeEl    = null;
+let _savedRange  = null;
+
+const storeSelection = (el) => {
+    const sel = window.getSelection();
+    if (sel?.rangeCount > 0 && el.contains(sel.anchorNode)) {
+        _activeEl   = el;
+        _savedRange = sel.getRangeAt(0).cloneRange();
+    }
+};
+
+export const execOnCard = (command) => {
+    if (!_activeEl) return;
+    _activeEl.focus();
+    if (_savedRange) {
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(_savedRange);
+    }
+    document.execCommand(command, false);
+};
+
 /**
  * contentEditable that doesn't lose cursor on re-render and enforces a char limit.
  */
@@ -35,10 +60,13 @@ const EditableContent = ({ content, side, cardStyle, onChange, cardKey }) => {
     };
 
     const handleInput = (e) => {
+        storeSelection(e.currentTarget);
         const len = e.currentTarget.innerText.replace(/\n$/, '').length;
         setCharCount(len);
         onChange?.(side, e.currentTarget.innerHTML);
     };
+
+    const handleSelect = (e) => storeSelection(e.currentTarget);
 
     return (
         <div className="w-full flex flex-col items-center gap-1">
@@ -47,6 +75,9 @@ const EditableContent = ({ content, side, cardStyle, onChange, cardKey }) => {
                 contentEditable
                 suppressContentEditableWarning
                 onKeyDown={handleKeyDown}
+                onKeyUp={e  => storeSelection(e.currentTarget)}
+                onMouseUp={e => storeSelection(e.currentTarget)}
+                onSelect={handleSelect}
                 onPaste={handlePaste}
                 onInput={handleInput}
                 className="w-full text-center outline-none focus:ring-0 empty:before:content-[attr(data-placeholder)] empty:before:opacity-40"

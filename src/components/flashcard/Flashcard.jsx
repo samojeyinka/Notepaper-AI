@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { flashcardService } from '../../api/flashcardService';
 import { invalidateFlashcardCache } from '../../pages/FlashcardsPage';
 import { invalidateFolderCache } from '../../pages/FolderPage';
@@ -12,6 +12,7 @@ const EMPTY_CARD = { front: '', back: '' };
 
 export const Flashcard = ({ id }) => {
     const navigate          = useNavigate();
+    const location          = useLocation();
     const [searchParams]    = useSearchParams();
     const isNew             = !id;
     // folder_id from URL when creating a new flashcard from a folder page
@@ -42,6 +43,7 @@ export const Flashcard = ({ id }) => {
     // ── Load existing flashcard ───────────────────────────────────────────────
     useEffect(() => {
         if (isNew) return;
+        if (location.state?.skipLoad) return; // data already in memory after first save
         setLoading(true);
         flashcardService.show(id)
             .then(res => {
@@ -67,7 +69,7 @@ export const Flashcard = ({ id }) => {
             if (!flashcardId) {
                 const res = await flashcardService.create(payload);
                 setFlashcardId(res.data.id);
-                navigate(`/lockedin/flashcards/${res.data.id}`, { replace: true });
+                navigate(`/lockedin/flashcards/${res.data.id}`, { replace: true, state: { skipLoad: true } });
             } else {
                 await flashcardService.update(flashcardId, payload);
             }
