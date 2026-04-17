@@ -814,6 +814,21 @@ const Thumbnail = ({ slide, themeId }) => {
     );
 };
 
+// ── Canvas ambient background ─────────────────────────────────────────────────
+/** Returns a very soft tint derived from the slide's effective background */
+const getCanvasBg = (slide, themeId) => {
+    const t = getTheme(themeId);
+    const activeBg = (slide?.bgColor) || (slide?.layout === 'closing' ? t.closingBg : t.bg);
+    const m = activeBg.match(/#([a-f0-9]{6})/i);
+    if (!m) return '#e8eaed';
+    const r = parseInt(m[1].slice(0,2),16);
+    const g = parseInt(m[1].slice(2,4),16);
+    const b = parseInt(m[1].slice(4,6),16);
+    // Blend 14% of the slide color into a light neutral base (218)
+    const mix = (c) => Math.round(c * 0.14 + 218 * 0.86);
+    return `rgb(${mix(r)},${mix(g)},${mix(b)})`;
+};
+
 // ── HTML parsing helpers for PPTX ────────────────────────────────────────────
 const stripHtml = (html) => html?.replace(/<[^>]+>/g, '') ?? '';
 
@@ -1101,7 +1116,7 @@ export const Presentation = () => {
 
             <div className="flex flex-1 overflow-hidden">
                 {/* Thumbnails */}
-                <div className="w-44 bg-white border-r border-slate-200 overflow-y-auto custom-scrollbar shrink-0 hidden md:flex flex-col">
+                <div className="w-44 border-r border-slate-200 overflow-y-auto custom-scrollbar shrink-0 hidden md:flex flex-col" style={{ background: getCanvasBg(current, themeId), transition: 'background 0.6s ease' }}>
                     <p className="px-3 pt-3 pb-2 text-[9px] font-bold text-slate-400 uppercase tracking-widest">Slides</p>
                     <div className="flex flex-col gap-1.5 px-2 pb-3">
                         {slides.map((s,i) => (
@@ -1125,7 +1140,7 @@ export const Presentation = () => {
 
                 {/* Slide canvas */}
                 <div className="flex-1 flex flex-col overflow-hidden min-w-0">
-                    <div ref={slideAreaRef} className="flex-1 flex items-center justify-center p-4 md:p-6 relative bg-slate-100">
+                    <div ref={slideAreaRef} className="flex-1 flex items-center justify-center p-4 md:p-6 relative" style={{ background: getCanvasBg(current, themeId), transition: 'background 0.6s ease' }}>
                         <div className="w-full max-w-4xl" style={{ aspectRatio:'16/9', boxShadow:'0 8px 40px rgba(0,0,0,0.15)', borderRadius:12, overflow:'hidden', position:'relative' }}>
                             {current && (
                                 <SlideEditor
