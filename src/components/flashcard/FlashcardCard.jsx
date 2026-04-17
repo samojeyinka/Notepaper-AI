@@ -1,11 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { TEMPLATES, getFontStyle } from './flashcardTemplates';
 
-const MAX_CHARS = 120;
+const MAX_CHARS = 250;
 
-// ── Shared selection store ────────────────────────────────────────────────────
-// Toolbar buttons call execOnCard() to run commands on the active editable
-// even after it has lost DOM focus from the button click.
+
 let _activeEl    = null;
 let _savedRange  = null;
 
@@ -28,9 +26,6 @@ export const execOnCard = (command) => {
     document.execCommand(command, false);
 };
 
-/**
- * contentEditable that doesn't lose cursor on re-render and enforces a char limit.
- */
 const EditableContent = ({ content, side, cardStyle, onChange, cardKey }) => {
     const ref                       = useRef(null);
     const [charCount, setCharCount] = useState(0);

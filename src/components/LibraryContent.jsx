@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { folderService } from '../api/folderService';
 import { noteService } from '../api/noteService';
+import { paperService } from '../api/paperService';
 import { workspaceCache } from '../api/workspaceCache';
 import { FolderShape, CreateFolderModal } from './user/FloatingAIButton';
 
@@ -232,6 +233,109 @@ const NoteCard = ({ note, onClick }) => {
     );
 };
 
+// ── Paper card ────────────────────────────────────────────────────────────────
+const PaperCard = ({ paper, onClick }) => {
+    const snippet = extractSnippet(paper.snippet ?? paper.content ?? '');
+    return (
+        <button onClick={onClick} className="text-left group focus:outline-none w-full">
+            <div className="bg-surface-light p-4 rounded-xl border border-slate-100 shadow-sm hover:shadow-md hover:border-indigo-200 transition-all h-full flex flex-col">
+                <div className="flex justify-between items-start mb-3">
+                    <div className="w-9 h-9 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0">
+                        <span className="material-icons-round text-indigo-500 text-[18px]">article</span>
+                    </div>
+                    <span className="text-[10px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded-lg">{timeAgo(paper.updated_at)}</span>
+                </div>
+                <h4 className="font-semibold text-[14px] text-slate-800 mb-1.5 line-clamp-1">
+                    {paper.title || 'Untitled Paper'}
+                </h4>
+                <p className="text-slate-400 text-[12px] line-clamp-3 leading-relaxed flex-1">
+                    {snippet || 'No content yet.'}
+                </p>
+                {paper.folder && (
+                    <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-slate-100">
+                        <div className="w-3.5 h-3.5 rounded-sm shrink-0" style={{ backgroundColor: paper.folder.color ?? '#A78BFA' }} />
+                        <span className="text-[11px] text-slate-400 truncate">{paper.folder.name}</span>
+                    </div>
+                )}
+            </div>
+        </button>
+    );
+};
+
+// ── Papers Section ────────────────────────────────────────────────────────────
+const PapersSection = ({ papers, loading, onPaperClick, onCreatePaper, search, meta, onLoadMore, onLoadLess, sort, sortOptions, onSortChange }) => (
+    <section className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+            <h2 className="text-[17px] font-semibold flex items-center gap-3">
+                <span className="w-1 h-5 bg-indigo-400 rounded-full" />
+                {search ? 'Papers' : 'Recent Papers'}
+                {meta?.total != null && (
+                    <span className="text-[12px] font-normal text-slate-400 ml-1">({meta.total})</span>
+                )}
+            </h2>
+            <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5">
+                <span className="material-icons-round text-slate-400 text-[15px]">sort</span>
+                <select value={sort} onChange={e => onSortChange(e.target.value)}
+                    className="bg-transparent text-[13px] text-slate-600 outline-none cursor-pointer">
+                    {sortOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                </select>
+            </div>
+        </div>
+
+        {loading && papers.length === 0 ? (
+            <div className="flex justify-center py-10">
+                <span className="material-icons-round text-indigo-400 text-[30px] animate-spin">sync</span>
+            </div>
+        ) : papers.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-10 gap-3 text-center">
+                <span className="material-icons-round text-slate-200 text-[48px]">{search ? 'search_off' : 'article'}</span>
+                <p className="text-sm text-slate-400">{search ? 'No papers match your search.' : 'No papers yet.'}</p>
+                {!search && (
+                    <button onClick={onCreatePaper}
+                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-500 text-white text-sm font-semibold shadow-lg shadow-indigo-200 hover:bg-indigo-600 active:scale-95 transition-all">
+                        <span className="material-icons-round text-[16px]">add</span>
+                        New Paper
+                    </button>
+                )}
+            </div>
+        ) : (
+            <>
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+                    {papers.map(paper => (
+                        <PaperCard key={paper.id} paper={paper} onClick={() => onPaperClick(paper.id)} />
+                    ))}
+                    {!search && (
+                        <button onClick={onCreatePaper}
+                            className="border-2 border-dashed border-indigo-100 rounded-xl flex flex-col items-center justify-center text-slate-300 hover:text-indigo-400 hover:border-indigo-300 transition-all cursor-pointer group py-8 gap-2">
+                            <span className="material-icons-round text-[30px] group-hover:scale-110 transition-transform">add_circle</span>
+                            <span className="text-sm font-semibold">New Paper</span>
+                        </button>
+                    )}
+                </div>
+                {meta && meta.last_page > 1 && (
+                    <div className="flex items-center justify-center gap-3 mt-6">
+                        {meta.current_page > 1 && (
+                            <button onClick={onLoadLess} disabled={loading}
+                                className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl border border-slate-200 text-[13px] font-medium text-slate-500 hover:border-indigo-300 hover:text-indigo-500 disabled:opacity-40 transition-colors">
+                                <span className="material-icons-round text-[15px]">expand_less</span>
+                                View less
+                            </button>
+                        )}
+                        {meta.current_page < meta.last_page && (
+                            <button onClick={onLoadMore} disabled={loading}
+                                className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl border border-slate-200 text-[13px] font-medium text-slate-500 hover:border-indigo-300 hover:text-indigo-500 disabled:opacity-40 transition-colors">
+                                {loading ? <span className="material-icons-round text-[15px] animate-spin">sync</span> : <span className="material-icons-round text-[15px]">expand_more</span>}
+                                View more
+                            </button>
+                        )}
+                        <span className="text-[11px] text-slate-300">Page {meta.current_page} of {meta.last_page} · {meta.total} total</span>
+                    </div>
+                )}
+            </>
+        )}
+    </section>
+);
+
 // ── Recent Notes Section ──────────────────────────────────────────────────────
 const RecentNotesSection = ({ notes, loading, onNoteClick, onCreateNote, search, meta, onLoadMore, onLoadLess, sort, sortOptions, onSortChange }) => (
     <section>
@@ -324,6 +428,13 @@ const RecentNotesSection = ({ notes, loading, onNoteClick, onCreateNote, search,
     </section>
 );
 
+const PAPER_SORT_OPTIONS = [
+    { value: 'updated_at:desc', label: 'Last updated' },
+    { value: 'updated_at:asc',  label: 'Oldest first' },
+    { value: 'title:asc',       label: 'Title A → Z' },
+    { value: 'title:desc',      label: 'Title Z → A' },
+];
+
 const FOLDER_SORT_OPTIONS = [
     { value: 'sort=updated_at:desc', label: 'Last updated' },
     { value: 'sort=updated_at:asc',  label: 'Oldest first' },
@@ -345,19 +456,24 @@ export const LibraryContent = () => {
     // Data
     const [folders, setFolders]           = useState([]);
     const [notes, setNotes]               = useState([]);
+    const [papers, setPapers]             = useState([]);
     const [foldersMeta, setFoldersMeta]   = useState(null);
     const [foldersPage, setFoldersPage]   = useState(1);
     const [notesMeta, setNotesMeta]       = useState(null);
     const [notesPage, setNotesPage]       = useState(1);
+    const [papersMeta, setPapersMeta]     = useState(null);
+    const [papersPage, setPapersPage]     = useState(1);
 
     // Loading
     const [foldersLoading, setFoldersLoading] = useState(true);
     const [notesLoading, setNotesLoading]     = useState(true);
+    const [papersLoading, setPapersLoading]   = useState(true);
 
     // Sort & search
     const [search, setSearch]           = useState('');
     const [folderSort, setFolderSort]   = useState(FOLDER_SORT_OPTIONS[0].value);
     const [noteSort, setNoteSort]       = useState(NOTE_SORT_OPTIONS[0].value);
+    const [paperSort, setPaperSort]     = useState(PAPER_SORT_OPTIONS[0].value);
     const [showCreateFolder, setShowCreateFolder] = useState(false);
     const debounceRef = useRef(null);
 
@@ -421,11 +537,35 @@ export const LibraryContent = () => {
         }
     }, []);
 
+    // ── Fetch papers ──────────────────────────────────────────────────────────
+    const loadPapers = useCallback(async ({ page = 1, q = '', sortVal = PAPER_SORT_OPTIONS[0].value, append = false } = {}) => {
+        setPapersLoading(true);
+        try {
+            const [sortField, sortDir] = sortVal.split(':');
+            const qp = [`page=${page}`];
+            if (q.trim()) qp.push(`searching=${encodeURIComponent(q.trim())}`);
+            if (sortField === 'updated_at') qp.push(`updated_at=${sortDir}`);
+            if (sortField === 'title')      qp.push(`title=${sortDir}`);
+            const res = await paperService.list(qp.join('&'));
+            const data = res.data ?? res;
+            const rows = data.data ?? [];
+            const meta = data.current_page != null ? { current_page: data.current_page, last_page: data.last_page, total: data.total, per_page: data.per_page } : null;
+            setPapers(append ? prev => [...prev, ...rows] : rows);
+            setPapersMeta(meta);
+            setPapersPage(page);
+        } catch {
+            // non-fatal
+        } finally {
+            setPapersLoading(false);
+        }
+    }, []);
+
     // Initial load — reads from cache instantly if available
     useEffect(() => {
         loadFolders({});
         loadNotes({});
-    }, [loadFolders, loadNotes]);
+        loadPapers({});
+    }, [loadFolders, loadNotes, loadPapers]);
 
     // Search — debounced 400ms
     const handleSearchChange = (value) => {
@@ -434,6 +574,7 @@ export const LibraryContent = () => {
         debounceRef.current = setTimeout(() => {
             loadFolders({ page: 1, q: value, sortVal: folderSort });
             loadNotes({ page: 1, q: value, sortVal: noteSort });
+            loadPapers({ page: 1, q: value, sortVal: paperSort });
         }, 400);
     };
 
@@ -452,6 +593,10 @@ export const LibraryContent = () => {
 
     const handleLoadMoreNotes = () => loadNotes({ page: notesPage + 1, q: search, sortVal: noteSort, append: true });
     const handleLoadLessNotes = () => loadNotes({ page: 1, q: search, sortVal: noteSort });
+
+    const handlePaperSortChange = (val) => { setPaperSort(val); loadPapers({ page: 1, q: search, sortVal: val }); };
+    const handleLoadMorePapers  = () => loadPapers({ page: papersPage + 1, q: search, sortVal: paperSort, append: true });
+    const handleLoadLessPapers  = () => loadPapers({ page: 1, q: search, sortVal: paperSort });
 
     const handleFolderCreated = (folder) => {
         setShowCreateFolder(false);
@@ -474,6 +619,13 @@ export const LibraryContent = () => {
                     >
                         <span className="material-icons-round text-[17px]">note_add</span>
                         New Note
+                    </button>
+                    <button
+                        onClick={() => navigate('/lockedin/papers/new')}
+                        className="flex items-center gap-2 bg-indigo-50 text-indigo-600 px-3 py-2 rounded-xl text-[14px] font-medium transition-all hover:bg-indigo-100 active:scale-95"
+                    >
+                        <span className="material-icons-round text-[17px]">article</span>
+                        New Paper
                     </button>
                     <button
                         onClick={() => setShowCreateFolder(true)}
@@ -500,6 +652,21 @@ export const LibraryContent = () => {
                 onCreateFolder={() => setShowCreateFolder(true)}
                 onLoadMore={handleLoadMoreFolders}
                 onLoadLess={handleLoadLessFolders}
+                search={search}
+            />
+
+            {/* Papers */}
+            <PapersSection
+                papers={papers}
+                loading={papersLoading}
+                meta={papersMeta}
+                sort={paperSort}
+                sortOptions={PAPER_SORT_OPTIONS}
+                onSortChange={handlePaperSortChange}
+                onPaperClick={(id) => navigate(`/lockedin/papers/${id}`)}
+                onCreatePaper={() => navigate('/lockedin/papers/new')}
+                onLoadMore={handleLoadMorePapers}
+                onLoadLess={handleLoadLessPapers}
                 search={search}
             />
 
