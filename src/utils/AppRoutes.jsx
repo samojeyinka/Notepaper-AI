@@ -8,6 +8,8 @@ import { LandingPage,PricingPage,SignUpPage,
       NotificationsPage, HelpSupportPage,SupportTicketsPage,NewSupportTicketsPage,SupportTicketPage } from '../pages/pages';
 import NotePage from '../pages/NotePage';
 import FolderPage from '../pages/FolderPage';
+import FlashcardsPage from '../pages/FlashcardsPage';
+import FlashcardPage from '../pages/FlashcardPage';
 import VoiceToSpeechPage from '../pages/VoiceToSpeechPage';
 import GeneratePage from '../pages/GeneratePage';
 import ScrollToTop from './ScrollToTop';
@@ -244,6 +246,18 @@ const AppRoutes = createBrowserRouter([
     {
         path: '/lockedin/notes/:id',
         element: <ProtectedRoute><ScrollToTop><NotePage /></ScrollToTop></ProtectedRoute>,
+    },
+    {
+        path: '/lockedin/flashcards',
+        element: <ProtectedRoute><ScrollToTop><FlashcardsPage /></ScrollToTop></ProtectedRoute>,
+    },
+    {
+        path: '/lockedin/flashcards/new',
+        element: <ProtectedRoute><ScrollToTop><FlashcardPage /></ScrollToTop></ProtectedRoute>,
+    },
+    {
+        path: '/lockedin/flashcards/:id',
+        element: <ProtectedRoute><ScrollToTop><FlashcardPage /></ScrollToTop></ProtectedRoute>,
     },
 
 ]);

@@ -217,6 +217,15 @@ export const FloatingAIButton = () => {
                             New Note
                         </button>
                         <button
+                            onClick={() => { setMenuOpen(false); navigate('/lockedin/flashcards/new'); }}
+                            className="flex items-center gap-3 bg-white text-slate-700 pl-4 pr-5 py-3 rounded-2xl shadow-xl border border-slate-100 text-sm font-semibold hover:border-violet-200 hover:shadow-lg transition-all active:scale-95 whitespace-nowrap"
+                        >
+                            <div className="w-8 h-8 rounded-xl bg-violet-50 text-violet-500 flex items-center justify-center shrink-0">
+                                <span className="material-icons-round text-[18px]">style</span>
+                            </div>
+                            New Flashcard
+                        </button>
+                        <button
                             onClick={() => { setMenuOpen(false); setShowCreateFolder(true); }}
                             className="flex items-center gap-3 bg-white text-slate-700 pl-4 pr-5 py-3 rounded-2xl shadow-xl border border-slate-100 text-sm font-semibold hover:border-emerald-200 hover:shadow-lg transition-all active:scale-95 whitespace-nowrap"
                         >

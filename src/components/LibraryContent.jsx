@@ -518,6 +518,36 @@ export const LibraryContent = () => {
                 search={search}
             />
 
+            {/* Flashcards shortcut */}
+            <section className="mt-8">
+                <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                        <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">Flashcards</h2>
+                        <div className="h-px flex-1 w-16 bg-slate-200" />
+                    </div>
+                    <button
+                        onClick={() => navigate('/lockedin/flashcards')}
+                        className="flex items-center gap-1.5 text-[12px] text-primary font-medium hover:underline"
+                    >
+                        View all
+                        <span className="material-icons-round text-[14px]">arrow_forward</span>
+                    </button>
+                </div>
+                <button
+                    onClick={() => navigate('/lockedin/flashcards')}
+                    className="w-full flex items-center gap-4 p-4 rounded-2xl bg-violet-50 border border-violet-100 hover:border-violet-300 hover:shadow-md transition-all group"
+                >
+                    <div className="w-10 h-10 rounded-xl bg-violet-500 flex items-center justify-center shrink-0 shadow-sm">
+                        <span className="material-icons-round text-white text-[20px]">style</span>
+                    </div>
+                    <div className="text-left">
+                        <p className="font-semibold text-slate-800 text-[14px]">Flashcard Decks</p>
+                        <p className="text-slate-400 text-[12px]">Create &amp; study flashcard decks with templates</p>
+                    </div>
+                    <span className="material-icons-round text-slate-300 group-hover:text-violet-400 transition-colors ml-auto text-[20px]">chevron_right</span>
+                </button>
+            </section>
+
             {/* Create Folder Modal */}
             {showCreateFolder && (
                 <CreateFolderModal

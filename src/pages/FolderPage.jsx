@@ -4,7 +4,27 @@ import { Sidebar } from "../components/user/Sidebar";
 import { FloatingAIButton, FolderShape } from "../components/user/FloatingAIButton";
 import { folderService } from "../api/folderService";
 import { noteService } from "../api/noteService";
+import { flashcardService } from "../api/flashcardService";
 import { PolaroidCard } from "../components/user/RecentNotesSection";
+import { FlashcardPreviewCard } from "./FlashcardsPage";
+
+// ── Module-level cache ────────────────────────────────────────────────────────
+const _cache = new Map();
+const CACHE_TTL = 5 * 60 * 1000;
+
+const cacheGet = (key) => {
+    const entry = _cache.get(key);
+    if (!entry) return null;
+    if (Date.now() - entry.ts > CACHE_TTL) { _cache.delete(key); return null; }
+    return entry.value;
+};
+const cacheSet = (key, value) => _cache.set(key, { value, ts: Date.now() });
+
+export const invalidateFolderCache = (id) => {
+    _cache.delete(`folder:${id}`);
+    _cache.delete(`notes:${id}:updated_at:desc`);
+    _cache.delete(`flashcards:${id}`);
+};
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 const timeAgo = (dateStr) => {
@@ -93,13 +113,14 @@ const FolderPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
 
-    const [folder, setFolder]         = useState(null);
-    const [notes, setNotes]           = useState([]);
+    const [folder, setFolder]               = useState(null);
+    const [notes, setNotes]                 = useState([]);
+    const [flashcards, setFlashcards]       = useState([]);
     const [folderLoading, setFolderLoading] = useState(true);
     const [notesLoading, setNotesLoading]   = useState(true);
     const [folderError, setFolderError]     = useState(null);
-    const [meta, setMeta]             = useState(null);
-    const [currentPage, setCurrentPage] = useState(1);
+    const [meta, setMeta]                   = useState(null);
+    const [currentPage, setCurrentPage]     = useState(1);
 
     // Search & sort state
     const [search, setSearch]   = useState('');
@@ -108,11 +129,15 @@ const FolderPage = () => {
 
     // ── Load folder ───────────────────────────────────────────────────────────
     const loadFolder = useCallback(async () => {
+        const key    = `folder:${id}`;
+        const cached = cacheGet(key);
+        if (cached) { setFolder(cached); setFolderLoading(false); return; }
         setFolderLoading(true);
         setFolderError(null);
         try {
             const res = await folderService.get(id);
             setFolder(res.data);
+            cacheSet(key, res.data);
         } catch {
             setFolderError('Could not load folder.');
         } finally {
@@ -122,29 +147,37 @@ const FolderPage = () => {
 
     // ── Load notes (page, search, sort) ──────────────────────────────────────
     const loadNotes = useCallback(async ({ page = 1, q = search, sortVal = sort, append = false } = {}) => {
+        // Only cache the default first-page view (no search active)
+        const cKey   = `notes:${id}:${sortVal}`;
+        const useHit = page === 1 && !q.trim() && !append;
+        if (useHit) {
+            const cached = cacheGet(cKey);
+            if (cached) {
+                setNotes(cached.rows);
+                setMeta(cached.meta);
+                setCurrentPage(1);
+                setNotesLoading(false);
+                return;
+            }
+        }
         setNotesLoading(true);
         try {
-            const [sortField, sortDir] = sortVal.split(':');
-            const params = new URLSearchParams({
-                folder_id: id,
-                page,
-                ...(q.trim() && { searching: q.trim() }),
-                ...(sortField === 'title' ? { title: sortField } : {}),
-                updated_at: sortDir === 'asc' || sortField === 'updated_at' ? sortDir : undefined,
-            });
-
-            // Build clean query string
             const qp = [`folder_id=${id}`, `page=${page}`];
             if (q.trim()) qp.push(`searching=${encodeURIComponent(q.trim())}`);
+            const [sortField, sortDir] = sortVal.split(':');
             if (sortField === 'updated_at') qp.push(`updated_at=${sortDir}`);
             if (sortField === 'title')      qp.push(`title=${sortDir}`);
 
-            const res = await noteService.list(qp.join('&'));
+            const res  = await noteService.list(qp.join('&'));
             const data = res.data ?? res;
             const rows = data.data ?? [];
             setNotes(append ? prev => [...prev, ...rows] : rows);
-            setMeta(data.current_page != null ? { current_page: data.current_page, last_page: data.last_page, total: data.total, per_page: data.per_page } : null);
+            const metaObj = data.current_page != null
+                ? { current_page: data.current_page, last_page: data.last_page, total: data.total, per_page: data.per_page }
+                : null;
+            setMeta(metaObj);
             setCurrentPage(page);
+            if (useHit) cacheSet(cKey, { rows, meta: metaObj });
         } catch {
             // non-fatal
         } finally {
@@ -152,10 +185,25 @@ const FolderPage = () => {
         }
     }, [id, search, sort]);
 
+    // ── Load flashcards ───────────────────────────────────────────────────────
+    const loadFlashcards = useCallback(async () => {
+        const key    = `flashcards:${id}`;
+        const cached = cacheGet(key);
+        if (cached) { setFlashcards(cached); return; }
+        try {
+            const res = await flashcardService.list({ folder_id: id });
+            setFlashcards(res.data ?? []);
+            cacheSet(key, res.data ?? []);
+        } catch {
+            // non-fatal
+        }
+    }, [id]);
+
     // Initial load
     useEffect(() => {
         loadFolder();
         loadNotes({ page: 1, q: '', sortVal: 'updated_at:desc' });
+        loadFlashcards();
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
@@ -224,13 +272,22 @@ const FolderPage = () => {
                                         {folder?.updated_at && <> · Updated {timeAgo(folder.updated_at)}</>}
                                     </p>
                                 </div>
-                                <button
-                                    onClick={() => navigate(`/lockedin/notes/new?folder=${id}`)}
-                                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-white text-sm font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all shrink-0"
-                                >
-                                    <span className="material-icons-round text-[17px]">note_add</span>
-                                    New Note
-                                </button>
+                                <div className="flex items-center gap-2 shrink-0">
+                                    <button
+                                        onClick={() => { invalidateFolderCache(id); navigate(`/lockedin/flashcards/new?folder_id=${id}`); }}
+                                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-violet-500 text-white text-sm font-bold shadow-lg shadow-violet-500/20 hover:bg-violet-600 active:scale-95 transition-all"
+                                    >
+                                        <span className="material-icons-round text-[17px]">style</span>
+                                        New Flashcard
+                                    </button>
+                                    <button
+                                        onClick={() => { invalidateFolderCache(id); navigate(`/lockedin/notes/new?folder=${id}`); }}
+                                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-white text-sm font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all"
+                                    >
+                                        <span className="material-icons-round text-[17px]">note_add</span>
+                                        New Note
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -277,6 +334,35 @@ const FolderPage = () => {
                                 <span className={`material-icons-round text-[18px] ${notesLoading ? 'animate-spin' : ''}`}>refresh</span>
                             </button>
                         </div>
+
+                        {/* ── Flashcards section ── */}
+                        {flashcards.length > 0 && (
+                            <div className="px-8 pt-8 pb-2">
+                                <div className="flex items-center justify-between mb-4">
+                                    <h2 className="text-sm font-bold text-slate-700 flex items-center gap-2">
+                                        <span className="material-icons-round text-violet-400 text-[18px]">style</span>
+                                        Flashcards
+                                        <span className="text-[11px] font-normal text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">{flashcards.length}</span>
+                                    </h2>
+                                    <button
+                                        onClick={() => navigate(`/lockedin/flashcards?folder_id=${id}`)}
+                                        className="text-xs text-violet-500 hover:text-violet-700 font-semibold transition-colors"
+                                    >
+                                        View all →
+                                    </button>
+                                </div>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                                    {flashcards.map(fc => (
+                                        <FlashcardPreviewCard
+                                            key={fc.id}
+                                            flashcard={fc}
+                                            onClick={() => navigate(`/lockedin/flashcards/${fc.id}`)}
+                                        />
+                                    ))}
+                                </div>
+                                <div className="mt-6 border-b border-slate-100" />
+                            </div>
+                        )}
 
                         {/* ── Notes grid ── */}
                         <div className="flex-1 px-8 py-8">
