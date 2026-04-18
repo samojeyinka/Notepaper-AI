@@ -577,7 +577,7 @@ const SlideToolbar = ({ slide, onChange, onAddSlide, onMoveUp, onMoveDown, canMo
 
 // ── Delete button overlay ─────────────────────────────────────────────────────
 const DeleteBtn = ({ onDelete }) => (
-    <button onClick={onDelete}
+    <button onClick={onDelete} data-pdf-hide
         className="absolute top-2 right-2 z-30 opacity-0 group-hover/slide:opacity-100 w-7 h-7 rounded-lg bg-red-500/80 hover:bg-red-500 text-white flex items-center justify-center transition-all shadow-md"
         title="Delete slide">
         <span className="material-icons-round text-[14px]">delete</span>
@@ -661,7 +661,7 @@ const SlideEditor = ({ slide, themeId, onChange, onDelete, canDelete }) => {
                     style={{ position:'absolute', inset:0, zIndex:1 }}>
                     <img src={slide.image.url} style={{ width:'100%', height:'100%', objectFit:'cover' }} alt="" />
                     <div style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.52)' }} />
-                    <button onClick={() => set({image:null})}
+                    <button onClick={() => set({image:null})} data-pdf-hide
                         style={{ position:'absolute', top:8, right:8, zIndex:10, opacity: imgHovered ? 1 : 0, transition:'opacity 0.15s' }}
                         className="w-7 h-7 rounded-full bg-black/60 hover:bg-red-500 text-white flex items-center justify-center shadow-lg"
                         title="Remove image">
@@ -677,7 +677,7 @@ const SlideEditor = ({ slide, themeId, onChange, onDelete, canDelete }) => {
     );
 
     const addBtn = (label) => bullets.length < 7 && (
-        <button onClick={addBullet} className="flex items-center gap-1 self-start text-[10px] font-semibold px-2 py-0.5 rounded-full mt-1 transition-all"
+        <button onClick={addBullet} data-pdf-hide className="flex items-center gap-1 self-start text-[10px] font-semibold px-2 py-0.5 rounded-full mt-1 transition-all"
             style={{ color:rBody, background:rAddBtn }}
             onMouseEnter={e=>e.currentTarget.style.background=rAddBtnH}
             onMouseLeave={e=>e.currentTarget.style.background=rAddBtn}>
@@ -776,7 +776,7 @@ const SlideEditor = ({ slide, themeId, onChange, onDelete, canDelete }) => {
                     onMouseLeave={() => setImgHovered(false)}
                     style={{ flex:'0 0 42%', position:'relative', display:'flex', alignItems:'center', justifyContent:'center', padding:'5% 4%', borderLeft:'1px solid rgba(255,255,255,0.08)' }}>
                     <img src={slide.image.url} style={{ maxWidth:'100%', maxHeight:'70%', width:'100%', height:'70%', objectFit:'contain', borderRadius:6 }} alt="" />
-                    <button onClick={() => set({image:null})}
+                    <button onClick={() => set({image:null})} data-pdf-hide
                         style={{ position:'absolute', top:8, right:8, zIndex:10, opacity: imgHovered ? 1 : 0, transition:'opacity 0.15s' }}
                         className="w-7 h-7 rounded-full bg-black/60 hover:bg-red-500 text-white flex items-center justify-center shadow-lg"
                         title="Remove image">
@@ -856,6 +856,92 @@ const parseHtmlRuns = (html, baseOpts = {}) => {
     return runs.length ? runs : [{ text: stripHtml(html), options: baseOpts }];
 };
 
+// ── PPTX theme art (coordinates clamped to 0-100% so nothing overflows) ───────
+const addThemeArtToPptx = (slide, PptxGenJS, themeId, t) => {
+    const E      = PptxGenJS.ShapeType?.ellipse ?? 'ellipse';
+    const R      = PptxGenJS.ShapeType?.rect    ?? 'rect';
+    const noLine = { type: 'none' };
+    const nofill = { type: 'none' };
+
+    if (themeId === 'modern') {
+        const ac = t.pptxAccent;
+        // Large circle outline — anchored top-right, starts at y:0 (was -18%)
+        slide.addShape(E, { x:'52%', y:0,    w:'48%', h:'68%', fill:nofill, line:{ color:ac, width:1.5, transparency:72 } });
+        // Small circle outline — top-right
+        slide.addShape(E, { x:'76%', y:'5%', w:'16%', h:'22%', fill:nofill, line:{ color:ac, width:1,   transparency:82 } });
+        // Filled soft circle — bottom-left, starts at x:0 (was -4%)
+        slide.addShape(E, { x:0,     y:'65%',w:'22%', h:'35%', fill:{ color:ac, transparency:86 }, line:noLine });
+        // Dot grid
+        [['8%','18%'],['22%','10%'],['44%','8%'],['66%','13%'],['84%','22%'],
+         ['13%','42%'],['56%','36%'],['78%','48%'],['24%','66%'],['50%','74%'],
+         ['70%','68%'],['87%','58%']].forEach(([x,y]) =>
+            slide.addShape(E, { x, y, w:0.07, h:0.07, fill:{ color:ac, transparency:78 }, line:noLine })
+        );
+    }
+
+    if (themeId === 'minimal') {
+        const ac = t.pptxAccent; // 16a34a
+        // Large leaf — top-right, y clamped to 0 (was -6%)
+        slide.addShape(E, { x:'80%', y:0,    w:'20%', h:'28%', fill:{ color:ac, transparency:87 }, line:noLine, rotate:330 });
+        // Medium leaf — top-right inner
+        slide.addShape(E, { x:'84%', y:'4%', w:'13%', h:'19%', fill:{ color:ac, transparency:91 }, line:noLine, rotate:340 });
+        // Stem
+        slide.addShape(R, { x:'89%', y:'2%', w:0.02,  h:'22%', fill:{ color:ac, transparency:82 }, line:noLine, rotate:15 });
+        // Small leaf — bottom-left, x clamped to 0 (was -3%)
+        slide.addShape(E, { x:0,     y:'74%',w:'14%', h:'22%', fill:{ color:ac, transparency:90 }, line:noLine, rotate:20 });
+        // Tiny leaf
+        slide.addShape(E, { x:'4%',  y:'80%',w:'9%',  h:'13%', fill:{ color:ac, transparency:92 }, line:noLine, rotate:35 });
+        // Dewdrop dots
+        [['70%','22%',0.10],['64%','38%',0.07],['18%','68%',0.08],['78%','55%',0.07]].forEach(([x,y,s]) =>
+            slide.addShape(E, { x, y, w:s, h:s, fill:{ color:ac, transparency:65 }, line:noLine })
+        );
+    }
+
+    if (themeId === 'academic') {
+        const ac = t.pptxAccent; // 60a5fa
+        // Left vertical accent bar
+        slide.addShape(R, { x:0, y:0, w:0.07, h:'100%', fill:{ color:ac, transparency:40 }, line:noLine });
+        // Outer circle — top-right
+        slide.addShape(E, { x:'82%', y:'3%',    w:'12%', h:'17%', fill:nofill, line:{ color:ac, width:2,   transparency:72 } });
+        // Inner circle — top-right
+        slide.addShape(E, { x:'84%', y:'6%',    w:'8%',  h:'11%', fill:nofill, line:{ color:ac, width:1.5, transparency:82 } });
+        // Centre dot
+        slide.addShape(E, { x:'87.5%', y:'10.5%', w:0.08, h:0.08, fill:{ color:ac, transparency:50 }, line:noLine });
+        // Horizontal accent lines — bottom-left
+        slide.addShape(R, { x:'4%', y:'87%', w:'12%', h:0.025, fill:{ color:ac, transparency:75 }, line:noLine });
+        slide.addShape(R, { x:'4%', y:'91%', w:'7%',  h:0.02,  fill:{ color:ac, transparency:82 }, line:noLine });
+    }
+
+    if (themeId === 'bold') {
+        const ac = t.pptxAccent; // f0abfc
+        // Top-right corner blocks
+        slide.addShape(R, { x:'88%', y:0,     w:'12%', h:'22%', fill:{ color:ac, transparency:82 }, line:noLine });
+        slide.addShape(R, { x:'92%', y:0,     w:'8%',  h:'12%', fill:{ color:ac, transparency:88 }, line:noLine });
+        // Bottom-left corner block
+        slide.addShape(R, { x:0,     y:'80%', w:'10%', h:'20%', fill:{ color:ac, transparency:88 }, line:noLine });
+        // Dot grid
+        [['8%','18%'],['22%','8%'],['42%','14%'],['62%','8%'],['82%','12%'],
+         ['15%','38%'],['35%','32%'],['55%','28%'],['75%','35%'],['90%','30%'],
+         ['10%','58%'],['30%','62%'],['50%','55%'],['70%','60%'],['88%','55%'],
+         ['18%','78%'],['40%','82%'],['62%','78%'],['80%','75%']].forEach(([x,y]) =>
+            slide.addShape(E, { x, y, w:0.09, h:0.09, fill:{ color:ac, transparency:82 }, line:noLine })
+        );
+    }
+
+    if (themeId === 'pastel') {
+        const ac  = t.pptxAccent; // 8b5cf6
+        const ac2 = 'ec4899';
+        // Large soft blob — top-right, y clamped to 0 (was -22%)
+        slide.addShape(E, { x:'55%', y:0,     w:'45%', h:'58%', fill:{ color:ac,  transparency:86 }, line:noLine });
+        // Medium blob — bottom-left, x clamped to 0 (was -5%)
+        slide.addShape(E, { x:0,     y:'60%', w:'35%', h:'40%', fill:{ color:ac2, transparency:90 }, line:noLine });
+        // Accent dots
+        [['87%','28%',0.12],['88%','58%',0.09],['6%','18%',0.10],['72%','80%',0.07]].forEach(([x,y,s]) =>
+            slide.addShape(E, { x, y, w:s, h:s, fill:{ color:ac, transparency:55 }, line:noLine })
+        );
+    }
+};
+
 // ── PPTX export ───────────────────────────────────────────────────────────────
 const exportAsPPTX = async (slides, themeId, title) => {
     const PptxGenJS = (await import('pptxgenjs')).default;
@@ -885,6 +971,11 @@ const exportAsPPTX = async (slides, themeId, title) => {
                     slide.addShape(PptxGenJS.ShapeType?.rect ?? 'rect', { x:0, y:0, w:'100%', h:'100%', fill:{color:'000000',transparency:50} });
                 }
             } catch (_) {}
+        }
+
+        // Theme art decorations (only when no full-bleed background image)
+        if (!s.image?.url || s.image?.position !== 'background') {
+            addThemeArtToPptx(slide, PptxGenJS, themeId, t);
         }
 
         if (s.layout==='title') {
@@ -940,15 +1031,19 @@ export const Presentation = () => {
     const [loading, setLoading]           = useState(true);
     const [saving, setSaving]             = useState(false);
     const [saveMsg, setSaveMsg]           = useState('');
-    const [exporting, setExporting]       = useState(false);
+    const [exporting, setExporting]         = useState(false);
+    const [exportingPdf, setExportingPdf]   = useState(false);
+    const [showExportMenu, setShowExportMenu] = useState(false);
     const [error, setError]               = useState(null);
     const [title, setTitle]               = useState('');
     const titleSaveTimer                  = useRef(null);
-    const slideAreaRef = useRef(null);
-    const saveTimer    = useRef(null);
-    const slidesRef    = useRef(slides);
-    const imgInputRef  = useRef(null);
-    slidesRef.current  = slides;
+    const slideAreaRef  = useRef(null);
+    const slideRef      = useRef(null);
+    const exportMenuRef = useRef(null);
+    const saveTimer     = useRef(null);
+    const slidesRef     = useRef(slides);
+    const imgInputRef   = useRef(null);
+    slidesRef.current   = slides;
 
     useEffect(() => {
         if (!id) return;
@@ -1046,6 +1141,48 @@ export const Presentation = () => {
         try { await presentationService.update(id, { theme:t }); } catch {}
     }, [id]);
 
+    // Close export menu on outside click
+    useEffect(() => {
+        if (!showExportMenu) return;
+        const h = (e) => { if (!exportMenuRef.current?.contains(e.target)) setShowExportMenu(false); };
+        document.addEventListener('mousedown', h);
+        return () => document.removeEventListener('mousedown', h);
+    }, [showExportMenu]);
+
+    const handleExportPDF = async () => {
+        if (!slideRef.current) return;
+        setShowExportMenu(false);
+        setExportingPdf(true);
+        const originalIdx = idx;
+        try {
+            const { toPng }  = await import('html-to-image');
+            const { jsPDF }  = await import('jspdf');
+            // 16:9 page in mm
+            const W = 267.75, H = 150.57;
+            const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [W, H] });
+            const nextFrame = () => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+            for (let i = 0; i < slides.length; i++) {
+                setIdx(i);
+                await nextFrame();
+                const dataUrl = await toPng(slideRef.current, {
+                    pixelRatio: 2,
+                    cacheBust: true,
+                    filter: (node) => !node.dataset?.pdfHide,
+                });
+                if (i > 0) pdf.addPage([W, H], 'landscape');
+                pdf.addImage(dataUrl, 'PNG', 0, 0, W, H);
+            }
+            pdf.save(`${(title || 'presentation').replace(/\s+/g, '-').toLowerCase()}.pdf`);
+        } catch (e) {
+            console.error(e);
+            alert('PDF export failed.');
+        } finally {
+            setIdx(originalIdx);
+            setExportingPdf(false);
+        }
+    };
+
     const handleImageUpload = useCallback((e) => {
         const file = e.target.files?.[0]; e.target.value = '';
         if (!file) return;
@@ -1114,12 +1251,36 @@ export const Presentation = () => {
                     <button onClick={toggleFS} className="w-8 h-8 rounded-xl flex items-center justify-center text-slate-500 hover:bg-slate-100 transition-all">
                         <span className="material-icons-round text-[18px]">{isFullscreen?'fullscreen_exit':'fullscreen'}</span>
                     </button>
-                    <button onClick={handleExportPPTX} disabled={exporting}
-                        className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-semibold bg-primary text-white hover:bg-primary/90 active:scale-95 transition-all shadow-md shadow-primary/20 disabled:opacity-60">
-                        {exporting
-                            ? <><span className="material-icons-round text-[14px] animate-spin">sync</span>Exporting…</>
-                            : <><span className="material-icons-round text-[14px]">download</span>Export PPTX</>}
-                    </button>
+                    {/* Export dropdown */}
+                    <div ref={exportMenuRef} className="relative">
+                        <button
+                            onClick={() => setShowExportMenu(v => !v)}
+                            disabled={exporting || exportingPdf}
+                            className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-semibold bg-primary text-white hover:bg-primary/90 active:scale-95 transition-all shadow-md shadow-primary/20 disabled:opacity-60"
+                        >
+                            {(exporting || exportingPdf)
+                                ? <><span className="material-icons-round text-[14px] animate-spin">sync</span>{exportingPdf ? 'Exporting PDF…' : 'Exporting…'}</>
+                                : <><span className="material-icons-round text-[14px]">download</span>Export<span className="material-icons-round text-[14px] ml-0.5">expand_more</span></>}
+                        </button>
+                        {showExportMenu && (
+                            <div className="absolute right-0 top-9 bg-white rounded-2xl shadow-xl border border-slate-100 py-1.5 w-44 z-50 animate-in fade-in zoom-in-95 duration-100">
+                                <button
+                                    onClick={() => { setShowExportMenu(false); handleExportPPTX(); }}
+                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                                >
+                                    <span className="material-icons-round text-[17px] text-indigo-400">slideshow</span>
+                                    Export PPTX
+                                </button>
+                                <button
+                                    onClick={handleExportPDF}
+                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                                >
+                                    <span className="material-icons-round text-[17px] text-rose-400">picture_as_pdf</span>
+                                    Export PDF
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 
@@ -1163,7 +1324,7 @@ export const Presentation = () => {
                 {/* Slide canvas */}
                 <div className="flex-1 flex flex-col overflow-hidden min-w-0">
                     <div ref={slideAreaRef} className="flex-1 flex items-center justify-center p-4 md:p-6 relative" style={{ background: getCanvasBg(current, themeId), transition: 'background 0.6s ease' }}>
-                        <div className="w-full max-w-4xl" style={{ aspectRatio:'16/9', boxShadow:'0 8px 40px rgba(0,0,0,0.15)', borderRadius:12, overflow:'hidden', position:'relative' }}>
+                        <div ref={slideRef} className="w-full max-w-4xl" style={{ aspectRatio:'16/9', boxShadow:'0 8px 40px rgba(0,0,0,0.15)', borderRadius:12, overflow:'hidden', position:'relative' }}>
                             {current && (
                                 <SlideEditor
                                     slide={current} themeId={themeId}
