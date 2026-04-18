@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import { folderService } from "../../api/folderService";
+import { presentationService } from "../../api/presentationService";
 
 // ── Shape definitions (match ShapeEnum values on the backend) ────────────────
 export const SHAPES = [
@@ -187,11 +188,26 @@ export const CreateFolderModal = ({ onClose, onCreated }) => {
     );
 };
 
+// ── FAB keyframes ─────────────────────────────────────────────────────────────
+const FAB_STYLES = `
+@keyframes fabItemIn {
+    from { opacity: 0; transform: translateY(16px) scale(0.88); }
+    to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+@keyframes fabPulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(167,139,250,0.45); }
+    50%      { box-shadow: 0 0 0 10px rgba(167,139,250,0); }
+}
+.fab-item        { animation: fabItemIn 0.22s cubic-bezier(0.34,1.56,0.64,1) both; }
+.fab-pulse       { animation: fabPulse 2.4s ease-in-out infinite; }
+`;
+
 // ── FloatingAIButton (FAB) ────────────────────────────────────────────────────
-export const FloatingAIButton = () => {
+export const FloatingAIButton = ({ exclude = [], folderId = null }) => {
     const navigate = useNavigate();
-    const [menuOpen, setMenuOpen]             = useState(false);
+    const [menuOpen, setMenuOpen]                 = useState(false);
     const [showCreateFolder, setShowCreateFolder] = useState(false);
+    const [creatingSlides, setCreatingSlides]     = useState(false);
     const wrapRef = useRef(null);
 
     useEffect(() => {
@@ -201,54 +217,100 @@ export const FloatingAIButton = () => {
         return () => document.removeEventListener('mousedown', handler);
     }, [menuOpen]);
 
+    const handleNewSlides = async () => {
+        setMenuOpen(false);
+        setCreatingSlides(true);
+        try {
+            const payload = {
+                title: 'Untitled Presentation',
+                slides: JSON.stringify([{ slide: 1, layout: 'title', title: '', bullets: [''], speaker_notes: '', listStyle: 'bullet' }]),
+                theme: 'modern',
+                slide_count: 1,
+                ...(folderId && { folder_id: folderId }),
+            };
+            const res = await presentationService.create(payload);
+            navigate(`/lockedin/presentations/${res.data?.id ?? res.id}`);
+        } catch { /* non-fatal */ }
+        finally { setCreatingSlides(false); }
+    };
+
+    const folderSuffix   = folderId ? `?folder=${folderId}`    : '';
+    const fcFolderSuffix = folderId ? `?folder_id=${folderId}` : '';
+
+    const ITEMS = [
+        { label: 'New Note',       icon: 'note_add',          color: '#8b5cf6', shadow: 'rgba(139,92,246,0.35)',  onClick: () => { setMenuOpen(false); navigate(`/lockedin/notes/new${folderSuffix}`); } },
+        { label: 'New Paper',      icon: 'article',           color: '#6366f1', shadow: 'rgba(99,102,241,0.35)',  onClick: () => { setMenuOpen(false); navigate(`/lockedin/papers/new${folderSuffix}`); } },
+        { label: 'New Slides',     icon: 'slideshow',         color: '#10b981', shadow: 'rgba(16,185,129,0.35)',  onClick: handleNewSlides, loading: creatingSlides },
+        { label: 'New Folder',     icon: 'create_new_folder', color: '#f59e0b', shadow: 'rgba(245,158,11,0.35)',  onClick: () => { setMenuOpen(false); setShowCreateFolder(true); } },
+        { label: 'New Flashcards', icon: 'style',             color: '#f43f5e', shadow: 'rgba(244,63,94,0.35)',   onClick: () => { setMenuOpen(false); navigate(`/lockedin/flashcards/new${fcFolderSuffix}`); } },
+    ];
+
+    const visibleItems = ITEMS.filter(item => !exclude.includes(item.label));
+
     return (
         <>
-            <div ref={wrapRef} className="fixed bottom-8 right-8 z-40 flex flex-col items-end gap-2">
-                {/* Pop-up options */}
+            <style>{FAB_STYLES}</style>
+
+            <div ref={wrapRef} className="fixed bottom-8 right-8 z-40 flex flex-col items-end gap-3">
+
+                {/* Menu items */}
                 {menuOpen && (
-                    <div className="flex flex-col gap-2 mb-1 animate-in fade-in slide-in-from-bottom-2 duration-150">
-                        <button
-                            onClick={() => { setMenuOpen(false); navigate('/lockedin/notes/new'); }}
-                            className="flex items-center gap-3 bg-white text-slate-700 pl-4 pr-5 py-3 rounded-2xl shadow-xl border border-slate-100 text-sm font-semibold hover:border-primary/30 hover:shadow-lg transition-all active:scale-95 whitespace-nowrap"
-                        >
-                            <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                                <span className="material-icons-round text-[18px]">note_add</span>
-                            </div>
-                            New Note
-                        </button>
-                        <button
-                            onClick={() => { setMenuOpen(false); navigate('/lockedin/flashcards/new'); }}
-                            className="flex items-center gap-3 bg-white text-slate-700 pl-4 pr-5 py-3 rounded-2xl shadow-xl border border-slate-100 text-sm font-semibold hover:border-violet-200 hover:shadow-lg transition-all active:scale-95 whitespace-nowrap"
-                        >
-                            <div className="w-8 h-8 rounded-xl bg-violet-50 text-violet-500 flex items-center justify-center shrink-0">
-                                <span className="material-icons-round text-[18px]">style</span>
-                            </div>
-                            New Flashcard
-                        </button>
-                        <button
-                            onClick={() => { setMenuOpen(false); setShowCreateFolder(true); }}
-                            className="flex items-center gap-3 bg-white text-slate-700 pl-4 pr-5 py-3 rounded-2xl shadow-xl border border-slate-100 text-sm font-semibold hover:border-emerald-200 hover:shadow-lg transition-all active:scale-95 whitespace-nowrap"
-                        >
-                            <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center shrink-0">
-                                <span className="material-icons-round text-[18px]">create_new_folder</span>
-                            </div>
-                            New Folder
-                        </button>
+                    <div className="flex flex-col items-end gap-2.5 mb-1">
+                        {visibleItems.map((item, i) => (
+                            <button
+                                key={item.label}
+                                onClick={item.onClick}
+                                disabled={item.loading}
+                                className="fab-item group flex items-center gap-3 disabled:opacity-60 cursor-pointer"
+                                style={{ animationDelay: `${i * 45}ms` }}
+                            >
+                                {/* Label pill */}
+                                <span className="
+                                    opacity-0 group-hover:opacity-100
+                                    translate-x-2 group-hover:translate-x-0
+                                    transition-all duration-200
+                                    text-[12px] font-semibold text-white
+                                    px-3 py-1.5 rounded-xl whitespace-nowrap
+                                    shadow-lg select-none pointer-events-none
+                                " style={{ background: item.color }}>
+                                    {item.label}
+                                </span>
+
+                                {/* Icon circle */}
+                                <div
+                                    className="w-12 h-12 rounded-2xl flex items-center justify-center text-white
+                                        transition-all duration-200
+                                        hover:scale-110 active:scale-95
+                                        shadow-lg group-hover:shadow-xl"
+                                    style={{
+                                        background: item.color,
+                                        boxShadow: `0 4px 18px ${item.shadow}`,
+                                    }}
+                                >
+                                    <span className={`material-icons-round text-[22px] ${item.loading ? 'animate-spin' : 'group-hover:scale-110 transition-transform duration-200'}`}>
+                                        {item.loading ? 'sync' : item.icon}
+                                    </span>
+                                </div>
+                            </button>
+                        ))}
                     </div>
                 )}
 
-                {/* FAB */}
+                {/* FAB trigger */}
                 <button
                     onClick={() => setMenuOpen(v => !v)}
                     title={menuOpen ? 'Close' : 'Create new…'}
-                    className="w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition-all active:scale-95"
+                    className={`w-14 h-14 rounded-2xl flex items-center justify-center text-white shadow-2xl active:scale-95 ${!menuOpen ? 'fab-pulse' : ''}`}
                     style={{
-                        background: menuOpen ? '#1e293b' : '#A78BFA',
+                        background: menuOpen
+                            ? 'linear-gradient(135deg,#1e293b,#334155)'
+                            : 'linear-gradient(135deg,#a78bfa,#8b5cf6)',
                         transform: menuOpen ? 'rotate(45deg)' : 'rotate(0deg)',
-                        transition: 'transform 0.2s, background 0.2s',
+                        transition: 'transform 0.25s cubic-bezier(0.34,1.56,0.64,1), background 0.2s',
+                        boxShadow: menuOpen ? '0 8px 32px rgba(30,41,59,0.4)' : '0 8px 32px rgba(139,92,246,0.45)',
                     }}
                 >
-                    <span className="material-icons-round text-white text-2xl">add</span>
+                    <span className="material-icons-round text-[26px]">add</span>
                 </button>
             </div>
 

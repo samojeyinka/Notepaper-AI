@@ -10,12 +10,14 @@ export const FlashcardHeader = ({
     onDuplicate,
     onDelete,
     folder,
+    urlFolderId,
 }) => {
     const navigate = useNavigate();
     const [menuOpen, setMenuOpen] = useState(false);
 
-    const backPath  = folder?.id ? `/lockedin/folders/${folder.id}` : '/lockedin/flashcards';
-    const backLabel = folder?.name ?? 'Flashcards';
+    const resolvedFolderId = folder?.id ?? urlFolderId ?? null;
+    const backPath  = resolvedFolderId ? `/lockedin/folders/${resolvedFolderId}` : '/lockedin/library?tab=flashcards';
+    const backLabel = folder?.name ?? 'Library';
 
     const statusLabel = saveStatus === 'saving'  ? 'Saving…'
                       : saveStatus === 'saved'   ? 'Saved'

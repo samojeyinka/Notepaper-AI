@@ -10,7 +10,6 @@ import NotePage from '../pages/NotePage';
 import PaperPage from '../pages/PaperPage';
 import PresentationPage from '../pages/PresentationPage';
 import FolderPage from '../pages/FolderPage';
-import FlashcardsPage from '../pages/FlashcardsPage';
 import FlashcardPage from '../pages/FlashcardPage';
 import VoiceToSpeechPage from '../pages/VoiceToSpeechPage';
 import GeneratePage from '../pages/GeneratePage';
@@ -260,10 +259,6 @@ const AppRoutes = createBrowserRouter([
     {
         path: '/lockedin/presentations/:id',
         element: <ProtectedRoute><ScrollToTop><PresentationPage /></ScrollToTop></ProtectedRoute>,
-    },
-    {
-        path: '/lockedin/flashcards',
-        element: <ProtectedRoute><ScrollToTop><FlashcardsPage /></ScrollToTop></ProtectedRoute>,
     },
     {
         path: '/lockedin/flashcards/new',

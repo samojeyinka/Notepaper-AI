@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { authService } from '../api/authService';
 import { userService } from '../api/userService';
+import { workspaceCache } from '../api/workspaceCache';
 
 const AuthContext = createContext(null);
 
@@ -96,6 +97,7 @@ export function AuthProvider({ children }) {
     } finally {
       setUser(null);
       clearSession();
+      workspaceCache.invalidateAll();
     }
   }, []);
 

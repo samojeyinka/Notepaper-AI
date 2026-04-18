@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { paperService } from "../../api/paperService";
 
 const THEME_PREVIEWS = {
-    modern:   { bg: 'linear-gradient(135deg, #0f172a, #1e293b)', accent: '#6366f1', text: '#fff' },
+    modern:   { bg: 'linear-gradient(135deg, #0b1f3a, #1e3a8a)', accent: '#4f46e5', text: '#fff' },
     minimal:  { bg: 'linear-gradient(135deg, #fff, #f8fafc)',    accent: '#0f172a', text: '#0f172a', border: '1px solid #e2e8f0' },
     academic: { bg: 'linear-gradient(135deg, #1e3a5f, #1d4ed8)', accent: '#60a5fa', text: '#fff' },
     bold:     { bg: 'linear-gradient(135deg, #6d28d9, #c026d3)', accent: '#f0abfc', text: '#fff' },

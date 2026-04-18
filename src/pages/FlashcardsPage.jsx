@@ -37,33 +37,44 @@ const timeAgo = (dateStr) => {
 export const FlashcardPreviewCard = ({ flashcard, onClick }) => {
     const tpl = TEMPLATES[flashcard.template] ?? TEMPLATES.girlies;
     const Decoration = tpl.Decoration;
+    const count     = flashcard.cards_count ?? flashcard.card_count ?? flashcard.cards?.length ?? 0;
+    const firstCard = flashcard.cards?.[0];
 
     return (
-        <button
-            onClick={onClick}
-            className="text-left group w-full focus:outline-none"
-        >
+        <button onClick={onClick} className="text-left group w-full focus:outline-none">
             <div
                 className="relative rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 border border-white/60"
-                style={{ backgroundColor: flashcard.bg_color || tpl.defaultBg, height: 160 }}
+                style={{ backgroundColor: flashcard.bg_color || tpl.defaultBg, minHeight: 160 }}
             >
                 <Decoration />
                 <div
-                    className="absolute inset-0 flex flex-col items-center justify-center p-4 z-10"
+                    className="absolute inset-0 flex flex-col p-4 z-10"
                     style={{ color: flashcard.text_color || tpl.defaultText }}
                 >
-                    <span
-                        className="text-[10px] uppercase tracking-widest font-semibold mb-2 px-2 py-0.5 rounded-full"
-                        style={{ background: 'rgba(0,0,0,0.08)' }}
-                    >
-                        {tpl.label}
-                    </span>
-                    <h3 className="font-semibold text-[15px] text-center line-clamp-2 leading-tight">
-                        {flashcard.title}
-                    </h3>
-                    <p className="text-[11px] mt-1.5 opacity-60">
-                        {flashcard.cards?.length ?? 0} card{flashcard.cards?.length !== 1 ? 's' : ''}
-                    </p>
+                    {/* Title row */}
+                    <div className="flex items-start justify-between gap-2 mb-auto">
+                        <h3 className="font-semibold text-[14px] line-clamp-2 leading-tight flex-1">
+                            {flashcard.title}
+                        </h3>
+                        <span
+                            className="text-[9px] uppercase tracking-widest font-bold px-1.5 py-0.5 rounded-full shrink-0"
+                            style={{ background: 'rgba(0,0,0,0.12)' }}
+                        >
+                            {count} {count === 1 ? 'card' : 'cards'}
+                        </span>
+                    </div>
+
+                    {/* First card preview */}
+                    {firstCard?.front ? (
+                        <div className="mt-2 rounded-xl p-2.5 text-left" style={{ background: 'rgba(0,0,0,0.12)' }}>
+                            <p className="text-[12px] font-medium line-clamp-1 leading-snug">{firstCard.front}</p>
+                            {firstCard.back && (
+                                <p className="text-[11px] opacity-75 line-clamp-1 leading-snug mt-1">{firstCard.back}</p>
+                            )}
+                        </div>
+                    ) : (
+                        <p className="text-[11px] mt-2 opacity-50 italic">No cards yet</p>
+                    )}
                 </div>
             </div>
             <div className="mt-2 px-1 flex justify-between items-center">

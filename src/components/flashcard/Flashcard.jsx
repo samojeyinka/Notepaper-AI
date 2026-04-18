@@ -162,6 +162,7 @@ export const Flashcard = ({ id }) => {
                 onDuplicate={handleDuplicate}
                 onDelete={handleDelete}
                 folder={folder}
+                urlFolderId={urlFolderId}
             />
 
             {editMode && (

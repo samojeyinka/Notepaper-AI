@@ -942,6 +942,8 @@ export const Presentation = () => {
     const [saveMsg, setSaveMsg]           = useState('');
     const [exporting, setExporting]       = useState(false);
     const [error, setError]               = useState(null);
+    const [title, setTitle]               = useState('');
+    const titleSaveTimer                  = useRef(null);
     const slideAreaRef = useRef(null);
     const saveTimer    = useRef(null);
     const slidesRef    = useRef(slides);
@@ -955,6 +957,7 @@ export const Presentation = () => {
             .then(res => {
                 const p = res.data;
                 setPresentation(p);
+                setTitle(p.title ?? '');
                 setThemeId(p.theme ?? 'modern');
                 try {
                     const raw = p.slides;
@@ -1024,6 +1027,19 @@ export const Presentation = () => {
         setIdx(idx+1);
     }, [idx, slides.length]);
 
+    const handleTitleChange = (val) => {
+        setTitle(val);
+        clearTimeout(titleSaveTimer.current);
+        titleSaveTimer.current = setTimeout(async () => {
+            if (!id) return;
+            try { await presentationService.update(id, { title: val }); } catch {}
+        }, 800);
+    };
+
+    const handleTitleKeyDown = (e) => {
+        if (e.key === 'Enter') e.target.blur();
+    };
+
     const handleThemeChange = useCallback(async (t) => {
         setThemeId(t);
         if (!id) return;
@@ -1044,7 +1060,7 @@ export const Presentation = () => {
     const handleExportPPTX = async () => {
         if (!presentation) return;
         setExporting(true);
-        try { await exportAsPPTX(slides, themeId, presentation.title); }
+        try { await exportAsPPTX(slides, themeId, title); }
         catch (e) { console.error(e); alert('Export failed.'); }
         finally { setExporting(false); }
     };
@@ -1078,7 +1094,13 @@ export const Presentation = () => {
                         <span className="material-icons-round text-[20px]">arrow_back</span>
                     </button>
                     <div className="min-w-0">
-                        <p className="text-slate-900 font-semibold text-sm truncate">{presentation.title}</p>
+                        <input
+                            value={title}
+                            onChange={e => handleTitleChange(e.target.value)}
+                            onKeyDown={handleTitleKeyDown}
+                            placeholder="Untitled Presentation"
+                            className="text-slate-900 font-semibold text-sm bg-transparent outline-none border-b border-transparent focus:border-slate-300 hover:border-slate-200 transition-colors w-full truncate placeholder-slate-400"
+                        />
                         <p className="text-slate-400 text-[10px]">{slides.length} slides · {themeId}</p>
                     </div>
                 </div>
