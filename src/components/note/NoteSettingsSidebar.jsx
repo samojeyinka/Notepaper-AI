@@ -62,7 +62,7 @@ export const NoteSettingsSidebar = ({
     return (
         <div ref={pickerRef} className="space-y-1.5 p-2 bg-slate-50 border border-slate-100 rounded-xl transition-all">
             <div className="flex items-center justify-between cursor-pointer" onClick={() => setActivePicker(isExpanded ? null : id)}>
-                <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">{label}</label>
+                <label className="text-[10px] font-medium md:font-semibold text-slate-400 uppercase tracking-widest">{label}</label>
                 <div className="flex items-center gap-3">
                     <span className="text-[10px] font-mono text-slate-500 uppercase">{value}</span>
                     <div className="w-8 h-8 rounded-lg shadow-sm border-2 border-white" style={{ backgroundColor: value }} />
@@ -97,7 +97,7 @@ export const NoteSettingsSidebar = ({
 
   const SliderInput = ({ label, value, min, max, unit, onChange }) => (
     <div className="space-y-2">
-        <div className="flex justify-between items-center text-[11px] font-semibold text-slate-500 uppercase">
+        <div className="flex justify-between items-center text-[11px] font-medium md:font-semibold text-slate-500 uppercase">
             <label className="text-slate-500">{label}</label>
             <span className="text-primary">{value}{unit}</span>
         </div>
@@ -115,16 +115,16 @@ export const NoteSettingsSidebar = ({
     <div className="fixed inset-0 z-[60] flex justify-end">
       <div className="absolute inset-0 bg-slate-900/10 backdrop-blur-[2px]" onClick={onClose} />
       
-      <aside className="relative w-80 bg-white h-full shadow-2xl p-6 flex flex-col gap-6 animate-in slide-in-from-right duration-300 overflow-y-auto custom-scrollbar border-l border-slate-100">
+      <aside className="relative w-58 md:w-80 bg-white h-full shadow-2xl p-3 md:p-6 flex flex-col gap-3 md:gap-6 animate-in slide-in-from-right duration-300 overflow-y-auto custom-scrollbar border-l border-slate-100">
         <div className="flex items-center justify-between">
-          <h3 className="text-[17px] font-semibold font-display text-slate-900">Note Preferences</h3>
+          <h3 className="text-[14px] md:text-[17px] font-medium md:font-semibold font-display text-slate-900">Note Preferences</h3>
           <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400">
              <span className="material-icons-round text-[15px]">close</span>
           </button>
         </div>
 
         <section>
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3">Paper Layout</p>
+          <p className="text-[11px] md:text-xs font-medium md:font-semibold text-slate-400 uppercase tracking-widest mb-3">Paper Layout</p>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setPaperPage(p => Math.max(0, p - 1))}
@@ -141,7 +141,7 @@ export const NoteSettingsSidebar = ({
                   onClick={() => setPaperStyle(option.id)}
                   className={`p-1.5 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 ${paperStyle === option.id ? "border-primary bg-primary/5 shadow-md shadow-primary/10" : "border-slate-50 hover:border-slate-100"}`}
                 >
-                  <div className={`w-6 h-6 rounded bg-white shadow-sm border border-slate-100 ${option.pattern}`} />
+                  <div className={`w-4 h-4 md:w-6 md:h-6 rounded bg-white shadow-sm border border-slate-100 ${option.pattern}`} />
                   <span className="text-[9px] font-medium uppercase tracking-tighter text-slate-600">{option.name}</span>
                 </button>
               ))}
@@ -167,7 +167,7 @@ export const NoteSettingsSidebar = ({
         </section>
 
         <section className="space-y-4">
-            <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mb-2">Color Customization</p>
+            <p className="text-[11px] font-medium md:font-semibold text-slate-400 uppercase tracking-widest mb-2">Color Customization</p>
             <ColorInput label="Paper Color" id="paper" value={paperColor} onChange={setPaperColor} />
             <ColorInput label="Line Color" id="line" value={lineColor} onChange={setLineColor} />
             <ColorInput label="Initial Ink" id="text" value={textColor} onChange={setTextColor} />
@@ -200,7 +200,7 @@ export const NoteSettingsSidebar = ({
         </section>
 
         <div className="mt-auto py-2 border-t border-slate-100">
-          <button onClick={onClose} className="w-full text-[13px] bg-slate-900 text-white py-2 rounded-xl font-medium shadow-xl hover:shadow-2xl hover:bg-black transition-all active:scale-[0.98]">
+          <button onClick={onClose} className="w-full text-[12px] md:text-[13px] bg-slate-900 text-white py-1.5 md:py-2 rounded-lg md:rounded-xl font-medium shadow-xl hover:shadow-2xl hover:bg-black transition-all active:scale-[0.98]">
             Apply Changes
           </button>
         </div>

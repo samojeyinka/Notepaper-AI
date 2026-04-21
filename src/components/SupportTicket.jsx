@@ -38,16 +38,16 @@ export const SupportConversationHeader = ({ ticket, isAdmin, onStatusChange }) =
     const isOpen = ticket?.status === 'open';
 
     return (
-        <header className="flex items-start justify-between mb-10">
+        <header className="flex items-start justify-between mb-5 md:mb-10">
             <div>
-                <nav className="flex items-center space-x-2 text-sm text-slate-400 mb-2">
+                <nav className="flex items-center space-x-2 text-[12px] md:text-sm text-slate-400 mb-0.5 md:mb-2">
                     <Link to="/lockedin/support-tickets" className="hover:text-primary transition-colors">
                         Support tickets
                     </Link>
                     <span>/</span>
                     <span className="text-slate-600">Ticket #{ticket?.id ?? '...'}</span>
                 </nav>
-                <h1 className="text-xl font-semibold text-slate-900 mb-2">
+                <h1 className="text-[14px] md:text-xl font-medium md:font-semibold text-slate-900 mb-2">
                     {ticket?.subject ?? 'Loading…'}
                 </h1>
                 {ticket && (
@@ -71,7 +71,7 @@ export const SupportConversationHeader = ({ ticket, isAdmin, onStatusChange }) =
             <div className="flex items-center gap-3 shrink-0">
                 {/* Status badge */}
                 {ticket && (
-                    <div className={`${isOpen ? 'bg-green-500' : 'bg-slate-400'} text-white px-2 py-0.5 rounded-full text-[12px] font-normal shadow-sm flex items-center gap-1.5 -rotate-1`}>
+                    <div className={`${isOpen ? 'bg-green-500' : 'bg-slate-400'} text-white px-2 py-0.5 rounded-full text-[10px] md:text-[12px] font-normal shadow-sm flex items-center gap-1.5 -rotate-1`}>
                         <span className="w-1.5 h-1.5 bg-white rounded-full"></span>
                         <span>{isOpen ? 'Open' : 'Resolved'}</span>
                     </div>
@@ -81,7 +81,7 @@ export const SupportConversationHeader = ({ ticket, isAdmin, onStatusChange }) =
                 {isAdmin && ticket && (
                     <button
                         onClick={() => onStatusChange(isOpen ? 'closed' : 'open')}
-                        className={`text-[11px] font-medium px-3 py-1.5 rounded-full border transition-all flex items-center gap-1.5
+                        className={`text-[9px] md:text-[11px] font-medium px-1.5 md:px-3 py-1 md:py-1.5 rounded-full border transition-all flex items-center gap-1.5
                             ${isOpen
                                 ? 'border-red-200 text-red-500 hover:bg-red-50'
                                 : 'border-green-200 text-green-600 hover:bg-green-50'
@@ -98,25 +98,71 @@ export const SupportConversationHeader = ({ ticket, isAdmin, onStatusChange }) =
     );
 };
 
+// Image Lightbox
+const ImageLightbox = ({ src, onClose }) => {
+    useEffect(() => {
+        const handler = (e) => { if (e.key === 'Escape') onClose(); };
+        document.addEventListener('keydown', handler);
+        return () => document.removeEventListener('keydown', handler);
+    }, [onClose]);
+
+    return (
+        <div
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+            style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(6px)' }}
+            onClick={onClose}
+        >
+            {/* Close */}
+            <button
+                onClick={onClose}
+                className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors"
+            >
+                <span className="material-symbols-outlined text-[22px]">close</span>
+            </button>
+
+            {/* Image — stop propagation so clicking the image itself doesn't close */}
+            <img
+                src={src}
+                alt="attachment"
+                onClick={e => e.stopPropagation()}
+                className="max-w-full max-h-[90vh] rounded-2xl shadow-2xl object-contain"
+                style={{ border: '1px solid rgba(255,255,255,0.1)' }}
+            />
+
+            {/* Open in new tab */}
+            <a
+                href={src}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={e => e.stopPropagation()}
+                className="absolute bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-1.5 text-white/60 hover:text-white text-[12px] transition-colors"
+            >
+                <span className="material-symbols-outlined text-[15px]">open_in_new</span>
+                Open full size
+            </a>
+        </div>
+    );
+};
+
 // Message Component
 // isOwn = current user sent this message
-export const Message = ({ author, role, timestamp, content, image, isOwn = false, profilePicture, initials }) => {
+export const Message = ({ author, role, timestamp, content, image, isOwn = false, profilePicture, initials, onImageClick }) => {
     return (
         <div className={`flex items-end gap-3 ${isOwn ? 'flex-row-reverse' : 'flex-row'}`}>
             {/* Avatar */}
-            <div className="shrink-0 w-8 h-8 rounded-full overflow-hidden border border-slate-200 shadow-sm">
+            <div className="shrink-0 w-6 h-6 md:w-8 md:h-8 rounded-full overflow-hidden border border-slate-200 shadow-sm">
                 {profilePicture ? (
                     <img src={profilePicture} alt={author} className="w-full h-full object-cover" />
                 ) : (
                     <div className={`w-full h-full flex items-center justify-center text-[11px] font-bold ${isOwn ? 'bg-slate-800 text-white' : 'bg-primary text-white'}`}>
-                        {isOwn ? initials : <span className="material-symbols-outlined text-[14px]">support_agent</span>}
+                        {isOwn ? initials : <span className="material-symbols-outlined text-[12px] md:text-[14px]">support_agent</span>}
                     </div>
                 )}
             </div>
 
             {/* Bubble */}
             <div className={`relative max-w-[70%] ${isOwn ? 'items-end' : 'items-start'} flex flex-col gap-1`}>
-                <div className={`px-4 py-3 rounded-2xl shadow-sm border text-[14px] leading-relaxed
+                <div className={`px-2 py-1.5 md:px-4 md:py-3 rounded-xl md:rounded-2xl shadow-sm border text-[14px] leading-relaxed
                     ${isOwn
                         ? 'bg-slate-800 text-white border-slate-700 rounded-br-sm'
                         : 'bg-white text-slate-700 border-slate-100 rounded-bl-sm'
@@ -126,7 +172,21 @@ export const Message = ({ author, role, timestamp, content, image, isOwn = false
                     </p>
                     <p>{content}</p>
                     {image && (
-                        <img src={image} alt="attachment" className="mt-2 max-w-xs rounded-xl border border-white/20 shadow-sm" />
+                        <button
+                            onClick={() => onImageClick?.(image)}
+                            className="mt-2 block group relative focus:outline-none"
+                        >
+                            <img
+                                src={image}
+                                alt="attachment"
+                                className="max-w-xs rounded-xl border border-white/20 shadow-sm transition-transform group-hover:scale-[1.02]"
+                            />
+                            <div className="absolute inset-0 rounded-xl bg-black/0 group-hover:bg-black/20 flex items-center justify-center transition-all">
+                                <span className="material-symbols-outlined text-white text-2xl opacity-0 group-hover:opacity-100 transition-opacity drop-shadow">
+                                    zoom_in
+                                </span>
+                            </div>
+                        </button>
                     )}
                 </div>
                 <span className="text-[9px] text-slate-400 px-1">{timestamp}</span>
@@ -175,11 +235,11 @@ export const ReplyTextarea = ({ value, onChange, onSend, isSending }) => {
     const busy = isSending || uploading;
 
     return (
-        <div className="relative pt-4">
+        <div className="relative md:pt-4">
             <div className="absolute inset-0 bg-slate-200/30 rounded-t-xl translate-y-2 translate-x-1"></div>
             <div className="relative bg-white rounded-t-xl border-t border-x border-slate-200 p-8 shadow-2xl">
                 <div className="flex items-center space-x-4 mb-3">
-                    <span className="font-semibold text-[18px]">New Correspondence</span>
+                    <span className="font-medium md:font-semibold text-[15px] md:text-[18px]">New Correspondence</span>
                     <div className="flex-1 h-px bg-slate-100"></div>
                 </div>
 
@@ -198,7 +258,7 @@ export const ReplyTextarea = ({ value, onChange, onSend, isSending }) => {
 
                 <div className="ruled-lines relative">
                     <textarea
-                        className="w-full bg-transparent border-none focus:ring-0 text-slate-700 resize-none font-handwriting text-[15px] leading-[28px] py-0 placeholder:text-slate-300 overflow-y-auto"
+                        className="w-full bg-transparent border-none focus:ring-0 text-slate-700 resize-none font-handwriting text-[12px] md:text-[15px] leading-[28px] py-0 placeholder:text-slate-300 overflow-y-auto"
                         placeholder="Type your reply here..."
                         value={value}
                         onChange={(e) => onChange(e.target.value)}
@@ -229,7 +289,7 @@ export const ReplyTextarea = ({ value, onChange, onSend, isSending }) => {
                     <button
                         onClick={handleSend}
                         disabled={(!value.trim() && !imageFile) || busy}
-                        className="px-4 py-1.5 bg-slate-900 text-white rounded-md font-medium hover:shadow-md transition-all flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-2 md:px-4 py-1 md:py-1.5 text-[12px] md:text-base bg-slate-900 text-white rounded-md font-normal md:font-medium hover:shadow-md transition-all flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {busy ? (
                             <span className="material-symbols-outlined text-sm animate-spin">progress_activity</span>
@@ -248,6 +308,7 @@ export const ReplyTextarea = ({ value, onChange, onSend, isSending }) => {
 export const SupportConversationContent = ({ ticket, messages, onSendMessage, isClosed, currentUserId }) => {
     const [replyText, setReplyText] = useState('');
     const [isSending, setIsSending] = useState(false);
+    const [lightboxSrc, setLightboxSrc] = useState(null);
     const bottomRef = useRef(null);
 
     useEffect(() => {
@@ -285,6 +346,7 @@ export const SupportConversationContent = ({ ticket, messages, onSendMessage, is
                                     isOwn={isOwn}
                                     profilePicture={msg.user?.profile_picture}
                                     initials={getInitials(msg.user?.full_name)}
+                                    onImageClick={setLightboxSrc}
                                 />
                             );
                         })}
@@ -309,11 +371,15 @@ export const SupportConversationContent = ({ ticket, messages, onSendMessage, is
             </div>
 
             {/* Folder Tab */}
-            <div className="absolute -top-10 left-12 h-10 w-32 bg-amber-100 folder-tab flex items-center justify-center border-t border-x border-slate-900/10">
+            <div className="hidden absolute md:-top-10 left-12 h-10 w-32 bg-amber-100 folder-tab md:flex items-center justify-center border-t border-x border-slate-900/10">
                 <span className="text-[10px] font-bold tracking-[0.2em] text-slate-500 uppercase">
                     Case: {ticket ? STATUS_LABEL[ticket.status]?.toUpperCase() ?? ticket.status.toUpperCase() : '…'}
                 </span>
             </div>
+
+            {lightboxSrc && (
+                <ImageLightbox src={lightboxSrc} onClose={() => setLightboxSrc(null)} />
+            )}
         </div>
     );
 };

@@ -7,6 +7,7 @@ import { presentationService } from '../api/presentationService';
 import { flashcardService } from '../api/flashcardService';
 import { workspaceCache } from '../api/workspaceCache';
 import { FolderShape, CreateFolderModal } from './user/FloatingAIButton';
+import NotificationIcon from './user/NotificationIcon';
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 const timeAgo = (dateStr) => {
@@ -68,7 +69,7 @@ const SearchBar = ({ value, onChange, placeholder }) => (
             <span className="material-icons-round text-slate-400 text-[18px]">search</span>
         </div>
         <input
-            className="w-full bg-surface-light border border-slate-200 rounded-xl py-2.5 pl-11 pr-10 shadow-sm focus:ring-2 focus:ring-primary focus:border-primary text-[14px] placeholder-slate-400 outline-none transition-all"
+            className="w-full bg-surface-light border border-slate-200 rounded-md md:rounded-xl py-1 md:py-2.5 pl-11 pr-10 shadow-sm focus:ring-2 focus:ring-primary focus:border-primary text-[12px] md:text-[14px] placeholder-slate-400 outline-none transition-all"
             placeholder={placeholder ?? 'Search…'}
             type="text"
             value={value}
@@ -83,15 +84,50 @@ const SearchBar = ({ value, onChange, placeholder }) => (
 );
 
 // ── Sort select ───────────────────────────────────────────────────────────────
-const SortSelect = ({ value, options, onChange }) => (
-    <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 shrink-0">
-        <span className="material-icons-round text-slate-400 text-[15px]">sort</span>
-        <select value={value} onChange={e => onChange(e.target.value)}
-            className="bg-transparent text-[13px] text-slate-600 outline-none cursor-pointer">
-            {options.map(o => <option key={o.v} value={o.v}>{o.label}</option>)}
-        </select>
-    </div>
-);
+const SortSelect = ({ value, options, onChange }) => {
+    const [open, setOpen] = useState(false);
+    const ref = useRef(null);
+    const selected = options.find(o => o.v === value);
+
+    useEffect(() => {
+        if (!open) return;
+        const handler = (e) => { if (!ref.current?.contains(e.target)) setOpen(false); };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, [open]);
+
+    return (
+        <div ref={ref} className="relative shrink-0">
+            <button
+                onClick={() => setOpen(v => !v)}
+                className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-md md:rounded-xl px-3 py-0.5 md:py-1.5 text-[12px] md:text-[13px] text-slate-600 hover:bg-slate-100 transition-colors"
+            >
+                <span className="material-icons-round text-slate-400 text-[12px] md:text-[15px]">sort</span>
+                <span>{selected?.label}</span>
+                <span className={`material-icons-round text-slate-400 text-[14px] transition-transform duration-200 ${open ? 'rotate-180' : ''}`}>
+                    expand_more
+                </span>
+            </button>
+
+            {open && (
+                <div className="absolute right-0 top-full mt-1.5 bg-white border border-slate-100 rounded-xl shadow-xl py-1 z-30 min-w-[140px] animate-in fade-in zoom-in-95 duration-100">
+                    {options.map(o => (
+                        <button
+                            key={o.v}
+                            onClick={() => { onChange(o.v); setOpen(false); }}
+                            className={`w-full flex items-center gap-2 px-3 py-2 text-[12px] md:text-[13px] text-left transition-colors hover:bg-slate-50 ${
+                                o.v === value ? 'text-primary font-semibold' : 'text-slate-600'
+                            }`}
+                        >
+                            {o.v === value && <span className="material-icons-round text-[13px]">check</span>}
+                            <span className={o.v === value ? '' : 'ml-[17px]'}>{o.label}</span>
+                        </button>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+};
 
 // ── Folder card (grid) ────────────────────────────────────────────────────────
 const FolderGridCard = ({ folder, onClick }) => (
@@ -216,18 +252,18 @@ const Pagination = ({ meta, loading, onMore, onLess }) => {
         <div className="flex items-center justify-center gap-3 mt-6">
             {meta.current_page > 1 && (
                 <button onClick={onLess} disabled={loading}
-                    className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl border border-slate-200 text-[13px] font-medium text-slate-500 hover:border-primary hover:text-primary disabled:opacity-40 transition-colors">
+                    className="flex items-center gap-1.5 px-2 md:px-4 md:py-1.5 py-1 rounded-md md:rounded-xl border border-slate-200 text-[13px] font-medium text-slate-500 hover:border-primary hover:text-primary disabled:opacity-40 transition-colors">
                     <span className="material-icons-round text-[15px]">expand_less</span>View less
                 </button>
             )}
             {meta.current_page < meta.last_page && (
                 <button onClick={onMore} disabled={loading}
-                    className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl border border-slate-200 text-[13px] font-medium text-slate-500 hover:border-primary hover:text-primary disabled:opacity-40 transition-colors">
+                    className="flex items-center gap-1.5 px-1 md:px-4 py-1 md:py-1.5 rounded-md md:rounded-xl border border-slate-200 text-[12px] md:text-[13px] font-medium text-slate-500 hover:border-primary hover:text-primary disabled:opacity-40 transition-colors">
                     {loading ? <span className="material-icons-round text-[15px] animate-spin">sync</span> : <span className="material-icons-round text-[15px]">expand_more</span>}
                     View more
                 </button>
             )}
-            <span className="text-[11px] text-slate-300">Page {meta.current_page} of {meta.last_page} · {meta.total} total</span>
+            <span className="text-[10px] md:text-[11px] text-slate-300">Page {meta.current_page} of {meta.last_page} · {meta.total} total</span>
         </div>
     );
 };
@@ -256,23 +292,23 @@ const FAB = ({ onNote, onPaper, onFolder, onPresentation, onFlashcard }) => {
             {open && items.map((item, i) => (
                 <div key={i} className="flex items-center gap-3"
                     style={{ animation: `slideUpFade 0.18s ease both`, animationDelay: `${i * 40}ms` }}>
-                    <span className="text-[12px] font-semibold text-slate-700 bg-white shadow-md px-2.5 py-1 rounded-lg whitespace-nowrap select-none">
+                    <span className="text-[11px] md:text-[12px] md:font-semibold text-slate-700 bg-white shadow-md px-2.5 py-1 rounded-md md:rounded-lg whitespace-nowrap select-none">
                         {item.label}
                     </span>
                     <button
                         onClick={() => { item.onClick(); setOpen(false); }}
-                        className="w-12 h-12 rounded-2xl shadow-lg flex items-center justify-center text-white transition-all hover:scale-110 active:scale-95"
+                        className="w-8 h-8 md:w-12 md:h-12 rounded-xl md:rounded-2xl shadow-lg flex items-center justify-center text-white transition-all hover:scale-110 active:scale-95"
                         style={{ backgroundColor: item.color }}>
-                        <span className="material-icons-round text-[22px]">{item.icon}</span>
+                        <span className="material-icons-round text-[18px] md:text-[22px]">{item.icon}</span>
                     </button>
                 </div>
             ))}
             <button
                 onClick={() => setOpen(v => !v)}
-                className={`w-14 h-14 rounded-2xl shadow-xl flex items-center justify-center text-white transition-all duration-200 active:scale-95
+                className={`w-8 h-8 md:w-14 md:h-14 rounded-xl md:rounded-2xl shadow-xl flex items-center justify-center text-white transition-all duration-200 active:scale-95
                     ${open ? 'bg-slate-700 rotate-45' : 'bg-primary hover:bg-primary/90 hover:scale-105'}`}
                 style={{ transform: open ? 'rotate(45deg)' : undefined }}>
-                <span className="material-icons-round text-[26px]">add</span>
+                <span className="material-icons-round text-[18px] md:text-[26px]">add</span>
             </button>
             <style>{`@keyframes slideUpFade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}`}</style>
         </div>
@@ -478,30 +514,34 @@ export const LibraryContent = () => {
     return (
         <main className="flex-1 lg:ml-64 p-4 lg:p-8 pt-20 lg:pt-8 min-w-0 overflow-x-hidden pb-28">
             {/* Header */}
-            <header className="mb-6">
-                <h1 className="text-2xl font-semibold tracking-tight mb-1">Library</h1>
-                <p className="text-slate-500 text-[14px]">All your notes, papers, folders, slides and flashcards.</p>
+            <header className="mb-6 flex items-center justify-between">
+                <div className="">
+                <h1 className="text-xl md:text-2xl font-medium md:font-semibold tracking-tight md:mb-1">Library</h1>
+                <p className="text-slate-500 text-[12px] md:text-[14px]">All your notes, papers, folders, slides and flashcards.</p>
+                </div>
+
+                <NotificationIcon/>
             </header>
 
             {/* Tabs */}
-            <div className="flex items-center gap-1 mb-6 border-b border-slate-200 overflow-x-auto">
+            <div className="flex items-center gap-1 mb-3 md:mb-6 border-b border-slate-200 overflow-x-auto">
                 {TABS.map(tab => (
                     <button
                         key={tab.id}
                         onClick={() => setTab(tab.id)}
-                        className={`flex items-center gap-2 px-4 py-2.5 text-[14px] font-medium whitespace-nowrap transition-all border-b-2 -mb-px
+                        className={`flex items-center gap-2 px-2 md:px-4 py-2.5 text-[10.5px] md:text-[14px] md:font-medium whitespace-nowrap transition-all border-b-2 -mb-px
                             ${activeTab === tab.id
                                 ? 'border-primary text-primary'
                                 : 'border-transparent text-slate-500 hover:text-slate-800'}`}
                     >
-                        <span className="material-icons-round text-[17px]">{tab.icon}</span>
+                        <span className="material-icons-round text-[15px] md:text-[17px]">{tab.icon}</span>
                         {tab.label}
                     </button>
                 ))}
             </div>
 
             {/* Search + Sort row */}
-            <div className="flex items-center gap-3 mb-6 flex-wrap">
+            <div className="flex items-center gap-3 mb-3 md:mb-6 flex-wrap">
                 <div className="flex-1 min-w-0">
                     <SearchBar value={search} onChange={handleSearch} placeholder={`Search ${activeTab}…`} />
                 </div>
@@ -533,8 +573,8 @@ export const LibraryContent = () => {
                             {!search && (
                                 <button onClick={() => navigate('/lockedin/notes/new')}
                                     className="border-2 border-dashed border-slate-200 rounded-xl flex flex-col items-center justify-center text-slate-300 hover:text-primary hover:border-primary transition-all group py-8 gap-2">
-                                    <span className="material-icons-round text-[30px] group-hover:scale-110 transition-transform">add_circle</span>
-                                    <span className="text-sm font-semibold">New Note</span>
+                                    <span className="material-icons-round text-[20px] md:text-[30px] group-hover:scale-110 transition-transform">add_circle</span>
+                                    <span className="text-sm medium md:font-semibold">New Note</span>
                                 </button>
                             )}
                         </div>
@@ -548,8 +588,8 @@ export const LibraryContent = () => {
                             {!search && (
                                 <button onClick={() => navigate('/lockedin/papers/new')}
                                     className="border-2 border-dashed border-indigo-100 rounded-xl flex flex-col items-center justify-center text-slate-300 hover:text-indigo-400 hover:border-indigo-300 transition-all group py-8 gap-2">
-                                    <span className="material-icons-round text-[30px] group-hover:scale-110 transition-transform">add_circle</span>
-                                    <span className="text-sm font-semibold">New Paper</span>
+                                    <span className="material-icons-round text-[20px] md:text-[30px] group-hover:scale-110 transition-transform">add_circle</span>
+                                    <span className="text-sm medium md:font-semibold">New Paper</span>
                                 </button>
                             )}
                         </div>
@@ -563,8 +603,8 @@ export const LibraryContent = () => {
                             {!search && (
                                 <button onClick={() => setShowCreateFolder(true)}
                                     className="border-2 border-dashed border-amber-100 rounded-2xl flex flex-col items-center justify-center text-slate-300 hover:text-amber-400 hover:border-amber-300 transition-all group aspect-square gap-2">
-                                    <span className="material-icons-round text-[30px] group-hover:scale-110 transition-transform">create_new_folder</span>
-                                    <span className="text-sm font-semibold">New Folder</span>
+                                    <span className="material-icons-round text-[20px] md:text-[30px] group-hover:scale-110 transition-transform">create_new_folder</span>
+                                    <span className="text-sm medium md:font-semibold">New Folder</span>
                                 </button>
                             )}
                         </div>
@@ -579,10 +619,10 @@ export const LibraryContent = () => {
                                 <button onClick={handleCreatePresentation} disabled={creatingPresentation}
                                     className="border-2 border-dashed border-emerald-100 rounded-xl flex flex-col items-center justify-center text-slate-300 hover:text-emerald-500 hover:border-emerald-300 transition-all group aspect-video gap-2 disabled:opacity-60">
                                     {creatingPresentation
-                                        ? <span className="material-icons-round text-[30px] animate-spin">sync</span>
-                                        : <span className="material-icons-round text-[30px] group-hover:scale-110 transition-transform">add_circle</span>
+                                        ? <span className="material-icons-round text-[20px] md:text-[30px] animate-spin">sync</span>
+                                        : <span className="material-icons-round text-[20px] md:text-[30px] group-hover:scale-110 transition-transform">add_circle</span>
                                     }
-                                    <span className="text-sm font-semibold">New Slides</span>
+                                    <span className="text-sm medium md:font-semibold">New Slides</span>
                                 </button>
                             )}
                         </div>

@@ -52,19 +52,19 @@ const PremiumBadge = () => {
                     onMouseLeave={() => setOpen(false)}
                     className="absolute bottom-1 right-0 mb-2 w-60 bg-white rounded-xl shadow-md border border-slate-100 p-2 z-10"
                 >
-                    <p className="text-[11px] font-semibold text-slate-700 mb-2 flex items-center gap-1.5">
+                    <p className="text-[10px] md:text-[11px] font-medium md:font-semibold text-slate-700 mb-2 flex items-center gap-1.5">
                         <span className="material-icons-round text-amber-500 text-[13px]">workspace_premium</span>
                         Unlock Pro Shakespeare
                     </p>
                     <ul className="flex flex-col gap-1">
                         {PREMIUM_PERKS.map(p => (
                             <li key={p.text} className="flex items-center gap-1 text-[9px] text-slate-600">
-                                <span className="material-icons-round text-primary text-[11px]">{p.icon}</span>
+                                <span className="material-icons-round text-primary text-[10px] md:text-[11px]">{p.icon}</span>
                                 {p.text}
                             </li>
                         ))}
                     </ul>
-                    <button className="w-full py-1 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-white text-[10px] font-medium hover:opacity-90 active:scale-[0.98] transition-all shadow-md shadow-amber-200">
+                    <button className="w-full py-0.5 md:py-1 rounded-md md:rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-white text-[10px] font-medium hover:opacity-90 active:scale-[0.98] transition-all shadow-md shadow-amber-200">
                         Upgrade to Pro
                     </button>
                 </div>
@@ -164,18 +164,18 @@ const ShakespeareModal = ({ onClose, onInsert }) => {
 
             {/* Popover card */}
             <div
-                className="fixed z-[100] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[420px] bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden"
+                className="fixed z-[100] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[85%] md:w-[420px] bg-white rounded-lg md:rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden"
                 style={{ maxHeight: '80vh' }}
                 onClick={e => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 shrink-0">
+                <div className="flex items-center justify-between px-2 md:px-4 py-1.5 md:py-3 border-b border-slate-100 shrink-0">
                     <div className="flex items-center gap-2.5">
-                        <div className="w-7 h-7 rounded-xl bg-gradient-to-br from-gray-400 to-black flex items-center justify-center shadow-sm overflow-hidden shrink-0">
+                        <div className="w-5 h-5 md:w-7 md:h-7 rounded-xl bg-gradient-to-br from-gray-400 to-black flex items-center justify-center shadow-sm overflow-hidden shrink-0">
                             <img src={shakespeare} className="w-full h-full object-cover" alt="" />
                         </div>
                         <div>
-                            <p className="font-semibold text-[12px] text-slate-800 leading-tight">Shakespeare Assist</p>
+                            <p className="font-medium md:font-semibold text-[12px] text-slate-800 leading-tight">Shakespeare Assist</p>
                             <p className="text-[9px] text-slate-400">Shakespeare writes it — you own it.</p>
                         </div>
                     </div>
@@ -183,7 +183,7 @@ const ShakespeareModal = ({ onClose, onInsert }) => {
                         onClick={onClose}
                         className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 transition-colors"
                     >
-                        <span className="material-icons-round text-[16px]">close</span>
+                        <span className="material-icons-round text-[13px] md:text-[16px]">close</span>
                     </button>
                 </div>
 
@@ -200,7 +200,7 @@ const ShakespeareModal = ({ onClose, onInsert }) => {
                                 onChange={e => setPrompt(e.target.value)}
                                 onKeyDown={handleKeyDown}
                                 placeholder="What should Shakespeare write?  e.g. a short intro to photosynthesis…"
-                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-[12px] text-slate-700 placeholder-slate-400 outline-none focus:border-primary resize-none leading-relaxed"
+                                className="w-full bg-slate-50 border border-slate-200 rounded-md md:rounded-xl md:px-3 px-1.5 py-1.5 md:py-2.5 text-[10px] md:text-[12px] text-slate-700 placeholder-slate-400 outline-none focus:border-primary resize-none leading-relaxed"
                             />
                             
                         </>
@@ -229,7 +229,7 @@ const ShakespeareModal = ({ onClose, onInsert }) => {
                             </div>
                             <div
                                 ref={outputRef}
-                                className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-[12px] text-slate-700 leading-relaxed whitespace-pre-wrap max-h-52 overflow-y-auto"
+                                className="bg-slate-50 border border-slate-200 rounded-md md:rounded-xl px-3 py-2.5 text-[10px] md:text-[12px] text-slate-700 leading-relaxed whitespace-pre-wrap max-h-52 overflow-y-auto"
                             >
                                 {output}
                                 {status === 'streaming' && (
@@ -241,7 +241,7 @@ const ShakespeareModal = ({ onClose, onInsert }) => {
 
                     {status === 'error' && (
                         <p className="text-[11px] text-red-500 flex items-center gap-1">
-                            <span className="material-icons-round text-[13px]">error_outline</span>
+                            <span className="material-icons-round text-[11px] md:text-[13px]">error_outline</span>
                             Something went wrong. Check your API key or try again.
                         </p>
                     )}
@@ -255,14 +255,14 @@ const ShakespeareModal = ({ onClose, onInsert }) => {
                                 onChange={e => setRefinePrompt(e.target.value)}
                                 onKeyDown={handleRefineKeyDown}
                                 placeholder="Refine… e.g. make it shorter, add examples"
-                                className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[11px] text-slate-700 placeholder-slate-400 outline-none focus:border-primary"
+                                className="flex-1 bg-slate-50 border border-slate-200 rounded-md md:rounded-xl md:px-3 px-1.5 py-1 md:py-2 text-[10px] md:text-[11px] text-slate-700 placeholder-slate-400 outline-none focus:border-primary"
                             />
                             <button
                                 onClick={handleRefine}
                                 disabled={!refinePrompt.trim()}
-                                className="shrink-0 w-8 h-8 rounded-xl bg-slate-100 hover:bg-primary hover:text-white text-slate-600 flex items-center justify-center transition-colors disabled:opacity-40"
+                                className="shrink-0 w-6 h-6 md:w-8 md:h-8 rounded-xl bg-slate-100 hover:bg-primary hover:text-white text-slate-600 flex items-center justify-center transition-colors disabled:opacity-40"
                             >
-                                <span className="material-icons-round text-[16px]">send</span>
+                                <span className="material-icons-round text-[14px] md:text-[16px]">send</span>
                             </button>
                         </div>
                     )}
@@ -295,7 +295,7 @@ const ShakespeareModal = ({ onClose, onInsert }) => {
                             <button
                                 onClick={handleGenerate}
                                 disabled={!prompt.trim()}
-                                className="w-[fit-content] ml-auto px-4 py-2 rounded-xl bg-gradient-to-r from-gray-700 to-black text-white text-[11px] font-medium shadow hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                                className="w-[fit-content] ml-auto px-2 md:px-4 py-1 md:py-2 rounded-md md:rounded-xl bg-gradient-to-r from-gray-700 to-black text-white text-[10px] md:text-[11px] font-medium shadow hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                             >
                                 Create
                             </button>

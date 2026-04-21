@@ -184,6 +184,11 @@ export default function GeneratePage() {
         navigate("/lockedin/notes/new", { state: { voiceText: output.trim() } });
     };
 
+      const handleInsertPaper = () => {
+        if (!output.trim()) return;
+        navigate("/lockedin/papers/new", { state: { voiceText: output.trim() } });
+    };
+
     const handleKeyDown = (e) => {
         if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) handleGenerate();
     };
@@ -384,7 +389,7 @@ export default function GeneratePage() {
                                     <button
                                         onClick={handleCopy}
                                         disabled={isStreaming}
-                                        className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-sm font-medium hover:bg-slate-50 disabled:opacity-40 transition"
+                                        className="flex items-center gap-1.5 px-2 py-1 rounded-xl border border-slate-200 text-slate-600 text-sm font-medium hover:bg-slate-50 disabled:opacity-40 transition"
                                     >
                                         <span className="material-icons-round text-[16px]">
                                             {copied ? "check" : "content_copy"}
@@ -394,11 +399,22 @@ export default function GeneratePage() {
                                     <button
                                         onClick={handleInsert}
                                         disabled={isStreaming || !output.trim()}
-                                        className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition shadow shadow-primary/20"
+                                        className="flex items-center gap-1.5 px-2 py-1 rounded bg-primary text-white text-sm font-normal hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition shadow shadow-primary/20"
                                     >
                                         <span className="material-icons-round text-[16px]">arrow_forward</span>
                                         Insert into Note
                                     </button>
+
+
+                                    <button
+                                        onClick={handleInsertPaper}
+                                        disabled={isStreaming || !output.trim()}
+                                        className="flex items-center gap-1.5 px-2 py-1 rounded bg-gray-800 text-white text-sm font-normal hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition shadow shadow-primary/20"
+                                    >
+                                        <span className="material-icons-round text-[16px]">arrow_forward</span>
+                                        Insert into Paper
+                                    </button>
+
                                 </div>
                             </div>
                         )}

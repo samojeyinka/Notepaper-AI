@@ -7,16 +7,16 @@ export const HelpHeader = () => {
 
   return (
     <header className="max-w-6xl mx-auto text-center mb-10">
-      <h1 className="text-4xl font-serif font-bold text-slate-900 mb-8">How can we help you?</h1>
+      <h1 className="text-xl md:text-4xl font-serif font-bold text-slate-900 mb-8">How can we help you?</h1>
       <div className="relative max-w-2xl mx-auto group">
         <div className="absolute inset-0 bg-slate-200 translate-x-1 translate-y-1 rounded-xl -z-10"></div>
-        <div className="relative flex items-center bg-white border-2 border-slate-900 rounded-2xl px-3 py-2 shadow-sm group-hover:-translate-y-1 group-hover:-translate-x-1 transition-all">
+        <div className="relative flex items-center bg-white border-2 border-slate-900 rounded-2xl px-1.5 md:px-3 py-1 md:py-2 shadow-sm group-hover:-translate-y-1 group-hover:-translate-x-1 transition-all">
           <span className="material-symbols-outlined text-3xl text-slate-400 mr-4" style={{ fontVariationSettings: "'wght' 200" }}>
             search
           </span>
           <input
             type="text"
-            className="w-full bg-transparent border-none focus:ring-0 text-[16px] font-normal placeholder:text-slate-300 placeholder:italic"
+            className="w-full bg-transparent border-none focus:ring-0 text-[13px] md:text-[16px] font-normal placeholder:text-slate-300 placeholder:italic"
             placeholder="Search through the archives..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -49,7 +49,7 @@ export const CategoryCard = ({ icon, title, description, shape, bgColor, onClick
   return (
     <button
       onClick={onClick}
-      className="group relative flex flex-col items-center p-4 transition-transform hover:-translate-y-2 w-full"
+      className="group relative flex flex-col items-center p-2 md:p-4 transition-transform hover:-translate-y-2 w-full"
     >
       <div className="absolute inset-0 bg-slate-900/5 rounded-[1rem] translate-y-3 rotate-1 scale-95"></div>
       <div className="relative w-full aspect-square bg-white rounded-[1rem] border-2 border-slate-900 p-4 flex flex-col items-center justify-center paper-shadow-h">
@@ -114,15 +114,15 @@ export const HelpCategories = () => {
 export const FAQItem = ({ question, answer, isOpen, onToggle }) => {
   return (
     <div
-      className="group flex items-start space-x-2 py-2 cursor-pointer hover:bg-slate-50 transition-colors"
+      className="group flex items-start space-x-2 py-.5 md:py-2 cursor-pointer hover:bg-slate-50 transition-colors"
       onClick={onToggle}
     >
-      <span className="material-symbols-outlined text-primary text-[16px] rotate-180 flex-shrink-0 mt-2">
+      <span className="material-symbols-outlined text-primary text-[12px] md:text-[16px] rotate-180 flex-shrink-0 mt-2">
         trending_flat
       </span>
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between">
-          <span className="font-medium text-[14px] text-slate-900">{question}</span>
+          <span className="font-normal md:font-medium text-[12px] md:text-[14px] text-slate-900">{question}</span>
           <span className={`material-symbols-outlined text-slate-300 group-hover:translate-x-2 transition-transform flex-shrink-0 ${isOpen ? 'rotate-90' : ''}`}>
             chevron_right
           </span>
@@ -171,8 +171,8 @@ export const TopQuestionsSection = () => {
       <div className="absolute inset-0 bg-slate-200 rounded-lg rotate-1 translate-y-2 translate-x-1"></div>
       <div className="relative bg-white p-10 pb-8 rounded-sm shadow-xl border border-slate-100">
         <div className="flex items-center justify-between mb-8 border-b-2 border-red-200 pb-4">
-          <h2 className="text-2xl font-serif font-semibold text-slate-900">Top Questions</h2>
-          <span className="font-handwriting text-slate-400">Helpful Docs</span>
+          <h2 className="text-[15px] md:text-2xl font-serif font-semibold text-slate-900">Top Questions</h2>
+          <span className="text-[13px] md:text-base font-handwriting text-slate-400">Helpful Docs</span>
         </div>
         <div className="ruled-page-h space-y-0">
           {faqs.map((faq, index) => (
@@ -201,16 +201,16 @@ export const SupportTicketCard = () => {
       <div className="absolute inset-0 bg-indigo-100 rounded-2xl stack-layer-2-h border border-slate-200"></div>
       <div className="absolute inset-0 bg-white rounded-3xl stack-layer-1-h border border-slate-200"></div>
       <div className="relative bg-white border-2 border-slate-900 rounded-3xl p-8 flex flex-col items-center text-center paper-shadow-h">
-        <div className="w-16 h-16 bg-purple-500/10 rounded-2xl flex items-center justify-center text-purple-500 mb-6">
+        <div className="w-10 h-10 md:w-16 md:h-16 bg-purple-500/10 rounded-2xl flex items-center justify-center text-purple-500 mb-6">
           <span className="material-symbols-outlined text-4xl">support_agent</span>
         </div>
         <h3 className="text-xxl font-semibold mb-2">Still stuck?</h3>
-        <p className="text-slate-500 mb-4 text-[15px]">
+        <p className="text-slate-500 mb-4 text-[13px] md:text-[15px]">
           If you couldn't find what you were looking for, our team is ready to help you manually.
         </p>
         <Link
         to={`/lockedin/support-tickets/new`}
-          className="w-full py-2 bg-slate-900 text-white rounded-xl font-medium hover:shadow-xl hover:-translate-y-1 transition-all flex items-center justify-center space-x-2"
+          className="w-full py-1 md:py-2 bg-slate-900 text-white rounded-xl font-normal md:font-medium hover:shadow-xl hover:-translate-y-1 transition-all flex items-center justify-center space-x-2"
         >
           <span className="material-symbols-outlined">confirmation_number</span>
           <span>Open a Ticket</span>
@@ -218,8 +218,8 @@ export const SupportTicketCard = () => {
 
         {/* Decorative Arrow */}
         <div className="mt-8 relative w-full">
-          <div className="absolute -top-12 -left-4">
-            <svg className="w-12 h-12 text-purple-500 rotate-[160deg]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="absolute -top-12 -left-2 md:-left-4">
+            <svg className="w-8 h-8 md:w-12 md:h-12 text-purple-500 rotate-[160deg]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 d="M19 14l-7 7m0 0l-7-7m7 7V3"
                 strokeLinecap="round"
@@ -228,7 +228,7 @@ export const SupportTicketCard = () => {
               ></path>
             </svg>
           </div>
-          <p className="font-handwriting text-2xl text-purple-500 transform -rotate-2">
+          <p className="font-handwriting text-[15px] md:text-2xl text-purple-500 transform -rotate-2">
             Our team of humans is here!
           </p>
         </div>

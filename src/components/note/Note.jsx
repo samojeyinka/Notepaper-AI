@@ -726,7 +726,7 @@ export const Note = () => {
                     {!isPageSidebarOpen && (
                         <button
                             onClick={() => setIsPageSidebarOpen(true)}
-                            className="absolute right-0 top-1/2 -translate-y-1/2 w-6 h-20 bg-white border border-slate-200 rounded-l-xl flex items-center justify-center hover:bg-slate-50 transition-colors z-20"
+                            className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-10 md:w-6 md:h-20 bg-white border border-slate-200 rounded-l-xl flex items-center justify-center hover:bg-slate-50 transition-colors z-20"
                         >
                             <span className="material-icons-round text-slate-400">chevron_left</span>
                         </button>

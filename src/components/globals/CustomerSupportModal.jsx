@@ -87,14 +87,14 @@ export default function CustomerSupportModal({ onClose }) {
           {/* Header */}
           <div className="bg-primary text-white p-3 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 md:w-12 md:h-12 bg-white/20 rounded-full flex items-center justify-center">
                 <span className="material-symbols-outlined text-xl">
                   support_agent
                 </span>
               </div>
               <div>
-                <h3 className="font-bold text-lg">Notepaper Support</h3>
-                <p className="text-sm text-white/80">Usually replies in minutes</p>
+                <h3 className="font-semibold text-[15px] md:font-bold md:text-lg">Support</h3>
+                <p className="text-[12px] md:text-sm text-white/80">Usually replies in minutes</p>
               </div>
             </div>
             <button
@@ -122,7 +122,7 @@ export default function CustomerSupportModal({ onClose }) {
                       : 'bg-white text-slate-900 rounded-bl-none border border-slate-200 shadow-sm'
                   }`}
                 >
-                  <p className="text-sm leading-relaxed">{msg.text}</p>
+                  <p className="text-[12px] md:text-sm leading-relaxed">{msg.text}</p>
                   <span
                     className={`text-xs mt-1 block ${
                       msg.type === 'user'
@@ -144,9 +144,9 @@ export default function CustomerSupportModal({ onClose }) {
               <div className="flex justify-start">
                 <div className="bg-white text-slate-900 px-4 py-3 rounded-2xl rounded-bl-none border border-slate-200 shadow-sm">
                   <div className="flex gap-1 items-center">
-                    <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"></span>
-                    <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></span>
-                    <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></span>
+                    <span className="w-1 h-1 md:w-2 md:h-2 bg-slate-400 rounded-full animate-bounce"></span>
+                    <span className="w-1 h-1 md:w-2 md:h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></span>
+                    <span className="w-1 h-1 md:w-2 md:h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></span>
                   </div>
                 </div>
               </div>
@@ -156,7 +156,7 @@ export default function CustomerSupportModal({ onClose }) {
           {/* Quick Replies */}
           {messages.length === 1 && !isLoading && (
             <div className="px-6 py-4 bg-white border-t border-slate-200 space-y-2">
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">
+              <p className="text-xs font-semibold md:font-bold text-slate-500 uppercase tracking-wider mb-3">
                 Quick Help Topics
               </p>
               <div className="space-y-1">
@@ -164,7 +164,7 @@ export default function CustomerSupportModal({ onClose }) {
                   <button
                     key={reply}
                     onClick={() => handleQuickReply(reply)}
-                    className="w-full text-left px-1.5 py-1 text-[11.5px] font-normal text-primary bg-primary/5 hover:bg-primary/10 rounded-lg transition-colors border border-primary/20"
+                    className="w-full text-left px-1.5 py-1 text-[11px] font-normal text-primary bg-primary/5 hover:bg-primary/10 rounded-lg transition-colors border border-primary/20"
                   >
                     {reply}
                   </button>
@@ -181,12 +181,12 @@ export default function CustomerSupportModal({ onClose }) {
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 placeholder="Type your message..."
-                className="flex-1 px-4 py-3 border border-slate-200 rounded-full focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm placeholder-slate-400"
+                className="flex-1 px-2 md:px-4 py-1.5 md:py-3 border text-[12px] md:text-sm border-slate-200 rounded-xl md:rounded-full focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 placeholder-slate-400"
               />
               <button
                 type="submit"
                 disabled={!inputMessage.trim() || isLoading}
-                className="p-3 bg-primary text-white rounded-full hover:bg-purple-600 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="p-1.5 md:p-3 bg-primary text-white rounded-xl md:rounded-full hover:bg-purple-600 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 aria-label="Send message"
               >
                 <span className="material-symbols-outlined text-lg">send</span>

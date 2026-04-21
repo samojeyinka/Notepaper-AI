@@ -23,11 +23,11 @@ export const SupportTicketHeader = () => {
             <div className="flex items-center space-x-4">
                 <Link
                     to="/lockedin/support-tickets"
-                    className="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:text-primary hover:border-primary transition-all"
+                    className="w-7 h-7 md:w-10 md:h-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:text-primary hover:border-primary transition-all"
                 >
                     <span className="material-symbols-outlined">arrow_back</span>
                 </Link>
-                <h1 className="text-xl font-semibold text-slate-900">Help & Support</h1>
+                <h1 className="font-medium text-[14px] md:text-xl md:font-semibold text-slate-900">Help & Support</h1>
             </div>
         </header>
     );
@@ -36,12 +36,12 @@ export const SupportTicketHeader = () => {
 export const FormInput = ({ label, placeholder, value, onChange, type = 'text' }) => {
     return (
         <div className="group">
-            <label className="block text-xs font-semibold uppercase tracking-widest text-slate-400 mb-2">
+            <label className="block text-xs font-medium md:font-semibold uppercase tracking-widest text-slate-400 mb-2">
                 {label}
             </label>
             <input
                 type={type}
-                className="w-full text-[15px] font-serif border-b-2 border-slate-100 focus:border-primary bg-transparent py-1 focus:ring-0 transition-all placeholder:text-slate-200"
+                className="w-full text-[12.5px] md:text-[15px] font-serif border-b-2 border-slate-100 focus:border-primary bg-transparent py-1 focus:ring-0 transition-all placeholder:text-slate-200"
                 placeholder={placeholder}
                 value={value}
                 onChange={onChange}
@@ -53,11 +53,11 @@ export const FormInput = ({ label, placeholder, value, onChange, type = 'text' }
 export const CategorySelect = ({ value, onChange }) => {
     return (
         <div className="relative inline-block group">
-            <label className="block text-xs font-semibold uppercase tracking-widest text-slate-400 mb-4">
+            <label className="block text-xs font-medium md:font-semibold uppercase tracking-widest text-slate-400 mb-4">
                 Category
             </label>
             <select
-                className="appearance-none text-[14px] bg-slate-100 border-none rounded-r-lg rounded-tl-lg px-3 py-1.5 pr-12 font-medium text-slate-700 cursor-pointer focus:ring-2 focus:ring-primary/20 hover:bg-slate-200 transition-all"
+                className="appearance-none text-[14px] bg-slate-100 border-none rounded-r-lg rounded-tl-lg px-3 py-1.5 pr-12 font-normal md:font-medium text-slate-700 cursor-pointer focus:ring-2 focus:ring-primary/20 hover:bg-slate-200 transition-all"
                 value={value}
                 onChange={onChange}
             >
@@ -72,11 +72,11 @@ export const CategorySelect = ({ value, onChange }) => {
 export const PrioritySelect = ({ value, onChange }) => {
     return (
         <div className="relative inline-block group ml-4">
-            <label className="block text-xs font-semibold uppercase tracking-widest text-slate-400 mb-4">
+            <label className="block text-xs font-medium md:font-semibold uppercase tracking-widest text-slate-400 mb-4">
                 Priority
             </label>
             <select
-                className="appearance-none text-[14px] bg-slate-100 border-none rounded-r-lg rounded-tl-lg px-3 py-1.5 pr-8 font-medium text-slate-700 cursor-pointer focus:ring-2 focus:ring-primary/20 hover:bg-slate-200 transition-all"
+                className="appearance-none text-[12px] md:text-[14px] bg-slate-100 border-none rounded-r-lg rounded-tl-lg px-3 py-1.5 pr-8 md:font-medium text-slate-700 cursor-pointer focus:ring-2 focus:ring-primary/20 hover:bg-slate-200 transition-all"
                 value={value}
                 onChange={onChange}
             >
@@ -90,13 +90,13 @@ export const PrioritySelect = ({ value, onChange }) => {
 
 export const TextareaInput = ({ label, placeholder, value, onChange }) => {
     return (
-        <div className="relative mt-6">
-            <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-6">
+        <div className="relative mt-3 md:mt-6">
+            <label className="block text-xs font-medium md:font-bold uppercase tracking-widest text-slate-400 mb-4 md:mb-6">
                 {label}
             </label>
-            <div className="ruled-page border-l-2 border-red-200 pl-8">
+            <div className="ruled-page border-l-2 border-red-200 pl-4 md:pl-8">
                 <textarea
-                    className="w-full bg-transparent border-none focus:ring-0 text-[15px] leading-[32px] p-0 resize-none overflow-y-auto placeholder:text-slate-300"
+                    className="w-full bg-transparent border-none focus:ring-0 text-[12px] md:text-[15px] leading-[32px] p-0 resize-none overflow-y-auto placeholder:text-slate-300"
                     placeholder={placeholder}
                     value={value}
                     onChange={onChange}
@@ -116,7 +116,7 @@ export const SubmitButton = ({ onClick, disabled = false, loading = false }) => 
                     type="button"
                     onClick={onClick}
                     disabled={disabled || loading}
-                    className="bg-primary text-white px-6 py-2 rounded-full font-semibold text-[15px] shadow-sm hover:shadow-primary/40 hover:-translate-y-1 active:translate-y-0 transition-all flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="bg-primary text-white px-3 md:px-6 py-1 md:py-2 rounded-full font-medium md:font-semibold text-[13px] md:text-[15px] shadow-sm hover:shadow-primary/40 hover:-translate-y-1 active:translate-y-0 transition-all flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {loading ? (
                         <span className="material-symbols-outlined animate-spin">progress_activity</span>
@@ -185,7 +185,7 @@ export const SupportTicketForm = () => {
                 <div className="absolute -top-6 left-1/2 -translate-x-1/2 flex flex-col items-center">
                     <div className="washi-tape-effect w-24 h-6 mb-[-12px] z-20"></div>
                     <div className="bg-amber-100 px-6 py-2 border border-amber-200 shadow-sm rotate-[-1deg]">
-                        <span className="font-handwriting text-[15px] text-amber-700">
+                        <span className="font-handwriting text-[13px] md:text-[15px] text-amber-700">
                             {submitted ? 'Ticket Submitted!' : 'New Support Ticket'}
                         </span>
                     </div>

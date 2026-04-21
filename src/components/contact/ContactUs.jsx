@@ -6,7 +6,7 @@ import CustomerSupport from '../globals/CustomerSupport';
 
 export default function ContactUs() {
   return (
-    <main className="pt-32 pb-40 min-h-screen relative overflow-hidden bg-paper">
+    <main className="pt-16 md:pt-32 pb-20 md:pb-40 min-h-screen relative overflow-hidden bg-paper">
       {/* Background Decorations */}
       <div className="absolute inset-0 pointer-events-none -z-10 opacity-10">
         {/* Coffee Cup */}
@@ -36,7 +36,7 @@ export default function ContactUs() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-20 items-center">
         {/* Left Column - Visual Elements */}
         <ContactHero />
 

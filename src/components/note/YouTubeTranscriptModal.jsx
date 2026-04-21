@@ -74,15 +74,15 @@ const WebToTextModal = ({ onClose, onInsert }) => {
 
             {/* Modal */}
             <div
-                className="fixed z-[100] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[420px] bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden"
+                className="fixed z-[100] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[85%] md:w-[420px] bg-white rounded-l md:rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden"
                 style={{ maxHeight: '80vh' }}
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
                 <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 shrink-0">
                     <div className="flex items-center gap-2.5">
-                        <div className="w-7 h-7 rounded-xl bg-slate-900 flex items-center justify-center text-white shadow-sm shrink-0">
-                            <span className="material-icons-round text-[15px]">article</span>
+                        <div className="w-5 h-5 md:w-7 md:h-7 :rounded-md md:rounded-xl bg-slate-900 flex items-center justify-center text-white shadow-sm shrink-0">
+                            <span className="material-icons-round text-[13px] md:text-[15px]">article</span>
                         </div>
                         <div>
                             <p className="font-semibold text-[12px] text-slate-800 leading-tight">Web to Text</p>
@@ -91,9 +91,9 @@ const WebToTextModal = ({ onClose, onInsert }) => {
                     </div>
                     <button
                         onClick={onClose}
-                        className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 transition-colors"
+                        className="md:w-7 md:h-7 w-5 h-5 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 transition-colors"
                     >
-                        <span className="material-icons-round text-[16px]">close</span>
+                        <span className="material-icons-round text-[13px] md:text-[16px]">close</span>
                     </button>
                 </div>
 
@@ -109,7 +109,7 @@ const WebToTextModal = ({ onClose, onInsert }) => {
                                 onChange={(e) => setUrl(e.target.value)}
                                 onKeyDown={(e) => { if (e.key === 'Enter') handleFetch(); }}
                                 placeholder="https://example.com/article..."
-                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-[12px] text-slate-700 placeholder-slate-400 outline-none focus:border-primary"
+                                className="w-full bg-slate-50 border border-slate-200 rounded-md md:rounded-xl px-1.5 md:px-3 py-1 md:py-2.5 text-[12px] text-slate-700 placeholder-slate-400 outline-none focus:border-primary"
                             />
                             {status === 'error' && (
                                 <p className="text-[11px] text-red-500 flex items-center gap-1">
@@ -122,7 +122,7 @@ const WebToTextModal = ({ onClose, onInsert }) => {
 
                     {status === 'fetching' && (
                         <div className="flex items-center justify-center py-8 gap-2 text-slate-400">
-                            <span className="material-icons-round text-primary text-[28px] animate-spin">sync</span>
+                            <span className="material-icons-round text-primary text-[16px] md:text-[28px] animate-spin">sync</span>
                             <span className="text-[12px]">Extracting content…</span>
                         </div>
                     )}
@@ -130,7 +130,7 @@ const WebToTextModal = ({ onClose, onInsert }) => {
                     {status === 'done' && (
                         <div className="flex flex-col gap-2">
                             <div className="flex items-center justify-between">
-                                <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-widest">
+                                <p className="text-[9px] font-medium md:font-semibold text-slate-400 uppercase tracking-widest">
                                     Extracted content
                                 </p>
                                 <button
@@ -140,7 +140,7 @@ const WebToTextModal = ({ onClose, onInsert }) => {
                                     Try another
                                 </button>
                             </div>
-                            <div className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-[12px] text-slate-700 leading-relaxed whitespace-pre-wrap max-h-64 overflow-y-auto">
+                            <div className="bg-slate-50 border border-slate-200 rounded-md md:rounded-xl px-3 py-2.5 text-[11px] md:text-[12px] text-slate-700 leading-relaxed whitespace-pre-wrap max-h-64 overflow-y-auto">
                                 {text}
                             </div>
                         </div>
@@ -153,7 +153,7 @@ const WebToTextModal = ({ onClose, onInsert }) => {
                         <button
                             onClick={handleFetch}
                             disabled={!url.trim()}
-                            className="px-4 py-2 rounded-xl bg-slate-900 text-white text-[11px] font-medium hover:bg-slate-700 active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="px-2 py-1 md:px-4 md:py-2 rounded-md md:rounded-xl bg-slate-900 text-white text-[11px] font-medium hover:bg-slate-700 active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                             Continue
                         </button>
@@ -161,7 +161,7 @@ const WebToTextModal = ({ onClose, onInsert }) => {
                     {status === 'done' && (
                         <button
                             onClick={() => onInsert(text)}
-                            className="px-4 py-2 rounded-xl bg-primary text-white text-[11px] font-medium shadow shadow-primary/20 hover:bg-primary/90 active:scale-[0.98] transition-all"
+                            className="px-2 py-1 md:px-4 md:py-2 rounded-md md:rounded-xl bg-primary text-white text-[11px] font-medium shadow shadow-primary/20 hover:bg-primary/90 active:scale-[0.98] transition-all"
                         >
                             Insert into note
                         </button>

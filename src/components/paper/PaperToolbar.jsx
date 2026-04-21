@@ -74,7 +74,7 @@ const AdvancedColorPicker = ({ anchorRef, color, onChange, onClose, title, recen
     <Popover anchorRef={anchorRef}>
       <div className="p-4 flex flex-col gap-4 w-64">
         <div className="flex items-center justify-between">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{title}</p>
+          <p className="text-[9px] md:text-[10px] font-medium md:font-bold text-slate-400 uppercase tracking-widest">{title}</p>
           {showNone && (
             <button onMouseDown={(e) => { e.preventDefault(); onNone?.(); onClose(); }}
               className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-red-50 hover:text-red-500 text-slate-500 text-[10px] font-bold transition-colors" title="Remove background color">
@@ -98,7 +98,7 @@ const AdvancedColorPicker = ({ anchorRef, color, onChange, onClose, title, recen
             <div className="flex flex-wrap gap-2">
               {recentColors.map((c, idx) => (
                 <button key={`${c}-${idx}`} onMouseDown={(e) => { e.preventDefault(); setLocalColor(c); onChange(c); }}
-                  className="w-6 h-6 rounded-full border border-white shadow-sm transition-transform hover:scale-110 active:scale-90"
+                  className="w-4 h-4 md:w-6 md:h-6 rounded-full border border-white shadow-sm transition-transform hover:scale-110 active:scale-90"
                   style={{ backgroundColor: c }} title={c} />
               ))}
             </div>

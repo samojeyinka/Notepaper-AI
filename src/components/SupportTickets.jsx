@@ -9,15 +9,15 @@ import { useAuth } from '../context/AuthContext';
 // Header Component
 export const SupportArchiveHeader = () => {
     return (
-        <header className="w-full max-w-5xl flex items-center justify-between mb-8">
+        <header className="w-full max-w-5xl flex items-center justify-between mb-4 md:mb-8">
             <div className="flex items-center space-x-4">
-                <h1 className="text-xl font-semibold text-slate-900">My Support Tickets</h1>
+                <h1 className="text-[14px] font-medium md:text-xl md:font-semibold text-slate-900">My Support Tickets</h1>
             </div>
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-1.5 md:space-x-3">
                 <div className="relative group">
                     <Link
                         to={`/lockedin/support-tickets/new`}
-                        className="bg-primary text-white text-[15px] px-3 py-1.5 rounded-full font-medium shadow-md hover:shadow-primary/40 hover:-translate-y-0.5 transition-all flex items-center space-x-2"
+                        className="bg-primary text-white text-[12px] md:text-[15px] px-1.5 py-1 md:px-3 md:py-1.5 rounded-full md:font-medium shadow-md hover:shadow-primary/40 hover:-translate-y-0.5 transition-all flex items-center space-x-2"
                     >
                         <span className="material-symbols-outlined">add</span>
                         <span>Open New Ticket</span>
@@ -43,15 +43,15 @@ export const SupportTab = ({ icon, label, count, isActive, onClick }) => {
     return (
         <button
             onClick={onClick}
-            className={`pb-4 px-2 font-medium transition-all flex items-center space-x-2 border-b-2 ${isActive
+            className={`pb-2 md:pb-4 px-1 md:px-2 font-medium transition-all flex items-center space-x-2 border-b-2 ${isActive
                 ? 'text-primary border-primary'
                 : 'text-slate-400 hover:text-slate-600 border-transparent'
                 }`}
         >
-            <span className="material-symbols-outlined text-[15px]">{icon}</span>
-            <span>{label}</span>
+            <span className="material-symbols-outlined text-[12px] md:text-[15px]">{icon}</span>
+            <span className='text-[12px] md:text-[15px]'>{label}</span>
             {count !== undefined && (
-                <span className="bg-primary text-white text-[10px] px-1.5 py-0.5 rounded-full ml-1">
+                <span className="bg-primary text-white text-[8px] md:text-[10px] px-1.5 py-0.5 rounded-full ml-1">
                     {count}
                 </span>
             )}
@@ -78,7 +78,7 @@ export const TicketCard = ({ ticketId, status, title, lastActivity, isResolved =
             className={`relative group cursor-pointer transition-all hover:-translate-y-1 hover:z-20 ${isResolved ? 'opacity-70' : ''}`}
         >
             <div className="absolute inset-0 bg-slate-50 translate-x-0.5 translate-y-1 rounded-sm transition-transform group-hover:rotate-0"></div>
-            <div className="relative bg-[#FFFDF9] p-3 rounded-sm border border-slate-200 shadow-sm flex items-center justify-between">
+            <div className="relative bg-[#FFFDF9] p-1.5 md:p-3 rounded-sm border border-slate-200 shadow-sm flex items-center justify-between">
                 <div className="flex flex-col space-y-1">
                     <div className="flex items-center space-x-3">
                         <span className="text-[10px] font-normal tracking-widest text-slate-400 uppercase">#{ticketId}</span>
@@ -94,7 +94,7 @@ export const TicketCard = ({ ticketId, status, title, lastActivity, isResolved =
                         )}
                     </div>
                     <h3
-                        className={`text-[15px] font-medium transition-colors ${isResolved
+                        className={`text-[13px] md:text-[15px] font-medium transition-colors ${isResolved
                             ? 'text-slate-400 line-through decoration-slate-300'
                             : 'text-slate-800 group-hover:text-primary'
                             }`}
@@ -118,7 +118,7 @@ export const TicketList = ({ tickets, loading }) => {
         return (
             <div className="space-y-2">
                 {[1, 2, 3].map(i => (
-                    <div key={i} className="h-16 bg-slate-100 rounded-sm animate-pulse" />
+                    <div key={i} className="h-8 md:h-16 bg-slate-100 rounded-sm animate-pulse" />
                 ))}
             </div>
         );
@@ -126,8 +126,8 @@ export const TicketList = ({ tickets, loading }) => {
 
     if (!tickets.length) {
         return (
-            <div className="flex flex-col items-center justify-center py-20 text-center">
-                <span className="material-symbols-outlined text-4xl text-slate-300 mb-3">inbox</span>
+            <div className="flex flex-col items-center justify-center py-10 md:py-20 text-center">
+                <span className="material-symbols-outlined text-2xl md:text-4xl text-slate-300 mb-3">inbox</span>
                 <p className="text-slate-400 text-sm">No tickets here yet.</p>
             </div>
         );
@@ -205,9 +205,9 @@ export const SupportArchiveContent = ({ activeTab, onTabChange }) => {
     return (
         <div className="relative w-full max-w-5xl">
             <div className="absolute inset-0 bg-slate-200 translate-x-1 translate-y-2 rounded-lg -rotate-1"></div>
-            <div className="relative bg-white min-h-[700px] rounded-lg shadow-md border border-slate-100 p-8">
+            <div className="relative bg-white min-h-[700px] rounded-lg shadow-md border border-slate-100 p-4 md:p-8">
                 <div className="flex items-center justify-between mb-6 border-b border-slate-100">
-                    <div className="flex space-x-4">
+                    <div className="flex space-x-2 md:space-x-4">
                         <SupportTab
                             icon="move_to_inbox"
                             label="Active Tickets"

@@ -7,11 +7,11 @@ import { TheSpark } from "./TheSpark";
 export default function OurStory() {
   return (
     <>
-    <Hero/>
-      <TheSpark/>
-      <TheCraft/>
-      <TheFuture/>
-      <FoundersLetter/>
+      <Hero />
+      <TheSpark />
+      <TheCraft />
+      <TheFuture />
+      <FoundersLetter />
     </>
   );
 }

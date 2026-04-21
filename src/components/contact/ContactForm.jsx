@@ -34,11 +34,11 @@ export default function ContactForm() {
         <form className="space-y-12 relative z-10" onSubmit={handleSubmit}>
           {/* Name Field */}
           <div className="relative">
-            <label className="block text-slate-400 font-serif-elegant font-bold text-lg mb-1" htmlFor="name">
+            <label className="block text-slate-400 font-serif-elegant font-semibold md:font-bold text-[15px] md:text-lg mb-1" htmlFor="name">
               Name
             </label>
             <input
-              className="w-full bg-transparent border-0 border-b border-transparent focus:ring-0 focus:border-primary font-handwritten text-2xl text-slate-800 p-0 placeholder-slate-200 transition-colors"
+              className="w-full bg-transparent border-0 border-b border-transparent focus:ring-0 focus:border-primary font-handwritten md:text-2xl text-slate-800 p-0 placeholder-slate-200 transition-colors"
               id="name"
               placeholder="Your name here..."
               type="text"
@@ -53,11 +53,11 @@ export default function ContactForm() {
 
           {/* Email Field */}
           <div className="relative">
-            <label className="block text-slate-400 font-serif-elegant font-bold text-lg mb-1" htmlFor="email">
+            <label className="block text-slate-400 font-serif-elegant font-semibold md:font-bold text-[15px] md:text-lg mb-1" htmlFor="email">
               Email Address
             </label>
             <input
-              className="w-full bg-transparent border-0 border-b border-transparent focus:ring-0 focus:border-primary font-handwritten text-2xl text-slate-800 p-0 placeholder-slate-200 transition-colors"
+              className="w-full bg-transparent border-0 border-b border-transparent focus:ring-0 focus:border-primary font-handwritten md:text-2xl text-slate-800 p-0 placeholder-slate-200 transition-colors"
               id="email"
               placeholder="email@example.com"
               type="email"
@@ -72,11 +72,11 @@ export default function ContactForm() {
 
           {/* Message Field */}
           <div className="relative">
-            <label className="block text-slate-400 font-serif-elegant font-bold text-lg mb-1" htmlFor="message">
+            <label className="block text-slate-400 font-serif-elegant font-semibold md:font-bold text-[15px] md:text-lg mb-1" htmlFor="message">
               Message
             </label>
             <textarea
-              className="w-full bg-transparent border-0 border-b border-transparent focus:ring-0 focus:border-primary font-handwritten text-2xl text-slate-800 p-0 placeholder-slate-200 resize-none transition-colors"
+              className="w-full bg-transparent border-0 border-b border-transparent focus:ring-0 focus:border-primary font-handwritten md:text-2xl text-slate-800 p-0 placeholder-slate-200 resize-none transition-colors"
               id="message"
               placeholder="What's on your mind?"
               rows="4"
@@ -92,7 +92,7 @@ export default function ContactForm() {
           {/* Submit Button with Arrow */}
           <div className="pt-8 flex items-center gap-8">
             <button
-              className="bg-primary hover:bg-primary/90 text-white font-bold py-5 px-12 rounded-lg text-xl paper-shadow transition-all hover:-translate-y-1 active:scale-95 flex items-center gap-3"
+              className="bg-primary hover:bg-primary/90 text-white font-medium md:font-bold py-2.5 px-6 md:py-5 md:px-12 rounded-md md:rounded-lg text-[15px] md:text-xl paper-shadow transition-all hover:-translate-y-1 active:scale-95 flex items-center gap-3"
               type="submit"
             >
               Send Message

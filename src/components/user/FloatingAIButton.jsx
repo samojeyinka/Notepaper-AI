@@ -269,8 +269,8 @@ export const FloatingAIButton = ({ exclude = [], folderId = null }) => {
                                     opacity-0 group-hover:opacity-100
                                     translate-x-2 group-hover:translate-x-0
                                     transition-all duration-200
-                                    text-[12px] font-semibold text-white
-                                    px-3 py-1.5 rounded-xl whitespace-nowrap
+                                    text-[10px] md:text-[12px] font-normal md:font-semibold text-white
+                                    px-1.5 md:px-3 py-1 md:py-1.5 rounded-md md:rounded-xl whitespace-nowrap
                                     shadow-lg select-none pointer-events-none
                                 " style={{ background: item.color }}>
                                     {item.label}
@@ -278,7 +278,7 @@ export const FloatingAIButton = ({ exclude = [], folderId = null }) => {
 
                                 {/* Icon circle */}
                                 <div
-                                    className="w-12 h-12 rounded-2xl flex items-center justify-center text-white
+                                    className="w-8 md:w-12 h-8 md:h-12 rounded-xl md:rounded-2xl flex items-center justify-center text-white
                                         transition-all duration-200
                                         hover:scale-110 active:scale-95
                                         shadow-lg group-hover:shadow-xl"
@@ -287,7 +287,7 @@ export const FloatingAIButton = ({ exclude = [], folderId = null }) => {
                                         boxShadow: `0 4px 18px ${item.shadow}`,
                                     }}
                                 >
-                                    <span className={`material-icons-round text-[22px] ${item.loading ? 'animate-spin' : 'group-hover:scale-110 transition-transform duration-200'}`}>
+                                    <span className={`material-icons-round text-[15px] md:text-[22px] ${item.loading ? 'animate-spin' : 'group-hover:scale-110 transition-transform duration-200'}`}>
                                         {item.loading ? 'sync' : item.icon}
                                     </span>
                                 </div>
@@ -300,7 +300,7 @@ export const FloatingAIButton = ({ exclude = [], folderId = null }) => {
                 <button
                     onClick={() => setMenuOpen(v => !v)}
                     title={menuOpen ? 'Close' : 'Create new…'}
-                    className={`w-14 h-14 rounded-2xl flex items-center justify-center text-white shadow-2xl active:scale-95 ${!menuOpen ? 'fab-pulse' : ''}`}
+                    className={`w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl flex items-center justify-center text-white shadow-2xl active:scale-95 ${!menuOpen ? 'fab-pulse' : ''}`}
                     style={{
                         background: menuOpen
                             ? 'linear-gradient(135deg,#1e293b,#334155)'
@@ -310,7 +310,7 @@ export const FloatingAIButton = ({ exclude = [], folderId = null }) => {
                         boxShadow: menuOpen ? '0 8px 32px rgba(30,41,59,0.4)' : '0 8px 32px rgba(139,92,246,0.45)',
                     }}
                 >
-                    <span className="material-icons-round text-[26px]">add</span>
+                    <span className="material-icons-round text-[18px] md:text-[26px]">add</span>
                 </button>
             </div>
 
