@@ -35,7 +35,7 @@ export const TheCraft = () => {
           </div>
           <h2 className="text-3xl md:text-5xl font-serif-elegant font-semibold md:font-bold">The Craft</h2>
           <p className="text-[13px] md:text-lg text-slate-600 leading-relaxed">
-            Building the AI wasn't just about math. It was about studying the physics of a fountain pen, the texture of heavy-stock paper, and the psychology of memory. We spent years perfecting an engine that doesn't just recognize text, but understands the <span className="italic text-purple-500">emotion</span> of handwriting.
+            Building the AI wasn't just about math. It was about studying the work of art of a fountain pen, the texture of heavy-stock paper, and the psychology of memory. We spent years perfecting an engine that doesn't just recognize text, but understands the <span className="italic text-purple-500">emotion</span> of handwriting.
           </p>
         </div>
       </div>

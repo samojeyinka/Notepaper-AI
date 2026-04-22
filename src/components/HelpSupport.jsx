@@ -8,27 +8,7 @@ export const HelpHeader = () => {
   return (
     <header className="max-w-6xl mx-auto text-center mb-10">
       <h1 className="text-xl md:text-4xl font-serif font-bold text-slate-900 mb-8">How can we help you?</h1>
-      <div className="relative max-w-2xl mx-auto group">
-        <div className="absolute inset-0 bg-slate-200 translate-x-1 translate-y-1 rounded-xl -z-10"></div>
-        <div className="relative flex items-center bg-white border-2 border-slate-900 rounded-2xl px-1.5 md:px-3 py-1 md:py-2 shadow-sm group-hover:-translate-y-1 group-hover:-translate-x-1 transition-all">
-          <span className="material-symbols-outlined text-3xl text-slate-400 mr-4" style={{ fontVariationSettings: "'wght' 200" }}>
-            search
-          </span>
-          <input
-            type="text"
-            className="w-full bg-transparent border-none focus:ring-0 text-[13px] md:text-[16px] font-normal placeholder:text-slate-300 placeholder:italic"
-            placeholder="Search through the archives..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          <div className="absolute -right-4 -top-8 rotate-12 hidden md:block">
-            <span className="font-handwriting text-primary text-lg">Looking for something?</span>
-            <svg className="w-10 h-10 text-primary -scale-x-100 -rotate-45" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path d="M19 14l-7 7m0 0l-7-7m7 7V3" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5"></path>
-            </svg>
-          </div>
-        </div>
-      </div>
+      
     </header>
   );
 };
