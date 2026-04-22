@@ -1,23 +1,23 @@
 export const GoldenRule = () => {
   return (
     <section className="relative">
-      <div className="bg-white p-12 lg:p-20 paper-shadow paper-edge -rotate-1 relative overflow-hidden">
+      <div className="bg-white p-6 md:p-12 lg:p-20 paper-shadow paper-edge -rotate-1 relative overflow-hidden">
         {/* Washi Tape */}
         <div className="washi-tape top-4 left-1/2 -translate-x-1/2"></div>
 
         <div className="flex flex-col md:flex-row items-center gap-12 relative z-10">
           {/* Left Content */}
-          <div className="flex-1 space-y-6">
-            <h2 className="text-4xl lg:text-5xl font-serif-elegant font-extrabold text-slate-900">
+          <div className="flex-1 space-y-4 md:space-y-6">
+            <h2 className="text-2xl md:text-4xl lg:text-5xl font-serif-elegant font-extrabold text-slate-900">
               The Golden Rule: <br />
               <span className="text-purple-500 italic">Your data is yours.</span>
             </h2>
-            <p className="text-lg text-slate-600 leading-relaxed">
+            <p className="text-[14px] md:text-lg text-slate-600 leading-relaxed">
               We believe that your thoughts, sketches, and notes are an extension of your mind. We don't own them, we don't lease them, and we certainly don't sell them. We are merely the stewards of your digital ink.
             </p>
             <div className="flex gap-4">
-              <div className="stamp-top-secret font-sketch text-xl">Top Secret</div>
-              <div className="flex items-center gap-2 text-purple-500 font-handwritten text-lg">
+              <div className="stamp-top-secret font-sketch text-[14px] md:text-xl">Top Secret</div>
+              <div className="flex items-center gap-2 text-purple-500 font-handwritten text-[14px] md:text-lg">
                 <span className="material-symbols-outlined">verified_user</span>
                 End-to-end respect
               </div>

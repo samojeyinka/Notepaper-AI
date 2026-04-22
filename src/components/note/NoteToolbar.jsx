@@ -19,7 +19,7 @@ const Popover = ({ anchorRef, children }) => {
 
   return createPortal(
     <div
-      className="toolbar-popover bg-white border border-slate-100 rounded-2xl shadow-2xl animate-in slide-in-from-left-2 duration-150"
+      className="toolbar-popover bg-white border border-slate-100 rounded-md md:rounded-2xl shadow-2xl animate-in slide-in-from-left-2 duration-150"
       style={{ position: 'fixed', top, left, zIndex: 9999, minWidth: '240px', maxHeight: `${POPOVER_MAX_HEIGHT}px`, overflowY: 'auto' }}
       onMouseDown={(e) => e.preventDefault()}
     >
@@ -39,19 +39,19 @@ const ToolbarButton = ({ icon, action, active, disabled, title, onClick, onActio
         else if (onAction) onAction(action);
       }
     }}
-    className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all active:scale-90
+    className={`w-7 h-7 md:w-10 md:h-10 rounded-md md:rounded-xl flex items-center justify-center transition-all active:scale-90
       ${active ? 'bg-primary text-white shadow-lg shadow-primary/30' : 'bg-slate-100/50 text-slate-600 hover:bg-slate-200'}
       ${disabled ? 'opacity-40 cursor-not-allowed' : ''}`}
     title={title}
   >
-    <span className="material-icons-round text-[20px]">{icon}</span>
+    <span className="material-icons-round text-[13px] md:text-[20px]">{icon}</span>
   </button>
 );
 
 const UrlInputPopover = ({ anchorRef, url, onUrlChange, onInsert, onCancel }) => (
   <Popover anchorRef={anchorRef}>
-    <div className="p-4 flex flex-col gap-3">
-      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Insert Link</p>
+    <div className="p-2 md:p-4 flex flex-col gap-3">
+      <p className="text-[10px] font-medium md:font-bold text-slate-400 uppercase tracking-widest">Insert Link</p>
       <input
         type="text"
         placeholder="Paste URL here..."
@@ -62,18 +62,18 @@ const UrlInputPopover = ({ anchorRef, url, onUrlChange, onInsert, onCancel }) =>
           if (e.key === 'Enter') { e.preventDefault(); onInsert(); }
           if (e.key === 'Escape') { e.preventDefault(); onCancel(); }
         }}
-        className="w-full bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 text-xs text-slate-700 outline-none focus:border-primary"
+        className="w-full bg-slate-50 border border-slate-100 rounded-md md:rounded-xl px-1.5 py-1 md:px-3 md:py-2 text-[9px] md:text-xs text-slate-700 outline-none focus:border-primary"
       />
       <div className="flex gap-2">
         <button
           onMouseDown={(e) => { e.preventDefault(); onInsert(); }}
-          className="flex-1 bg-primary text-white py-2 rounded-xl text-[11px] font-bold"
+          className="flex-1 bg-primary text-white py-1 md:py-2 rounded-md md:rounded-xl text-[9.5px] md:text-[11px] font-medium md:font-bold"
         >
           Insert
         </button>
         <button
           onMouseDown={(e) => { e.preventDefault(); onCancel(); }}
-          className="bg-slate-100 text-slate-500 px-3 py-2 rounded-xl text-[11px] font-bold"
+          className="bg-slate-100 text-slate-500 px-1 py-1 md:py-2 rounded-md md:rounded-xl text-[9.5px] md:text-[11px] font-medium md:font-bold"
         >
           Cancel
         </button>
@@ -89,7 +89,7 @@ const FontSizePopover = ({ anchorRef, options, onSelect }) => (
         <button
           key={opt.value}
           onMouseDown={(e) => { e.preventDefault(); onSelect(opt.value); }}
-          className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold uppercase transition-colors text-slate-600 hover:bg-slate-50"
+          className="flex items-center justify-between px-1.5 py-1 md:px-3 md:py-2 rounded-xl text-[10px] md:text-xs font-medium md:font-bold uppercase transition-colors text-slate-600 hover:bg-slate-50"
         >
           {opt.label}
           <span
@@ -104,7 +104,7 @@ const FontSizePopover = ({ anchorRef, options, onSelect }) => (
   </Popover>
 );
 
-const AdvancedColorPicker = ({ anchorRef, color, onChange, onClose, title, recentColors, onAddRecentColor }) => {
+const AdvancedColorPicker = ({ anchorRef, color, onChange, onClose, title, recentColors, onAddRecentColor, showNone, onNone }) => {
   const [localColor, setLocalColor] = useState(color || "#000000");
 
   useEffect(() => {
@@ -114,7 +114,23 @@ const AdvancedColorPicker = ({ anchorRef, color, onChange, onClose, title, recen
   return (
     <Popover anchorRef={anchorRef}>
       <div className="p-4 flex flex-col gap-4 w-64">
-        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{title}</p>
+        <div className="flex items-center justify-between">
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{title}</p>
+          {showNone && (
+            <button
+              onMouseDown={(e) => {
+                e.preventDefault();
+                onNone?.();
+                onClose();
+              }}
+              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-red-50 hover:text-red-500 text-slate-500 text-[10px] font-bold transition-colors"
+              title="Remove background color"
+            >
+              <span className="material-icons-round text-[12px]">format_color_reset</span>
+              None
+            </button>
+          )}
+        </div>
 
         <div className="custom-toolbar-picker" onMouseDown={(e) => e.stopPropagation()}>
           <HexColorPicker
@@ -177,7 +193,7 @@ const DrawPopover = ({ anchorRef, drawMode, onAction }) => {
           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Draw Mode</p>
           <button
             onMouseDown={(e) => { e.preventDefault(); onAction('drawToggle'); }}
-            className={`px-3 py-1 rounded-lg text-[11px] font-bold transition-colors ${
+            className={`px-3 py-1 rounded-lg text-[11px] font-medium md:font-bold transition-colors ${
               drawMode?.active ? 'bg-primary text-white' : 'bg-slate-100 text-slate-500'
             }`}
           >
@@ -189,19 +205,19 @@ const DrawPopover = ({ anchorRef, drawMode, onAction }) => {
         <div className="flex gap-2">
           <button
             onMouseDown={(e) => { e.preventDefault(); onAction('drawEraser', false); }}
-            className={`flex-1 flex items-center justify-center gap-1 py-2 rounded-xl text-[11px] font-bold transition-colors ${
+            className={`flex-1 flex items-center justify-center gap-1 py-1 md:py-2 rounded-md md:rounded-xl text-[10px] md:text-[11px] font-medium md:font-bold transition-colors ${
               !drawMode?.eraser ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-500'
             }`}
           >
-            <span className="material-icons-round text-[14px]">edit</span> Pen
+            <span className="material-icons-round text-[11px] md:text-[14px]">edit</span> Pen
           </button>
           <button
             onMouseDown={(e) => { e.preventDefault(); onAction('drawEraser', true); }}
-            className={`flex-1 flex items-center justify-center gap-1 py-2 rounded-xl text-[11px] font-bold transition-colors ${
+            className={`flex-1 flex items-center justify-center gap-1 py-1 md:py-2 rounded-md md:rounded-xl text-[10px] md:text-[11px] font-medium md:font-bold transition-colors ${
               drawMode?.eraser ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-500'
             }`}
           >
-            <span className="material-icons-round text-[14px]">auto_fix_normal</span> Eraser
+            <span className="material-icons-round text-[11px] md:text-[14px]">auto_fix_normal</span> Eraser
           </button>
         </div>
 
@@ -261,7 +277,7 @@ const DrawPopover = ({ anchorRef, drawMode, onAction }) => {
   );
 };
 
-export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRecentColor, onImageUpload }) => {
+export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRecentColor, onImageUpload, onOpenShakespeare, onOpenYouTube }) => {
   const [showTextColor, setShowTextColor] = useState(false);
   const [showHighlight, setShowHighlight] = useState(false);
   const [showFontSize, setShowFontSize] = useState(false);
@@ -377,9 +393,20 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
       {/* Sidebar is now properly scrollable — popovers escape via portals */}
       <aside
         ref={toolbarRef}
-        className="w-16 border-r border-slate-200 bg-white flex flex-col items-center py-6 gap-5 shrink-0 select-none overflow-y-auto custom-scrollbar"
-        style={{ position: 'relative', zIndex: 100 }}
+        className="w-10 md:w-16 border-r border-slate-200 bg-white flex flex-col items-center py-6 gap-5 shrink-0 select-none overflow-y-auto custom-scrollbar"
+        style={{ position: 'relative', zIndex: 10 }}
       >
+        {/* 0. Shakespeare AI */}
+        <button
+          onMouseDown={(e) => { e.preventDefault(); onOpenShakespeare?.(); }}
+          title="Shakespeare Assist — AI writing"
+          className="w-8 h-8 md:w-10 md:h-10 rounded-xl flex items-center justify-center text-black hover:opacity-90 active:scale-90 transition-all"
+        >
+          <span className="material-icons-round text-[14px] md:text-[18px]">auto_fix_high</span>
+        </button>
+
+        <div className="h-px w-8 bg-slate-100 shrink-0" />
+
         {/* 1. Basic Formatting */}
         <div className="flex flex-col gap-2">
           <ToolbarButton icon="format_bold" action="bold" active={activeState?.bold} title="Bold" onAction={onAction} />
@@ -440,11 +467,11 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
                 setShowHighlight(false);
                 setShowUrlInput(false);
               }}
-              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all
+              className={`w-7 h-7 md:w-10 md:h-10 rounded-md md:rounded-xl flex items-center justify-center transition-all
                 ${showFontSize ? 'bg-slate-900 text-white shadow-lg' : 'bg-slate-100/50 text-slate-600 hover:bg-slate-200'}`}
               title="Text Size"
             >
-              <span className="material-icons-round text-[22px]">text_fields</span>
+              <span className="material-icons-round text-[18px] md:text-[22px]">text_fields</span>
             </button>
           </div>
           {showFontSize && (
@@ -477,10 +504,10 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
                 setShowFontSize(false);
                 setShowUrlInput(false);
               }}
-              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${showTextColor ? 'bg-slate-900 text-white' : 'bg-slate-100/50 text-slate-600 hover:bg-slate-200'}`}
+              className={`w-7 h-7 md:w-10 md:h-10 rounded-md md:rounded-xl flex items-center justify-center transition-all ${showTextColor ? 'bg-slate-900 text-white' : 'bg-slate-100/50 text-slate-600 hover:bg-slate-200'}`}
               title="Text Color"
             >
-              <span className="material-icons-round text-[22px]">format_color_text</span>
+              <span className="material-icons-round text-[13px] md:text-[22px]">format_color_text</span>
             </button>
           </div>
           {showTextColor && (
@@ -504,21 +531,28 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
                 setShowFontSize(false);
                 setShowUrlInput(false);
               }}
-              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${showHighlight ? 'bg-slate-900 text-white' : 'bg-slate-100/50 text-slate-600 hover:bg-slate-200'}`}
+              className={`w-7 h-7 md:w-10 md:h-10 rounded-md md:rounded-xl flex items-center justify-center transition-all ${showHighlight ? 'bg-slate-900 text-white' : 'bg-slate-100/50 text-slate-600 hover:bg-slate-200'}`}
               title="Highlight"
             >
-              <span className="material-icons-round text-[22px]">draw</span>
+              <span className="material-icons-round text-[13px] md:text-[22px]">draw</span>
             </button>
           </div>
           {showHighlight && (
             <AdvancedColorPicker
               anchorRef={highlightBtnRef}
-              color={activeState?.hiliteColor || "transparent"}
-              title="Highlight"
+              color={activeState?.hiliteColor || "#ffffff"}
+              title="Text Background"
               onClose={() => setShowHighlight(false)}
               onChange={(color) => onAction('hiliteColor', color)}
               recentColors={recentColors}
               onAddRecentColor={onAddRecentColor}
+              showNone
+              onNone={() => {
+                // removeFormat only removes colour if we target backColor specifically
+                document.execCommand('styleWithCSS', false, true);
+                document.execCommand('hiliteColor', false, 'transparent');
+                onAction('hiliteColor', 'transparent');
+              }}
             />
           )}
         </div>
@@ -527,6 +561,13 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
 
         {/* 7. Special Tools */}
         <div className="flex flex-col gap-2.5">
+          <button
+            onMouseDown={(e) => { e.preventDefault(); onOpenYouTube?.(); }}
+            title="Web to Text — extract from any article or blog URL"
+            className="w-7 h-7 md:w-10 md:h-10 rounded-md md:rounded-xl flex items-center justify-center bg-slate-100/50 text-slate-600 hover:bg-slate-200 active:scale-90 transition-all"
+          >
+            <span className="material-icons-round text-[16px] md:text-[20px]">article</span>
+          </button>
           {/* Hidden file input */}
           <input
             ref={fileInputRef}
@@ -541,9 +582,9 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
               try {
                 const data = new FormData();
                 data.append('file', file);
-                data.append('upload_preset', 'foogles');
-                data.append('cloud_name', 'djstk2ukm');
-                const res = await fetch('https://api.cloudinary.com/v1_1/djstk2ukm/image/upload', {
+                data.append('upload_preset', import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET);
+                data.append('cloud_name', import.meta.env.VITE_CLOUDINARY_CLOUD_NAME);
+                const res = await fetch(`https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/image/upload`, {
                   method: 'POST', body: data,
                 });
                 const json = await res.json();
@@ -555,6 +596,7 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
               }
             }}
           />
+
           <button
             onMouseDown={(e) => {
               e.preventDefault();
@@ -562,11 +604,11 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
               fileInputRef.current?.click();
             }}
             disabled={isUploading}
-            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all
+            className={`w-7 h-7 md:w-10 md:h-10 rounded-md md:rounded-xl flex items-center justify-center transition-all
               ${isUploading ? 'bg-primary/20 text-primary animate-pulse' : 'bg-slate-100/50 text-slate-600 hover:bg-slate-200'}`}
             title="Insert Image"
           >
-            <span className="material-icons-round text-[20px]">{isUploading ? 'hourglass_top' : 'image'}</span>
+            <span className="material-icons-round text-[13px] md:text-[20px]">{isUploading ? 'hourglass_top' : 'image'}</span>
           </button>
           <div ref={drawBtnRef}>
             <button
@@ -578,12 +620,12 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
                 setShowFontSize(false);
                 setShowUrlInput(false);
               }}
-              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all
+              className={`w-7 h-7 md:w-10 md:h-10 rounded-md md:rounded-xl flex items-center justify-center transition-all
                 ${activeState?.drawMode?.active ? 'bg-primary text-white shadow-lg shadow-primary/30' : 'bg-slate-100/50 text-slate-600 hover:bg-slate-200'}
                 ${showDraw ? 'ring-2 ring-primary ring-offset-1' : ''}`}
               title="Draw"
             >
-              <span className="material-icons-round text-[20px]">gesture</span>
+              <span className="material-icons-round text-[13px] md:text-[20px]">gesture</span>
             </button>
           </div>
           {showDraw && (

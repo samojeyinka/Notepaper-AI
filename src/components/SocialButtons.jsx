@@ -8,20 +8,20 @@ export const SocialButton = () => {
     };
 
     return (
-        <div className="grid grid-cols-2 gap-4 mb-8">
+        <div className="grid grid-cols-2 gap-2 md:gap-4 mb-4 md:mb-8">
             <button 
                 onClick={() => handleSocialLogin('google')}
-                className="flex items-center justify-center gap-2 px-4 py-3 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors duration-200 shadow-sm"
+                className="flex items-center justify-center gap-2 px-2 md:px-4 py-1.5 md:py-3 border border-slate-200 rounded-lg md:rounded-xl hover:bg-slate-50 transition-colors duration-200 shadow-sm"
             >
-                <BsGoogle className="text-xl text-red-500" />
-                <span className="text-sm font-semibold text-slate-700">Google</span>
+                <BsGoogle className="text-[13px] md:text-xl text-red-500" />
+                <span className="text-[12px] md:text-sm font-medium md:font-semibold text-slate-700">Google</span>
             </button>
             <button 
                 onClick={() => handleSocialLogin('github')}
-                className="flex items-center justify-center gap-2 px-4 py-3 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors duration-200 shadow-sm"
+                className="flex items-center justify-center gap-2 px-2 md:px-4 py-1.5 md:py-3 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors duration-200 shadow-sm"
             >
-                <BsGithub className="text-xl text-slate-900" />
-                <span className="text-sm font-semibold text-slate-700">GitHub</span>
+                <BsGithub className="text-[13px] md:text-xl text-slate-900" />
+                <span className="text-[12px] md:text-sm font-medium md:font-semibold text-slate-700">GitHub</span>
             </button>
         </div>
     );

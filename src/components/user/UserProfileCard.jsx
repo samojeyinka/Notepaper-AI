@@ -57,7 +57,7 @@ export const UserProfileCard = () => {
         <div className='flex items-center justify-between w-full'>
         <div className="text-left min-w-0">
           <p className="text-[12px] font-medium truncate">{user.full_name}</p>
-          <p className="text-[10px] text-slate-500 capitalize">{user.plan || 'Free Member'}</p>
+          <p className="text-[10px] text-slate-500 capitalize">{user.plan || 'Free Plan'}</p>
         </div>
         <span className={`material-icons-round text-slate-400 transition-transform ${isMenuOpen ? 'rotate-180' : ''}`}>
           expand_more

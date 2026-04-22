@@ -33,7 +33,7 @@ export default function Header() {
               <Link
               key={link.label}
                 to={`/${link.href}`}
-                className="text-ink-black hover:text-primary transition-colors"
+                className="text-ink-black hover:text-primary transition-colors text-[13px] lg:text-[16px]"
               >
                 {link.label}
               </Link>
@@ -44,22 +44,22 @@ export default function Header() {
           <div className="flex items-center gap-4">
             {isAuthenticated ? (
               <>
-                <Link to={'/lockedin'} className="hidden sm:block font-semibold px-6 py-2 rounded-full border border-slate-300 hover:bg-slate-50 transition-all text-ink-black">
+                <Link to={'/lockedin'} className="text-[14px] md:text-[16px] sm:block lg:font-semibold px-6 py-2 rounded-full border border-slate-300 hover:bg-slate-50 transition-all text-ink-black">
                   Dashboard
                 </Link>
                 <button 
                   onClick={logout} 
-                  className="hand-drawn-border bg-white px-8 py-2 font-bold hover:scale-105 transition-transform text-ink-black"
+                  className="hidden text-[14px] md:text-[16px] hand-drawn-border bg-white px-8 py-2 font-bold hover:scale-105 transition-transform text-ink-black"
                 >
                   Log out
                 </button>
               </>
             ) : (
               <>
-                <Link to={'/signin'} className="hidden sm:block font-semibold px-6 py-2 rounded-full border border-slate-300 hover:bg-slate-50 transition-all text-ink-black">
+                <Link to={'/signin'} className="hidden text-[12px] lg:text-[16px] sm:block md:font-medium lg:font-semibold px-1.5 py-1 lg:px-6 lg:py-2 rounded-full border border-slate-300 hover:bg-slate-50 transition-all text-ink-black">
                   Log in
                 </Link>
-                <Link to={'/signup'} className="hand-drawn-border bg-white px-8 py-2 font-bold hover:scale-105 transition-transform text-ink-black">
+                <Link to={'/signup'} className="hand-drawn-border text-[12px] lg:text-[16px] bg-white px-2 py-1 lg:px-8 lg:py-2 font-medium md:font-bold hover:scale-105 transition-transform text-ink-black">
                   Get Started
                 </Link>
               </>
@@ -80,63 +80,70 @@ export default function Header() {
         </div>
 
         {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden fixed inset-0 top-20 z-40 bg-paper/95 backdrop-blur-lg border-t border-slate-200/50">
-            <div className="max-w-7xl mx-auto px-6 py-8 bg-paper-cream">
-              <nav className="flex flex-col gap-2 mb-8">
-                {navLinks.map((link) => (
+        <div className={`md:hidden fixed inset-0 top-20 z-40 bg-paper/95 backdrop-blur-lg border-t border-slate-200/50 transition-all duration-300 ease-out ${
+          mobileMenuOpen
+            ? 'opacity-100 pointer-events-auto translate-y-0'
+            : 'opacity-0 pointer-events-none -translate-y-3'
+        }`}>
+          <div className="max-w-7xl mx-auto px-6 py-4 bg-paper-cream">
+            <nav className="flex flex-col gap-2 mb-8">
+              {navLinks.map((link, i) => (
+                <Link
+                  key={link.label}
+                  to={`/${link.href}`}
+                  className={`text-[14px] font-normal text-ink-black hover:text-primary py-1.5 px-2 rounded-md hover:bg-slate-50 transition-all duration-300 ${
+                    mobileMenuOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
+                  }`}
+                  style={{ transitionDelay: mobileMenuOpen ? `${i * 60 + 60}ms` : '0ms' }}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+
+            <div className="border-t border-slate-200/50 my-2"></div>
+
+            <div className={`flex flex-col gap-3 transition-all duration-300 ${
+              mobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+            }`} style={{ transitionDelay: mobileMenuOpen ? '320ms' : '0ms' }}>
+              {isAuthenticated ? (
+                <>
                   <Link
-                  
-                    to={link.href}
-                    className="text-lg font-semibold text-ink-black hover:text-primary py-3 px-4 rounded-lg hover:bg-slate-50"
+                    to={'/lockedin'}
                     onClick={() => setMobileMenuOpen(false)}
+                    className="w-full py-1.5 text-center text-[12px] font-normal text-ink-black hover:bg-slate-50 rounded-lg border border-slate-300"
                   >
-                    {link.label}
+                    Dashboard
                   </Link>
-                ))}
-              </nav>
-
-              <div className="border-t border-slate-200/50 my-4"></div>
-
-              <div className="flex flex-col gap-3">
-                {isAuthenticated ? (
-                  <>
-                    <Link 
-                      to={'/lockedin'} 
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="w-full py-3 text-center text-sm font-semibold text-ink-black hover:bg-slate-50 rounded-lg border border-slate-300"
-                    >
-                      Dashboard
-                    </Link>
-                    <button 
-                      onClick={() => { logout(); setMobileMenuOpen(false); }}
-                      className="w-full py-3 hand-drawn-border bg-white font-bold text-ink-black hover:scale-105"
-                    >
-                      Log out
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <Link 
-                      to={'/signin'} 
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="w-full py-3 text-center text-sm font-semibold text-ink-black hover:bg-slate-50 rounded-lg border border-slate-300"
-                    >
-                      Log in
-                    </Link>
-                    <Link 
-                      to={'/signup'} 
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="w-full py-3 text-center hand-drawn-border bg-white font-bold text-ink-black hover:scale-105"
-                    >
-                      Get Started
-                    </Link>
-                  </>
-                )}
-              </div>
+                  <button
+                    onClick={() => { logout(); setMobileMenuOpen(false); }}
+                    className="w-full py-1.5 hand-drawn-border bg-white font-medium text-ink-black hover:scale-105"
+                  >
+                    Log out 
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to={'/signin'}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full py-1.5 text-center text-[12px] font-normal text-ink-black hover:bg-slate-50 rounded-lg border border-slate-300"
+                  >
+                    Log in
+                  </Link>
+                  <Link
+                    to={'/signup'}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full py-1.5 text-center text-[14px] hand-drawn-border bg-white font-semibold text-ink-black hover:scale-105"
+                  >
+                    Get Started
+                  </Link>
+                </>
+              )}
             </div>
           </div>
-        )}
+        </div>
       </nav>
       <div className="h-20"></div>
     </>

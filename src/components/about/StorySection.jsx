@@ -2,18 +2,18 @@ import React from 'react';
 
 export default function StorySection() {
   return (
-    <section className="py-20 relative">
-      <div className="max-w-4xl mx-auto px-6 space-y-40">
+    <section className="py-10 md:py-20 relative">
+      <div className="max-w-4xl mx-auto px-6 space-y-12 md:space-y-40">
         {/* Story 1: The Human Touch */}
         <div className="flex flex-col md:flex-row items-center gap-12 relative">
           <div className="w-full md:w-1/2">
-            <div className="organic-card-1 bg-accent-yellow p-12 paper-shadow text-white relative">
+            <div className="organic-card-1 bg-accent-yellow p-6 md:p-12 paper-shadow text-white relative">
               <div className="washi-tape -top-4 right-10 bg-white/30"></div>
-              <h2 className="text-4xl font-serif-elegant font-extrabold mb-6">The Human Touch</h2>
-              <p className="text-lg opacity-90 leading-relaxed mb-4 font-medium">
+              <h2 className="text-2xl md:text-4xl font-serif-elegant font-extrabold mb-6">The Human Touch</h2>
+              <p className="text-[15px] md:text-lg opacity-90 leading-relaxed mb-4 font-normal md:font-medium">
                 We believe that technology should adapt to humans, not the other way around. Our journey started in a small stationery shop in San Francisco, watching people interact with real tactile journals.
               </p>
-              <div className="font-sketch text-xl border-t border-white/20 pt-4 mt-4">
+              <div className="font-sketch text-[14px] md:text-xl border-t border-white/20 pt-4 mt-4">
                 Analog souls, digital minds.
               </div>
             </div>
@@ -34,12 +34,12 @@ export default function StorySection() {
         {/* Story 2: The Intelligence Behind the Ink */}
         <div className="flex flex-col md:flex-row-reverse items-center gap-12 relative">
           <div className="w-full md:w-1/2">
-            <div className="organic-card-2 bg-accent-green p-12 paper-shadow text-white relative">
+            <div className="organic-card-2 bg-accent-green p-10 md:p-12 paper-shadow text-white relative">
               <div className="washi-tape-vert -left-4 top-10 bg-white/20 -rotate-12"></div>
-              <h2 className="text-4xl font-serif-elegant font-extrabold mb-6">
+              <h2 className="text-2xl md:text-4xl font-serif-elegant font-extrabold mb-6">
                 The Intelligence Behind the Ink
               </h2>
-              <p className="text-lg opacity-90 leading-relaxed mb-4 font-medium">
+              <p className="text-[14px] md:text-lg opacity-90 leading-relaxed mb-4 font-normal md:font-medium">
                 Our AI isn't just about automation; it's about enhancement. We spent thousands of hours training models to understand the nuance of a pen stroke, the hesitation in a line, and the context of a messy sketch.
               </p>
               <div className="bg-white/10 p-4 rounded-xl border border-white/20">
@@ -63,10 +63,10 @@ export default function StorySection() {
         <div className="flex flex-col md:flex-row items-center gap-12 relative bg-primary">
           <div className="w-full md:w-1/2">
             <div className="organic-card-3 bg-accent-purple p-12 paper-shadow text-white relative">
-              <h2 className="text-4xl font-serif-elegant font-extrabold mb-6">
+              <h2 className="text-2xl md:text-4xl font-serif-elegant font-extrabold mb-6">
                 Designed for Thinkers
               </h2>
-              <p className="text-lg opacity-90 leading-relaxed mb-4 font-medium">
+              <p className="text-[15px] md:text-lg opacity-90 leading-relaxed mb-4 font-normal md:font-medium">
                 Notepaper AI is built for the polymaths—the students who draw diagrams in biology class and the executives who sketch product roadmaps during meetings. We build for those who think with their hands.
               </p>
               <div className="flex gap-2 mt-6">

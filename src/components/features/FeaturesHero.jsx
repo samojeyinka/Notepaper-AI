@@ -2,10 +2,10 @@ import React from 'react';
 
 export default function FeaturesHero() {
   return (
-    <div className="pt-4 pb-24 relative z-10">
+    <div className="md:pt-4 pb-12 md:pb-24 relative z-10">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-24 relative">
-          <h1 className="text-6xl lg:text-8xl font-bold font-serif text-slate-900 leading-tight">
+        <div className="text-center mb-12 md:mb-24 relative">
+          <h1 className="text-3xl md:text-6xl lg:text-8xl font-bold font-serif text-slate-900 leading-tight">
             Everything you need <br />
             to{' '}
             <span className="relative">

@@ -9,10 +9,9 @@ export const Sidebar = ({ activePage }) => {
   const navItems = [
     { path: '/lockedin', icon: 'grid_view', label: 'Dashboard' },
     { path: '/lockedin/library', icon: 'folder', label: 'Library' },
-    { path: '/lockedin/assets', icon: 'store', label: 'Assets' },
-    { path: '/lockedin/study-plan', icon: 'event_note', label: 'Study Plan' },
+    // { path: '/lockedin/study-plan', icon: 'event_note', label: 'Study Plan' },
     { path: '/lockedin/support-tickets', icon: 'chat', label: 'Support Tickets' },
-    { path: '/lockedin/application-settings', icon: 'settings', label: 'Settings' }
+    // { path: '/lockedin/application-settings', icon: 'settings', label: 'Settings' }
   ];
 
   return (
@@ -46,7 +45,7 @@ export const Sidebar = ({ activePage }) => {
 
       {/* Sidebar */}
       <aside className={`
-        w-64 bg-background-light flex flex-col fixed h-full z-50 transition-transform duration-300
+        w-64 bg-background-light flex flex-col fixed top-0 left-0 h-full z-50 transition-transform duration-300
         lg:translate-x-0
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>

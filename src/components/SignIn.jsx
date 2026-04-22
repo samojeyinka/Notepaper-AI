@@ -152,9 +152,9 @@ export default function SignIn() {
          
 
           {/* Header */}
-          <header className="mb-10">
-            <h2 className="text-3xl font-bold text-slate-900 mb-2">Welcome Back</h2>
-            <p className="text-slate-500">Continue your creative journey.</p>
+          <header className="mb-5 md:mb-10">
+            <h2 className="text-xl md:text-3xl font-semibold md:font-bold text-slate-900 mb-2">Welcome Back</h2>
+            <p className="text-slate-500 text-[12px] md:text-base">Continue your creative journey.</p>
           </header>
 
           {/* Social Buttons */}
@@ -163,23 +163,23 @@ export default function SignIn() {
           {/* Divider */}
           <div className="relative flex py-5 items-center">
             <div className="flex-grow border-t border-slate-100"></div>
-            <span className="flex-shrink mx-4 text-slate-400 text-xs font-bold uppercase tracking-widest handwritten text-lg">
+            <span className="flex-shrink mx-4 text-slate-400 text-[10px] font-semibold md:font-bold uppercase tracking-widest handwritten md:text-lg">
               or use email
             </span>
             <div className="flex-grow border-t border-slate-100"></div>
           </div>
 
           {/* Form */}
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <form className="space-y-3 md:space-y-6" onSubmit={handleSubmit}>
             {error && <Alert type="error" message={error.message} details={error.details} />}
 
             {/* Email Input */}
             <div className="group">
-              <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-1" htmlFor="email">
+              <label className="block text-[12px] md:text-xs font-medium md:font-bold text-slate-400 uppercase tracking-widest mb-1" htmlFor="email">
                 Email Address
               </label>
               <input
-                className="w-full ruled-input focus:ring-0 text-slate-800 placeholder-slate-300"
+                className="w-full ruled-input focus:ring-0 text-slate-800 placeholder-slate-300  text-[12px] md:text-base"
                 id="email"
                 placeholder="you@example.com"
                 type="email"
@@ -199,16 +199,16 @@ export default function SignIn() {
             {/* Password Input */}
             <div className="group">
               <div className="flex justify-between mb-1">
-                <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest" htmlFor="password">
+                <label className="block text-[12px] md:text-xs font-medium md:font-bold text-slate-400 uppercase tracking-widest" htmlFor="password">
                   Password
                 </label>
-                <Link to={'/forgot-password'} className="text-xs font-semibold text-purple-600 hover:underline handwritten text-base" href="#">
+                <Link to={'/forgot-password'} className="text-xs font-semibold text-purple-600 hover:underline handwritten md:text-base" href="#">
                   Forgot?
                 </Link>
               </div>
               <div className="relative">
                 <input
-                  className="w-full ruled-input focus:ring-0 text-slate-800 placeholder-slate-300"
+                  className="w-full ruled-input focus:ring-0 text-slate-800 placeholder-slate-300 text-[12px] md:text-base"
                   id="password"
                   placeholder="••••••••"
                   type={showPassword ? 'text' : 'password'}
@@ -252,7 +252,7 @@ export default function SignIn() {
             </div>
 
             {/* Submit Button */}
-            <div className="relative pt-4">
+            <div className="relative pt-2 md:pt-4">
               <div className="absolute -top-6 right-0 pointer-events-none hidden md:block">
                 <span className="scribble text-purple-600 text-xl rotate-12 inline-block">Jump back in!</span>
                 <svg className="w-12 h-12 text-purple-600 -rotate-45 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -265,7 +265,7 @@ export default function SignIn() {
                 </svg>
               </div>
               <button
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
+                className="w-full text-[13px] md:text-base bg-purple-600 hover:bg-purple-700 text-white font-medium md:font-bold py-2 md:py-4 rounded-lg md:rounded-xl shadow-lg transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
                 style={{ boxShadow: '0 20px 25px -5px rgba(147, 51, 234, 0.2)' }}
                 type="submit"
                 disabled={loading}
@@ -276,10 +276,10 @@ export default function SignIn() {
           </form>
 
           {/* Footer */}
-          <footer className="mt-8 text-center">
-            <p className="text-slate-500 text-sm">
+          <footer className="mt-4 md:mt-8 text-center">
+            <p className="text-slate-500 text-[12px] md:text-sm">
               Don't have an account?{' '}
-              <Link to={'/signup'} className="text-purple-600 font-medium hover:underline handwritten text-lg ml-1" href="#">
+              <Link to={'/signup'} className="text-purple-600 font-medium hover:underline handwritten text-[13px] md:text-lg ml-1" href="#">
                 Sign up here
               </Link>
             </p>

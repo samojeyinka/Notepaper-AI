@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { authService } from '../api/authService';
 import { userService } from '../api/userService';
+import { workspaceCache } from '../api/workspaceCache';
 
 const AuthContext = createContext(null);
 
@@ -96,18 +97,22 @@ export function AuthProvider({ children }) {
     } finally {
       setUser(null);
       clearSession();
+      workspaceCache.invalidateAll();
     }
   }, []);
 
   // Don't render until we verify session existence prevents flash of login screen 
   if (!isChecked) return null;
 
+  const isAdmin = user?.roles?.some(r => ['admin', 'super_admin'].includes(r?.name ?? r)) ?? false;
+
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, verify2fa, updateUser, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, isAdmin, login, verify2fa, updateUser, logout }}>
       {children}
     </AuthContext.Provider>
   );
 }
+
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {

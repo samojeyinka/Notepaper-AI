@@ -46,7 +46,7 @@ export default function ForgotPassword() {
   };
 
   return (
-    <main className="w-full max-w-6xl mx-auto flex flex-col md:flex-row overflow-hidden bg-white min-h-[85vh] relative">
+    <main className="w-full max-w-6xl mx-auto flex flex-col md:flex-row overflow-hidden bg-white md:min-h-[85vh] relative">
       {toast && (
         <Toast
           type={toast.type}
@@ -92,10 +92,10 @@ export default function ForgotPassword() {
         <div className="max-w-md mx-auto w-full">
           {/* Header */}
           <header className="mb-10">
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">
+            <h2 className="text-xl md:text-2xl font-semibold md:font-bold text-slate-900 mb-2">
               {success ? 'Check your email' : 'Reset your password'}
             </h2>
-            <p className="text-slate-500">
+            <p className="text-slate-500 text-[13px] md:text-base">
               {success 
                 ? `We've sent a recovery link to ${email}. Please check your inbox and spam folder.` 
                 : "Enter your email and we'll send you a link to get back in."}
@@ -104,13 +104,13 @@ export default function ForgotPassword() {
 
           {/* Form */}
           {!success ? (
-            <form className="space-y-8" onSubmit={handleSubmit}>
+            <form className="space-y-4 md:space-y-8" onSubmit={handleSubmit}>
               <div className="group">
-                <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-1" htmlFor="email">
+                <label className="block text-[11px] md:text-xs font-medium md:font-bold text-slate-400 uppercase tracking-widest mb-1" htmlFor="email">
                   Email Address
                 </label>
                 <input
-                  className="w-full ruled-input focus:ring-0 text-slate-800 placeholder-slate-300"
+                  className="w-full ruled-input focus:ring-0 text-slate-800 placeholder-slate-300 text-[12px] md:text-base"
                   id="email"
                   placeholder="you@example.com"
                   type="email"
@@ -120,13 +120,13 @@ export default function ForgotPassword() {
                 />
               </div>
 
-              <div className="relative pt-4">
+              <div className="relative pt-2 md:pt-4">
                 <div className="absolute -top-6 right-2 pointer-events-none">
-                  <span className="scribble text-purple-600 text-xl rotate-12 inline-block">Don't worry!</span>
+                  <span className="scribble text-purple-600 text-[13px] md:text-xl rotate-12 inline-block">Don't worry!</span>
                 </div>
                 <button
                   disabled={loading}
-                  className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full text-[12px] md:text-base bg-purple-600 hover:bg-purple-700 text-white font-medium md:font-bold py-2 md:py-4 rounded-lg md:rounded-xl shadow-lg transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
                   type="submit"
                 >
                   {loading && <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>}
@@ -135,12 +135,12 @@ export default function ForgotPassword() {
               </div>
             </form>
           ) : (
-            <div className="space-y-6">
-              <div className="p-6 bg-purple-50 border border-purple-100 rounded-2xl flex items-center gap-4 animate-in fade-in zoom-in duration-500">
+            <div className="space-y-3 md:space-y-6">
+              <div className="p-3 md:p-6 bg-purple-50 border border-purple-100 rounded-2xl flex items-center gap-4 animate-in fade-in zoom-in duration-500">
                 <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-purple-600 shadow-sm">
                   <span className="material-symbols-outlined">mark_email_read</span>
                 </div>
-                <p className="text-purple-900 font-medium text-sm leading-relaxed">
+                <p className="text-purple-900 font-normal md:font-medium text-[12px] md:text-sm leading-relaxed">
                   Link sent! If you don't receive it within a few minutes, you can request another one.
                 </p>
               </div>
@@ -148,7 +148,7 @@ export default function ForgotPassword() {
               <button
                 onClick={handleSubmit}
                 disabled={loading || resendTimer > 0}
-                className="w-full py-4 border-2 border-purple-100 rounded-xl font-bold transition-all flex items-center justify-center gap-3 active:scale-[0.98] disabled:opacity-50"
+                className="w-full py-4 border-2 border-purple-100 text-[13px] md:text-base rounded-xl font-medium md:font-bold transition-all flex items-center justify-center gap-3 active:scale-[0.98] disabled:opacity-50"
               >
                 {loading ? (
                   <span className="w-5 h-5 border-2 border-purple-600/30 border-t-purple-600 rounded-full animate-spin"></span>
@@ -163,15 +163,15 @@ export default function ForgotPassword() {
           )}
 
           {/* Footer */}
-          <footer className="mt-12 text-center">
+          <footer className="mt-6 md:mt-12 text-center">
             <Link 
-              className="text-slate-500 font-medium hover:text-purple-600 transition-colors flex items-center justify-center gap-2 group"
+              className="text-slate-500 text-[12px] md:text-base md:font-medium hover:text-purple-600 transition-colors flex items-center justify-center gap-2 group"
               to="/signin"
             >
               <span className="material-symbols-outlined text-[12px] group-hover:-translate-x-1 transition-transform">
                 arrow_back
               </span>
-              <span className="handwritten text-xl">Back to login</span>
+              <span className="handwritten text-[13px] md:text-xl">Back to login</span>
             </Link>
           </footer>
         </div>

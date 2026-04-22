@@ -185,36 +185,36 @@ export default function SignUp() {
         <div className="max-w-md mx-auto w-full">
        
           {/* Header */}
-          <header className="mb-10">
-            <h2 className="text-3xl font-bold text-slate-900 mb-2">Join the Hub</h2>
-            <p className="text-slate-500">Start your creative journey in seconds.</p>
+          <header className="mb-5 md:mb-10">
+            <h2 className="text-xl md:text-3xl font-bold text-slate-900 mb-0.5 md:mb-2">Join the Hub</h2>
+            <p className="text-slate-500 text-[12px] md:text-[15px]">Start your creative journey in seconds.</p>
           </header>
 
           {/* Social Buttons */}
           <SocialButton />
 
           {/* Divider */}
-          <div className="relative flex py-5 items-center">
+          <div className="relative flex py-2.5 md:py-5 items-center">
             <div className="flex-grow border-t border-slate-100"></div>
-            <span className="flex-shrink mx-4 text-slate-400 text-xs font-bold uppercase tracking-widest handwritten text-lg">
+            <span className="flex-shrink mx-4 text-slate-400 text-[10px] font-medium md:font-bold uppercase tracking-widest handwritten md:text-lg">
               or email
             </span>
             <div className="flex-grow border-t border-slate-100"></div>
           </div>
 
           {/* Form */}
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <form className="space-y-3 md:space-y-6" onSubmit={handleSubmit}>
             {error && (
               <Alert type="error" message={error.message} details={error.details} />
             )}
 
             {/* Name Input */}
             <div className="group">
-              <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-1" htmlFor="full_name">
+              <label className="block text-[12px] md:text-xs font-medium md:font-bold text-slate-400 uppercase tracking-widest mb-1" htmlFor="full_name">
                 Full Name
               </label>
               <input
-                className="w-full ruled-input focus:ring-0 text-slate-800 placeholder-slate-300"
+                className="w-full ruled-input focus:ring-0 text-slate-800 placeholder-slate-300 text-[12px] md:text-[15px]"
                 id="full_name"
                 placeholder="Type your name..."
                 type="text"
@@ -233,11 +233,11 @@ export default function SignUp() {
 
             {/* Email Input */}
             <div className="group">
-              <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-1" htmlFor="email">
+              <label className="block text-[12px] md:text-xs font-medium md:font-bold text-slate-400 uppercase tracking-widest mb-1" htmlFor="email">
                 Email Address
               </label>
               <input
-                className="w-full ruled-input focus:ring-0 text-slate-800 placeholder-slate-300"
+                className="w-full ruled-input focus:ring-0 text-slate-800 placeholder-slate-300 text-[12px] md:text-[15px]"
                 id="email"
                 placeholder="you@example.com"
                 type="email"
@@ -267,14 +267,14 @@ export default function SignUp() {
             {/* Password Input */}
             <div className="group">
               <div className="flex justify-between mb-1">
-                <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest" htmlFor="password">
+                <label className="block text-[12px] md:text-xs font-medium md:font-bold text-slate-400 uppercase tracking-widest" htmlFor="password">
                   Password
                 </label>
                 
               </div>
               <div className="relative">
                 <input
-                  className="w-full ruled-input focus:ring-0 text-slate-800 placeholder-slate-300"
+                  className="w-full ruled-input focus:ring-0 text-slate-800 placeholder-slate-300 text-[12px] md:text-[15px]"
                   id="password"
                   placeholder="••••••••"
                   type={showPassword ? 'text' : 'password'}
@@ -304,7 +304,7 @@ export default function SignUp() {
             {/* Terms Checkbox */}
             <div className="flex items-center gap-2 py-2">
               <input
-                className="rounded-sm text-purple-600 focus:ring-purple-600 border-slate-300"
+                className="rounded-sm text-purple-600 focus:ring-purple-600 border-slate-300 text-[12px] md:text-[15px]"
                 id="terms"
                 type="checkbox"
                 checked={agreeToTerms}
@@ -324,7 +324,7 @@ export default function SignUp() {
             </div>
 
             {/* Submit Button */}
-            <div className="relative pt-4">
+            <div className="relative pt-2 md:pt-4">
               <div className="absolute -top-6 right-0 pointer-events-none hidden md:block">
                 <span className="scribble text-purple-600 text-xl rotate-12 inline-block">Start here!</span>
                 <svg className="w-12 h-12 text-purple-600 -rotate-45 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -337,7 +337,7 @@ export default function SignUp() {
                 </svg>
               </div>
               <button
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
+                className="w-full text-[12px] md:text-[15px] bg-purple-600 hover:bg-purple-700 text-white font-medium md:font-bold py-2 md:py-4 rounded-lg md:rounded-xl shadow-lg transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
                 style={{
                   boxShadow: '0 20px 25px -5px rgba(147, 51, 234, 0.2)',
                 }}
@@ -350,10 +350,10 @@ export default function SignUp() {
           </form>
 
           {/* Footer */}
-          <footer className="mt-8 text-center">
-            <p className="text-slate-500 text-sm">
+          <footer className="mt-4 md:mt-8 text-center">
+            <p className="text-slate-500 text-[12px] md:text-sm">
               Already have an account?{' '}
-              <Link to={'/signin'} className="text-purple-600 font-medium hover:underline handwritten text-lg ml-1" href="#">
+              <Link to={'/signin'} className="text-purple-600 md:font-medium hover:underline handwritten text-[14px] md:text-lg ml-1" href="#">
                 Log in here
               </Link>
             </p>

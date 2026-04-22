@@ -2,34 +2,34 @@ import React from 'react';
 
 export default function Hero() {
   return (
-    <section className="relative pt-20 pb-2 overflow-hidden flex flex-col items-center text-center bg-paper">
+    <section className="relative pt-10 md:pt-20 pb-2 overflow-hidden flex flex-col items-center text-center bg-paper">
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none -z-10 opacity-40">
         <div className="absolute top-40 left-10 w-64 h-64 bg-accent-yellow/10 rounded-full blur-3xl"></div>
         <div className="absolute bottom-20 right-10 w-80 h-80 bg-primary/10 rounded-full blur-3xl"></div>
       </div>
 
       <div className="max-w-4xl px-6 space-y-10 mb-20 relative">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 text-slate-600 font-medium text-sm underline">
-          <span className="material-symbols-outlined text-sm">auto_awesome</span>
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 text-slate-600 font-medium text-[10px] md:text-sm underline">
+          <span className="material-symbols-outlined">auto_awesome</span>
           The soul of paper, the mind of AI
         </div>
 
-        <h1 className="text-6xl lg:text-8xl font-serif-elegant font-extrabold leading-[1.05] text-slate-900">
+        <h1 className="text-4xl lg:text-8xl font-serif-elegant font-extrabold leading-[1.05] text-slate-900">
           Your thoughts,<br />
           <span className="italic text-slate-700">beautifully handwritten</span>
           <br />
           by AI.
         </h1>
 
-        <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed relative z-50">
+        <p className="text-[14px] md:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed relative z-50">
           Experience the tactile joy of traditional note-taking powered by modern intelligence. Transform voice and text into stunning, personal digital journals.
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6 relative z-40">
-          <button className="hand-drawn-border bg-white px-12 py-4 text-xl font-bold shadow-lg hover:-rotate-1 hover:scale-105 transition-all text-ink-black">
+          <button className="hand-drawn-border bg-white px-12 py-4 text-[15px] md:text-xl font-bold shadow-lg hover:-rotate-1 hover:scale-105 transition-all text-ink-black">
             Start Your Journal
           </button>
-          <button className="flex items-center gap-2 font-bold text-lg hover:text-primary transition-colors decoration-wavy underline underline-offset-8 text-ink-black">
+          <button className="bg-[#FF0000] md:bg-transparent flex items-center gap-2 font-bold text-lg hover:text-primary transition-colors decoration-wavy underline underline-offset-8 text-ink-black">
             <span className="material-symbols-outlined">play_circle</span>
             Watch the process
           </button>
@@ -68,14 +68,14 @@ export default function Hero() {
                 </div>
               </div>
 
-              <div className="font-handwritten text-xl lg:text-2xl text-slate-800 space-y-4 leading-loose mt-4">
+              <div className="font-handwritten text-[15px] lg:text-2xl text-slate-800 space-y-4 leading-loose mt-4">
                 <p>The morning light hits...</p>
                 <p>I realized today that <span className="bg-accent-yellow/20 px-2">creativity isn't a resource</span>, it's a practice.</p>
                 <p className="text-primary italic">AI: This insight aligns with your previous notes on "The Creative Habit." Would you like to connect them?</p>
                 <p>Building the new studio space next month...</p>
               </div>
 
-              <div className="pt-12">
+              <div className="pt-8  md:pt-12">
                 <div className="w-48 h-1 bg-slate-100 mb-2"></div>
                 <p className="font-sketch text-slate-400">#reflections #studio #growth</p>
               </div>

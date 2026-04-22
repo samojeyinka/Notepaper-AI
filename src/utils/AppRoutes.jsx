@@ -7,6 +7,12 @@ import { LandingPage,PricingPage,SignUpPage,
      BillingPage,ProfileSettingsPage,ChangePasswordPage,ApplicationSettingsPage,
       NotificationsPage, HelpSupportPage,SupportTicketsPage,NewSupportTicketsPage,SupportTicketPage } from '../pages/pages';
 import NotePage from '../pages/NotePage';
+import PaperPage from '../pages/PaperPage';
+import PresentationPage from '../pages/PresentationPage';
+import FolderPage from '../pages/FolderPage';
+import FlashcardPage from '../pages/FlashcardPage';
+import VoiceToSpeechPage from '../pages/VoiceToSpeechPage';
+import GeneratePage from '../pages/GeneratePage';
 import ScrollToTop from './ScrollToTop';
 import ProtectedRoute, { GuestRoute } from './ProtectedRoute';
 
@@ -222,11 +228,45 @@ const AppRoutes = createBrowserRouter([
         </ScrollToTop></ProtectedRoute>,       
     },
 
-     {
+    {
+        path: '/lockedin/folders/:id',
+        element: <ProtectedRoute><ScrollToTop><FolderPage /></ScrollToTop></ProtectedRoute>,
+    },
+    {
+        path: '/lockedin/voice-to-speech',
+        element: <ProtectedRoute><ScrollToTop><VoiceToSpeechPage /></ScrollToTop></ProtectedRoute>,
+    },
+    {
+        path: '/lockedin/generate',
+        element: <ProtectedRoute><ScrollToTop><GeneratePage /></ScrollToTop></ProtectedRoute>,
+    },
+    {
         path: '/lockedin/notes/new',
-        element:<ScrollToTop>
-        <NotePage/>
-        </ScrollToTop>,       
+        element: <ProtectedRoute><ScrollToTop><NotePage /></ScrollToTop></ProtectedRoute>,
+    },
+    {
+        path: '/lockedin/notes/:id',
+        element: <ProtectedRoute><ScrollToTop><NotePage /></ScrollToTop></ProtectedRoute>,
+    },
+    {
+        path: '/lockedin/papers/new',
+        element: <ProtectedRoute><ScrollToTop><PaperPage /></ScrollToTop></ProtectedRoute>,
+    },
+    {
+        path: '/lockedin/papers/:id',
+        element: <ProtectedRoute><ScrollToTop><PaperPage /></ScrollToTop></ProtectedRoute>,
+    },
+    {
+        path: '/lockedin/presentations/:id',
+        element: <ProtectedRoute><ScrollToTop><PresentationPage /></ScrollToTop></ProtectedRoute>,
+    },
+    {
+        path: '/lockedin/flashcards/new',
+        element: <ProtectedRoute><ScrollToTop><FlashcardPage /></ScrollToTop></ProtectedRoute>,
+    },
+    {
+        path: '/lockedin/flashcards/:id',
+        element: <ProtectedRoute><ScrollToTop><FlashcardPage /></ScrollToTop></ProtectedRoute>,
     },
 
 ]);

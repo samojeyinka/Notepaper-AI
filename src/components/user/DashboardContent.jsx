@@ -1,8 +1,7 @@
 import { ActionCardsSection } from "./ActionCardsSection";
 import { DashboardHeader } from "./DashboardHeader";
-import ElevateProSection from "./ElevateProSection";
 import RecentNotesSection from "./RecentNotesSection";
-import { UpcomingQuizzesSection } from "./UpcomingQuizzesSection";
+
 
 export const DashboardContent = () => {
   return (
@@ -14,7 +13,7 @@ export const DashboardContent = () => {
       {/* Two Column Layout */}
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 lg:gap-8">
         <RecentNotesSection />
-        <UpcomingQuizzesSection />
+        {/* <UpcomingQuizzesSection /> */}
       </div>
     </main>
   );

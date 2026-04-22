@@ -1,6 +1,6 @@
 export const FoundersLetter = () => {
   return (
-    <section className="py-40 bg-yellow-50 relative overflow-hidden">
+    <section className="py-20 md:py-40 bg-yellow-50 relative overflow-hidden">
       {/* Decorative SVG - Reading Glasses (Top Left) */}
       <div className="absolute top-20 left-10 opacity-20 hidden xl:block grayscale pointer-events-none">
         <svg className="text-slate-500" height="150" viewBox="0 0 100 100" width="150">
@@ -38,24 +38,24 @@ export const FoundersLetter = () => {
           <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-32 h-12 bg-blue-300/40 opacity-60"></div>
 
           {/* Header */}
-          <div className="mb-12 flex justify-between items-start border-b border-slate-100 pb-8">
+          <div className="mb-6 md:mb-12 flex justify-between items-start border-b border-slate-100 pb-4 md:pb-8">
             <div className="space-y-1">
-              <p className="font-serif-elegant text-slate-400 text-sm">October 24, 2024</p>
-              <p className="font-serif-elegant text-slate-400 text-sm">San Francisco, CA</p>
+              <p className="font-serif-elegant text-slate-400 text-sm">October 24, 2025</p>
+              <p className="font-serif-elegant text-slate-400 text-sm">Internet</p>
             </div>
-            <div className="w-12 h-12 bg-purple-100 rounded flex items-center justify-center text-purple-600">
+            <div className="w-6 h-6 md:w-12 md:h-12 bg-purple-100 rounded flex items-center justify-center text-purple-600">
               <span className="material-symbols-outlined">auto_awesome</span>
             </div>
           </div>
 
           {/* Letter Content */}
-          <div className="font-serif-elegant text-slate-800 text-lg leading-relaxed space-y-6">
+          <div className="font-serif-elegant text-slate-800 text-[13px] md:text-lg leading-relaxed space-y-3 md:space-y-6">
             <p>To our community of thinkers,</p>
             <p>
               We built Notepaper AI because we missed the weight of a journal in our hands and the freedom of a blank page. We believe that technology should amplify our humanity, not replace it.
             </p>
             <p>
-              Every feature we design—from the "ink" physics to our AI-powered reflection prompts—is crafted to help you slow down, think more deeply, and rediscover the joy of your own handwriting.
+              Every feature we design—from the "ink & work of art" to our AI-powered reflection prompts—is crafted to help you slow down, think more deeply, and rediscover the joy of your own handwriting.
             </p>
             <p>
               Thank you for being part of this journey. We're just getting started.
@@ -63,24 +63,19 @@ export const FoundersLetter = () => {
           </div>
 
           {/* Footer with Signatures */}
-          <div className="mt-16 pt-8 border-t border-slate-50 flex flex-col md:flex-row md:items-end justify-between gap-8">
+          <div className="mt-8 md:mt-16 pt-4 md:pt-8 border-t border-slate-50 flex flex-col md:flex-row md:items-end justify-between gap-8">
             <div>
               <p className="font-serif-elegant text-sm text-slate-400 mb-4">With gratitude,</p>
               <div className="space-y-4">
                 <div>
-                  <p className="font-handwritten text-3xl text-blue-600">Sarah & Julian</p>
+                  <p className="font-handwritten text-2xl md:text-3xl text-blue-600">Sam</p>
                   <p className="font-serif-elegant text-xs text-slate-400 mt-2 uppercase tracking-widest">
-                    Founders, Notepaper AI
+                    Founder, Notepaper AI
                   </p>
                 </div>
               </div>
             </div>
-            <div className="relative group">
-              <div className="absolute inset-0 bg-purple-100 rounded-full scale-150 blur-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              <button className="font-handwritten text-purple-600 text-xl relative z-10 hover:underline underline-offset-8">
-                Read the manifesto →
-              </button>
-            </div>
+       
           </div>
         </div>
       </div>

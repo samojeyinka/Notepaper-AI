@@ -6,10 +6,10 @@ import CustomerSupport from '../components/globals/CustomerSupport'
 const PrivacyPage = () => {
   return (
     <>
-    <Header/>
-    <Privacy/>
-      <CustomerSupport/>
-    <Footer/>
+      <Header />
+      <Privacy />
+      <CustomerSupport />
+      <Footer />
     </>
   )
 }

@@ -9,9 +9,9 @@ export const NotePageSidebar = ({
     onCollapse 
 }) => {
     return (
-        <aside className="w-64 border-l border-slate-200 bg-white flex flex-col p-6 gap-6 relative z-20 shrink-0 animate-in slide-in-from-right duration-300">
+        <aside className="w-40 md:w-64 border-l border-slate-200 bg-white flex flex-col p-3 md:p-6 gap-3 md:gap-6 relative z-20 shrink-0 animate-in slide-in-from-right duration-300">
             <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Pages</h3>
+                <h3 className="text-[13px] font-medium text-slate-800 uppercase tracking-wider">Pages</h3>
                 <button 
                     onClick={onCollapse}
                     className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 transition-colors"
@@ -31,7 +31,7 @@ export const NotePageSidebar = ({
                                 : 'border-slate-100 hover:border-slate-200 hover:bg-slate-50'}`}
                     >
                         <div className="flex items-center justify-between mb-2">
-                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full
+                            <span className={`text-[9px] md:text-[10px] font-medium md:font-bold px-2 py-0.5 rounded md:rounded-full
                                 ${activePageIndex === index ? 'bg-primary text-white' : 'bg-slate-100 text-slate-500'}`}>
                                 Page {index + 1}
                             </span>
@@ -49,7 +49,7 @@ export const NotePageSidebar = ({
                             )}
                         </div>
 
-                        <div className="h-24 bg-white border border-slate-50 rounded shadow-sm overflow-hidden p-2">
+                        <div className="h-16 md:h-24 bg-white border border-slate-50 rounded shadow-sm overflow-hidden p-2">
                             <div 
                                 className="text-[6px] text-slate-300 leading-tight origin-top scale-75 whitespace-pre-wrap break-words"
                                 dangerouslySetInnerHTML={{ __html: page || "Empty page..." }}
@@ -61,15 +61,15 @@ export const NotePageSidebar = ({
 
             <button 
                 onClick={onAddPage}
-                className="mt-auto w-full group flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white py-3 rounded-2xl transition-all shadow-lg shadow-slate-900/20 active:scale-95"
+                className="mt-auto w-full group flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white py-1.5 md:py-3 rounded-md md:rounded-2xl transition-all shadow-lg shadow-slate-900/20 active:scale-95"
             >
                 <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center group-hover:rotate-90 transition-transform">
-                    <span className="material-icons-round text-sm">add</span>
+                    <span className="material-icons-round text-[14px]">add</span>
                 </div>
-                <span className="text-xs font-bold uppercase tracking-widest">New Page</span>
+                <span className="text-[10px] font-medium uppercase tracking-widest">New Page</span>
             </button>
 
-            <div className="flex items-center justify-center gap-2 text-slate-400 text-[10px] font-bold uppercase tracking-widest border-t border-slate-50 pt-4">
+            <div className="flex items-center justify-center gap-2 text-slate-400 text-[10px] font-normal uppercase tracking-widest border-t border-slate-50 pt-2">
                 <span className="material-icons-round text-[14px]">description</span>
                 {pages.length} Pages Total
             </div>

@@ -64,9 +64,9 @@ export const UpcomingQuizzesSection = () => {
         />
 
         {/* Add Study Plan Button */}
-        <button className="w-full py-1 md:py-2 border-2 border-dashed border-slate-200 rounded-3xl text-slate-400 hover:text-purple-500 hover:border-purple-500 transition-all flex items-center justify-center space-x-2">
+        <button className="w-full py-1 md:py-2 border-2 border-dashed border-slate-200 rounded-lg md:rounded-3xl text-slate-400 hover:text-purple-500 hover:border-purple-500 transition-all flex items-center justify-center space-x-2">
           <span className="material-icons-round text-[13px] md:text-[16px]">add</span>
-          <span className="font-medium text-[13px] md:text-[16px]">Add Study Plan</span>
+          <span className="text-[12px] md:font-medium md:text-[16px]">Add Study Plan</span>
         </button>
       </div>
     </div>

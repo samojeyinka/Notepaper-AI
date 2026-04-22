@@ -2,6 +2,7 @@ import { forwardRef, useEffect, useRef, useCallback, useState } from "react";
 import { createPortal } from "react-dom";
 
 // US Letter dimensions at 96 dpi: 816 × 1056 px
+const PAGE_WIDTH  = 816;
 const PAGE_HEIGHT = 1056;
 
 // Remove child nodes from the end of `el` until its scrollHeight fits within
@@ -38,6 +39,7 @@ const NotePage = ({
   drawMode,
   drawingDataUrl,
   onDrawingChange,
+  readOnly,
 }) => {
   const pageRef = useRef(null);
   const isComposingRef = useRef(false);
@@ -252,7 +254,7 @@ const NotePage = ({
       )}
 
       {/* Page number badge */}
-      <div className="absolute -left-14 top-6 w-10 h-10 rounded-2xl bg-white border border-slate-100 flex items-center justify-center shadow-sm text-xs font-bold text-slate-400 select-none">
+      <div className="absolute -left-5 top-6 w-7 h-7 rounded-xl bg-white border border-slate-200 flex items-center justify-center shadow-sm text-xs font-medium text-slate-400 select-none">
         {index + 1}
       </div>
 
@@ -265,15 +267,16 @@ const NotePage = ({
             else editorRef.current = node;
           }
         }}
-        contentEditable
+        data-note-page={index}
+        contentEditable={!readOnly}
         suppressContentEditableWarning
-        onInput={handleInput}
-        onCompositionStart={handleCompositionStart}
-        onCompositionEnd={handleCompositionEnd}
-        onFocus={() => onFocus(index)}
-        onKeyDown={(e) => onKeyDown && onKeyDown(e, index)}
-        spellCheck={true}
-        className={`relative w-full outline-none prose prose-slate max-w-none page-content-area ${fontClass}`}
+        onInput={readOnly ? undefined : handleInput}
+        onCompositionStart={readOnly ? undefined : handleCompositionStart}
+        onCompositionEnd={readOnly ? undefined : handleCompositionEnd}
+        onFocus={() => !readOnly && onFocus(index)}
+        onKeyDown={(e) => !readOnly && onKeyDown && onKeyDown(e, index)}
+        spellCheck={!readOnly}
+        className={`relative w-full outline-none prose prose-slate max-w-none page-content-area ${fontClass} ${readOnly ? 'cursor-wait select-none' : ''}`}
         style={{
           height: `${PAGE_HEIGHT}px`,
           padding: '72px 80px',
@@ -281,15 +284,13 @@ const NotePage = ({
           lineHeight: `${lineSpacing}px`,
           color: textColor,
           fontFamily:
-            fontFamily === 'sans'
-              ? 'Inter, ui-sans-serif, sans-serif'
-              : fontFamily === 'handwriting'
-              ? 'Kalam, cursive'
-              : fontFamily === 'casual'
-              ? 'Caveat, cursive'
-              : fontFamily === 'fun'
-              ? '"Indie Flower", cursive'
-              : 'inherit',
+            fontFamily === 'sans'        ? 'Inter, ui-sans-serif, sans-serif' :
+            fontFamily === 'handwriting' ? 'Kalam, cursive' :
+            fontFamily === 'casual'      ? 'Caveat, cursive' :
+            fontFamily === 'fun'         ? '"Indie Flower", cursive' :
+            fontFamily === 'shadows'     ? '"Shadows Into Light", cursive' :
+            fontFamily === 'dancing'     ? '"Dancing Script", cursive' :
+            'inherit',
           wordBreak: 'break-word',
           overflowWrap: 'break-word',
           overflow: 'hidden',
@@ -347,20 +348,39 @@ export const NoteEditor = forwardRef(function NoteEditor(
     drawingData = [],
     onDrawingChange,
     onPageRefsReady,
+    readOnly = false,
   },
   ref
 ) {
   const fontMapping = {
-    sans: 'font-sans',
-    handwriting: 'font-handwriting',
-    casual: 'font-handwriting2',
-    neat: 'font-handwriting',
-    fun: 'font-handwriting3',
+    sans:        'font-sans',
+    handwriting: 'font-handwriting',  // Kalam
+    casual:      'font-handwriting2', // Caveat
+    fun:         'font-handwriting3', // Indie Flower
+    shadows:     'font-sketch',       // Shadows Into Light
+    dancing:     'font-dancing',      // Dancing Script
   };
   const fontClass = fontMapping[fontFamily] || 'font-sans';
 
   const containerRef = useRef(null);
   const pageRefs = useRef([]);
+
+  // Dynamically scale pages so they always fit the available container width.
+  // GAP is the total horizontal breathing room we want around the scaled page.
+  const GAP = 48;
+  const [pageScale, setPageScale] = useState(1);
+
+  useEffect(() => {
+    const measure = () => {
+      if (!containerRef.current) return;
+      const available = containerRef.current.clientWidth - GAP;
+      setPageScale(Math.min(1, available / PAGE_WIDTH));
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    if (containerRef.current) ro.observe(containerRef.current);
+    return () => ro.disconnect();
+  }, []);
 
   // Auto-scroll to active page when it changes
   useEffect(() => {
@@ -629,16 +649,25 @@ export const NoteEditor = forwardRef(function NoteEditor(
       className="flex-1 overflow-y-auto custom-scrollbar"
       style={{
         background: '#f1f5f9',
-        padding: '48px 80px',
+        padding: '32px 0',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: '40px',
+        gap: `${Math.round(40 * pageScale)}px`,
       }}
     >
       {pages.map((content, index) => (
+        // Outer wrapper collapses to the SCALED dimensions so the scrollable
+        // container doesn't overflow horizontally, while the inner page renders
+        // at its true 816 × 1056 size and is scaled via transform.
         <div
           key={index}
+          style={{
+            width:  `${Math.round(PAGE_WIDTH  * pageScale)}px`,
+            height: `${Math.round(PAGE_HEIGHT * pageScale)}px`,
+            flexShrink: 0,
+            position: 'relative',
+          }}
           ref={(el) => {
             pageRefs.current[index] = el;
             if (index === pages.length - 1 && onPageRefsReady) {
@@ -646,30 +675,40 @@ export const NoteEditor = forwardRef(function NoteEditor(
             }
           }}
         >
-          <NotePage
-            index={index}
-            content={content}
-            activePageIndex={activePageIndex}
-            onContentChange={onContentChange}
-            onFocus={setActivePageIndex}
-            onHeightOverflow={onPageOverflow}
-            onKeyDown={onKeyDown}
-            paperStyle={paperStyle}
-            paperColor={paperColor}
-            lineColor={lineColor}
-            lineSpacing={lineSpacing}
-            fontClass={fontClass}
-            fontSize={fontSize}
-            fontFamily={fontFamily}
-            textColor={textColor}
-            editorRef={ref}
-            drawMode={drawMode}
-            drawingDataUrl={drawingData[index] ?? ""}
-            onDrawingChange={onDrawingChange}
-          />
+          <div
+            style={{
+              transform: `scale(${pageScale})`,
+              transformOrigin: 'top left',
+              width:  `${PAGE_WIDTH}px`,
+              height: `${PAGE_HEIGHT}px`,
+            }}
+          >
+            <NotePage
+              index={index}
+              content={content}
+              activePageIndex={activePageIndex}
+              onContentChange={onContentChange}
+              onFocus={setActivePageIndex}
+              onHeightOverflow={onPageOverflow}
+              onKeyDown={onKeyDown}
+              paperStyle={paperStyle}
+              paperColor={paperColor}
+              lineColor={lineColor}
+              lineSpacing={lineSpacing}
+              fontClass={fontClass}
+              fontSize={fontSize}
+              fontFamily={fontFamily}
+              textColor={textColor}
+              editorRef={ref}
+              drawMode={drawMode}
+              drawingDataUrl={drawingData[index] ?? ""}
+              onDrawingChange={onDrawingChange}
+              readOnly={readOnly}
+            />
+          </div>
         </div>
       ))}
-      <div style={{ height: '80px', flexShrink: 0 }} />
+      <div style={{ height: '32px', flexShrink: 0 }} />
     </div>
     </>
   );

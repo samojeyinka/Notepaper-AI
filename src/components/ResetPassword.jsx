@@ -80,7 +80,7 @@ export default function ResetPassword() {
   };
 
   return (
-    <main className="w-full max-w-6xl mx-auto flex flex-col md:flex-row overflow-hidden bg-white min-h-[85vh] relative">
+    <main className="w-full max-w-6xl mx-auto flex flex-col md:flex-row overflow-hidden bg-white md:min-h-[85vh] relative">
       {toast && (
         <Toast
           type={toast.type}
@@ -126,9 +126,9 @@ export default function ResetPassword() {
       <section className="flex-1 p-8 md:p-16 flex flex-col justify-center bg-white relative">
         <div className="max-w-md mx-auto w-full">
           {/* Header */}
-          <header className="mb-10">
-            <h2 className="text-3xl font-extrabold text-slate-900 mb-2 font-serif-elegant">Set New Password</h2>
-            <p className="text-slate-500 text-[14px] md:text-[15px] font-handwriting">
+          <header className="mb-5 md:mb-10">
+            <h2 className="text-xl md:text-3xl font-semibold md:font-extrabold text-slate-900 mb-1 md:mb-2 font-serif-elegant">Set New Password</h2>
+            <p className="text-slate-500 text-[13px] md:text-[15px] font-handwriting">
               Choose a strong password to keep your notes safe.
             </p>
           </header>
@@ -158,7 +158,7 @@ export default function ResetPassword() {
           {/* Form */}
           <form className="space-y-8" onSubmit={handleSubmit}>
             <div className="group relative">
-              <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">
+              <label className="block text-[12px] md:text-xs font-medium md:font-bold text-slate-400 uppercase tracking-widest mb-1">
                 New Password
               </label>
               <input
@@ -181,7 +181,7 @@ export default function ResetPassword() {
             </div>
 
             <div className="group relative">
-              <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">
+              <label className="block text-[12px] md:text-xs font-medium md:font-bold text-slate-400 uppercase tracking-widest mb-1">
                 Confirm New Password
               </label>
               <input
@@ -205,11 +205,11 @@ export default function ResetPassword() {
 
             <div className="relative pt-4">
               <div className="absolute -top-6 right-2 pointer-events-none">
-                <span className="scribble text-purple-600 text-xl rotate-12 inline-block">Safe & Sound</span>
+                <span className="scribble text-purple-600 text-[13px] md:text-xl rotate-12 inline-block">Safe & Sound</span>
               </div>
               <button
                 disabled={loading}
-                className="w-full bg-slate-900 hover:bg-black text-white font-bold py-4 rounded-xl shadow-sm transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full bg-slate-900 hover:bg-black text-[13px] md:text-[15px] text-white font-medium md:font-bold py-2 md:py-4 rounded-lg md:rounded-xl shadow-sm transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
                 type="submit"
               >
                 {loading && <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>}
@@ -219,15 +219,15 @@ export default function ResetPassword() {
           </form>
 
           {/* Footer */}
-          <footer className="mt-12 text-center">
+          <footer className="mt-6 md:mt-12 text-center">
             <Link 
-              className="text-slate-500 font-medium hover:text-purple-600 transition-colors flex items-center justify-center gap-2 group"
+              className="text-slate-500 font-normal md:font-medium hover:text-purple-600 transition-colors flex items-center justify-center gap-2 group"
               to="/forgot-password"
             >
               <span className="material-symbols-outlined text-sm group-hover:-translate-x-1 transition-transform">
                 replay
               </span>
-              <span className="handwritten text-[15px] text-primary">Need a new link?</span>
+              <span className="handwritten text-[13px] md:text-[15px] text-primary">Need a new link?</span>
             </Link>
           </footer>
         </div>
