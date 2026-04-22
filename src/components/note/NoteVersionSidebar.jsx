@@ -371,26 +371,26 @@ export const NoteVersionSidebar = ({
     };
 
     return (
-        <aside className="w-72 border-l border-slate-200 bg-white flex flex-col shrink-0 overflow-hidden relative z-30">
+        <aside className="w-40 md:w-72 border-l border-slate-200 bg-white flex flex-col shrink-0 overflow-hidden relative z-30">
             {/* Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
-                <div className="flex items-center gap-2">
-                    <span className="material-icons-round text-primary text-[20px]">history</span>
-                    <h3 className="font-display font-bold text-sm text-slate-900">Version History</h3>
+            <div className="flex items-center justify-between px-2.5 md:px-5 py-2 md:py-4 border-b border-slate-100">
+                <div className="flex items-center gap-1 md:gap-2">
+                    <span className="material-icons-round text-primary text-[10px] md:text-[20px]">history</span>
+                    <h3 className="font-display font-medium md:font-bold text-[10px] md:text-sm text-slate-900">Version History</h3>
                     <button
                         onClick={load}
                         disabled={loading}
                         title="Refresh version list"
-                        className="w-6 h-6 rounded-md flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-primary transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                        className="w-5 h-5 md:w-6 md:h-6 rounded-md flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-primary transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                     >
-                        <span className={`material-icons-round text-[15px] ${loading ? 'animate-spin' : ''}`}>refresh</span>
+                        <span className={`material-icons-round text-[13px] md:text-[15px] ${loading ? 'animate-spin' : ''}`}>refresh</span>
                     </button>
                 </div>
                 <button
                     onClick={onClose}
-                    className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 transition-colors"
+                    className="w-5 h-5 md:w-7 md:h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 transition-colors"
                 >
-                    <span className="material-icons-round text-[18px]">close</span>
+                    <span className="material-icons-round text-[14px] md:text-[18px]">close</span>
                 </button>
             </div>
 
@@ -398,14 +398,14 @@ export const NoteVersionSidebar = ({
             <div className="flex-1 overflow-y-auto custom-scrollbar">
                 {loading && (
                     <div className="flex flex-col items-center justify-center py-16 gap-3 text-slate-400">
-                        <span className="material-icons-round text-[32px] animate-spin">sync</span>
-                        <p className="text-xs font-normal">Loading history…</p>
+                        <span className="material-icons-round text-[16px] md:text-[32px] animate-spin">sync</span>
+                        <p className="text-[9px] md:text-xs font-normal">Loading history…</p>
                     </div>
                 )}
 
                 {error && (
                     <div className="m-4 p-3 bg-red-50 rounded-xl text-xs text-red-500 font-medium flex items-center gap-2">
-                        <span className="material-icons-round text-[16px]">error_outline</span>
+                        <span className="material-icons-round text-[13px] md:text-[16px]">error_outline</span>
                         {error}
                     </div>
                 )}
@@ -418,26 +418,26 @@ export const NoteVersionSidebar = ({
                 )}
 
                 {!loading && versions.length > 0 && (
-                    <div className="py-3 px-3 flex flex-col gap-1">
+                    <div className="py-1.5 md:py-3 px-1.5 md:px-3 flex flex-col gap-1">
                         {versions.map((v, i) => {
                             const isFirst = i === 0;
                             return (
                                 <button
                                     key={v.id}
                                     onClick={() => setPreviewIdx(i)}
-                                    className="w-full flex items-center gap-3 px-1.5 py-1.5 rounded-xl text-left border border-transparent hover:border-slate-100 hover:bg-slate-50 transition-all duration-150 group"
+                                    className="w-full flex items-center pag-1.5 md:gap-3 px-1 md:px-1.5 py-1 md:py-1.5 rounded-xl text-left border border-transparent hover:border-slate-100 hover:bg-slate-50 transition-all duration-150 group"
                                 >
                                     {/* Timeline dot */}
                                     <div className="flex flex-col items-center shrink-0">
-                                        <div className={`w-1.5 h-1.5 rounded-full border-2 ${isFirst ? 'border-primary bg-primary' : 'border-slate-300 bg-white'}`} />
+                                        <div className={`w-1 md:w-1.5 h-1 md:h-1.5 rounded-full border-2 ${isFirst ? 'border-primary bg-primary' : 'border-slate-300 bg-white'}`} />
                                         {i < versions.length - 1 && <div className="w-px flex-1 min-h-[20px] bg-slate-100 mt-1" />}
                                     </div>
 
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-xs font-medium text-slate-700 truncate">
+                                        <p className="text-[10px] md:text-xs font-normal md:font-medium text-slate-700 truncate">
                                             {isFirst ? 'Latest snapshot' : `Version ${versions.length - i}`}
                                         </p>
-                                        <p className="text-[10px] text-slate-400 mt-0.5">{timeAgo(v.created_at)}</p>
+                                        <p className="text-[8px] md:text-[10px] text-slate-400 mt-0.5">{timeAgo(v.created_at)}</p>
                                     </div>
 
                                     
@@ -450,7 +450,7 @@ export const NoteVersionSidebar = ({
 
             {/* Footer */}
             <div className="px-5 py-3 border-t border-slate-50">
-                <p className="text-[10px] text-slate-400 text-center">Snapshots saved every 5 minutes automatically</p>
+                <p className="text-[9px] md:text-[10px] text-slate-400 text-center">Snapshots saved every 5 minutes automatically</p>
             </div>
 
             {/* Preview modal — rendered via portal so it covers the whole screen */}

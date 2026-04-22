@@ -78,14 +78,14 @@ export const CreateFolderModal = ({ onClose, onCreated }) => {
     return createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center"
             style={{ background: 'rgba(15,23,42,0.55)', backdropFilter: 'blur(4px)' }}>
-            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md mx-4 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="bg-white rounded-xl md:rounded-3xl shadow-2xl w-full max-w-md mx-4 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
 
                 {/* Header */}
-                <div className="px-6 pt-6 pb-4 border-b border-slate-100 flex items-center justify-between">
+                <div className="px-3 md:px-6 pt-3 md:pt-6 pb-4 border-b border-slate-100 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <FolderShape shape={shape} color={color} icon={icon} size={44} />
                         <div>
-                            <h2 className="font-display font-bold text-slate-900 text-base">{name || 'New Folder'}</h2>
+                            <h2 className="font-display font-medium md:font-bold text-slate-900 text-base">{name || 'New Folder'}</h2>
                             <p className="text-[11px] text-slate-400 mt-0.5">Organise your notes into a folder</p>
                         </div>
                     </div>
@@ -97,13 +97,13 @@ export const CreateFolderModal = ({ onClose, onCreated }) => {
                 <form onSubmit={handleSubmit} className="px-6 py-5 flex flex-col gap-5">
                     {/* Name */}
                     <div>
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Folder Name</label>
+                        <label className="text-[10px] font-medium md:font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Folder Name</label>
                         <input
                             ref={inputRef}
                             value={name}
                             onChange={e => setName(e.target.value)}
                             placeholder="e.g. University Finals"
-                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 outline-none focus:border-primary"
+                            className="w-full bg-slate-50 border border-slate-200 rounded-md md:rounded-xl px-2 md:px-4 py-1.5 md:py-2.5 text-[11px] md:text-sm text-slate-800 placeholder-slate-400 outline-none focus:border-primary"
                         />
                     </div>
 
@@ -116,17 +116,17 @@ export const CreateFolderModal = ({ onClose, onCreated }) => {
                             value={description}
                             onChange={e => setDescription(e.target.value)}
                             placeholder="What's this folder for?"
-                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 outline-none focus:border-primary"
+                           className="w-full bg-slate-50 border border-slate-200 rounded-md md:rounded-xl px-2 md:px-4 py-1.5 md:py-2.5 text-[11px] md:text-sm text-slate-800 placeholder-slate-400 outline-none focus:border-primary"
                         />
                     </div>
 
                     {/* Color */}
                     <div>
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">Color</label>
+                        <label className="text-[10px] font-medium md:font-bold text-slate-400 uppercase tracking-widest mb-2 block">Color</label>
                         <div className="flex flex-wrap gap-2">
                             {COLORS.map(c => (
                                 <button key={c.value} type="button" onClick={() => setColor(c.value)} title={c.label}
-                                    className={`w-8 h-8 rounded-full transition-transform hover:scale-110 active:scale-95 ${color === c.value ? 'ring-2 ring-offset-2 ring-slate-500 scale-110' : ''}`}
+                                    className={`w-5 h-5 md:w-8 md:h-8 rounded-full transition-transform hover:scale-110 active:scale-95 ${color === c.value ? 'ring-2 ring-offset-2 ring-slate-500 scale-110' : ''}`}
                                     style={{ backgroundColor: c.value }}
                                 />
                             ))}
@@ -135,14 +135,14 @@ export const CreateFolderModal = ({ onClose, onCreated }) => {
 
                     {/* Shape */}
                     <div>
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">Shape</label>
+                        <label className="text-[10px] font-medium md:font-bold text-slate-400 uppercase tracking-widest mb-2 block">Shape</label>
                         <div className="flex flex-wrap gap-3">
                             {SHAPES.map(s => (
                                 <button key={s.id} type="button" onClick={() => setShape(s.id)} title={s.label}
                                     className={`transition-transform hover:scale-110 active:scale-95 p-0.5 rounded-lg ${shape === s.id ? 'ring-2 ring-primary ring-offset-1' : ''}`}
                                     style={{ background: 'none', border: 'none' }}
                                 >
-                                    <div style={{ width: 34, height: 34, backgroundColor: color, ...s.style }} />
+                                    <div style={{backgroundColor: color, ...s.style }} className="w-[24px] h-[24px] md:w-[34px] md:h-[34px]" />
                                 </button>
                             ))}
                         </div>
@@ -154,10 +154,10 @@ export const CreateFolderModal = ({ onClose, onCreated }) => {
                         <div className="flex flex-wrap gap-2">
                             {ICONS.map(ic => (
                                 <button key={ic} type="button" onClick={() => setIcon(ic)}
-                                    className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all
+                                    className={`w-7 h-7 md:w-9 md:h-9 rounded-xl flex items-center justify-center transition-all
                                         ${icon === ic ? 'bg-primary text-white shadow-md shadow-primary/30' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
                                 >
-                                    <span className="material-icons-round text-[18px]">{ic}</span>
+                                    <span className="material-icons-round text-[14px] md:text-[18px]">{ic}</span>
                                 </button>
                             ))}
                         </div>
@@ -171,11 +171,11 @@ export const CreateFolderModal = ({ onClose, onCreated }) => {
 
                     <div className="flex gap-3 pt-1">
                         <button type="button" onClick={onClose}
-                            className="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-600 text-sm font-semibold hover:bg-slate-200 transition-colors">
+                            className="flex-1 py-1.5 md:py-2.5 rounded-md md:rounded-xl bg-slate-100 text-slate-600 text-[12px] md:text-sm font-semibold hover:bg-slate-200 transition-colors">
                             Cancel
                         </button>
                         <button type="submit" disabled={!name.trim() || loading}
-                            className="flex-1 py-2.5 rounded-xl bg-primary text-white text-sm font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                            className="flex-1 py-1.5 md:py-2.5 rounded-md md:rounded-xl bg-primary text-white text-[12px] md:text-sm font-semibold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
                             {loading
                                 ? <><span className="material-icons-round text-[15px] animate-spin">sync</span>Creating…</>
                                 : <><span className="material-icons-round text-[15px]">create_new_folder</span>Create Folder</>}

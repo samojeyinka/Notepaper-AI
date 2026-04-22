@@ -420,147 +420,152 @@ const SlideToolbar = ({ slide, onChange, onAddSlide, onMoveUp, onMoveDown, canMo
 
     return (
         <>
-            <div className="shrink-0 flex items-center gap-1 px-3 py-1.5 bg-white border-b border-slate-100 overflow-x-auto" style={{ minHeight:40 }}>
-                {/* Layout */}
-                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider shrink-0 mr-0.5">Layout</span>
-                {LAYOUTS.map(l => (
-                    <button key={l} onClick={() => setLayout(l)}
-                        className={`px-2 py-0.5 rounded-md text-[11px] font-semibold capitalize transition-all shrink-0 ${slide.layout===l?'bg-primary text-white':'text-slate-500 hover:bg-slate-100'}`}>
-                        {l}
-                    </button>
-                ))}
+            <div className="shrink-0 bg-white border-b border-slate-100">
 
-                <div className="w-px h-4 bg-slate-200 shrink-0 mx-1" />
+                {/* ── Row 1: Layout + Slide navigation ── */}
+                <div className="flex items-center gap-1 px-2 md:px-3 py-1.5 border-b border-slate-50">
+                    <span className="text-[8px] md:text-[9px] font-bold text-slate-400 uppercase tracking-wider shrink-0 mr-0.5 hidden sm:block">Layout</span>
+                    <div className="flex items-center gap-0.5 bg-slate-100 rounded-lg p-0.5 shrink-0">
+                        {LAYOUTS.map(l => (
+                            <button key={l} onClick={() => setLayout(l)}
+                                className={`px-1.5 md:px-2 py-0.5 rounded-md text-[10px] md:text-[11px] font-semibold capitalize transition-all shrink-0 ${slide.layout===l?'bg-primary text-white shadow-sm':'text-slate-500 hover:bg-white hover:shadow-sm'}`}>
+                                {l}
+                            </button>
+                        ))}
+                    </div>
 
-                {/* List style */}
-                {hasBody && (<>
-                    <button onClick={() => set({listStyle:'bullet'})} title="Bullets"
-                        className={`w-6 h-6 flex items-center justify-center rounded-md transition-all shrink-0 ${!isNumbered&&!isText?'bg-slate-900 text-white':'text-slate-500 hover:bg-slate-100'}`}>
-                        <span className="material-icons-round text-[13px]">format_list_bulleted</span>
-                    </button>
-                    <button onClick={() => set({listStyle:'numbered'})} title="Numbered"
-                        className={`w-6 h-6 flex items-center justify-center rounded-md transition-all shrink-0 ${isNumbered?'bg-slate-900 text-white':'text-slate-500 hover:bg-slate-100'}`}>
-                        <span className="material-icons-round text-[13px]">format_list_numbered</span>
-                    </button>
-                    <button onClick={() => set({listStyle:'text'})} title="Free text"
-                        className={`w-6 h-6 flex items-center justify-center rounded-md transition-all shrink-0 ${isText?'bg-slate-900 text-white':'text-slate-500 hover:bg-slate-100'}`}>
-                        <span className="material-icons-round text-[13px]">notes</span>
-                    </button>
-                    {(slide.bullets??[]).length < 7 && (
-                        <button onClick={() => set({bullets:[...(slide.bullets??[]),''] })}
-                            className="flex items-center gap-0.5 px-2 py-0.5 rounded-md text-[11px] font-semibold text-slate-500 hover:bg-slate-100 transition-all shrink-0">
-                            <span className="material-icons-round text-[12px]">add</span>{isText?'Para':'Point'}
+                    <div className="ml-auto flex items-center gap-0.5 md:gap-1 shrink-0">
+                        <button onClick={onMoveUp} disabled={!canMoveUp}
+                            className="w-6 h-6 flex items-center justify-center rounded-md text-slate-400 hover:bg-slate-100 disabled:opacity-20 disabled:cursor-not-allowed transition-all">
+                            <span className="material-icons-round text-[14px]">arrow_upward</span>
                         </button>
-                    )}
-                    {/* Bold / Italic / Underline */}
-                    <button
-                        onMouseDown={e => e.preventDefault()}
-                        onClick={() => document.execCommand('bold')}
-                        title="Bold (Ctrl+B)"
-                        className="w-6 h-6 flex items-center justify-center rounded-md text-slate-500 hover:bg-slate-100 transition-all shrink-0 font-bold text-[13px]">
-                        B
-                    </button>
-                    <button
-                        onMouseDown={e => e.preventDefault()}
-                        onClick={() => document.execCommand('italic')}
-                        title="Italic (Ctrl+I)"
-                        className="w-6 h-6 flex items-center justify-center rounded-md text-slate-500 hover:bg-slate-100 transition-all shrink-0 italic text-[13px] font-semibold">
-                        I
-                    </button>
-                    <button
-                        onMouseDown={e => e.preventDefault()}
-                        onClick={() => document.execCommand('underline')}
-                        title="Underline (Ctrl+U)"
-                        className="w-6 h-6 flex items-center justify-center rounded-md text-slate-500 hover:bg-slate-100 transition-all shrink-0 underline text-[13px] font-semibold">
-                        U
-                    </button>
-                    <div className="w-px h-4 bg-slate-200 shrink-0 mx-1" />
-                </>)}
+                        <button onClick={onMoveDown} disabled={!canMoveDown}
+                            className="w-6 h-6 flex items-center justify-center rounded-md text-slate-400 hover:bg-slate-100 disabled:opacity-20 disabled:cursor-not-allowed transition-all">
+                            <span className="material-icons-round text-[14px]">arrow_downward</span>
+                        </button>
+                        <button onClick={onAddSlide}
+                            className="flex items-center gap-0.5 px-2 py-0.5 rounded-md text-[10px] md:text-[11px] font-semibold text-primary bg-primary/10 hover:bg-primary/20 transition-all">
+                            <span className="material-icons-round text-[12px]">add</span>
+                            <span className="hidden sm:inline">Slide</span>
+                        </button>
+                        <span className="text-[10px] text-slate-400 ml-0.5 tabular-nums whitespace-nowrap">{slideNum}/{total}</span>
+                    </div>
+                </div>
 
-                {/* Spacing */}
-                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Spacing</span>
-                <button onClick={() => set({lineHeight:Math.max(1.1,+(lh-0.1).toFixed(1))})}
-                    className="w-5 h-5 flex items-center justify-center rounded text-slate-500 hover:bg-slate-100 text-[13px] font-bold shrink-0">−</button>
-                <span className="text-[11px] font-semibold text-slate-600 w-6 text-center shrink-0 tabular-nums">{lh.toFixed(1)}</span>
-                <button onClick={() => set({lineHeight:Math.min(3,+(lh+0.1).toFixed(1))})}
-                    className="w-5 h-5 flex items-center justify-center rounded text-slate-500 hover:bg-slate-100 text-[13px] font-bold shrink-0">+</button>
+                {/* ── Row 2: List / B·I·U / Spacing ── */}
+                <div className="flex items-center gap-1 px-2 md:px-3 py-1 border-b border-slate-50 overflow-x-auto">
 
-                <div className="w-px h-4 bg-slate-200 shrink-0 mx-1" />
+                    {/* List style + Add point */}
+                    {hasBody && (<>
+                        <button onClick={() => set({listStyle:'bullet'})} title="Bullets"
+                            className={`w-6 h-6 flex items-center justify-center rounded-md transition-all shrink-0 ${!isNumbered&&!isText?'bg-slate-900 text-white':'text-slate-500 hover:bg-slate-100'}`}>
+                            <span className="material-icons-round text-[13px]">format_list_bulleted</span>
+                        </button>
+                        <button onClick={() => set({listStyle:'numbered'})} title="Numbered"
+                            className={`w-6 h-6 flex items-center justify-center rounded-md transition-all shrink-0 ${isNumbered?'bg-slate-900 text-white':'text-slate-500 hover:bg-slate-100'}`}>
+                            <span className="material-icons-round text-[13px]">format_list_numbered</span>
+                        </button>
+                        <button onClick={() => set({listStyle:'text'})} title="Free text"
+                            className={`w-6 h-6 flex items-center justify-center rounded-md transition-all shrink-0 ${isText?'bg-slate-900 text-white':'text-slate-500 hover:bg-slate-100'}`}>
+                            <span className="material-icons-round text-[13px]">notes</span>
+                        </button>
+                        {(slide.bullets??[]).length < 7 && (
+                            <button onClick={() => set({bullets:[...(slide.bullets??[]),''] })}
+                                className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[10px] md:text-[11px] font-semibold text-slate-500 hover:bg-slate-100 transition-all shrink-0">
+                                <span className="material-icons-round text-[12px]">add</span>
+                                {isText ? 'Para' : 'Point'}
+                            </button>
+                        )}
 
-                {/* Title color */}
-                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Title</span>
-                <label className="relative w-5 h-5 rounded cursor-pointer shrink-0 border border-slate-200 overflow-hidden" title="Title colour"
-                    style={{ background: slide.titleColor || t.titleColor }}>
-                    <input type="color" value={slide.titleColor||t.titleColor} onChange={e=>set({titleColor:e.target.value})}
-                        className="absolute inset-0 opacity-0 w-full h-full cursor-pointer" />
-                </label>
-                {slide.titleColor && <button onClick={() => set({titleColor:''})} className="text-[10px] text-slate-400 hover:text-red-400 shrink-0" title="Reset">↺</button>}
+                        <div className="w-px h-4 bg-slate-200 shrink-0 mx-0.5" />
 
-                {/* Body color */}
-                {hasBody && (<>
-                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Body</span>
-                    <label className="relative w-5 h-5 rounded cursor-pointer shrink-0 border border-slate-200 overflow-hidden" title="Body colour"
-                        style={{ background: slide.bodyColor || t.bulletColor }}>
-                        <input type="color" value={slide.bodyColor||t.bulletColor} onChange={e=>set({bodyColor:e.target.value})}
+                        {/* Bold / Italic / Underline */}
+                        <button onMouseDown={e => e.preventDefault()} onClick={() => document.execCommand('bold')}
+                            title="Bold" className="w-6 h-6 flex items-center justify-center rounded-md text-slate-500 hover:bg-slate-100 transition-all shrink-0 font-bold text-[13px]">B</button>
+                        <button onMouseDown={e => e.preventDefault()} onClick={() => document.execCommand('italic')}
+                            title="Italic" className="w-6 h-6 flex items-center justify-center rounded-md text-slate-500 hover:bg-slate-100 transition-all shrink-0 italic text-[13px] font-semibold">I</button>
+                        <button onMouseDown={e => e.preventDefault()} onClick={() => document.execCommand('underline')}
+                            title="Underline" className="w-6 h-6 flex items-center justify-center rounded-md text-slate-500 hover:bg-slate-100 transition-all shrink-0 underline text-[13px] font-semibold">U</button>
+
+                        <div className="w-px h-4 bg-slate-200 shrink-0 mx-0.5" />
+                    </>)}
+
+                    {/* Spacing */}
+                    <span className="text-[8px] md:text-[9px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Spacing</span>
+                    <button onClick={() => set({lineHeight:Math.max(1.1,+(lh-0.1).toFixed(1))})}
+                        className="w-5 h-5 flex items-center justify-center rounded text-slate-500 hover:bg-slate-100 text-[13px] font-bold shrink-0">−</button>
+                    <span className="text-[11px] font-semibold text-slate-600 w-6 text-center shrink-0 tabular-nums">{lh.toFixed(1)}</span>
+                    <button onClick={() => set({lineHeight:Math.min(3,+(lh+0.1).toFixed(1))})}
+                        className="w-5 h-5 flex items-center justify-center rounded text-slate-500 hover:bg-slate-100 text-[13px] font-bold shrink-0">+</button>
+                </div>
+
+                {/* ── Row 3: Colors / Image / BG & Theme ── */}
+                <div className="flex items-center gap-1 px-2 md:px-3 py-1 overflow-x-auto">
+
+                    {/* Title color */}
+                    <span className="text-[8px] md:text-[9px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Title</span>
+                    <label className="relative w-5 h-5 rounded cursor-pointer shrink-0 border border-slate-200 overflow-hidden" title="Title colour"
+                        style={{ background: slide.titleColor || t.titleColor }}>
+                        <input type="color" value={slide.titleColor||t.titleColor} onChange={e=>set({titleColor:e.target.value})}
                             className="absolute inset-0 opacity-0 w-full h-full cursor-pointer" />
                     </label>
-                    {slide.bodyColor && <button onClick={() => set({bodyColor:''})} className="text-[10px] text-slate-400 hover:text-red-400 shrink-0" title="Reset">↺</button>}
-                </>)}
+                    {slide.titleColor && (
+                        <button onClick={() => set({titleColor:''})} className="text-[10px] text-slate-400 hover:text-red-400 shrink-0" title="Reset">↺</button>
+                    )}
 
-                <div className="w-px h-4 bg-slate-200 shrink-0 mx-1" />
+                    {/* Body color */}
+                    {hasBody && (<>
+                        <div className="w-px h-4 bg-slate-200 shrink-0 mx-0.5" />
+                        <span className="text-[8px] md:text-[9px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Body</span>
+                        <label className="relative w-5 h-5 rounded cursor-pointer shrink-0 border border-slate-200 overflow-hidden" title="Body colour"
+                            style={{ background: slide.bodyColor || t.bulletColor }}>
+                            <input type="color" value={slide.bodyColor||t.bulletColor} onChange={e=>set({bodyColor:e.target.value})}
+                                className="absolute inset-0 opacity-0 w-full h-full cursor-pointer" />
+                        </label>
+                        {slide.bodyColor && (
+                            <button onClick={() => set({bodyColor:''})} className="text-[10px] text-slate-400 hover:text-red-400 shrink-0" title="Reset">↺</button>
+                        )}
+                    </>)}
 
-                {/* Image */}
-                {!slide.image ? (
-                    <button onClick={onImageUpload}
-                        className="flex items-center gap-0.5 px-2 py-0.5 rounded-md text-[11px] font-semibold text-slate-500 hover:bg-slate-100 transition-all shrink-0">
-                        <span className="material-icons-round text-[13px]">image</span>
-                        Image
-                    </button>
-                ) : (<>
-                    <div className="flex items-center gap-0.5 bg-slate-100 rounded-md p-0.5 shrink-0">
-                        <button onClick={() => set({image:{...slide.image,position:'right'}})}
-                            className={`px-1.5 py-0.5 rounded text-[10px] font-semibold transition-all ${slide.image?.position!=='background'?'bg-white shadow-sm text-slate-700':'text-slate-400'}`}>
-                            Side
+                    <div className="w-px h-4 bg-slate-200 shrink-0 mx-0.5" />
+
+                    {/* Image */}
+                    {!slide.image ? (
+                        <button onClick={onImageUpload}
+                            className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[10px] md:text-[11px] font-semibold text-slate-500 hover:bg-slate-100 transition-all shrink-0">
+                            <span className="material-icons-round text-[12px]">image</span>
+                            Image
                         </button>
-                        <button onClick={() => set({image:{...slide.image,position:'background'}})}
-                            className={`px-1.5 py-0.5 rounded text-[10px] font-semibold transition-all ${slide.image?.position==='background'?'bg-white shadow-sm text-slate-700':'text-slate-400'}`}>
-                            BG
+                    ) : (<>
+                        <div className="flex items-center gap-0.5 bg-slate-100 rounded-md p-0.5 shrink-0">
+                            <button onClick={() => set({image:{...slide.image,position:'right'}})}
+                                className={`px-1.5 py-0.5 rounded text-[10px] font-semibold transition-all ${slide.image?.position!=='background'?'bg-white shadow-sm text-slate-700':'text-slate-400'}`}>
+                                Side
+                            </button>
+                            <button onClick={() => set({image:{...slide.image,position:'background'}})}
+                                className={`px-1.5 py-0.5 rounded text-[10px] font-semibold transition-all ${slide.image?.position==='background'?'bg-white shadow-sm text-slate-700':'text-slate-400'}`}>
+                                BG
+                            </button>
+                        </div>
+                        <button onClick={() => set({image:null})}
+                            className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[10px] md:text-[11px] font-semibold text-red-500 hover:bg-red-50 transition-all shrink-0">
+                            <span className="material-icons-round text-[12px]">hide_image</span>
+                            Remove
                         </button>
-                    </div>
-                    <button onClick={() => set({image:null})}
-                        className="flex items-center gap-0.5 px-2 py-0.5 rounded-md text-[11px] font-semibold text-red-500 hover:bg-red-50 transition-all shrink-0">
-                        <span className="material-icons-round text-[13px]">hide_image</span>
-                        Remove
-                    </button>
-                </>)}
+                    </>)}
 
-                <div className="w-px h-4 bg-slate-200 shrink-0 mx-1" />
+                    <div className="w-px h-4 bg-slate-200 shrink-0 mx-0.5" />
 
-                {/* Background & Theme button */}
-                <button onClick={() => setShowBgModal(true)}
-                    className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold transition-all shrink-0 border ${hasBgOverride?'border-primary/40 text-primary bg-primary/5':'border-slate-200 text-slate-500 hover:bg-slate-100'}`}
-                    title="Background & Theme">
-                    <span className="material-icons-round text-[13px]">palette</span>
-                    BG &amp; Theme
-                    {hasBgOverride && <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />}
-                </button>
-
-                {/* Actions */}
-                <div className="ml-auto flex items-center gap-1 shrink-0">
-                    <button onClick={onMoveUp} disabled={!canMoveUp}
-                        className="w-6 h-6 flex items-center justify-center rounded text-slate-400 hover:bg-slate-100 disabled:opacity-20 disabled:cursor-not-allowed transition-all">
-                        <span className="material-icons-round text-[14px]">arrow_upward</span>
+                    {/* Background & Theme */}
+                    <button onClick={() => setShowBgModal(true)}
+                        className={`flex items-center gap-1 px-1.5 md:px-2 py-0.5 rounded-md text-[10px] md:text-[11px] font-semibold transition-all shrink-0 border ${hasBgOverride?'border-primary/40 text-primary bg-primary/5':'border-slate-200 text-slate-500 hover:bg-slate-100'}`}
+                        title="Background & Theme">
+                        <span className="material-icons-round text-[13px]">palette</span>
+                        BG &amp; Theme
+                        {hasBgOverride && <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />}
                     </button>
-                    <button onClick={onMoveDown} disabled={!canMoveDown}
-                        className="w-6 h-6 flex items-center justify-center rounded text-slate-400 hover:bg-slate-100 disabled:opacity-20 disabled:cursor-not-allowed transition-all">
-                        <span className="material-icons-round text-[14px]">arrow_downward</span>
-                    </button>
-                    <button onClick={onAddSlide}
-                        className="flex items-center gap-0.5 px-2 py-0.5 rounded-md text-[11px] font-semibold text-primary bg-primary/10 hover:bg-primary/20 transition-all ml-1">
-                        <span className="material-icons-round text-[12px]">add</span>Slide
-                    </button>
-                    <span className="text-[10px] text-slate-400 ml-1 tabular-nums">{slideNum}/{total}</span>
                 </div>
+
             </div>
 
             {/* Background & Theme modal */}
@@ -1207,8 +1212,8 @@ export const Presentation = () => {
 
     if (loading) return (
         <div className="flex flex-col flex-1 h-screen items-center justify-center bg-slate-50 lg:ml-64">
-            <span className="material-icons-round text-primary text-[48px] animate-spin">sync</span>
-            <p className="text-sm text-slate-400 mt-4">Loading presentation…</p>
+            <span className="material-icons-round text-primary text-[30pxpx] md:text-[48px] animate-spin">sync</span>
+
         </div>
     );
     if (error || !presentation) return (
@@ -1225,30 +1230,30 @@ export const Presentation = () => {
             <input ref={imgInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
 
             {/* App header */}
-            <div className="flex items-center justify-between px-5 py-3 bg-white border-b border-slate-200 shrink-0 z-10 gap-3">
+            <div className="flex items-center justify-between px-2.5 md:px-5 py-1.5 md:py-3 bg-white border-b border-slate-200 shrink-0 z-10 gap-3">
                 <div className="flex items-center gap-3 min-w-0">
-                    <button onClick={() => navigate(-1)} className="w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:bg-slate-100 transition-colors shrink-0">
+                    {/* <button onClick={() => navigate(-1)} className="w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:bg-slate-100 transition-colors shrink-0">
                         <span className="material-icons-round text-[20px]">arrow_back</span>
-                    </button>
+                    </button> */}
                     <div className="min-w-0">
                         <input
                             value={title}
                             onChange={e => handleTitleChange(e.target.value)}
                             onKeyDown={handleTitleKeyDown}
                             placeholder="Untitled Presentation"
-                            className="text-slate-900 font-semibold text-sm bg-transparent outline-none border-b border-transparent focus:border-slate-300 hover:border-slate-200 transition-colors w-full truncate placeholder-slate-400"
+                            className="text-slate-900 font-medium md:font-semibold text-[12px] md:text-sm bg-transparent outline-none border-none transition-colors w-full truncate placeholder-slate-400"
                         />
-                        <p className="text-slate-400 text-[10px]">{slides.length} slides · {themeId}</p>
+                        <p className="text-slate-400 text-[8px] md:text-[10px]">{slides.length} slides · {themeId}</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                     {saving && <span className="flex items-center gap-1 text-[11px] text-amber-500"><span className="material-icons-round text-[13px] animate-spin">sync</span>Saving…</span>}
                     {!saving && saveMsg==='saved' && <span className="flex items-center gap-1 text-[11px] text-green-500"><span className="material-icons-round text-[13px]">check</span>Saved</span>}
                     <button onClick={() => setShowNotes(v=>!v)}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${showNotes?'bg-amber-50 text-amber-600 border border-amber-200':'text-slate-500 hover:bg-slate-100'}`}>
-                        <span className="material-icons-round text-[15px]">speaker_notes</span>Notes
+                        className={`flex items-center gap-1 md:gap-1.5 px-1.5 py-1 md:px-3 md:py-1.5 rounded-xl text-[11px] md:text-xs font-medium md:font-semibold transition-all ${showNotes?'bg-amber-50 text-amber-600 border border-amber-200':'text-slate-500 hover:bg-slate-100'}`}>
+                        <span className="material-icons-round text-[11px] md:text-[15px]">speaker_notes</span>Notes
                     </button>
-                    <button onClick={toggleFS} className="w-8 h-8 rounded-xl flex items-center justify-center text-slate-500 hover:bg-slate-100 transition-all">
+                    <button onClick={toggleFS} className="w-5 h-5 md:w-8 md:h-8 rounded-md md:rounded-xl flex items-center justify-center text-slate-500 hover:bg-slate-100 transition-all">
                         <span className="material-icons-round text-[18px]">{isFullscreen?'fullscreen_exit':'fullscreen'}</span>
                     </button>
                     {/* Export dropdown */}
@@ -1256,26 +1261,26 @@ export const Presentation = () => {
                         <button
                             onClick={() => setShowExportMenu(v => !v)}
                             disabled={exporting || exportingPdf}
-                            className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-semibold bg-primary text-white hover:bg-primary/90 active:scale-95 transition-all shadow-md shadow-primary/20 disabled:opacity-60"
+                            className="flex items-center gap-1 md:gap-1.5 px-2 md:px-4 py-1 md:py-1.5 rounded-md md:rounded-xl text-[9px] md:text-xs font-normal md:font-semibold bg-primary text-white hover:bg-primary/90 active:scale-95 transition-all shadow-md shadow-primary/20 disabled:opacity-60"
                         >
                             {(exporting || exportingPdf)
                                 ? <><span className="material-icons-round text-[14px] animate-spin">sync</span>{exportingPdf ? 'Exporting PDF…' : 'Exporting…'}</>
                                 : <><span className="material-icons-round text-[14px]">download</span>Export<span className="material-icons-round text-[14px] ml-0.5">expand_more</span></>}
                         </button>
                         {showExportMenu && (
-                            <div className="absolute right-0 top-9 bg-white rounded-2xl shadow-xl border border-slate-100 py-1.5 w-44 z-50 animate-in fade-in zoom-in-95 duration-100">
+                            <div className="absolute right-0 top-9 bg-white rounded-lg md:rounded-2xl shadow-xl border border-slate-100 py-1.5 w-44 z-50 animate-in fade-in zoom-in-95 duration-100">
                                 <button
                                     onClick={() => { setShowExportMenu(false); handleExportPPTX(); }}
-                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                                    className="w-full flex items-center gap-1.5 md:gap-3 px-2 md:px-4 py-1.5 md:py-2.5 text-[12px] md:text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                                 >
-                                    <span className="material-icons-round text-[17px] text-indigo-400">slideshow</span>
+                                    <span className="material-icons-round text-[13px] md:text-[17px] text-indigo-400">slideshow</span>
                                     Export PPTX
                                 </button>
                                 <button
                                     onClick={handleExportPDF}
-                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                                    className="w-full flex items-center gap-1.5 md:gap-3 px-2 md:px-4 py-1.5 md:py-2.5 text-[12px] md:text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                                 >
-                                    <span className="material-icons-round text-[17px] text-rose-400">picture_as_pdf</span>
+                                    <span className="material-icons-round text-[13px] md:text-[17px] text-rose-400">picture_as_pdf</span>
                                     Export PDF
                                 </button>
                             </div>
@@ -1344,16 +1349,16 @@ export const Presentation = () => {
                     {/* Navigation */}
                     <div className="flex items-center justify-between px-5 py-2.5 bg-white border-t border-slate-100 shrink-0">
                         <button onClick={goPrev} disabled={idx===0}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all">
-                            <span className="material-icons-round text-[18px]">chevron_left</span>Prev
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[12px] md:text-sm md:font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all">
+                            <span className="material-icons-round text-[15px] md:text-[18px]">chevron_left</span>Prev
                         </button>
                         <div className="flex items-center gap-2">
                             <span className="text-[12px] font-semibold text-slate-700 tabular-nums">{idx+1}</span>
                             <span className="text-[11px] text-slate-400">of {slides.length}</span>
                         </div>
                         <button onClick={goNext} disabled={idx===slides.length-1}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all">
-                            Next<span className="material-icons-round text-[18px]">chevron_right</span>
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[12px] md:text-sm md:font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all">
+                            Next<span className="material-icons-round text-[15px] md:text-[18px]">chevron_right</span>
                         </button>
                     </div>
 

@@ -53,7 +53,7 @@ function markdownToHtml(md) {
 }
 
 
-const SYSTEM_INSTRUCTION = `You are Naomi — an expert study-note generator inside a note-taking app called Notepaper.ai.
+const SYSTEM_INSTRUCTION = `You are Schola — an expert study-note generator inside a note-taking app called Notepaper.ai.
 Your job is to produce thorough, well-structured, deeply informative content on any topic the student gives you.
 
 Rules:

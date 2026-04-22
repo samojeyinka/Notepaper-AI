@@ -195,82 +195,14 @@ export const NoteHeader = ({
                 {/* Left side */}
                 <div className="flex items-center w-full justify-between gap-4">
                     <input
-                        className={`bg-transparent border-none text-[12px] md:text-[17px] font-display font-medium md:font-semibold focus:ring-0 w-36 md:w-96 text-slate-900 transition-opacity ${saveStatus === 'loading' ? 'opacity-40 cursor-wait pointer-events-none' : ''}`}
+                        className={`bg-transparent border-none text-[12px] md:text-[17px] font-display font-medium md:font-semibold focus:ring-0 w-38 md:w-96 text-slate-900 transition-opacity ${saveStatus === 'loading' ? 'opacity-40 cursor-wait pointer-events-none' : ''}`}
                         type="text"
                         value={title}
                         onChange={(e) => onTitleChange(e.target.value)}
                         placeholder="Untitled Note"
                         readOnly={saveStatus === 'loading'}
                     />
-                        <div className="flex  items-center gap-1">
-                     <div className="flex items-center gap-1 bg-slate-100 rounded-full px-0.5 md:p-1 relative">
-                        <button
-                            onClick={onToggleHistory}
-                            title="Version history"
-                            className={`p-0.5 md:p-1 rounded-full transition-all duration-200 flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95
-                                ${isHistoryOpen
-                                    ? 'bg-primary text-white shadow-md shadow-primary/40'
-                                    : 'text-slate-400 hover:bg-white hover:text-primary hover:shadow-lg'}`}
-                        >
-                            <span className="material-icons-round text-[13px] md:text-[17px]">history</span>
-                        </button>
-                        <button
-                            onClick={onToggleAI}
-                            className={`p-0.5 md:p-1 rounded-full transition-all duration-500 relative flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95
-                                ${isAIOpen
-                                    ? 'bg-primary text-white shadow-xl shadow-primary/40'
-                                    : 'text-slate-400 hover:bg-white hover:text-primary hover:shadow-lg animate-glow'}`}
-                        >
-                            <span className="material-icons-round text-[13px] md:text-[17px]">auto_awesome</span>
-                            {!isAIOpen && (
-                                <span className="absolute inset-0 rounded-full border-2 border-primary/20 animate-ping opacity-30 pointer-events-none" />
-                            )}
-                        </button>
-                        <style>{`
-                            @keyframes glow {
-                                0% { box-shadow: 0 0 0 0 rgba(167, 139, 250, 0); }
-                                50% { box-shadow: 0 0 15px 2px rgba(167, 139, 250, 0.3); }
-                                100% { box-shadow: 0 0 0 0 rgba(167, 139, 250, 0); }
-                            }
-                            .animate-glow { animation: glow 2.5s infinite ease-in-out; }
-                        `}</style>
-                        <div className="relative">
-                            <button
-                                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                                className={`p-0.5 md:p-1 hover:bg-white rounded-full text-slate-600 transition-all ${isMenuOpen ? 'bg-white shadow-sm' : ''}`}
-                            >
-                                <span className="material-icons-round text-[13px] md:text-[17px]">more_vert</span>
-                            </button>
-                            {isMenuOpen && (
-                                <>
-                                    <div className="fixed inset-0 z-20 pointer-events-auto" onClick={() => setIsMenuOpen(false)} />
-                                    <div className="absolute right-0 mt-2 w-36 md:w-56 bg-white rounded-md md:rounded-2xl shadow-xl border border-slate-100 py-2 z-30 animate-in fade-in zoom-in-95 duration-150">
-                                        <MenuButton icon="share" label="Share Note" onClick={onShare} />
-                                        <MenuButton icon="content_copy" label="Make a Copy" onClick={onCopy} />
-                                        <div className="h-px bg-slate-100 my-2" />
-                                        <MenuButton icon="picture_as_pdf" label="Export as PDF" onClick={onExportPDF} />
-                                        <MenuButton icon="image" label="Export as Image" onClick={onExportImage} />
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                    </div>
-                    
-                    
-                    <button
-                        onClick={toggleVoice}
-                        title={voiceState === 'listening' ? 'Stop recording' : 'Voice to text (Chrome / Edge)'}
-                        className={`flex items-center gap-1 text-[13px] text-white px-1 py-1 md:px-1.5 md:py-1.5 rounded-full font-medium shadow-lg hover:scale-105 active:scale-95 transition-all
-                            ${voiceState === 'listening'
-                                ? 'bg-red-500 shadow-red-400/30 animate-pulse'
-                                : 'bg-accent-green shadow-accent-green/20'
-                            }`}
-                    >
-                        <span className="material-icons-round text-[13px] md:text-[17px]">
-                            {voiceState === 'listening' ? 'stop_circle' : 'mic'}
-                        </span>
-                    </button>
-</div>
+         
                   
                 </div>
 
@@ -313,7 +245,79 @@ export const NoteHeader = ({
                             <span className="material-icons-round text-[14px] md:text-[17px]">redo</span>
                         </button>
                     </div> 
+
+                                   <div className="flex  items-center gap-1">
+                     <div className="flex items-center gap-1 bg-slate-100 rounded-full px-0.5 md:p-1 relative">
+                        <button
+                            onClick={onToggleHistory}
+                            title="Version history"
+                            className={`p-0.5 md:p-1 rounded-full transition-all duration-200 flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95
+                                ${isHistoryOpen
+                                    ? 'bg-primary text-white shadow-md shadow-primary/40'
+                                    : 'text-slate-400 hover:bg-white hover:text-primary hover:shadow-lg'}`}
+                        >
+                            <span className="material-icons-round text-[13px] md:text-[17px]">history</span>
+                        </button>
+                        <button
+                            onClick={onToggleAI}
+                            className={`p-0.5 md:p-1 rounded-full transition-all duration-500 relative flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95
+                                ${isAIOpen
+                                    ? 'bg-primary text-white shadow-xl shadow-primary/40'
+                                    : 'text-slate-400 hover:bg-white hover:text-primary hover:shadow-lg animate-glow'}`}
+                        >
+                            <span className="material-icons-round text-[13px] md:text-[17px]">auto_awesome</span>
+                            {!isAIOpen && (
+                                <span className="absolute inset-0 rounded-full border-2 border-primary/20 animate-ping opacity-30 pointer-events-none" />
+                            )}
+                        </button>
+                        <style>{`
+                            @keyframes glow {
+                                0% { box-shadow: 0 0 0 0 rgba(167, 139, 250, 0); }
+                                50% { box-shadow: 0 0 15px 2px rgba(167, 139, 250, 0.3); }
+                                100% { box-shadow: 0 0 0 0 rgba(167, 139, 250, 0); }
+                            }
+                            .animate-glow { animation: glow 2.5s infinite ease-in-out; }
+                        `}</style>
+                        <div className="relative">
+                            <button
+                                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                                className={`p-0.5 md:p-1 hover:bg-white rounded-full text-slate-600 transition-all ${isMenuOpen ? 'bg-white shadow-sm' : ''}`}
+                            >
+                                <span className="material-icons-round text-[13px] md:text-[17px]">more_vert</span>
+                            </button>
+                            {isMenuOpen && (
+                                <>
+                                    <div className="fixed inset-0 z-20 pointer-events-auto" onClick={() => setIsMenuOpen(false)} />
+                                    <div className="absolute right-0 mt-2 w-36 md:w-56 bg-white rounded-md md:rounded-2xl shadow-xl border border-slate-100 py-2 z-30 animate-in fade-in zoom-in-95 duration-150">
+                                
+                                        <MenuButton icon="content_copy" label="Make a Copy" onClick={onCopy} />
+                                        <div className="h-px bg-slate-100 my-2" />
+                                        <MenuButton icon="picture_as_pdf" label="Export as PDF" onClick={onExportPDF} />
+                                        <MenuButton icon="image" label="Export as Image" onClick={onExportImage} />
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                    
+                    
+                    <button
+                        onClick={toggleVoice}
+                        title={voiceState === 'listening' ? 'Stop recording' : 'Voice to text (Chrome / Edge)'}
+                        className={`flex items-center gap-1 text-[13px] text-white px-1 py-1 md:px-1.5 md:py-1.5 rounded-full font-medium shadow-lg hover:scale-105 active:scale-95 transition-all
+                            ${voiceState === 'listening'
+                                ? 'bg-red-500 shadow-red-400/30 animate-pulse'
+                                : 'bg-accent-green shadow-accent-green/20'
+                            }`}
+                    >
+                        <span className="material-icons-round text-[13px] md:text-[17px]">
+                            {voiceState === 'listening' ? 'stop_circle' : 'mic'}
+                        </span>
+                    </button>
+</div>
+
                 </div>
+
             </div>
             <VoiceCountdown voiceState={voiceState} />
         </header>

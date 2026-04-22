@@ -126,7 +126,7 @@ const Face = ({
             )}
 
             {/* content area */}
-            <div className="flex-1 flex items-center justify-center p-8 pt-10 relative z-10 overflow-hidden">
+            <div className="flex-1 flex items-center justify-center p-4 md:p-8 pt-8 md:pt-10 relative z-10 overflow-hidden">
                 {editMode ? (
                     <EditableContent
                         content={content}
@@ -177,8 +177,8 @@ export const FlashcardCard = ({
     textColor,
     fontFamily,
     fontSize,
-    isBold,
-    isItalic,
+    boldSides  = { front: true,  back: true  },
+    italicSides = { front: false, back: false },
     editMode = false,
     editSide = 'front',
     onChange,
@@ -192,14 +192,15 @@ export const FlashcardCard = ({
     const tpl                   = TEMPLATES[template] ?? TEMPLATES.girlies;
     const fontStyle             = getFontStyle(fontFamily);
 
-    const cardStyle = {
+    const baseStyle = {
         backgroundColor: bgColor || tpl.defaultBg,
         color: textColor || tpl.defaultText,
         ...fontStyle,
         fontSize: fontSize ? `${fontSize}px` : '18px',
-        fontWeight: isBold ? '700' : '400',
-        fontStyle: isItalic ? 'italic' : 'normal',
     };
+
+    const frontCardStyle = { ...baseStyle, fontWeight: boldSides.front ? '700' : '400', fontStyle: italicSides.front ? 'italic' : 'normal' };
+    const backCardStyle  = { ...baseStyle, fontWeight: boldSides.back  ? '700' : '400', fontStyle: italicSides.back  ? 'italic' : 'normal' };
 
     // In edit mode the flip is driven by the parent's editSide toggle
     const isFlipped = editMode ? editSide === 'back' : flipped;
@@ -233,8 +234,8 @@ export const FlashcardCard = ({
 
     return (
         <div
-            className="relative select-none cursor-pointer"
-            style={{ perspective: '1200px', width: '100%', maxWidth: 480, height: 280 }}
+            className="relative select-none cursor-pointer w-full h-[220px] md:h-[280px]"
+            style={{ perspective: '1200px' }}
             onPointerDown={onPointerDown}
             onPointerUp={onPointerUp}
             onClick={handleFlip}
@@ -251,7 +252,7 @@ export const FlashcardCard = ({
                 <Face
                     side="front"
                     content={card?.front}
-                    cardStyle={cardStyle}
+                    cardStyle={frontCardStyle}
                     textColor={textColor}
                     tpl={tpl}
                     editMode={editMode}
@@ -263,7 +264,7 @@ export const FlashcardCard = ({
                 <Face
                     side="back"
                     content={card?.back}
-                    cardStyle={cardStyle}
+                    cardStyle={backCardStyle}
                     textColor={textColor}
                     tpl={tpl}
                     editMode={editMode}

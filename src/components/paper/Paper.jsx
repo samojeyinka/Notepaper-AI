@@ -420,13 +420,27 @@ export const Paper = () => {
                     if (!isAISidebarOpen) {
                         const sel = window.getSelection();
                         savedRangeRef.current = sel && sel.rangeCount > 0 ? sel.getRangeAt(0).cloneRange() : null;
+                        setIsVersionSidebarOpen(false);
+                        setIsPresentationsSidebarOpen(false);
                     }
-                    setIsAISidebarOpen(!isAISidebarOpen);
+                    setIsAISidebarOpen(v => !v);
                 }}
                 isAIOpen={isAISidebarOpen}
-                onToggleHistory={() => { setIsVersionSidebarOpen(v => !v); setIsPresentationsSidebarOpen(false); }}
+                onToggleHistory={() => {
+                    if (!isVersionSidebarOpen) {
+                        setIsAISidebarOpen(false);
+                        setIsPresentationsSidebarOpen(false);
+                    }
+                    setIsVersionSidebarOpen(v => !v);
+                }}
                 isHistoryOpen={isVersionSidebarOpen}
-                onTogglePresentations={() => { setIsPresentationsSidebarOpen(v => !v); setIsVersionSidebarOpen(false); }}
+                onTogglePresentations={() => {
+                    if (!isPresentationsSidebarOpen) {
+                        setIsAISidebarOpen(false);
+                        setIsVersionSidebarOpen(false);
+                    }
+                    setIsPresentationsSidebarOpen(v => !v);
+                }}
                 isPresentationsOpen={isPresentationsSidebarOpen}
                 canUndo={canUndo} canRedo={canRedo}
                 onUndo={() => handleUndoRef.current?.()} onRedo={() => handleRedoRef.current?.()}
@@ -516,7 +530,7 @@ export const Paper = () => {
                     )}
                     {!isPageSidebarOpen && (
                         <button onClick={() => setIsPageSidebarOpen(true)}
-                            className="absolute right-0 top-1/2 -translate-y-1/2 w-6 h-20 bg-white border border-slate-200 rounded-l-xl flex items-center justify-center hover:bg-slate-50 transition-colors z-20">
+                            className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-10 md:w-6 md:h-20 bg-white border border-slate-200 rounded-l-xl flex items-center justify-center hover:bg-slate-50 transition-colors z-20">
                             <span className="material-icons-round text-slate-400">chevron_left</span>
                         </button>
                     )}
@@ -562,7 +576,7 @@ export const Paper = () => {
                 {/* Preferences button */}
                 <button
                     onClick={() => setIsSettingsOpen(true)}
-                    className="fixed bottom-10 right-10 z-50 w-12 h-12 bg-white border-2 border-primary text-primary rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform"
+                    className="fixed bottom-10 right-10 z-50 w-8 h-8 md:w-12 md:h-12 bg-white border-2 border-primary text-primary rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform"
                 >
                     <span className="material-icons-round">tune</span>
                 </button>

@@ -82,18 +82,18 @@ const VoiceCountdown = ({ voiceState }) => {
 
     if (voiceState === 'countdown') return (
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm">
-            <div className="bg-white rounded-3xl shadow-2xl px-12 py-10 text-center">
-                <p className="text-slate-500 text-sm mb-4">Get ready to speak in…</p>
-                <p className="text-8xl font-bold text-primary leading-none">{count}</p>
-                <p className="text-slate-400 text-xs mt-4">Works best in Chrome &amp; Edge</p>
+            <div className="bg-white mt-20 md:mt-52 rounded-xl md:rounded-3xl shadow-2xl px-6 md:px-12 py-10 text-center">
+                <p className="text-slate-500 text-[12px] md:text-sm mb-2 md:mb-4">Get ready to speak in…</p>
+                <p className="text-3xl md:text-8xl font-semibold md:font-bold text-primary leading-none">{count}</p>
+                <p className="text-slate-400 text-[10px] md:text-xs mt-4">Works best in Chrome &amp; Edge</p>
             </div>
         </div>
     );
 
     if (voiceState === 'listening') return (
-        <div className="fixed bottom-2 left-1/2 -translate-x-1/2 z-[200] flex items-center gap-3 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-2xl">
-            <span className="w-2.5 h-2.5 rounded-full bg-red-400 animate-pulse" />
-            <span className="text-[12px] font-normal">Listening…</span>
+        <div className="fixed bottom-2 left-1/2 -translate-x-1/2 z-[200] flex items-center gap-3 bg-slate-900 text-white px-2.5 md:px-5 py-1.5 md:py-3 rounded-xl md:rounded-2xl shadow-2xl">
+            <span className="w-1.5 h-1.5 md:w-2.5 md:h-2.5 rounded-full bg-red-400 animate-pulse" />
+            <span className="text-[10px] md:text-[12px] font-normal">Listening…</span>
         </div>
     );
 
@@ -139,9 +139,9 @@ export const PaperHeader = ({
     const MenuButton = ({ icon, label, onClick, badge }) => (
         <button
             onClick={() => { onClick(); setIsMenuOpen(false); }}
-            className="w-full flex items-center gap-3 px-4 py-2 hover:bg-slate-50 text-slate-700 text-sm font-medium transition-all"
+            className="w-full flex items-center gap-1.5 md:gap-3 px-2 py-1 md:px-4 md:py-2 hover:bg-slate-50 text-slate-700 text-[11px] md:text-sm font-normal md:font-medium transition-all"
         >
-            <span className="material-icons-round text-[18px] text-slate-400">{icon}</span>
+            <span className="material-icons-round text-[11px] md:text-[18px] text-slate-400">{icon}</span>
             {label}
             {badge != null && badge > 0 && (
                 <span className="ml-auto text-[10px] bg-primary/10 text-primary font-bold px-1.5 py-0.5 rounded-full">{badge}</span>
@@ -152,18 +152,18 @@ export const PaperHeader = ({
     return (
         <header className="border-b border-slate-200 bg-white/80 backdrop-blur-md sticky top-0 z-40">
             {folderId && (
-                <div className="px-6 pt-2">
-                    <Link to={`/lockedin/folders/${folderId}`} className="inline-flex items-center gap-1 text-[11px] text-slate-400 hover:text-primary transition-colors">
-                        <span className="material-icons-round text-[14px]">arrow_back</span>
+                <div className="px-3 md:px-6 pt-1 md:pt-2">
+                    <Link to={`/lockedin/folders/${folderId}`} className="inline-flex items-center gap-1 text-[10px] md:text-[11px] text-slate-400 hover:text-primary transition-colors">
+                        <span className="material-icons-round text-[11px] md:text-[14px]">arrow_back</span>
                         Back to folder
                     </Link>
                 </div>
             )}
-            <div className="h-14 flex items-center justify-between px-8">
+            <div className="h-auto md:h-14 flex items-center flex-wrap md:flex-nowrap justify-between px-3 md:px-8 py-1.5 md:py-0">
                 {/* Left */}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 md:gap-4">
                     <input
-                        className={`bg-transparent border-none text-[17px] font-display font-semibold focus:ring-0 w-64 md:w-96 text-slate-900 transition-opacity ${saveStatus === 'loading' ? 'opacity-40 cursor-wait pointer-events-none' : ''}`}
+                        className={`bg-transparent border-none text-[12px] md:text-[14px] font-display font-medium md:font-semibold focus:ring-0 w-32 md:w-96 text-slate-900 transition-opacity ${saveStatus === 'loading' ? 'opacity-40 cursor-wait pointer-events-none' : ''}`}
                         type="text"
                         value={title}
                         onChange={(e) => onTitleChange(e.target.value)}
@@ -171,8 +171,8 @@ export const PaperHeader = ({
                         readOnly={saveStatus === 'loading'}
                     />
                     {status.label && (
-                        <span className={`flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-medium uppercase tracking-wider transition-all duration-300 ${status.cls}`}>
-                            <span className={`material-icons-round text-[14px] ${saveStatus === 'saving' ? 'animate-spin' : ''}`}>{status.icon}</span>
+                        <span className={`flex items-center gap-0.5 md:gap-1 px-1 md:px-2 py-0.5 md:py-1 rounded-lg text-[8px] md:text-[10px] font-medium uppercase tracking-wider transition-all duration-300 ${status.cls}`}>
+                            <span className={`material-icons-round text-[10px] md:text-[14px] ${saveStatus === 'saving' ? 'animate-spin' : ''}`}>{status.icon}</span>
                             {status.label}
                         </span>
                     )}
@@ -180,51 +180,51 @@ export const PaperHeader = ({
                         onClick={onSave}
                         disabled={saveStatus === 'saving'}
                         title="Save now (Ctrl+S)"
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-normal transition-all duration-200
+                        className={`flex items-center gap-1 md:gap-1.5 px-1.5 md:px-3 py-1 md:py-1.5 rounded-lg text-[9px] md:text-xs font-normal transition-all duration-200
                             ${saveStatus === 'saving' ? 'bg-amber-50 text-amber-400 cursor-wait' : 'bg-primary/10 text-primary hover:bg-primary hover:text-white active:scale-95'}`}
                     >
-                        <span className="material-icons-round text-[14px]">save</span>
+                        <span className="material-icons-round text-[10px] md:text-[14px]">save</span>
                         Save
                     </button>
                     <div className="flex items-center gap-1">
-                        <button onClick={onUndo} disabled={!canUndo} title="Undo (Ctrl+Z)" className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-90">
-                            <span className="material-icons-round text-[17px]">undo</span>
+                        <button onClick={onUndo} disabled={!canUndo} title="Undo (Ctrl+Z)" className="w-6 h-6 md:w-8 md:h-8 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-90">
+                            <span className="material-icons-round text-[14px] md:text-[17px]">undo</span>
                         </button>
-                        <button onClick={onRedo} disabled={!canRedo} title="Redo (Ctrl+Y)" className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-90">
-                            <span className="material-icons-round text-[17px]">redo</span>
+                        <button onClick={onRedo} disabled={!canRedo} title="Redo (Ctrl+Y)" className="w-6 h-6 md:w-8 md:h-8 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-90">
+                            <span className="material-icons-round text-[14px] md:text-[17px]">redo</span>
                         </button>
                     </div>
                 </div>
 
                 {/* Right */}
-                <div className="flex items-center gap-3">
+                <div className="flex items-center justify-between w-full gap-1.5 md:gap-3">
                     {/* Generate presentation button */}
                     <button
                         onClick={onGeneratePresentation}
                         title="Generate Presentation from this Paper"
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-gradient-to-r from-primary to-indigo-500 text-white shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:scale-105 active:scale-95 transition-all"
+                        className="flex items-center gap-1 md:gap-1.5 px-1.5 md:px-3 py-1 md:py-1.5 rounded-xl text-[9px] md:text-[10px] font-medium bg-gradient-to-r from-primary to-indigo-500 text-white shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:scale-105 active:scale-95 transition-all"
                     >
-                        <span className="material-icons-round text-[15px]">slideshow</span>
-                        <span className="hidden md:inline">Generate Slides</span>
+                        <span className="material-icons-round text-[12px] md:text-[15px]">slideshow</span>
+                        <span className="inline">Generate Slides</span>
                         {presentationCount > 0 && <span className="bg-white/20 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">{presentationCount}</span>}
                     </button>
 
-                    <div className="flex items-center bg-slate-100 rounded-full p-1 mr-4 relative">
+                    <div className="flex items-center bg-slate-100 rounded-full px-0.5 md:p-1 mr-2 md:mr-4 relative">
                         <button
                             onClick={onToggleHistory}
                             title="Version history"
-                            className={`p-1 rounded-full transition-all duration-200 flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95
+                            className={`p-0.5 md:p-1 rounded-full transition-all duration-200 flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95
                                 ${isHistoryOpen ? 'bg-primary text-white shadow-md shadow-primary/40' : 'text-slate-400 hover:bg-white hover:text-primary hover:shadow-lg'}`}
                         >
-                            <span className="material-icons-round text-[17px]">history</span>
+                            <span className="material-icons-round text-[13px] md:text-[17px]">history</span>
                         </button>
                         <button
                             onClick={onTogglePresentations}
                             title="Presentations"
-                            className={`relative p-1 rounded-full transition-all duration-200 flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95
+                            className={`relative p-0.5 md:p-1 rounded-full transition-all duration-200 flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95
                                 ${isPresentationsOpen ? 'bg-primary text-white shadow-md shadow-primary/40' : 'text-slate-400 hover:bg-white hover:text-primary hover:shadow-lg'}`}
                         >
-                            <span className="material-icons-round text-[17px]">slideshow</span>
+                            <span className="material-icons-round text-[13px] md:text-[17px]">slideshow</span>
                             {presentationCount > 0 && (
                                 <span className={`absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full text-[8px] font-bold flex items-center justify-center leading-none ${isPresentationsOpen ? 'bg-white text-primary' : 'bg-primary text-white'}`}>
                                     {presentationCount}
@@ -233,21 +233,21 @@ export const PaperHeader = ({
                         </button>
                         <button
                             onClick={onToggleAI}
-                            className={`p-1 rounded-full transition-all duration-500 relative flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95
+                            className={`p-0.5 md:p-1 rounded-full transition-all duration-500 relative flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95
                                 ${isAIOpen ? 'bg-primary text-white shadow-xl shadow-primary/40' : 'text-slate-400 hover:bg-white hover:text-primary hover:shadow-lg animate-glow'}`}
                         >
-                            <span className="material-icons-round text-[17px]">auto_awesome</span>
+                            <span className="material-icons-round text-[13px] md:text-[17px]">auto_awesome</span>
                             {!isAIOpen && <span className="absolute inset-0 rounded-full border-2 border-primary/20 animate-ping opacity-30 pointer-events-none" />}
                         </button>
                         <style>{`@keyframes glow{0%{box-shadow:0 0 0 0 rgba(167,139,250,0)}50%{box-shadow:0 0 15px 2px rgba(167,139,250,0.3)}100%{box-shadow:0 0 0 0 rgba(167,139,250,0)}}.animate-glow{animation:glow 2.5s infinite ease-in-out}`}</style>
                         <div className="relative">
-                            <button onClick={() => setIsMenuOpen(!isMenuOpen)} className={`p-1 hover:bg-white rounded-full text-slate-600 transition-all ${isMenuOpen ? 'bg-white shadow-sm' : ''}`}>
-                                <span className="material-icons-round text-[17px]">more_vert</span>
+                            <button onClick={() => setIsMenuOpen(!isMenuOpen)} className={`p-0.5 md:p-1 hover:bg-white rounded-full text-slate-600 transition-all ${isMenuOpen ? 'bg-white shadow-sm' : ''}`}>
+                                <span className="material-icons-round text-[13px] md:text-[17px]">more_vert</span>
                             </button>
                             {isMenuOpen && (
                                 <>
                                     <div className="fixed inset-0 z-20 pointer-events-auto" onClick={() => setIsMenuOpen(false)} />
-                                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-30 animate-in fade-in zoom-in-95 duration-150">
+                                    <div className="absolute right-0 mt-2 w-36 md:w-56 bg-white rounded-md md:rounded-2xl shadow-xl border border-slate-100 py-2 z-30 animate-in fade-in zoom-in-95 duration-150">
                                         <MenuButton icon="content_copy" label="Make a Copy" onClick={onCopy} />
                                         <div className="h-px bg-slate-100 my-2" />
                                         <MenuButton icon="picture_as_pdf" label="Export as PDF" onClick={onExportPDF} />
@@ -262,10 +262,10 @@ export const PaperHeader = ({
                     <button
                         onClick={toggleVoice}
                         title={voiceState === 'listening' ? 'Stop recording' : 'Voice to text'}
-                        className={`flex items-center gap-1 text-[13px] text-white px-1.5 py-1.5 rounded-full font-medium shadow-lg hover:scale-105 active:scale-95 transition-all
+                        className={`flex items-center gap-1 text-[13px] text-white px-1 py-1 md:px-1.5 md:py-1.5 rounded-full font-medium shadow-lg hover:scale-105 active:scale-95 transition-all
                             ${voiceState === 'listening' ? 'bg-red-500 shadow-red-400/30 animate-pulse' : 'bg-accent-green shadow-accent-green/20'}`}
                     >
-                        <span className="material-icons-round text-[17px]">{voiceState === 'listening' ? 'stop_circle' : 'mic'}</span>
+                        <span className="material-icons-round text-[13px] md:text-[17px]">{voiceState === 'listening' ? 'stop_circle' : 'mic'}</span>
                     </button>
                 </div>
             </div>

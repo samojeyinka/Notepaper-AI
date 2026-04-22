@@ -27,8 +27,8 @@ export const Flashcard = ({ id }) => {
     const [textColor,   setTextColor]   = useState(TEMPLATES.girlies.defaultText);
     const [fontFamily,  setFontFamily]  = useState('sans');
     const [fontSize,    setFontSize]    = useState(18);
-    const [isBold,      setIsBold]      = useState(true);
-    const [isItalic,    setIsItalic]    = useState(false);
+    const [boldSides,   setBoldSides]   = useState({ front: true,  back: true  });
+    const [italicSides, setItalicSides] = useState({ front: false, back: false });
     const [folder,      setFolder]      = useState(null);
 
     // ── UI state ──────────────────────────────────────────────────────────────
@@ -55,8 +55,14 @@ export const Flashcard = ({ id }) => {
                 setTextColor(d.text_color);
                 setFontFamily(d.font_family);
                 setFontSize(d.font_size);
-                setIsBold(d.is_bold);
-                setIsItalic(d.is_italic);
+                // Load per-side overrides if present, otherwise fall back to legacy boolean
+                const overrides = d.style_overrides;
+                setBoldSides(overrides
+                    ? { front: !!overrides.bold_front,   back: !!overrides.bold_back   }
+                    : { front: !!d.is_bold,              back: !!d.is_bold             });
+                setItalicSides(overrides
+                    ? { front: !!overrides.italic_front, back: !!overrides.italic_back }
+                    : { front: !!d.is_italic,            back: !!d.is_italic           });
                 setFolder(d.folder ?? null);
             })
             .finally(() => setLoading(false));
@@ -85,12 +91,25 @@ export const Flashcard = ({ id }) => {
         saveTimerRef.current = setTimeout(() => {
             if (!dirtyRef.current) return;
             dirtyRef.current = false;
-            save({ title, cards, template, bg_color: bgColor, text_color: textColor, font_family: fontFamily, font_size: fontSize, is_bold: isBold, is_italic: isItalic, ...(urlFolderId && { folder_id: urlFolderId }) });
+            save({
+                title, cards, template,
+                bg_color: bgColor, text_color: textColor,
+                font_family: fontFamily, font_size: fontSize,
+                is_bold:   boldSides.front,
+                is_italic: italicSides.front,
+                style_overrides: {
+                    bold_front:   boldSides.front,
+                    bold_back:    boldSides.back,
+                    italic_front: italicSides.front,
+                    italic_back:  italicSides.back,
+                },
+                ...(urlFolderId && { folder_id: urlFolderId }),
+            });
         }, 1200);
-    }, [title, cards, template, bgColor, textColor, fontFamily, fontSize, isBold, isItalic, save]);
+    }, [title, cards, template, bgColor, textColor, fontFamily, fontSize, boldSides, italicSides, save]);
 
     // Watch every style/content change
-    useEffect(() => { if (!loading) scheduleSave(); }, [title, cards, template, bgColor, textColor, fontFamily, fontSize, isBold, isItalic]); // eslint-disable-line
+    useEffect(() => { if (!loading) scheduleSave(); }, [title, cards, template, bgColor, textColor, fontFamily, fontSize, boldSides, italicSides]); // eslint-disable-line
 
     // ── Template change resets default colours ────────────────────────────────
     const handleTemplateChange = (tplKey) => {
@@ -152,7 +171,7 @@ export const Flashcard = ({ id }) => {
     }
 
     return (
-        <div className="flex flex-col flex-1 h-screen overflow-hidden bg-slate-50 lg:ml-64">
+        <div className="flex flex-col flex-1 h-screen overflow-hidden bg-slate-50 lg:ml-64 pt-16 lg:pt-0">
             <FlashcardHeader
                 title={title}
                 onTitleChange={setTitle}
@@ -172,22 +191,24 @@ export const Flashcard = ({ id }) => {
                     textColor={textColor} onTextColor={setTextColor}
                     fontFamily={fontFamily} onFontFamily={setFontFamily}
                     fontSize={fontSize}   onFontSize={setFontSize}
-                    isBold={isBold}       onBold={setIsBold}
-                    isItalic={isItalic}   onItalic={setIsItalic}
+                    isBold={boldSides[editSide]}
+                    onBold={val => setBoldSides(s => ({ ...s, [editSide]: val }))}
+                    isItalic={italicSides[editSide]}
+                    onItalic={val => setItalicSides(s => ({ ...s, [editSide]: val }))}
                 />
             )}
 
             {/* Main area */}
-            <div className="flex-1 flex flex-col items-center justify-center px-4 py-6 overflow-auto">
+            <div className="flex-1 flex flex-col items-center justify-center px-4 py-3 md:py-6 overflow-auto">
 
                 {/* Front / Back toggle (edit mode) */}
                 {editMode && (
-                    <div className="flex items-center bg-slate-100 rounded-xl p-1 gap-1 mb-4">
+                    <div className="flex items-center bg-slate-100 rounded-lg md:rounded-xl p-0.5 md:p-1 gap-0.5 md:gap-1 mb-3 md:mb-4">
                         {['front', 'back'].map(side => (
                             <button
                                 key={side}
                                 onClick={() => setEditSide(side)}
-                                className={`px-5 py-1.5 rounded-lg text-xs font-semibold transition-all capitalize ${
+                                className={`px-4 md:px-5 py-1 md:py-1.5 rounded-md md:rounded-lg text-[10px] md:text-xs font-semibold transition-all capitalize ${
                                     editSide === side
                                         ? 'bg-white text-slate-800 shadow-sm'
                                         : 'text-slate-400 hover:text-slate-600'
@@ -199,18 +220,18 @@ export const Flashcard = ({ id }) => {
                     </div>
                 )}
 
-                {/* Card + side buttons */}
-                <div className="relative flex items-center justify-center w-full" style={{ maxWidth: 600 }}>
+                {/* Card + side buttons — px-10 on mobile reserves space for the absolute nav buttons */}
+                <div className="relative flex items-center justify-center w-full px-10 md:px-16" style={{ maxWidth: 600 }}>
 
                     {/* Left side — prev nav (view) / remove card (edit) */}
-                    <div className="absolute left-0 flex flex-col items-center gap-2">
+                    <div className="absolute left-0 flex flex-col items-center gap-1.5 md:gap-2">
                         <div className="relative group">
                             <button
                                 onClick={goPrev}
                                 disabled={activeIndex === 0}
-                                className="w-9 h-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:border-primary hover:text-primary transition-all disabled:opacity-25 disabled:cursor-not-allowed shadow-sm active:scale-95"
+                                className="w-7 h-7 md:w-9 md:h-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:border-primary hover:text-primary transition-all disabled:opacity-25 disabled:cursor-not-allowed shadow-sm active:scale-95"
                             >
-                                <span className="material-icons-round text-[20px]">chevron_left</span>
+                                <span className="material-icons-round text-[16px] md:text-[20px]">chevron_left</span>
                             </button>
                             <span className="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] px-2 py-0.5 rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
                                 Previous
@@ -221,9 +242,9 @@ export const Flashcard = ({ id }) => {
                             <div className="relative group">
                                 <button
                                     onClick={() => removeCard(activeIndex)}
-                                    className="w-9 h-9 rounded-full bg-white border border-red-200 flex items-center justify-center text-red-400 hover:bg-red-50 hover:border-red-400 transition-all shadow-sm active:scale-95"
+                                    className="w-7 h-7 md:w-9 md:h-9 rounded-full bg-white border border-red-200 flex items-center justify-center text-red-400 hover:bg-red-50 hover:border-red-400 transition-all shadow-sm active:scale-95"
                                 >
-                                    <span className="material-icons-round text-[18px]">remove</span>
+                                    <span className="material-icons-round text-[15px] md:text-[18px]">remove</span>
                                 </button>
                                 <span className="pointer-events-none absolute -bottom-7 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] px-2 py-0.5 rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
                                     Remove
@@ -240,8 +261,8 @@ export const Flashcard = ({ id }) => {
                         textColor={textColor}
                         fontFamily={fontFamily}
                         fontSize={fontSize}
-                        isBold={isBold}
-                        isItalic={isItalic}
+                        boldSides={boldSides}
+                        italicSides={italicSides}
                         editMode={editMode}
                         editSide={editSide}
                         onChange={(side, html) => updateCard(activeIndex, side, html)}
@@ -252,14 +273,14 @@ export const Flashcard = ({ id }) => {
                     />
 
                     {/* Right side — next nav (view) / add card (edit) */}
-                    <div className="absolute right-0 flex flex-col items-center gap-2">
+                    <div className="absolute right-0 flex flex-col items-center gap-1.5 md:gap-2">
                         <div className="relative group">
                             <button
                                 onClick={goNext}
                                 disabled={activeIndex === cards.length - 1}
-                                className="w-9 h-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:border-primary hover:text-primary transition-all disabled:opacity-25 disabled:cursor-not-allowed shadow-sm active:scale-95"
+                                className="w-7 h-7 md:w-9 md:h-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:border-primary hover:text-primary transition-all disabled:opacity-25 disabled:cursor-not-allowed shadow-sm active:scale-95"
                             >
-                                <span className="material-icons-round text-[20px]">chevron_right</span>
+                                <span className="material-icons-round text-[16px] md:text-[20px]">chevron_right</span>
                             </button>
                             <span className="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] px-2 py-0.5 rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
                                 Next
@@ -270,9 +291,9 @@ export const Flashcard = ({ id }) => {
                             <div className="relative group">
                                 <button
                                     onClick={addCard}
-                                    className="w-9 h-9 rounded-full bg-white border border-primary/40 flex items-center justify-center text-primary hover:bg-primary/10 hover:border-primary transition-all shadow-sm active:scale-95"
+                                    className="w-7 h-7 md:w-9 md:h-9 rounded-full bg-white border border-primary/40 flex items-center justify-center text-primary hover:bg-primary/10 hover:border-primary transition-all shadow-sm active:scale-95"
                                 >
-                                    <span className="material-icons-round text-[18px]">add</span>
+                                    <span className="material-icons-round text-[15px] md:text-[18px]">add</span>
                                 </button>
                                 <span className="pointer-events-none absolute -bottom-7 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] px-2 py-0.5 rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
                                     Add Card

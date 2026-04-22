@@ -3,8 +3,8 @@ import React from "react";
 const SliderRow = ({ label, value, min, max, step = 1, unit = 'px', onChange }) => (
     <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
-            <span className="text-[11px] font-medium text-slate-600">{label}</span>
-            <span className="text-[11px] font-mono text-primary bg-primary/10 px-2 py-0.5 rounded-lg">{value}{unit}</span>
+            <span className="text-[10px] md:text-[11px] font-medium text-slate-600">{label}</span>
+            <span className="text-[10px] md:text-[11px] font-mono text-primary bg-primary/10 px-1.5 md:px-2 py-0.5 rounded-lg">{value}{unit}</span>
         </div>
         <input
             type="range"
@@ -13,7 +13,7 @@ const SliderRow = ({ label, value, min, max, step = 1, unit = 'px', onChange }) 
             step={step}
             value={value}
             onChange={(e) => onChange(Number(e.target.value))}
-            className="w-full accent-primary h-1.5 rounded-full cursor-pointer"
+            className="w-full accent-primary h-1 md:h-1.5 rounded-full cursor-pointer"
         />
         <div className="flex justify-between text-[9px] text-slate-300 font-mono">
             <span>{min}{unit}</span>
@@ -52,19 +52,19 @@ export const PaperPreferencesSidebar = ({
     return (
         <>
             <div className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm" onClick={onClose} />
-            <aside className="fixed right-0 top-0 h-full w-80 bg-white shadow-2xl z-50 flex flex-col overflow-hidden animate-in slide-in-from-right-4 duration-200">
+            <aside className="fixed right-0 top-0 h-full w-64 md:w-80 bg-white shadow-2xl z-50 flex flex-col overflow-hidden animate-in slide-in-from-right-4 duration-200">
                 {/* Header */}
-                <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+                <div className="flex items-center justify-between px-3 md:px-5 py-3 md:py-4 border-b border-slate-100">
                     <div className="flex items-center gap-2">
-                        <span className="material-icons-round text-primary text-[20px]">tune</span>
-                        <h3 className="font-display font-bold text-sm text-slate-900">Paper Preferences</h3>
+                        <span className="material-icons-round text-primary text-[16px] md:text-[20px]">tune</span>
+                        <h3 className="font-display font-bold text-[11px] md:text-sm text-slate-900">Paper Preferences</h3>
                     </div>
-                    <button onClick={onClose} className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 transition-colors">
-                        <span className="material-icons-round text-[18px]">close</span>
+                    <button onClick={onClose} className="w-6 h-6 md:w-7 md:h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 transition-colors">
+                        <span className="material-icons-round text-[16px] md:text-[18px]">close</span>
                     </button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto custom-scrollbar px-5 py-5 flex flex-col gap-6">
+                <div className="flex-1 overflow-y-auto custom-scrollbar px-3 md:px-5 py-3 md:py-5 flex flex-col gap-4 md:gap-6">
                     {/* Layout */}
                     <section>
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Page Layout</p>
@@ -95,7 +95,7 @@ export const PaperPreferencesSidebar = ({
                                 <button
                                     key={f.id}
                                     onClick={() => setFontFamily(f.id)}
-                                    className={`py-2.5 px-3 rounded-xl text-left transition-all border text-sm
+                                    className={`py-1.5 md:py-2.5 px-2 md:px-3 rounded-lg md:rounded-xl text-left transition-all border text-[11px] md:text-sm
                                         ${fontFamily === f.id
                                             ? 'border-primary bg-primary/5 text-primary shadow-sm'
                                             : 'border-slate-100 bg-slate-50 text-slate-600 hover:border-slate-200'
@@ -118,7 +118,7 @@ export const PaperPreferencesSidebar = ({
                                 type="color"
                                 value={textColor}
                                 onChange={(e) => setTextColor(e.target.value)}
-                                className="w-10 h-10 rounded-xl border border-slate-100 cursor-pointer p-1"
+                                className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl border border-slate-100 cursor-pointer p-1"
                             />
                             <input
                                 type="text"

@@ -14,7 +14,7 @@ const Popover = ({ anchorRef, children }) => {
     top = Math.max(POPOVER_MARGIN, Math.min(rect.top, maxTop));
   }
   return createPortal(
-    <div className="toolbar-popover bg-white border border-slate-100 rounded-2xl shadow-2xl animate-in slide-in-from-left-2 duration-150"
+    <div className="toolbar-popover bg-white border border-slate-100 rounded-md md:rounded-2xl shadow-2xl animate-in slide-in-from-left-2 duration-150"
       style={{ position:'fixed',top,left,zIndex:9999,minWidth:'240px',maxHeight:`${POPOVER_MAX_HEIGHT}px`,overflowY:'auto' }}
       onMouseDown={(e) => e.preventDefault()}>
       {children}
@@ -26,26 +26,26 @@ const Popover = ({ anchorRef, children }) => {
 const ToolbarButton = ({ icon, action, active, disabled, title, onClick, onAction }) => (
   <button
     onMouseDown={(e) => { e.preventDefault(); if (!disabled) { if (onClick) onClick(); else if (onAction) onAction(action); } }}
-    className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all active:scale-90
+    className={`w-7 h-7 md:w-10 md:h-10 rounded-md md:rounded-xl flex items-center justify-center transition-all active:scale-90
       ${active ? 'bg-primary text-white shadow-lg shadow-primary/30' : 'bg-slate-100/50 text-slate-600 hover:bg-slate-200'}
       ${disabled ? 'opacity-40 cursor-not-allowed' : ''}`}
     title={title}
   >
-    <span className="material-icons-round text-[20px]">{icon}</span>
+    <span className="material-icons-round text-[13px] md:text-[20px]">{icon}</span>
   </button>
 );
 
 const UrlInputPopover = ({ anchorRef, url, onUrlChange, onInsert, onCancel }) => (
   <Popover anchorRef={anchorRef}>
-    <div className="p-4 flex flex-col gap-3">
-      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Insert Link</p>
+    <div className="p-2 md:p-4 flex flex-col gap-3">
+      <p className="text-[10px] font-medium md:font-bold text-slate-400 uppercase tracking-widest">Insert Link</p>
       <input type="text" placeholder="Paste URL here..." value={url} autoFocus
         onChange={(e) => onUrlChange(e.target.value)}
         onKeyDown={(e) => { if (e.key==='Enter'){e.preventDefault();onInsert();} if(e.key==='Escape'){e.preventDefault();onCancel();} }}
-        className="w-full bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 text-xs text-slate-700 outline-none focus:border-primary" />
+        className="w-full bg-slate-50 border border-slate-100 rounded-md md:rounded-xl px-1.5 py-1 md:px-3 md:py-2 text-[9px] md:text-xs text-slate-700 outline-none focus:border-primary" />
       <div className="flex gap-2">
-        <button onMouseDown={(e)=>{e.preventDefault();onInsert();}} className="flex-1 bg-primary text-white py-2 rounded-xl text-[11px] font-bold">Insert</button>
-        <button onMouseDown={(e)=>{e.preventDefault();onCancel();}} className="bg-slate-100 text-slate-500 px-3 py-2 rounded-xl text-[11px] font-bold">Cancel</button>
+        <button onMouseDown={(e)=>{e.preventDefault();onInsert();}} className="flex-1 bg-primary text-white py-1 md:py-2 rounded-md md:rounded-xl text-[9.5px] md:text-[11px] font-medium md:font-bold">Insert</button>
+        <button onMouseDown={(e)=>{e.preventDefault();onCancel();}} className="bg-slate-100 text-slate-500 px-1 py-1 md:py-2 rounded-md md:rounded-xl text-[9.5px] md:text-[11px] font-medium md:font-bold">Cancel</button>
       </div>
     </div>
   </Popover>
@@ -56,7 +56,7 @@ const FontSizePopover = ({ anchorRef, options, onSelect }) => (
     <div className="p-2 flex flex-col gap-1 w-36" onMouseDown={(e) => e.preventDefault()}>
       {options.map((opt) => (
         <button key={opt.value} onMouseDown={(e) => { e.preventDefault(); onSelect(opt.value); }}
-          className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold uppercase transition-colors text-slate-600 hover:bg-slate-50">
+          className="flex items-center justify-between px-1.5 py-1 md:px-3 md:py-2 rounded-xl text-[10px] md:text-xs font-medium md:font-bold uppercase transition-colors text-slate-600 hover:bg-slate-50">
           {opt.label}
           <span className="material-icons-round text-slate-300"
             style={{ fontSize: opt.value==='1'?'12px':opt.value==='3'?'16px':opt.value==='5'?'20px':'24px' }}>format_size</span>
@@ -127,12 +127,12 @@ const DrawPopover = ({ anchorRef, drawMode, onAction }) => {
         </div>
         <div className="flex gap-2">
           <button onMouseDown={(e)=>{e.preventDefault();onAction('drawEraser',false);}}
-            className={`flex-1 flex items-center justify-center gap-1 py-2 rounded-xl text-[11px] font-bold transition-colors ${!drawMode?.eraser?'bg-slate-900 text-white':'bg-slate-100 text-slate-500'}`}>
-            <span className="material-icons-round text-[14px]">edit</span>Pen
+            className={`flex-1 flex items-center justify-center gap-1 py-1 md:py-2 rounded-md md:rounded-xl text-[10px] md:text-[11px] font-medium md:font-bold transition-colors ${!drawMode?.eraser?'bg-slate-900 text-white':'bg-slate-100 text-slate-500'}`}>
+            <span className="material-icons-round text-[11px] md:text-[14px]">edit</span>Pen
           </button>
           <button onMouseDown={(e)=>{e.preventDefault();onAction('drawEraser',true);}}
-            className={`flex-1 flex items-center justify-center gap-1 py-2 rounded-xl text-[11px] font-bold transition-colors ${drawMode?.eraser?'bg-slate-900 text-white':'bg-slate-100 text-slate-500'}`}>
-            <span className="material-icons-round text-[14px]">auto_fix_normal</span>Eraser
+            className={`flex-1 flex items-center justify-center gap-1 py-1 md:py-2 rounded-md md:rounded-xl text-[10px] md:text-[11px] font-medium md:font-bold transition-colors ${drawMode?.eraser?'bg-slate-900 text-white':'bg-slate-100 text-slate-500'}`}>
+            <span className="material-icons-round text-[11px] md:text-[14px]">auto_fix_normal</span>Eraser
           </button>
         </div>
         <div>
@@ -233,13 +233,13 @@ export const PaperToolbar = ({ onAction, activeState, recentColors = [], onAddRe
       `}</style>
 
       <aside ref={toolbarRef}
-        className="w-16 border-r border-slate-200 bg-white flex flex-col items-center py-6 gap-5 shrink-0 select-none overflow-y-auto custom-scrollbar"
-        style={{ position:'relative',zIndex:100 }}>
+        className="w-10 md:w-16 border-r border-slate-200 bg-white flex flex-col items-center py-6 gap-5 shrink-0 select-none overflow-y-auto custom-scrollbar"
+        style={{ position:'relative',zIndex:10 }}>
 
         {/* 0. Shakespeare AI */}
         <button onMouseDown={(e) => { e.preventDefault(); onOpenShakespeare?.(); }} title="Shakespeare Assist — AI writing"
-          className="w-10 h-10 rounded-xl flex items-center justify-center text-black hover:opacity-90 active:scale-90 transition-all">
-          <span className="material-icons-round text-[18px]">auto_fix_high</span>
+          className="w-7 h-7 md:w-10 md:h-10 rounded-xl flex items-center justify-center text-black hover:opacity-90 active:scale-90 transition-all">
+          <span className="material-icons-round text-[15px] md:text-[18px]">auto_fix_high</span>
         </button>
 
         <div className="h-px w-8 bg-slate-100 shrink-0" />
@@ -266,14 +266,7 @@ export const PaperToolbar = ({ onAction, activeState, recentColors = [], onAddRe
 
         <div className="h-px w-8 bg-slate-100 shrink-0" />
 
-        {/* 2. Headings */}
-        <div className="flex flex-col gap-2">
-          <ToolbarButton icon="format_h1" action="formatBlock" active={activeState?.heading==='h1'} title="Heading 1" onClick={() => onAction('formatBlock', 'h1')} />
-          <ToolbarButton icon="format_h2" action="formatBlock" active={activeState?.heading==='h2'} title="Heading 2" onClick={() => onAction('formatBlock', 'h2')} />
-          <ToolbarButton icon="format_h3" action="formatBlock" active={activeState?.heading==='h3'} title="Heading 3" onClick={() => onAction('formatBlock', 'h3')} />
-        </div>
 
-        <div className="h-px w-8 bg-slate-100 shrink-0" />
 
         {/* 3. Alignment */}
         <div className="flex flex-col gap-2">
@@ -289,9 +282,9 @@ export const PaperToolbar = ({ onAction, activeState, recentColors = [], onAddRe
         <div className="flex flex-col gap-2.5">
           <div ref={fontSizeBtnRef}>
             <button onMouseDown={(e) => { e.preventDefault(); setShowFontSize(v=>!v); setShowTextColor(false); setShowHighlight(false); setShowUrlInput(false); }}
-              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${showFontSize?'bg-slate-900 text-white shadow-lg':'bg-slate-100/50 text-slate-600 hover:bg-slate-200'}`}
+              className={`w-7 h-7 md:w-10 md:h-10 rounded-md md:rounded-xl flex items-center justify-center transition-all ${showFontSize?'bg-slate-900 text-white shadow-lg':'bg-slate-100/50 text-slate-600 hover:bg-slate-200'}`}
               title="Text Size">
-              <span className="material-icons-round text-[22px]">text_fields</span>
+              <span className="material-icons-round text-[13px] md:text-[22px]">text_fields</span>
             </button>
           </div>
           {showFontSize && <FontSizePopover anchorRef={fontSizeBtnRef} options={fontSizeOptions} onSelect={(val) => { onAction('fontSize',val); setShowFontSize(false); }} />}
@@ -311,9 +304,9 @@ export const PaperToolbar = ({ onAction, activeState, recentColors = [], onAddRe
         <div className="flex flex-col gap-2.5">
           <div ref={textColorBtnRef}>
             <button onMouseDown={(e) => { e.preventDefault(); setShowTextColor(v=>!v); setShowHighlight(false); setShowFontSize(false); setShowUrlInput(false); }}
-              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${showTextColor?'bg-slate-900 text-white':'bg-slate-100/50 text-slate-600 hover:bg-slate-200'}`}
+              className={`w-7 h-7 md:w-10 md:h-10 rounded-md md:rounded-xl flex items-center justify-center transition-all ${showTextColor?'bg-slate-900 text-white':'bg-slate-100/50 text-slate-600 hover:bg-slate-200'}`}
               title="Text Color">
-              <span className="material-icons-round text-[22px]">format_color_text</span>
+              <span className="material-icons-round text-[13px] md:text-[22px]">format_color_text</span>
             </button>
           </div>
           {showTextColor && (
@@ -323,9 +316,9 @@ export const PaperToolbar = ({ onAction, activeState, recentColors = [], onAddRe
           )}
           <div ref={highlightBtnRef}>
             <button onMouseDown={(e) => { e.preventDefault(); setShowHighlight(v=>!v); setShowTextColor(false); setShowFontSize(false); setShowUrlInput(false); }}
-              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${showHighlight?'bg-slate-900 text-white':'bg-slate-100/50 text-slate-600 hover:bg-slate-200'}`}
+              className={`w-7 h-7 md:w-10 md:h-10 rounded-md md:rounded-xl flex items-center justify-center transition-all ${showHighlight?'bg-slate-900 text-white':'bg-slate-100/50 text-slate-600 hover:bg-slate-200'}`}
               title="Highlight">
-              <span className="material-icons-round text-[22px]">draw</span>
+              <span className="material-icons-round text-[13px] md:text-[22px]">draw</span>
             </button>
           </div>
           {showHighlight && (
@@ -343,15 +336,15 @@ export const PaperToolbar = ({ onAction, activeState, recentColors = [], onAddRe
           {/* Web import */}
           <button onMouseDown={(e) => { e.preventDefault(); onOpenWebImport?.(); }}
             title="Web to Text — extract from any article URL"
-            className="w-10 h-10 rounded-xl flex items-center justify-center bg-slate-100/50 text-slate-600 hover:bg-slate-200 active:scale-90 transition-all">
-            <span className="material-icons-round text-[20px]">article</span>
+            className="w-7 h-7 md:w-10 md:h-10 rounded-md md:rounded-xl flex items-center justify-center bg-slate-100/50 text-slate-600 hover:bg-slate-200 active:scale-90 transition-all">
+            <span className="material-icons-round text-[13px] md:text-[20px]">article</span>
           </button>
 
           {/* Doc / PDF import */}
           <button onMouseDown={(e) => { e.preventDefault(); onOpenDocImport?.(); }}
             title="Import PDF or DOCX"
-            className="w-10 h-10 rounded-xl flex items-center justify-center bg-slate-100/50 text-slate-600 hover:bg-slate-200 active:scale-90 transition-all">
-            <span className="material-icons-round text-[20px]">upload_file</span>
+            className="w-7 h-7 md:w-10 md:h-10 rounded-md md:rounded-xl flex items-center justify-center bg-slate-100/50 text-slate-600 hover:bg-slate-200 active:scale-90 transition-all">
+            <span className="material-icons-round text-[13px] md:text-[20px]">upload_file</span>
           </button>
 
           {/* Image upload */}
@@ -371,19 +364,19 @@ export const PaperToolbar = ({ onAction, activeState, recentColors = [], onAddRe
             }} />
           <button onMouseDown={(e) => { e.preventDefault(); saveSelection(); fileInputRef.current?.click(); }}
             disabled={isUploading}
-            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${isUploading?'bg-primary/20 text-primary animate-pulse':'bg-slate-100/50 text-slate-600 hover:bg-slate-200'}`}
+            className={`w-7 h-7 md:w-10 md:h-10 rounded-md md:rounded-xl flex items-center justify-center transition-all ${isUploading?'bg-primary/20 text-primary animate-pulse':'bg-slate-100/50 text-slate-600 hover:bg-slate-200'}`}
             title="Insert Image">
-            <span className="material-icons-round text-[20px]">{isUploading?'hourglass_top':'image'}</span>
+            <span className="material-icons-round text-[13px] md:text-[20px]">{isUploading?'hourglass_top':'image'}</span>
           </button>
 
           {/* Draw */}
           <div ref={drawBtnRef}>
             <button onMouseDown={(e) => { e.preventDefault(); setShowDraw(v=>!v); setShowTextColor(false); setShowHighlight(false); setShowFontSize(false); setShowUrlInput(false); }}
-              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all
+              className={`w-7 h-7 md:w-10 md:h-10 rounded-md md:rounded-xl flex items-center justify-center transition-all
                 ${activeState?.drawMode?.active?'bg-primary text-white shadow-lg shadow-primary/30':'bg-slate-100/50 text-slate-600 hover:bg-slate-200'}
                 ${showDraw?'ring-2 ring-primary ring-offset-1':''}`}
               title="Draw">
-              <span className="material-icons-round text-[20px]">gesture</span>
+              <span className="material-icons-round text-[13px] md:text-[20px]">gesture</span>
             </button>
           </div>
           {showDraw && <DrawPopover anchorRef={drawBtnRef} drawMode={activeState?.drawMode} onAction={onAction} />}

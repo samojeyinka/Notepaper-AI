@@ -106,66 +106,66 @@ STRICT RULES:
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
                     <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-indigo-500 flex items-center justify-center shadow-sm">
-                            <span className="material-icons-round text-white text-[18px]">slideshow</span>
+                        <div className="w-6 h-6 md:w-8 md:h-8 rounded-md md:rounded-xl bg-gradient-to-br from-primary to-indigo-500 flex items-center justify-center shadow-sm">
+                            <span className="material-icons-round text-white text-[14px] md:text-[18px]">slideshow</span>
                         </div>
                         <div>
-                            <h2 className="font-display font-semibold text-slate-900 text-base leading-tight">Generate Presentation</h2>
-                            <p className="text-[11px] text-slate-400">AI will create slides from your paper — max 70 words per slide</p>
+                            <h2 className="font-display font-medium md:font-semibold text-slate-900 text-[13px] md:text-base leading-tight">Generate Presentation</h2>
+                            <p className="text-[9px] md:text-[11px] text-slate-400">AI will create slides from your paper — max 70 words per slide</p>
                         </div>
                     </div>
                     <button onClick={onClose} disabled={status === 'generating' || status === 'saving'}
-                        className="w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:bg-slate-100 transition-colors disabled:opacity-30">
+                        className="w-6 h-6 md:w-8 md:h-8 rounded-xl flex items-center justify-center text-slate-400 hover:bg-slate-100 transition-colors disabled:opacity-30">
                         <span className="material-icons-round text-[18px]">close</span>
                     </button>
                 </div>
 
-                <div className="p-6 flex flex-col gap-5">
+                <div className="p-3 md:p-6 flex flex-col gap-5">
                     {status === 'idle' || status === 'error' ? (
                         <>
                             {/* Slide count */}
                             <div>
-                                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-3">Number of Slides</p>
+                                <p className="text-[10px] md:text-[11px] font-medium md:font-bold text-slate-500 uppercase tracking-widest mb-3">Number of Slides</p>
                                 <div className="flex flex-wrap gap-2">
                                     {SLIDE_COUNT_OPTIONS.map(n => (
                                         <button key={n} onClick={() => setSlideCount(n)}
-                                            className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all border ${slideCount===n?'bg-primary text-white border-primary shadow-lg shadow-primary/20':'bg-slate-50 text-slate-600 border-slate-100 hover:border-slate-200'}`}>
+                                            className={`px-2 py-1 md:px-4 md:py-2 rounded-md md:rounded-xl text-[12px] md:text-sm font-medium md:font-semibold transition-all border ${slideCount===n?'bg-primary text-white border-primary shadow-lg shadow-primary/20':'bg-slate-50 text-slate-600 border-slate-100 hover:border-slate-200'}`}>
                                             {n}
                                         </button>
                                     ))}
                                     <input type="number" min={3} max={50} value={slideCount} onChange={(e) => setSlideCount(Math.min(50, Math.max(3, Number(e.target.value))))}
-                                        className="w-20 px-3 py-2 rounded-xl text-sm font-semibold text-center border border-slate-200 bg-slate-50 text-slate-600 outline-none focus:border-primary"
+                                        className="w-16 md:w-20 px-3 py-2 rounded-xl text-sm font-semibold text-center border border-slate-200 bg-slate-50 text-slate-600 outline-none focus:border-primary"
                                         placeholder="Custom" />
                                 </div>
                             </div>
 
                             {/* Theme */}
                             <div>
-                                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-3">Design Theme</p>
+                                <p className="text-[10px] md:text-[11px] font-medium md:font-bold text-slate-500 uppercase tracking-widest mb-3">Design Theme</p>
                                 <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
                                     {THEMES.map(t => (
                                         <button key={t.id} onClick={() => setTheme(t.id)}
                                             className={`flex flex-col items-center gap-1.5 p-2.5 rounded-xl border transition-all ${theme===t.id?'border-primary bg-primary/5':'border-slate-100 hover:border-slate-200'}`}>
-                                            <div className={`w-full h-10 rounded-lg bg-gradient-to-br ${t.gradient} ${t.dark?'border border-slate-200':''}`} />
-                                            <span className={`text-[10px] font-semibold ${theme===t.id?'text-primary':'text-slate-500'}`}>{t.label}</span>
+                                            <div className={`w-full h-7 md:h-10 rounded-lg bg-gradient-to-br ${t.gradient} ${t.dark?'border border-slate-200':''}`} />
+                                            <span className={`text-[10px] font-medium md:font-semibold ${theme===t.id?'text-primary':'text-slate-500'}`}>{t.label}</span>
                                         </button>
                                     ))}
                                 </div>
                             </div>
 
                             {error && (
-                                <div className="flex items-start gap-2 p-3 bg-red-50 rounded-xl border border-red-100">
-                                    <span className="material-icons-round text-red-500 text-[16px] mt-0.5">error_outline</span>
-                                    <p className="text-xs text-red-600">{error}</p>
+                                <div className="flex items-start gap-2 p-3 bg-red-50 rounded-md md:rounded-xl border border-red-100">
+                                    <span className="material-icons-round text-red-500 text-[13px] md:text-[16px] mt-0.5">error_outline</span>
+                                    <p className="text-[9px] md:text-xs text-red-600">{error}</p>
                                 </div>
                             )}
 
-                            <div className="flex gap-3 pt-1">
-                                <button onClick={onClose} className="flex-1 py-3 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-colors border border-slate-200">
+                            <div className="flex gap-3 pt-0.5 md:pt-1">
+                                <button onClick={onClose} className="flex-1 py-1.5 md:py-3 rounded-md md:rounded-xl text-[12px] md:text-sm font-medium md:font-semibold text-slate-600 hover:bg-slate-100 transition-colors border border-slate-200">
                                     Cancel
                                 </button>
                                 <button onClick={handleGenerate}
-                                    className="flex-1 py-3 rounded-xl bg-gradient-to-r from-primary to-indigo-500 text-white text-sm font-semibold hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
+                                    className="flex-1 bg-gradient-to-r from-primary to-indigo-500 text-white py-1.5 md:py-3 rounded-md md:rounded-xl text-[12px] md:text-sm font-medium md:font-semibold hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
                                     <span className="material-icons-round text-[18px]">auto_awesome</span>
                                     Generate {slideCount} Slides
                                 </button>
@@ -173,11 +173,8 @@ STRICT RULES:
                         </>
                     ) : status === 'generating' || status === 'saving' ? (
                         <div className="flex flex-col items-center gap-5 py-8">
-                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-indigo-500 flex items-center justify-center shadow-xl shadow-primary/30 animate-pulse">
-                                <span className="material-icons-round text-white text-[32px]">auto_awesome</span>
-                            </div>
+                           
                             <div className="text-center">
-                                <p className="font-display font-semibold text-slate-900">{status === 'saving' ? 'Saving…' : 'Generating Slides…'}</p>
                                 <p className="text-xs text-slate-400 mt-1">{progress}</p>
                             </div>
                             <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">

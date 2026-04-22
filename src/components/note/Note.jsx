@@ -571,11 +571,17 @@ export const Note = () => {
                         // Save cursor before focus leaves the editor
                         const sel = window.getSelection();
                         savedRangeRef.current = sel && sel.rangeCount > 0 ? sel.getRangeAt(0).cloneRange() : null;
+                        setIsVersionSidebarOpen(false); // close version sidebar if open
                     }
-                    setIsAISidebarOpen(!isAISidebarOpen);
+                    setIsAISidebarOpen(v => !v);
                 }}
                 isAIOpen={isAISidebarOpen}
-                onToggleHistory={() => setIsVersionSidebarOpen(v => !v)}
+                onToggleHistory={() => {
+                    if (!isVersionSidebarOpen) {
+                        setIsAISidebarOpen(false); // close AI sidebar if open
+                    }
+                    setIsVersionSidebarOpen(v => !v);
+                }}
                 isHistoryOpen={isVersionSidebarOpen}
                 canUndo={canUndo}
                 canRedo={canRedo}
@@ -839,7 +845,7 @@ export const Note = () => {
 
                 <button
                     onClick={() => setIsSettingsOpen(true)}
-                    className="fixed bottom-10 right-10 z-50 w-12 h-12 bg-white border-2 border-primary text-primary rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform"
+                    className="fixed bottom-10 right-10 z-50 w-9 h-9 md:w-12 md:h-12 bg-white border-2 border-primary text-primary rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform"
                 >
                     <span className="material-icons-round">settings</span>
                 </button>

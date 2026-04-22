@@ -59,20 +59,20 @@ export const PaperPresentationsSidebar = ({ paperId, onClose, onNewPresentation 
     useEffect(() => { load(); }, [load]);
 
     return (
-        <aside className="w-72 border-l border-slate-200 bg-white flex flex-col shrink-0 overflow-hidden relative z-30">
+        <aside className="w-52 md:w-72 border-l border-slate-200 bg-white flex flex-col shrink-0 overflow-hidden relative z-30">
             {/* Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+            <div className="flex items-center justify-between px-3 md:px-5 py-3 md:py-4 border-b border-slate-100">
                 <div className="flex items-center gap-2">
-                    <span className="material-icons-round text-primary text-[20px]">slideshow</span>
-                    <h3 className="font-display font-bold text-sm text-slate-900">Presentations</h3>
+                    <span className="material-icons-round text-primary text-[16px] md:text-[20px]">slideshow</span>
+                    <h3 className="font-display font-bold text-[11px] md:text-sm text-slate-900">Presentations</h3>
                     <button onClick={load} disabled={loading} title="Refresh"
-                        className="w-6 h-6 rounded-md flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-primary transition-colors disabled:opacity-40">
-                        <span className={`material-icons-round text-[15px] ${loading ? 'animate-spin' : ''}`}>refresh</span>
+                        className="w-5 h-5 md:w-6 md:h-6 rounded-md flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-primary transition-colors disabled:opacity-40">
+                        <span className={`material-icons-round text-[13px] md:text-[15px] ${loading ? 'animate-spin' : ''}`}>refresh</span>
                     </button>
                 </div>
                 <button onClick={onClose}
-                    className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 transition-colors">
-                    <span className="material-icons-round text-[18px]">close</span>
+                    className="w-6 h-6 md:w-7 md:h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 transition-colors">
+                    <span className="material-icons-round text-[16px] md:text-[18px]">close</span>
                 </button>
             </div>
 
@@ -90,22 +90,22 @@ export const PaperPresentationsSidebar = ({ paperId, onClose, onNewPresentation 
                     </div>
                 )}
                 {!loading && !error && presentations.length === 0 && (
-                    <div className="flex flex-col items-center justify-center py-16 gap-3 px-6 text-center">
-                        <span className="material-icons-round text-[36px] text-slate-200">slideshow</span>
-                        <p className="text-[11px] text-slate-400 leading-relaxed">No presentations yet.<br />Generate slides from this paper to get started.</p>
+                    <div className="flex flex-col items-center justify-center py-16 gap-3 px-4 md:px-6 text-center">
+                        <span className="material-icons-round text-[32px] md:text-[36px] text-slate-200">slideshow</span>
+                        <p className="text-[10px] md:text-[11px] text-slate-400 leading-relaxed">No presentations yet.<br />Generate slides from this paper to get started.</p>
                     </div>
                 )}
                 {!loading && presentations.length > 0 && (
-                    <div className="py-3 px-3 flex flex-col gap-2">
+                    <div className="py-2 md:py-3 px-2 md:px-3 flex flex-col gap-2">
                         {presentations.map((p) => (
                             <button key={p.id} onClick={() => navigate(`/lockedin/presentations/${p.id}`)}
-                                className="w-full text-left rounded-xl border border-slate-100 hover:border-primary/30 hover:shadow-md bg-white p-3 transition-all group">
+                                className="w-full text-left rounded-lg md:rounded-xl border border-slate-100 hover:border-primary/30 hover:shadow-md bg-white p-2 md:p-3 transition-all group">
                                 <SlideMiniPreview theme={p.theme} />
-                                <div className="mt-2.5">
-                                    <p className="text-xs font-semibold text-slate-800 line-clamp-1 group-hover:text-primary transition-colors">{p.title}</p>
+                                <div className="mt-2">
+                                    <p className="text-[10px] md:text-xs font-semibold text-slate-800 line-clamp-1 group-hover:text-primary transition-colors">{p.title}</p>
                                     <div className="flex items-center justify-between mt-1">
-                                        <span className="text-[10px] text-slate-400">{p.slide_count} slides · {p.theme}</span>
-                                        <span className="text-[10px] text-slate-400">{timeAgo(p.created_at)}</span>
+                                        <span className="text-[9px] md:text-[10px] text-slate-400">{p.slide_count} slides · {p.theme}</span>
+                                        <span className="text-[9px] md:text-[10px] text-slate-400">{timeAgo(p.created_at)}</span>
                                     </div>
                                 </div>
                             </button>
@@ -115,10 +115,10 @@ export const PaperPresentationsSidebar = ({ paperId, onClose, onNewPresentation 
             </div>
 
             {/* Footer action */}
-            <div className="px-4 py-3 border-t border-slate-100">
+            <div className="px-2 md:px-4 py-2 md:py-3 border-t border-slate-100">
                 <button onClick={onNewPresentation}
-                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-to-r from-primary to-indigo-500 text-white text-xs font-semibold shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95 transition-all">
-                    <span className="material-icons-round text-[16px]">auto_awesome</span>
+                    className="w-full flex items-center justify-center gap-1.5 md:gap-2 py-2 md:py-2.5 rounded-lg md:rounded-xl bg-gradient-to-r from-primary to-indigo-500 text-white text-[10px] md:text-xs font-semibold shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95 transition-all">
+                    <span className="material-icons-round text-[13px] md:text-[16px]">auto_awesome</span>
                     Generate New Presentation
                 </button>
             </div>

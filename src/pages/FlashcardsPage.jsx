@@ -146,7 +146,7 @@ const FlashcardsContent = () => {
     };
 
     return (
-        <main className="flex-1 lg:ml-64 p-4 lg:p-8 pt-20 lg:pt-8 min-h-screen">
+        <main className="flex-1 lg:ml-64 p-4 lg:p-8 pt-20 lg:pt-8 min-h-screen min-w-0 overflow-x-hidden">
             <div className="max-w-5xl mx-auto">
                 {/* Header */}
                 <header className="flex items-end justify-between mb-8">

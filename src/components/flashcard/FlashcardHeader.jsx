@@ -25,41 +25,41 @@ export const FlashcardHeader = ({
                       : '';
 
     return (
-        <header className="flex items-center justify-between px-4 py-3 border-b border-slate-100 bg-white z-20 relative">
+        <header className="flex items-center justify-between mt-2 md:mt-0 px-2 md:px-4 py-2 md:py-3 border-b border-slate-100 bg-white z-20 relative">
             {/* Back */}
             <button
                 onClick={() => navigate(backPath)}
                 className="flex items-center gap-1 text-slate-400 hover:text-slate-700 transition-colors"
             >
-                <span className="material-icons-round text-[20px]">arrow_back</span>
-                <span className="text-sm hidden sm:inline truncate max-w-[120px]">{backLabel}</span>
+                <span className="material-icons-round text-[16px] md:text-[20px]">arrow_back</span>
+                <span className="text-[11px] md:text-sm hidden sm:inline truncate max-w-[80px] md:max-w-[120px]">{backLabel}</span>
             </button>
 
             {/* Title */}
             <input
                 value={title}
                 onChange={e => onTitleChange(e.target.value)}
-                className="flex-1 mx-4 text-center font-semibold text-slate-800 text-[15px] bg-transparent outline-none border-b border-transparent focus:border-slate-300 transition-colors truncate"
+                className="flex-1 mx-2 md:mx-4 text-center font-semibold text-slate-800 text-[12px] md:text-[15px] bg-transparent outline-none border-b border-transparent focus:border-slate-300 transition-colors truncate"
                 placeholder="Untitled Flashcard"
             />
 
             {/* Right actions */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 md:gap-2">
                 {statusLabel && (
-                    <span className={`text-[11px] hidden sm:block ${saveStatus === 'error' ? 'text-red-400' : 'text-slate-400'}`}>
+                    <span className={`text-[10px] md:text-[11px] hidden sm:block ${saveStatus === 'error' ? 'text-red-400' : 'text-slate-400'}`}>
                         {statusLabel}
                     </span>
                 )}
 
                 <button
                     onClick={onToggleEditMode}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                    className={`flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-1 md:py-1.5 rounded-lg md:rounded-xl text-[10px] md:text-xs font-semibold transition-all ${
                         editMode
                             ? 'bg-primary text-white shadow-sm shadow-primary/30'
                             : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                     }`}
                 >
-                    <span className="material-icons-round text-[15px]">
+                    <span className="material-icons-round text-[13px] md:text-[15px]">
                         {editMode ? 'visibility' : 'edit'}
                     </span>
                     {editMode ? 'View' : 'Edit'}
@@ -69,9 +69,9 @@ export const FlashcardHeader = ({
                 <div className="relative">
                     <button
                         onClick={() => setMenuOpen(v => !v)}
-                        className="w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:bg-slate-100 transition-colors"
+                        className="w-6 h-6 md:w-8 md:h-8 rounded-lg md:rounded-xl flex items-center justify-center text-slate-400 hover:bg-slate-100 transition-colors"
                     >
-                        <span className="material-icons-round text-[20px]">more_vert</span>
+                        <span className="material-icons-round text-[16px] md:text-[20px]">more_vert</span>
                     </button>
 
                     {menuOpen && (
