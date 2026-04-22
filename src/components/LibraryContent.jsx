@@ -47,12 +47,16 @@ const TABS = [
 ];
 
 // ── Sort options ──────────────────────────────────────────────────────────────
+// All tabs use the unified `sort=field:direction` format fed directly to the API.
+// Notes/Papers use SortFilter (sortable: updated_at, title).
+// Folders use FolderFilter (sortable: updated_at, name).
+// Presentations & Flashcards parse the `sort` query param in their controllers.
 const SORT_OPTIONS = {
-    notes:         [{ v:'updated_at:desc',label:'Last updated'},{ v:'updated_at:asc',label:'Oldest first'},{ v:'title:asc',label:'A → Z'},{ v:'title:desc',label:'Z → A'}],
-    papers:        [{ v:'updated_at:desc',label:'Last updated'},{ v:'updated_at:asc',label:'Oldest first'},{ v:'title:asc',label:'A → Z'},{ v:'title:desc',label:'Z → A'}],
+    notes:         [{ v:'sort=updated_at:desc',label:'Last updated'},{ v:'sort=updated_at:asc',label:'Oldest first'},{ v:'sort=title:asc',label:'A → Z'},{ v:'sort=title:desc',label:'Z → A'}],
+    papers:        [{ v:'sort=updated_at:desc',label:'Last updated'},{ v:'sort=updated_at:asc',label:'Oldest first'},{ v:'sort=title:asc',label:'A → Z'},{ v:'sort=title:desc',label:'Z → A'}],
     folders:       [{ v:'sort=updated_at:desc',label:'Last updated'},{ v:'sort=updated_at:asc',label:'Oldest first'},{ v:'sort=name:asc',label:'A → Z'},{ v:'sort=name:desc',label:'Z → A'}],
-    presentations: [{ v:'updated_at:desc',label:'Last updated'},{ v:'updated_at:asc',label:'Oldest first'},{ v:'title:asc',label:'A → Z'},{ v:'title:desc',label:'Z → A'}],
-    flashcards:    [{ v:'updated_at:desc',label:'Last updated'},{ v:'updated_at:asc',label:'Oldest first'}],
+    presentations: [{ v:'sort=updated_at:desc',label:'Last updated'},{ v:'sort=updated_at:asc',label:'Oldest first'},{ v:'sort=title:asc',label:'A → Z'},{ v:'sort=title:desc',label:'Z → A'}],
+    flashcards:    [{ v:'sort=updated_at:desc',label:'Last updated'},{ v:'sort=updated_at:asc',label:'Oldest first'},{ v:'sort=title:asc',label:'A → Z'},{ v:'sort=title:desc',label:'Z → A'}],
 };
 
 // ── Presentation theme preview ────────────────────────────────────────────────
@@ -322,6 +326,9 @@ export const LibraryContent = () => {
     const activeTab = searchParams.get('tab') || 'notes';
     const setTab = (tab) => setSearchParams({ tab }, { replace: true });
 
+    // Pre-populate search from URL ?q= param (set by the dashboard global search bar)
+    const urlQ = searchParams.get('q') || '';
+
     // Per-tab state
     const [data,    setData]    = useState({ notes:[], papers:[], folders:[], presentations:[], flashcards:[] });
     const [meta,    setMeta]    = useState({ notes:null, papers:null, folders:null, presentations:null, flashcards:null });
@@ -334,7 +341,7 @@ export const LibraryContent = () => {
         presentations: SORT_OPTIONS.presentations[0].v,
         flashcards: SORT_OPTIONS.flashcards[0].v,
     });
-    const [search, setSearch] = useState('');
+    const [search, setSearch] = useState(urlQ);
     const [showCreateFolder, setShowCreateFolder] = useState(false);
     const [creatingPresentation, setCreatingPresentation] = useState(false);
 
@@ -355,11 +362,8 @@ export const LibraryContent = () => {
         }
         setTabLoading('notes', true);
         try {
-            const [sf, sd] = sv.split(':');
-            const qp = [`page=${p}`];
+            const qp = [`page=${p}`, sv];
             if (q.trim()) qp.push(`searching=${encodeURIComponent(q.trim())}`);
-            if (sf === 'updated_at') qp.push(`updated_at=${sd}`);
-            if (sf === 'title')      qp.push(`title=${sd}`);
             const res = await noteService.list(qp.join('&'));
             const d = res.data ?? res; const rows = d.data ?? [];
             const m = d.current_page != null ? { current_page:d.current_page, last_page:d.last_page, total:d.total, per_page:d.per_page } : null;
@@ -377,11 +381,8 @@ export const LibraryContent = () => {
         }
         setTabLoading('papers', true);
         try {
-            const [sf, sd] = sv.split(':');
-            const qp = [`page=${p}`];
+            const qp = [`page=${p}`, sv];
             if (q.trim()) qp.push(`searching=${encodeURIComponent(q.trim())}`);
-            if (sf === 'updated_at') qp.push(`updated_at=${sd}`);
-            if (sf === 'title')      qp.push(`title=${sd}`);
             const res = await paperService.list(qp.join('&'));
             const d = res.data ?? res; const rows = d.data ?? [];
             const m = d.current_page != null ? { current_page:d.current_page, last_page:d.last_page, total:d.total, per_page:d.per_page } : null;
@@ -418,34 +419,41 @@ export const LibraryContent = () => {
         }
         setTabLoading('presentations', true);
         try {
-            const res = await presentationService.list();
+            const sortParam = sv.replace('sort=', '');
+            const qp = [`page=${p}`, `sort=${sortParam}`];
+            if (q.trim()) qp.push(`searching=${encodeURIComponent(q.trim())}`);
+            const res = await presentationService.list(qp.join('&'));
             const d = res.data ?? res;
             const rows = d.data ?? (Array.isArray(d) ? d : []);
             const m = d.current_page != null ? { current_page:d.current_page, last_page:d.last_page, total:d.total, per_page:d.per_page } : null;
-            setTabData('presentations', rows); setTabMeta('presentations', m); setTabPage('presentations', p);
+            setTabData('presentations', append ? [...data.presentations, ...rows] : rows);
+            setTabMeta('presentations', m); setTabPage('presentations', p);
             if (!q.trim() && p === 1 && sv === SORT_OPTIONS.presentations[0].v) workspaceCache.setPresentations(rows, m);
         } catch {} finally { setTabLoading('presentations', false); }
-    }, [sort.presentations]);
+    }, [sort.presentations, data.presentations]);
 
-    const loadFlashcards = useCallback(async ({ p = 1, q = '', append = false } = {}) => {
+    const loadFlashcards = useCallback(async ({ p = 1, q = '', sortVal, append = false } = {}) => {
+        const sv = sortVal ?? sort.flashcards;
         setTabLoading('flashcards', true);
         try {
-            const res = await flashcardService.list({ page: p });
+            // sv is e.g. 'sort=updated_at:desc' — extract just the field:direction part
+            const sortParam = sv.replace('sort=', '');
+            const res = await flashcardService.list({ page: p, sort: sortParam, searching: q.trim() || undefined });
             const d = res.data ?? res;
             const rows = d.data ?? (Array.isArray(d) ? d : []);
             const m = d.current_page != null ? { current_page:d.current_page, last_page:d.last_page, total:d.total, per_page:d.per_page } : null;
             setTabData('flashcards', append ? [...data.flashcards, ...rows] : rows);
             setTabMeta('flashcards', m); setTabPage('flashcards', p);
         } catch {} finally { setTabLoading('flashcards', false); }
-    }, [data.flashcards]);
+    }, [sort.flashcards, data.flashcards]);
 
     const LOADERS = { notes: loadNotes, papers: loadPapers, folders: loadFolders, presentations: loadPresentations, flashcards: loadFlashcards };
 
-    // Load tab on first visit
+    // Load tab on first visit (pass URL ?q= if present)
     useEffect(() => {
         if (!loadedTabs.current.has(activeTab)) {
             loadedTabs.current.add(activeTab);
-            LOADERS[activeTab]?.();
+            LOADERS[activeTab]?.({ q: urlQ });
         }
     }, [activeTab]);
 

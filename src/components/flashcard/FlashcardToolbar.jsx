@@ -4,8 +4,8 @@ import { TEMPLATES, FONT_OPTIONS } from './flashcardTemplates';
 const ColorPicker = ({ label, value, onChange }) => (
     <label className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg border border-slate-200 hover:border-slate-300 cursor-pointer shrink-0 transition-colors" title={label}>
         <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wide">{label}</span>
-        <div className="relative w-5 h-5">
-            <div className="w-5 h-5 rounded-full border border-black/10 shadow-sm" style={{ background: value }} />
+        <div className="relative w-4 h-4 md:w-5 md:h-5">
+            <div className="w-4 h-4 md:w-5 md:h-5 rounded-full border border-black/10 shadow-sm" style={{ background: value }} />
             <input type="color" value={value} onChange={e => onChange(e.target.value)} className="absolute inset-0 opacity-0 w-full h-full cursor-pointer" />
         </div>
     </label>

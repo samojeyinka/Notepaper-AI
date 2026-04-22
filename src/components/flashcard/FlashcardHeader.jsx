@@ -76,22 +76,22 @@ export const FlashcardHeader = ({
 
                     {menuOpen && (
                         <div
-                            className="absolute right-0 top-10 bg-white rounded-2xl shadow-xl border border-slate-100 py-1.5 w-44 z-50 animate-in fade-in zoom-in-95 duration-100"
+                            className="absolute right-0 top-10 bg-white rounded-xl md:rounded-2xl shadow-xl border border-slate-100 py-1 md:py-1.5 w-36 md:w-44 z-50 animate-in fade-in zoom-in-95 duration-100"
                             onMouseLeave={() => setMenuOpen(false)}
                         >
                             <button
                                 onClick={() => { setMenuOpen(false); onDuplicate?.(); }}
-                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                                className="w-full flex items-center gap-1.5 md:gap-3 px-2 md:px-4 py-1.5 md:py-2.5 text-[12px] md:text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                             >
-                                <span className="material-icons-round text-[17px] text-slate-400">content_copy</span>
+                                <span className="material-icons-round text-[13px] md:text-[17px] text-slate-400">content_copy</span>
                                 Duplicate
                             </button>
                             <div className="h-px bg-slate-100 my-1" />
                             <button
                                 onClick={() => { setMenuOpen(false); onDelete?.(); }}
-                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors"
+                                className="w-full flex items-center  gap-1.5 md:gap-3 px-2 md:px-4 py-1.5 md:py-2.5 text-[12px] md:text-sm text-red-500 hover:bg-red-50 transition-colors"
                             >
-                                <span className="material-icons-round text-[17px]">delete_outline</span>
+                                <span className="material-icons-round text-[13px] md:text-[17px]">delete_outline</span>
                                 Delete
                             </button>
                         </div>
