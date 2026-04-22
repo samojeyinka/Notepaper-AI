@@ -582,9 +582,9 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
               try {
                 const data = new FormData();
                 data.append('file', file);
-                data.append('upload_preset', 'foogles');
-                data.append('cloud_name', 'djstk2ukm');
-                const res = await fetch('https://api.cloudinary.com/v1_1/djstk2ukm/image/upload', {
+                data.append('upload_preset', import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET);
+                data.append('cloud_name', import.meta.env.VITE_CLOUDINARY_CLOUD_NAME);
+                const res = await fetch(`https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/image/upload`, {
                   method: 'POST', body: data,
                 });
                 const json = await res.json();
@@ -596,6 +596,7 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
               }
             }}
           />
+
           <button
             onMouseDown={(e) => {
               e.preventDefault();

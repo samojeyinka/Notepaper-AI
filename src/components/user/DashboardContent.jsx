@@ -1,8 +1,7 @@
 import { ActionCardsSection } from "./ActionCardsSection";
 import { DashboardHeader } from "./DashboardHeader";
-import ElevateProSection from "./ElevateProSection";
 import RecentNotesSection from "./RecentNotesSection";
-import { UpcomingQuizzesSection } from "./UpcomingQuizzesSection";
+
 
 export const DashboardContent = () => {
   return (

@@ -355,13 +355,14 @@ export const PaperToolbar = ({ onAction, activeState, recentColors = [], onAddRe
               setIsUploading(true);
               try {
                 const data = new FormData();
-                data.append('file', file); data.append('upload_preset','foogles'); data.append('cloud_name','djstk2ukm');
-                const res  = await fetch('https://api.cloudinary.com/v1_1/djstk2ukm/image/upload', { method:'POST', body:data });
+                data.append('file', file); data.append('upload_preset', import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET); data.append('cloud_name',import.meta.env.VITE_CLOUDINARY_CLOUD_NAME);
+                const res  = await fetch(`https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/image/upload`, { method:'POST', body:data });
                 const json = await res.json();
                 if (json.secure_url) onImageUpload(json.secure_url);
               } catch (err) { console.error('Upload failed', err); }
               finally { setIsUploading(false); }
             }} />
+
           <button onMouseDown={(e) => { e.preventDefault(); saveSelection(); fileInputRef.current?.click(); }}
             disabled={isUploading}
             className={`w-7 h-7 md:w-10 md:h-10 rounded-md md:rounded-xl flex items-center justify-center transition-all ${isUploading?'bg-primary/20 text-primary animate-pulse':'bg-slate-100/50 text-slate-600 hover:bg-slate-200'}`}
