@@ -34,14 +34,14 @@ export default function DeleteAccountSection() {
       
       <div className="flex items-center gap-2 mb-6">
         <span className="material-symbols-outlined text-red-500">heart_broken</span>
-        <h2 className="text-[17px] font-bold text-red-900">Danger Zone</h2>
+        <h2 className="text-[15px] md:text-[17px] font-medium md:font-bold text-red-900">Danger Zone</h2>
       </div>
 
       <div className="space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex-1">
-            <p className="font-semibold text-slate-800">Delete Account</p>
-            <p className="text-xs text-slate-500 leading-relaxed max-w-md">
+            <p className="text-[14px] md:text-base font-medium md:font-semibold text-slate-800">Delete Account</p>
+            <p className="text-[12px] md:text-xs text-slate-500 leading-relaxed max-w-md">
               Once you delete your account, there is no going back. Please be certain. 
               You can choose to deactivate temporarily or delete permanently via the link we'll send.
             </p>
@@ -50,7 +50,7 @@ export default function DeleteAccountSection() {
           <button
             onClick={handleRequestDeletion}
             disabled={loading || success}
-            className={`px-6 py-2.5 rounded-md flex items-center justify-center font-medium text-center text-sm transition-all shadow-sm ${
+            className={`px-3 md:px-6  py-1.5 md:py-2.5 rounded-md flex items-center justify-center md:font-medium text-center text-sm transition-all shadow-sm ${
               success 
                 ? 'bg-green-100 text-green-700 cursor-default' 
                 : 'bg-red-600 hover:bg-red-700 text-white active:scale-[0.98]'

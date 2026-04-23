@@ -17,17 +17,15 @@ export default function CTA() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 relative z-10 mb-4 md:mb-8">
-            <button className="bg-white text-primary px-10 py-2 md:py-4 rounded-full text-[15px] md:text-lg font-medium md:font-bold hover:scale-105 transition-transform shadow-xl">
+            <a href='/signin' className="bg-white text-primary px-10 py-2 md:py-4 rounded-full text-[15px] md:text-lg font-medium md:font-bold hover:scale-105 transition-transform shadow-xl">
               Get Started Free
-            </button>
-            <button className="border-2 border-white/40 px-10 py-2 md:py-4 rounded-full ttext-[15px] md:text-lg font-medium md:font-bold hover:bg-white/10 transition-all">
+            </a>
+            <a href='/pricing' className="border-2 border-white/40 px-10 py-2 md:py-4 rounded-full ttext-[15px] md:text-lg font-medium md:font-bold hover:bg-white/10 transition-all">
               Pricing
-            </button>
+            </a>
           </div>
 
-          <p className="text-[10px] md:text-sm opacity-60 font-normal md:font-medium tracking-widest uppercase relative z-10">
-            Credit card required • 7-day free trial
-          </p>
+         
 
           <div className="absolute -bottom-8 -right-4 transform rotate-12 hidden lg:block">
             <div className="font-sketch text-2xl text-accent-pink">See you inside!</div>

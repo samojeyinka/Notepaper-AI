@@ -87,17 +87,17 @@ export default function RestoreAccountFinal() {
       {/* Right Section - Main Action */}
       <section className="flex-1 p-8 md:p-16 flex flex-col justify-center bg-white relative">
         <div className="max-w-md mx-auto w-full text-center">
-          <header className="mb-10">
-            <div className="w-20 h-20 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-6">
+          <header className="mb-6 md:mb-10">
+            <div className="w-12 h-12 md:w-20 md:h-20 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-6">
               <span className="material-symbols-outlined text-4xl text-purple-600">verified</span>
             </div>
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">Ready to Restore?</h2>
+            <h2 className="text-xl md:text-2xl font-medium md:font-bold text-slate-900 mb-2">Ready to Restore?</h2>
             <p className="text-slate-500 font-normal font-handwriting text-[15px]">
               Glad to see you again! Click below to reactivate your account instantly.
             </p>
           </header>
 
-          <div className="space-y-6">
+          <div className="space-y-3 md:space-y-6">
             <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 mb-8">
               <p className="text-[12px] font-medium text-slate-400 uppercase tracking-widest mb-1">Restoring Account</p>
               <p className="text-slate-700 font-medium truncate italic">{email || 'Waiting for link data...'}</p>
@@ -106,7 +106,7 @@ export default function RestoreAccountFinal() {
             <button
               onClick={handleRestore}
               disabled={loading || !token || !email}
-              className="w-full bg-purple-600 hover:bg-black text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 text-[15px]"
+              className="w-full bg-purple-600 text-[13px] hover:bg-black text-white font-medium md:font-bold py-2 md:py-4 rounded-lg md:rounded-xl shadow-lg transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 md:text-[15px]"
             >
               {loading && <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>}
               {loading ? 'Restoring...' : 'Bring My Account Back'}

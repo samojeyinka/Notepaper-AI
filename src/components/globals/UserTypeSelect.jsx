@@ -44,7 +44,7 @@ export default function UserTypeSelect({ value, onChange, options = [], loading 
   return (
     <div className={`relative ${open ? 'z-50' : 'z-10'}`} ref={containerRef}>
       <div className="group">
-        <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">
+        <label className="block text-[12px] md:text-xs font-medium md:font-bold text-slate-400 uppercase tracking-widest mb-1">
           I am a...
         </label>
 
@@ -63,7 +63,7 @@ export default function UserTypeSelect({ value, onChange, options = [], loading 
             transition: 'border-color 0.2s',
           }}
         >
-          <span className={selected ? 'text-slate-800 text-sm font-medium' : 'text-slate-300 text-sm'}>
+          <span className={selected ? 'text-slate-800 text-[11px] md:text-sm md:font-medium' : 'text-slate-300 text-sm'}>
             {loading ? 'Loading roles...' : (selected || 'Select your role')}
           </span>
           <span

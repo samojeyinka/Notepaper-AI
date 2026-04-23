@@ -110,7 +110,7 @@ export const PersonalInfoSection = () => {
   };
 
   return (
-    <section className="paper-scrap p-8 rounded-lg col-span-1 md:col-span-2 relative">
+    <section className="paper-scrap p-4 md:p-8 rounded-lg col-span-1 md:col-span-2 relative">
       {toast && (
         <Toast
           type={toast.type}
@@ -122,7 +122,7 @@ export const PersonalInfoSection = () => {
       <button
         onClick={handleSaveChanges}
         disabled={loading || uploading}
-        className="mb-6 float-end px-6 py-2 bg-slate-900 text-white font-normal text-[13px] md:font-medium md:text-[14px] rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center gap-2 disabled:opacity-50 disabled:transform-none"
+        className="mb-3 md:mb-6 float-end px-3 md:px-6 py-1 md:py-2 bg-slate-900 text-white font-normal text-[12px] md:font-medium md:text-[14px] rounded-md md:rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center gap-2 disabled:opacity-50 disabled:transform-none"
       >
         {loading ? (
           <>
@@ -132,11 +132,11 @@ export const PersonalInfoSection = () => {
         ) : 'Save Changes'}
       </button>
 
-      <div className="flex flex-col md:flex-row gap-12 clear-both">
+      <div className="flex flex-col md:flex-row gap-6 md:gap-12 clear-both">
         {/* Profile Photo */}
-        <div className="flex flex-col items-center gap-4 relative">
+        <div className="flex flex-col items-center gap-2 md:gap-4 relative">
           <div className="photo-clip"></div>
-          <div className="w-24 h-24 rounded-sm bg-white p-2 shadow-md ring-1 ring-slate-200 rotate-2 group relative cursor-pointer overflow-hidden">
+          <div className="w-16 h-16 md:w-24 md:h-24 rounded-sm bg-white p-2 shadow-md ring-1 ring-slate-200 rotate-2 group relative cursor-pointer overflow-hidden">
             <img
               alt="Profile photo"
               className={`w-full h-full object-cover grayscale-[0.2] transition-opacity ${uploading ? 'opacity-30' : 'opacity-100'}`}
@@ -160,45 +160,45 @@ export const PersonalInfoSection = () => {
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
-            className="mt-2 text-xs font-bold text-purple-600 hover:text-purple-700 hover:underline font-sketch uppercase tracking-wider disabled:opacity-50"
+            className="mt-1 md:mt-2 text-[10px] md:text-xs font-medium md:font-bold text-purple-600 hover:text-purple-700 hover:underline font-sketch uppercase tracking-wider disabled:opacity-50"
           >
             {uploading ? 'Uploading...' : 'Update Portrait'}
           </button>
-          <p className="font-handwriting text-slate-400 text-[12px] mt-1 italic text-center">
+          <p className="font-handwriting text-slate-400 text-[11px] md:text-[12px] mt-1 italic text-center">
             Click to pick a new snapshot
           </p>
         </div>
 
         {/* Form Fields */}
-        <div className="flex-1 space-y-6">
+        <div className="flex-1 space-y-3 md:space-y-6">
           <div className="flex items-center gap-2 mb-2">
             <span className="material-symbols-outlined text-slate-400">person</span>
-            <h2 className="text-[17px] font-medium">Personal Information</h2>
+            <h2 className="text-[14px] md:text-[17px] font-medium">Personal Information</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
             {/* Full Name */}
             <div>
-              <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">
+              <label className="block text-[12px] md:text-xs font-medium md:font-bold text-slate-400 uppercase tracking-widest mb-1 md:mb-2">
                 Full Name
               </label>
               <input
                 type="text"
-                className="w-full bg-transparent border-none focus:ring-0 paper-lined-input font-handwriting text-[15px] text-slate-700"
+                className="w-full bg-transparent border-none focus:ring-0 paper-lined-input font-handwriting text-[12px] md:text-[15px] text-slate-700"
                 placeholder="How shall we call you?"
                 value={formData.fullName}
                 onChange={(e) => handleInputChange('fullName', e.target.value)}
-              />
+              /> 
             </div>
 
             {/* Email */}
             <div>
-              <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">
+              <label className="block text-[12px] md:text-xs font-medium md:font-bold text-slate-400 uppercase tracking-widest mb-1 md:mb-2">
                 Email Address
               </label>
               <input
                 type="email"
-                className="w-full bg-transparent border-none focus:ring-0 paper-lined-input font-handwriting text-[15px] text-slate-400 cursor-not-allowed"
+                className="w-full bg-transparent border-none focus:ring-0 paper-lined-input font-handwriting text-[12px] md:text-[15px] text-slate-400 cursor-not-allowed"
                 placeholder="your@email.com"
                 value={formData.email}
                 disabled

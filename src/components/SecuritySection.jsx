@@ -44,20 +44,20 @@ export default function SecuritySection() {
         )}
         <div className="flex items-center gap-2 mb-8">
           <span className="material-symbols-outlined text-slate-400">security</span>
-          <h2 className="text-[17px] font-medium">Security</h2>
+          <h2 className="text-[14px] md:text-[17px] font-medium">Security</h2>
         </div>
 
         <div className="space-y-3">
           {/* Password */}
           <div className="flex items-center justify-between group">
             <div>
-              <p className="font-medium">Password</p>
-              <p className="text-xs text-slate-400">Keep it strong and unique</p>
+              <p className="text-[14px] md:text-base font-medium">Password</p>
+              <p className="text-[10px] md:text-xs text-slate-400">Keep it strong and unique</p>
             </div>
             <button
               onClick={handleRequestReset}
               disabled={loading}
-              className="text-primary font-bold text-sm hover:underline font-sketch disabled:opacity-50"
+              className="text-primary font-medium text-[12px] md:font-bold md:text-sm hover:underline font-sketch disabled:opacity-50"
             >
               {loading ? 'Sending...' : 'Reset'}
             </button>
@@ -68,8 +68,8 @@ export default function SecuritySection() {
           {/* 2FA Authentication */}
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">2FA Authentication</p>
-              <p className="text-xs text-slate-400">Adds an extra layer of security</p>
+              <p className="text-[14px] md:text-base font-medium">2FA Authentication</p>
+              <p className="text-[10px] md:text-xs text-slate-400">Adds an extra layer of security</p>
             </div>
             <ToggleSwitch
               checked={twoFAEnabled}
@@ -79,7 +79,7 @@ export default function SecuritySection() {
           </div>
 
           {/* Status badge */}
-          <div className={`pt-4 flex items-center gap-3 p-3 rounded-xl border ${
+          <div className={`md:pt-4 flex items-center p-1.5 md:gap-3  md:p-3 rounded-md md:rounded-xl border ${
             twoFAEnabled
               ? 'bg-green-50 border-green-100'
               : 'bg-slate-50 border-slate-200'
@@ -87,7 +87,7 @@ export default function SecuritySection() {
             <span className={`material-symbols-outlined ${twoFAEnabled ? 'text-green-500' : 'text-slate-400'}`}>
               {twoFAEnabled ? 'verified_user' : 'shield'}
             </span>
-            <p className={`font-handwriting text-[14px] ${twoFAEnabled ? 'text-green-700' : 'text-slate-500'}`}>
+            <p className={`font-handwriting text-[12px] md:text-[14px] ${twoFAEnabled ? 'text-green-700' : 'text-slate-500'}`}>
               {twoFAEnabled ? 'Status: Protected & Synced' : 'Status: 2FA not enabled'}
             </p>
           </div>
