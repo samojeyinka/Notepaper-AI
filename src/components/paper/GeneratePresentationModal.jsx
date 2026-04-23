@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { generateText } from 'ai';
 import { presentationService } from "../../api/presentationService";
+import { usePlan } from "../../hooks/usePlan";
 
 const google = createGoogleGenerativeAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
 
@@ -23,11 +24,14 @@ function stripHtml(html) {
 }
 
 export const GeneratePresentationModal = ({ onClose, paperId, paperTitle, pages, onGenerated }) => {
+    const { canUseAI, increment, loaded } = usePlan();
     const [slideCount, setSlideCount] = useState(10);
     const [theme, setTheme]           = useState('modern');
     const [status, setStatus]         = useState('idle'); // idle | generating | saving | done | error
     const [error, setError]           = useState(null);
     const [progress, setProgress]     = useState('');
+
+    const limitReached = loaded && !canUseAI('ai_presentation');
 
     const handleGenerate = async () => {
         setStatus('generating');
@@ -92,6 +96,7 @@ STRICT RULES:
 
             const saved = res.data;
             setStatus('done');
+            increment('ai_presentation');
             onGenerated(saved);
         } catch (err) {
             console.error('[GeneratePresentation] error', err);
@@ -153,6 +158,13 @@ STRICT RULES:
                                 </div>
                             </div>
 
+                            {limitReached && (
+                                <div className="flex items-start gap-2 p-3 bg-amber-50 rounded-md md:rounded-xl border border-amber-100">
+                                    <span className="material-icons-round text-amber-500 text-[13px] md:text-[16px] mt-0.5">workspace_premium</span>
+                                    <p className="text-[9px] md:text-xs text-amber-700">Daily AI presentation limit reached. Upgrade to Pro for unlimited generations.</p>
+                                </div>
+                            )}
+
                             {error && (
                                 <div className="flex items-start gap-2 p-3 bg-red-50 rounded-md md:rounded-xl border border-red-100">
                                     <span className="material-icons-round text-red-500 text-[13px] md:text-[16px] mt-0.5">error_outline</span>
@@ -164,10 +176,16 @@ STRICT RULES:
                                 <button onClick={onClose} className="flex-1 py-1.5 md:py-3 rounded-md md:rounded-xl text-[12px] md:text-sm font-medium md:font-semibold text-slate-600 hover:bg-slate-100 transition-colors border border-slate-200">
                                     Cancel
                                 </button>
-                                <button onClick={handleGenerate}
-                                    className="flex-1 bg-gradient-to-r from-primary to-indigo-500 text-white py-1.5 md:py-3 rounded-md md:rounded-xl text-[12px] md:text-sm font-medium md:font-semibold hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
-                                    <span className="material-icons-round text-[18px]">auto_awesome</span>
-                                    Generate {slideCount} Slides
+                                <button onClick={handleGenerate} disabled={limitReached || !loaded}
+                                    className="flex-1 bg-gradient-to-r from-primary to-indigo-500 text-white py-1.5 md:py-3 rounded-md md:rounded-xl text-[12px] md:text-sm font-medium md:font-semibold hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
+                                    {!loaded ? (
+                                        <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                    ) : (
+                                        <>
+                                            <span className="material-icons-round text-[18px]">auto_awesome</span>
+                                            Generate {slideCount} Slides
+                                        </>
+                                    )}
                                 </button>
                             </div>
                         </>

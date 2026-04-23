@@ -4,6 +4,7 @@ import { Sidebar } from "../components/user/Sidebar";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { streamText } from "ai";
 import { shakespeare } from "../assets/assets";
+import { usePlan } from "../hooks/usePlan";
 
 const google = createGoogleGenerativeAI({
     apiKey: import.meta.env.VITE_GEMINI_API_KEY,
@@ -93,6 +94,7 @@ function Skeleton() {
 
 export default function GeneratePage() {
     const navigate = useNavigate();
+    const { canUseAI, increment, loaded } = usePlan();
     const [panelOpen, setPanelOpen] = useState(true);
     const [prompt, setPrompt]   = useState("");
     const [tone, setTone]       = useState("academic");
@@ -101,6 +103,8 @@ export default function GeneratePage() {
     const [status, setStatus]   = useState("idle"); // idle | streaming | done | error
     const [copied, setCopied]   = useState(false);
     const [wordCount, setWordCount] = useState(0);
+
+    const limitReached = loaded && !canUseAI('ai_use');
 
     const abortRef   = useRef(null);
     const outputRef  = useRef(null);
@@ -146,6 +150,7 @@ export default function GeneratePage() {
                 setOutput(prev => prev + chunk);
             }
             setStatus("done");
+            increment('ai_use');
         } catch (err) {
             if (err.name === "AbortError") {
                 setStatus(output ? "done" : "idle");
@@ -297,6 +302,12 @@ export default function GeneratePage() {
 
                             {/* Generate / Stop */}
                             <div className="flex flex-col gap-2 mt-auto pt-2">
+                                {limitReached && (
+                                    <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-xl">
+                                        <span className="material-icons-round text-amber-500 text-[16px] mt-0.5 shrink-0">workspace_premium</span>
+                                        <p className="text-[11px] text-amber-700">Daily AI limit reached. Upgrade to Pro for more generations.</p>
+                                    </div>
+                                )}
                                 {isStreaming ? (
                                     <button
                                         onClick={handleStop}
@@ -308,11 +319,17 @@ export default function GeneratePage() {
                                 ) : (
                                     <button
                                         onClick={handleGenerate}
-                                        disabled={!prompt.trim()}
+                                        disabled={!prompt.trim() || limitReached || !loaded}
                                         className="w-full py-2.5 rounded-xl bg-gradient-to-r from-primary to-indigo-500 text-white text-sm font-semibold flex items-center justify-center gap-2 shadow shadow-primary/20 hover:opacity-90 active:scale-[0.98] transition disabled:opacity-40 disabled:cursor-not-allowed"
                                     >
-                                        <span className="material-icons-round text-[18px]">auto_awesome</span>
-                                        {isDone ? "Regenerate" : "Generate"}
+                                        {!loaded ? (
+                                            <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                        ) : (
+                                            <>
+                                                <span className="material-icons-round text-[18px]">auto_awesome</span>
+                                                {isDone ? "Regenerate" : "Generate"}
+                                            </>
+                                        )}
                                     </button>
                                 )}
                                 {isDone && (
