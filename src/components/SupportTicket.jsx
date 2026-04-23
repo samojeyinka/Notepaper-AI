@@ -125,7 +125,7 @@ const ImageLightbox = ({ src, onClose }) => {
                 src={src}
                 alt="attachment"
                 onClick={e => e.stopPropagation()}
-                className="max-w-full max-h-[90vh] rounded-2xl shadow-2xl object-contain"
+                className="max-w-full  max-h-[90vh] rounded-2xl shadow-2xl object-contain"
                 style={{ border: '1px solid rgba(255,255,255,0.1)' }}
             />
 
