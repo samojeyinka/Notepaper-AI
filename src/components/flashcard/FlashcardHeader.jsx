@@ -65,6 +65,16 @@ export const FlashcardHeader = ({
                     {editMode ? 'View' : 'Edit'}
                 </button>
 
+                {/* AI generate button */}
+                <button
+                    onClick={() => navigate('/lockedin/generate?tab=flashcards')}
+                    className="flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-1 md:py-1.5 rounded-lg md:rounded-xl text-[10px] md:text-xs font-semibold bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                    title="Generate flashcards with AI"
+                >
+                    <span className="material-icons-round text-[13px] md:text-[15px]">auto_awesome</span>
+                    <span className="hidden sm:inline">AI Generate</span>
+                </button>
+
                 {/* overflow menu */}
                 <div className="relative">
                     <button

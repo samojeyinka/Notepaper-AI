@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Sidebar } from "../components/user/Sidebar";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { streamText } from "ai";
 import { usePlan } from "../hooks/usePlan";
+import AutoFlashcardTab from "../components/generate/AutoFlashcardTab";
+import AutoPresentationTab from "../components/generate/AutoPresentationTab";
 
 const google = createGoogleGenerativeAI({
     apiKey: import.meta.env.VITE_GEMINI_API_KEY,
@@ -91,8 +93,20 @@ function Skeleton() {
     );
 }
 
+const TABS = [
+    { id: 'generate',      label: 'AI Generate',   icon: 'auto_awesome' },
+    { id: 'flashcards',    label: 'Flashcards',     icon: 'style'        },
+    { id: 'quizzes',       label: 'Quizzes',        icon: 'quiz',        soon: true },
+    { id: 'presentations', label: 'Presentations',  icon: 'slideshow' },
+];
+
 export default function GeneratePage() {
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
+    const activeTab = searchParams.get('tab') ?? 'generate';
+
+    const setTab = (id) => setSearchParams({ tab: id }, { replace: true });
+
     const { canUseAI, increment, loaded } = usePlan();
     const [prompt, setPrompt]   = useState("");
     const [tone, setTone]       = useState("academic");
@@ -228,7 +242,50 @@ export default function GeneratePage() {
                     </div>
                 </header>
 
-                {/* ── Canvas ──────────────────────────────────────────────── */}
+                {/* ── Tab strip ──────────────────────────────────────────── */}
+                <div className="shrink-0 bg-white border-b border-slate-100 px-4 md:px-6 flex items-center gap-1 overflow-x-auto scrollbar-none">
+                    {TABS.map(tab => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setTab(tab.id)}
+                            className={`flex items-center gap-1.5 px-4 py-3.5 text-xs font-bold whitespace-nowrap border-b-2 transition-all shrink-0 ${
+                                activeTab === tab.id
+                                    ? 'border-primary text-primary'
+                                    : 'border-transparent text-slate-400 hover:text-slate-600 hover:border-slate-200'
+                            }`}
+                        >
+                            <span className="material-icons-round text-[15px]">{tab.icon}</span>
+                            {tab.label}
+                            {tab.soon && (
+                                <span className="px-1.5 py-0.5 bg-slate-100 text-slate-400 rounded-full text-[8px] font-bold uppercase tracking-wider">Soon</span>
+                            )}
+                        </button>
+                    ))}
+                </div>
+
+                {/* ── Tab content ─────────────────────────────────────────── */}
+
+                {/* Flashcards tab */}
+                {activeTab === 'flashcards' && <AutoFlashcardTab />}
+
+                {/* Presentations tab */}
+                {activeTab === 'presentations' && <AutoPresentationTab />}
+
+                {/* Placeholder tabs */}
+                {activeTab === 'quizzes' && (
+                    <div className="flex-1 flex flex-col items-center justify-center gap-4 p-12 text-center">
+                        <div className="w-20 h-20 rounded-2xl bg-slate-100 flex items-center justify-center">
+                            <span className="material-icons-round text-slate-300 text-4xl">quiz</span>
+                        </div>
+                        <div>
+                            <p className="font-bold text-slate-700 text-lg">Quizzes — Coming Soon</p>
+                            <p className="text-sm text-slate-400 mt-1">We're building this feature. Stay tuned.</p>
+                        </div>
+                    </div>
+                )}
+
+                {/* Generate tab (default) */}
+                {activeTab === 'generate' && (
                 <div className="flex-1 p-4 md:p-6 grid grid-cols-12 gap-4 md:gap-6 items-start">
 
                     {/* ── Left — config panel ──────────────────────────────── */}
@@ -350,16 +407,7 @@ export default function GeneratePage() {
                             )}
                         </div>
 
-                        {/* Tip card */}
-                        <div className="bg-emerald-50 p-5 rounded-2xl flex items-start gap-3">
-                            <span className="material-icons-round text-emerald-500 text-[22px] mt-0.5 shrink-0">lightbulb</span>
-                            <div>
-                                <p className="text-sm font-bold text-emerald-800 mb-1">Pro Tip</p>
-                                <p className="text-xs text-emerald-700/80 leading-relaxed">
-                                    Add <em>"at a university level"</em> or <em>"for a 10-year-old"</em> to fine-tune depth and complexity.
-                                </p>
-                            </div>
-                        </div>
+                        
                     </section>
 
                     {/* ── Right — output workspace ─────────────────────────── */}
@@ -468,6 +516,7 @@ export default function GeneratePage() {
                         </div>
                     </section>
                 </div>
+                )}
             </main>
         </div>
     );
