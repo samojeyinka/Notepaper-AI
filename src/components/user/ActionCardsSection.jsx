@@ -67,7 +67,7 @@ export const ActionCardsSection = () => {
     // Page 2
     { icon: 'folder_open',           label: 'New Folder',    shapeClass: 'rounded-xl',     bgColor: 'bg-orange-400', onClick: () => setShowFolderModal(true) },
     { icon: 'collections_bookmark',  label: 'Library',       shapeClass: 'rounded-full',   bgColor: 'bg-teal-500',   url: 'library' },
-    { icon: 'quiz',                  label: 'AI Quiz',       shapeClass: 'blob-shape',     bgColor: 'bg-rose-500',   url: 'generate' },
+    { icon: 'quiz',                  label: 'AI Quiz',       shapeClass: 'blob-shape',     bgColor: 'bg-rose-500',   url: 'quizzes' },
   ];
 
   const TOTAL_PAGES = Math.ceil(ALL_CARDS.length / PAGE_SIZE);

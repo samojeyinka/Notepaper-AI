@@ -33,7 +33,7 @@ const Highlight = ({ text = '', query = '' }) => {
 
 // ── Global Search Dropdown ────────────────────────────────────────────────────
 export const DashboardHeader = () => {
-    const { user }   = useAuth();
+    const { user }   = useAuth(); 
     const navigate   = useNavigate();
     const wrapperRef = useRef(null);
     const inputRef   = useRef(null);

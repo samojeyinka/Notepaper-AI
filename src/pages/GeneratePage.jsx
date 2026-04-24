@@ -6,6 +6,7 @@ import { streamText } from "ai";
 import { usePlan } from "../hooks/usePlan";
 import AutoFlashcardTab from "../components/generate/AutoFlashcardTab";
 import AutoPresentationTab from "../components/generate/AutoPresentationTab";
+import AutoQuizTab from "../components/generate/AutoQuizTab";
 
 const google = createGoogleGenerativeAI({
     apiKey: import.meta.env.VITE_GEMINI_API_KEY,
@@ -96,7 +97,7 @@ function Skeleton() {
 const TABS = [
     { id: 'generate',      label: 'AI Generate',   icon: 'auto_awesome' },
     { id: 'flashcards',    label: 'Flashcards',     icon: 'style'        },
-    { id: 'quizzes',       label: 'Quizzes',        icon: 'quiz',        soon: true },
+    { id: 'quizzes',       label: 'Quizzes',        icon: 'quiz'         },
     { id: 'presentations', label: 'Presentations',  icon: 'slideshow' },
 ];
 
@@ -271,18 +272,8 @@ export default function GeneratePage() {
                 {/* Presentations tab */}
                 {activeTab === 'presentations' && <AutoPresentationTab />}
 
-                {/* Placeholder tabs */}
-                {activeTab === 'quizzes' && (
-                    <div className="flex-1 flex flex-col items-center justify-center gap-4 p-12 text-center">
-                        <div className="w-20 h-20 rounded-2xl bg-slate-100 flex items-center justify-center">
-                            <span className="material-icons-round text-slate-300 text-4xl">quiz</span>
-                        </div>
-                        <div>
-                            <p className="font-bold text-slate-700 text-lg">Quizzes — Coming Soon</p>
-                            <p className="text-sm text-slate-400 mt-1">We're building this feature. Stay tuned.</p>
-                        </div>
-                    </div>
-                )}
+                {/* Quizzes tab */}
+                {activeTab === 'quizzes' && <AutoQuizTab />}
 
                 {/* Generate tab (default) */}
                 {activeTab === 'generate' && (

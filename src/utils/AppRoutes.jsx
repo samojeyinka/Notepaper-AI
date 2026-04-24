@@ -15,6 +15,9 @@ import FolderPage from '../pages/FolderPage';
 import FlashcardPage from '../pages/FlashcardPage';
 import VoiceToSpeechPage from '../pages/VoiceToSpeechPage';
 import GeneratePage from '../pages/GeneratePage';
+import QuizzesPage from '../pages/QuizzesPage';
+import QuizCreatePage from '../pages/QuizCreatePage';
+import QuizPlayPage from '../pages/QuizPlayPage';
 import ScrollToTop from './ScrollToTop';
 import ProtectedRoute, { GuestRoute } from './ProtectedRoute';
 
@@ -269,6 +272,18 @@ const AppRoutes = createBrowserRouter([
     {
         path: '/lockedin/flashcards/:id',
         element: <ProtectedRoute><ScrollToTop><FlashcardPage /></ScrollToTop></ProtectedRoute>,
+    },
+    {
+        path: '/lockedin/quizzes',
+        element: <ProtectedRoute><ScrollToTop><QuizzesPage /></ScrollToTop></ProtectedRoute>,
+    },
+    {
+        path: '/lockedin/quizzes/new',
+        element: <ProtectedRoute><ScrollToTop><QuizCreatePage /></ScrollToTop></ProtectedRoute>,
+    },
+    {
+        path: '/lockedin/quizzes/:id/play',
+        element: <ProtectedRoute><ScrollToTop><QuizPlayPage /></ScrollToTop></ProtectedRoute>,
     },
 
 ]);
