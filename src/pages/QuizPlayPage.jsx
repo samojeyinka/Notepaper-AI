@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { quizService } from '../api/quizService';
 
 // ── Instrument Serif font loader ──────────────────────────────────────────────
 const SERIF_FONT_URL =
@@ -196,7 +197,15 @@ const ScoreScreen = ({ score, total, quiz, onRestart, onBack }) => {
         : pct >= 50 ? { label: 'Good effort', emoji: '👍', color: 'text-amber-600',   bg: 'bg-amber-50'   }
         :             { label: 'Keep trying!',emoji: '💪', color: 'text-rose-600',    bg: 'bg-rose-50'    };
 
-    useEffect(() => { playSound('complete'); }, []);
+    useEffect(() => {
+        playSound('complete');
+        if (quiz?.id) {
+            const key  = `quiz_best_${quiz.id}`;
+            const prev = parseInt(localStorage.getItem(key) ?? '0', 10);
+            if (pct > prev) localStorage.setItem(key, String(pct));
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{ background: '#F8F9FA' }}>
@@ -265,8 +274,23 @@ export default function QuizPlayPage() {
     const { id } = useParams();
     const navigate = useNavigate();
 
-    const quiz      = DEMO_QUIZZES.find(q => q.id === id) ?? DEMO_QUIZZES[0];
-    const questions = quiz.questions;
+    // Try API first; fall back to demo data for hardcoded demo IDs
+    const [quiz,      setQuiz]      = useState(null);
+    const [loadError, setLoadError] = useState(false);
+
+    useEffect(() => {
+        const demoMatch = DEMO_QUIZZES.find(q => q.id === id);
+        if (demoMatch) { setQuiz(demoMatch); return; }
+
+        quizService.show(id)
+            .then(res => {
+                const data = res?.data ?? res;
+                setQuiz(data);
+            })
+            .catch(() => setLoadError(true));
+    }, [id]);
+
+    const questions = quiz?.questions ?? [];
 
     const [currentIdx, setCurrentIdx] = useState(0);
     const [selected,   setSelected]   = useState(null);
@@ -278,9 +302,9 @@ export default function QuizPlayPage() {
     const [flash,      setFlash]      = useState(null);   // 'correct' | 'wrong'
     const inputRef = useRef(null);
 
-    const q          = questions[currentIdx];
+    const q          = questions[currentIdx] ?? null;
     const progress   = Math.round((currentIdx / questions.length) * 100);
-    const isMultiple = q.type === 'multiple';
+    const isMultiple = q?.type === 'multiple';
     const hasAnswer  = isMultiple ? selected !== null : inputVal.trim().length > 0;
 
     // Load Instrument Serif
@@ -301,7 +325,7 @@ export default function QuizPlayPage() {
 
     // ── Submit answer ─────────────────────────────────────────────────────────
     const checkAnswer = useCallback(() => {
-        if (!hasAnswer || submitted) return;
+        if (!hasAnswer || submitted || !q) return;
         const correct = isMultiple
             ? selected === q.correct
             : inputVal.trim().toLowerCase() === q.correct.toLowerCase();
@@ -340,7 +364,7 @@ export default function QuizPlayPage() {
             if (done) return;
             if (isMultiple && !submitted) {
                 const idx = LETTERS.indexOf(e.key.toUpperCase());
-                if (idx !== -1 && idx < q.options.length) {
+                if (idx !== -1 && q && idx < (q.options?.length ?? 0)) {
                     setSelected(idx);
                     playSound('select');
                     return;
@@ -358,6 +382,27 @@ export default function QuizPlayPage() {
         setCurrentIdx(0); setSelected(null); setInputVal('');
         setSubmitted(false); setScore(0); setDone(false); setFlash(null);
     };
+
+    // ── Loading / error states ────────────────────────────────────────────────
+    if (loadError) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center gap-4" style={{ background: '#F8F9FA' }}>
+                <span className="material-icons-round text-slate-300 text-5xl">quiz</span>
+                <p className="text-slate-500 font-medium">Quiz not found.</p>
+                <button onClick={() => navigate('/lockedin/quizzes')} className="text-primary text-sm font-semibold hover:underline">
+                    Back to Quizzes
+                </button>
+            </div>
+        );
+    }
+
+    if (!quiz) {
+        return (
+            <div className="min-h-screen flex items-center justify-center" style={{ background: '#F8F9FA' }}>
+                <span className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+            </div>
+        );
+    }
 
     if (done) {
         return <ScoreScreen score={score} total={questions.length} quiz={quiz}

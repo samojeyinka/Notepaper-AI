@@ -303,17 +303,17 @@ export const Paper = () => {
     // Export
     const slug = () => title.replace(/\s+/g,'-').toLowerCase() || 'paper';
 
-    const applyWatermark = (canvas) => {
-        const ctx = canvas.getContext('2d'); const r = 2;
-        const lY = canvas.height - 28*r, sY = lY - 20*r - 8*r;
-        ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
-        ctx.font = `300 ${13*r}px 'DM Sans',sans-serif`; ctx.fillStyle = 'rgba(0,0,0,0.2)'; ctx.fillText('Written with', canvas.width/2, sY);
-        ctx.font = `500 ${20*r}px 'DM Sans',sans-serif`; ctx.fillStyle = 'rgba(0,0,0,0.28)'; ctx.fillText('Notepaper-ai.com', canvas.width/2, lY);
-    };
+    // const applyWatermark = (canvas) => {
+    //     const ctx = canvas.getContext('2d'); const r = 2;
+    //     const lY = canvas.height - 28*r, sY = lY - 20*r - 8*r;
+    //     ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    //     ctx.font = `300 ${13*r}px 'DM Sans',sans-serif`; ctx.fillStyle = 'rgba(0,0,0,0.2)'; ctx.fillText('Written with', canvas.width/2, sY);
+    //     ctx.font = `500 ${20*r}px 'DM Sans',sans-serif`; ctx.fillStyle = 'rgba(0,0,0,0.28)'; ctx.fillText('Notepaper-ai.com', canvas.width/2, lY);
+    // };
 
     const capturePages = async () => {
         const refs = pageRefsRef.current.filter(Boolean); const canvases = [];
-        for (const el of refs) { const c = await htmlToImage.toCanvas(el, { pixelRatio:2,useCORS:true }); applyWatermark(c); canvases.push(c); }
+        for (const el of refs) { const c = await htmlToImage.toCanvas(el, { pixelRatio:2,useCORS:true }); canvases.push(c); }
         return canvases;
     };
 

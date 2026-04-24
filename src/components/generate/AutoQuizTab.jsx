@@ -1,13 +1,20 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
+import { generateText } from 'ai';
+import { usePlan } from '../../hooks/usePlan';
+import { quizService } from '../../api/quizService';
+import { invalidateQuizzesCache } from '../../pages/QuizzesPage';
+
+const google = createGoogleGenerativeAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const QUESTION_COUNTS = [5, 10, 15, 20];
 
 const DIFFICULTIES = [
-    { id: 'easy',   label: 'Easy',   color: 'text-emerald-600', bg: 'bg-emerald-100', active: 'bg-emerald-500 text-white' },
-    { id: 'medium', label: 'Medium', color: 'text-amber-600',   bg: 'bg-amber-100',   active: 'bg-amber-500 text-white'   },
-    { id: 'hard',   label: 'Hard',   color: 'text-rose-600',    bg: 'bg-rose-100',    active: 'bg-rose-500 text-white'    },
+    { id: 'easy',   label: 'Easy',   active: 'bg-emerald-500 text-white', rest: 'bg-emerald-100 text-emerald-600' },
+    { id: 'medium', label: 'Medium', active: 'bg-amber-500 text-white',   rest: 'bg-amber-100 text-amber-600'     },
+    { id: 'hard',   label: 'Hard',   active: 'bg-rose-500 text-white',    rest: 'bg-rose-100 text-rose-600'       },
 ];
 
 const SUBJECTS = [
@@ -21,9 +28,12 @@ const SUBJECTS = [
 
 const QUESTION_TYPES = [
     { id: 'multiple', label: 'Multiple Choice', icon: 'check_box' },
-    { id: 'input',    label: 'Short Answer',     icon: 'edit_note'  },
-    { id: 'both',     label: 'Mixed',            icon: 'shuffle'    },
+    { id: 'input',    label: 'Short Answer',    icon: 'edit_note'  },
+    { id: 'both',     label: 'Mixed',           icon: 'shuffle'    },
 ];
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+const countWords = (str) => str.trim().split(/\s+/).filter(Boolean).length;
 
 // ── Locked source ─────────────────────────────────────────────────────────────
 const LockedSource = ({ icon, label }) => (
@@ -36,157 +46,169 @@ const LockedSource = ({ icon, label }) => (
     </div>
 );
 
-// ── Word counter ──────────────────────────────────────────────────────────────
-const countWords = (str) => str.trim().split(/\s+/).filter(Boolean).length;
+// ── Hidden quiz ready panel ───────────────────────────────────────────────────
+const QuizReadyPanel = ({ count, difficulty, subject, onSave, isSaving }) => {
+    const diffStyle =
+        difficulty === 'easy'   ? 'bg-emerald-100 text-emerald-700' :
+        difficulty === 'medium' ? 'bg-amber-100 text-amber-700'     :
+                                  'bg-rose-100 text-rose-700';
 
-// ── Question preview card ─────────────────────────────────────────────────────
-const QuestionPreview = ({ question, index }) => {
-    const isMultiple = question.type === 'multiple';
-    const LETTERS = ['A', 'B', 'C', 'D'];
+    const subjectLabel = SUBJECTS.find(s => s.id === subject)?.label ?? 'General';
 
     return (
-        <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow">
-            {/* Header row */}
-            <div className="flex items-center justify-between mb-3">
-                <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">Q{index + 1}</span>
-                <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
-                    isMultiple
-                        ? 'bg-violet-100 text-violet-600'
-                        : 'bg-indigo-100 text-indigo-600'
-                }`}>
-                    {isMultiple ? 'Multiple Choice' : 'Short Answer'}
+        <div className="h-full flex flex-col items-center justify-center gap-6 text-center py-10 px-4">
+            {/* Lock icon */}
+            <div className="relative">
+                <div className="absolute inset-0 bg-rose-400/10 blur-3xl rounded-full scale-150 pointer-events-none" />
+                <div className="relative w-28 h-28 bg-slate-50 rounded-full flex items-center justify-center shadow-[0_8px_32px_rgba(0,0,0,0.08)]">
+                    <span className="material-icons-round text-slate-300 text-5xl">lock</span>
+                </div>
+                <div className="absolute -bottom-1 -right-1 bg-emerald-100 p-2 rounded-full shadow-sm">
+                    <span className="material-icons-round text-emerald-600 text-[15px]">check</span>
+                </div>
+            </div>
+
+            {/* Message */}
+            <div>
+                <h3 className="text-2xl font-bold text-slate-800 mb-2 tracking-tight">
+                    {count} Questions Ready
+                </h3>
+                <p className="text-sm text-slate-400 max-w-xs leading-relaxed">
+                    Questions are hidden so you get a genuine test. Save your quiz and start playing to reveal them.
+                </p>
+            </div>
+
+            {/* Tags */}
+            <div className="flex items-center gap-2">
+                <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${diffStyle}`}>
+                    {difficulty}
+                </span>
+                <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-500">
+                    {subjectLabel}
+                </span>
+                <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-violet-100 text-violet-600">
+                    {count} questions
                 </span>
             </div>
 
-            {/* Question text */}
-            <p className="text-sm font-semibold text-slate-800 leading-snug mb-4">
-                {question.question}
-            </p>
-
-            {/* Options */}
-            {isMultiple ? (
-                <div className="grid grid-cols-2 gap-1.5">
-                    {question.options.map((opt, i) => (
-                        <div
-                            key={i}
-                            className={`flex items-center gap-2 px-3 py-2 rounded-xl text-[11px] transition-all ${
-                                i === question.correct
-                                    ? 'bg-emerald-50 border border-emerald-200 text-emerald-700 font-semibold'
-                                    : 'bg-slate-50 text-slate-500'
-                            }`}
-                        >
-                            <span className={`w-5 h-5 rounded-lg flex items-center justify-center text-[9px] font-bold shrink-0 ${
-                                i === question.correct ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-400'
-                            }`}>
-                                {LETTERS[i]}
-                            </span>
-                            <span className="leading-snug line-clamp-1">{opt}</span>
-                        </div>
-                    ))}
-                </div>
-            ) : (
-                <div className="flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-xl">
-                    <span className="material-icons-round text-slate-300 text-[14px]">edit_note</span>
-                    <span className="text-[11px] text-slate-400 italic">Student types their answer</span>
-                </div>
-            )}
+            {/* Faint locked card previews */}
+            <div className="w-full max-w-sm space-y-2 opacity-20 pointer-events-none select-none mt-2">
+                {[...Array(3)].map((_, i) => (
+                    <div key={i} className="h-14 bg-slate-100 rounded-2xl flex items-center justify-center gap-2">
+                        <span className="material-icons-round text-slate-400 text-[14px]">lock</span>
+                        <div className="flex-1 h-2 bg-slate-200 rounded-full max-w-[60%]" />
+                    </div>
+                ))}
+            </div>
         </div>
     );
 };
 
-// ── Hardcoded preview questions (shown after "generate") ──────────────────────
-const PREVIEW_QUESTIONS = [
-    {
-        type: 'multiple',
-        question: 'What is the primary function of mitochondria in a cell?',
-        options: ['Protein synthesis', 'Energy production', 'Cell division', 'Waste removal'],
-        correct: 1,
-    },
-    {
-        type: 'multiple',
-        question: 'Which organelle is known as the "control center" of the cell?',
-        options: ['Ribosome', 'Lysosome', 'Nucleus', 'Vacuole'],
-        correct: 2,
-    },
-    {
-        type: 'input',
-        question: 'What molecule carries genetic information in most living organisms?',
-        correct: 'DNA',
-    },
-    {
-        type: 'multiple',
-        question: 'Which process do cells use to produce energy without oxygen?',
-        options: ['Photosynthesis', 'Aerobic respiration', 'Anaerobic fermentation', 'Osmosis'],
-        correct: 2,
-    },
-    {
-        type: 'input',
-        question: 'What is the powerhouse of the cell?',
-        correct: 'Mitochondria',
-    },
-    {
-        type: 'multiple',
-        question: 'What type of bond holds the two strands of DNA together?',
-        options: ['Ionic bonds', 'Covalent bonds', 'Hydrogen bonds', 'Peptide bonds'],
-        correct: 2,
-    },
-    {
-        type: 'multiple',
-        question: 'Which phase of mitosis is characterized by chromosomes aligning at the cell\'s equator?',
-        options: ['Prophase', 'Anaphase', 'Metaphase', 'Telophase'],
-        correct: 2,
-    },
-    {
-        type: 'input',
-        question: 'What is the building block of proteins called?',
-        correct: 'Amino acid',
-    },
-    {
-        type: 'multiple',
-        question: 'Which scientist is credited with the discovery of penicillin?',
-        options: ['Louis Pasteur', 'Alexander Fleming', 'Robert Koch', 'Joseph Lister'],
-        correct: 1,
-    },
-    {
-        type: 'multiple',
-        question: 'What is the process by which plants convert sunlight into chemical energy?',
-        options: ['Respiration', 'Transpiration', 'Photosynthesis', 'Fermentation'],
-        correct: 2,
-    },
-];
-
 // ── Main component ────────────────────────────────────────────────────────────
 export default function AutoQuizTab() {
     const navigate = useNavigate();
+    const { canUseAI, increment, loaded } = usePlan();
 
-    const [topic,        setTopic]        = useState('');
-    const [details,      setDetails]      = useState('');
-    const [questionCount,setQuestionCount]= useState(10);
-    const [qType,        setQType]        = useState('multiple');
-    const [difficulty,   setDifficulty]   = useState('medium');
-    const [subject,      setSubject]      = useState('auto');
+    const [topic,         setTopic]         = useState('');
+    const [details,       setDetails]       = useState('');
+    const [questionCount, setQuestionCount] = useState(10);
+    const [qType,         setQType]         = useState('multiple');
+    const [difficulty,    setDifficulty]    = useState('medium');
+    const [subject,       setSubject]       = useState('auto');
 
-    const [status, setStatus] = useState('idle'); // idle | generating | done
-    const [questions, setQuestions] = useState([]);
+    const [status,    setStatus]    = useState('idle'); // idle | generating | done | saving | error
+    const [generated, setGenerated] = useState(null);  // raw parsed questions array
+    const [error,     setError]     = useState(null);
+    const [saveError, setSaveError] = useState(null);
 
+    const limitReached = loaded && !canUseAI('ai_quiz');
     const detailsWords = countWords(details);
     const detailsOver  = detailsWords > 50;
 
-    const canGenerate = topic.trim() && !detailsOver;
+    const isGenerating = status === 'generating';
+    const isSaving     = status === 'saving';
+    const isDone       = status === 'done';
 
-    // Simulate generation (UI only — wires to AI later)
-    const handleGenerate = () => {
-        if (!canGenerate) return;
+    // ── Gemini generation ─────────────────────────────────────────────────────
+    const handleGenerate = async () => {
+        if (!topic.trim() || detailsOver) return;
+        setError(null);
+        setSaveError(null);
+        setGenerated(null);
         setStatus('generating');
-        setQuestions([]);
-        setTimeout(() => {
-            setQuestions(PREVIEW_QUESTIONS.slice(0, questionCount));
+
+        const typeInstruction =
+            qType === 'multiple' ? 'All questions must be multiple choice with exactly 4 options.' :
+            qType === 'input'    ? 'All questions must be short-answer (no options).' :
+                                   'Mix multiple choice and short-answer questions roughly 50/50.';
+
+        const detailsClause = details.trim() ? `\nAdditional context: ${details.trim()}` : '';
+        const subjectLabel  = SUBJECTS.find(s => s.id === subject)?.label ?? '';
+        const subjectClause = subject !== 'auto' ? ` The subject is ${subjectLabel}.` : '';
+
+        const prompt = `Generate exactly ${questionCount} quiz questions on this topic: "${topic.trim()}"${detailsClause}${subjectClause}
+Difficulty: ${difficulty}.
+${typeInstruction}
+
+Return ONLY a valid JSON array, no markdown fences, no explanation:
+[
+  {"type":"multiple","question":"...","options":["A","B","C","D"],"correct":0,"explanation":"..."},
+  {"type":"input","question":"...","correct":"exact answer","explanation":"..."}
+]
+
+Rules:
+- "correct" for multiple choice is the 0-based index of the right option
+- "correct" for input is a short exact string answer
+- "explanation" is 1–2 sentences explaining the answer
+- Vary difficulty within the ${difficulty} range
+- Never repeat questions`;
+
+        try {
+            const { text } = await generateText({
+                model: google('gemini-2.5-flash-lite'),
+                prompt,
+            });
+
+            let raw = text.trim();
+            if (raw.startsWith('```')) raw = raw.replace(/^```[a-z]*\n?/, '').replace(/```$/, '').trim();
+
+            const parsed = JSON.parse(raw);
+            if (!Array.isArray(parsed) || parsed.length === 0) throw new Error('Invalid response');
+
+            setGenerated(parsed.slice(0, questionCount));
             setStatus('done');
-        }, 2200);
+            increment('ai_quiz');
+        } catch (err) {
+            console.error('[AutoQuizTab]', err);
+            setError(err.message?.includes('JSON') ? 'AI returned unexpected format — try again.' : 'Generation failed. Please try again.');
+            setStatus('error');
+        }
     };
 
-    const isGenerating = status === 'generating';
-    const isDone       = status === 'done';
+    // ── Save to backend ───────────────────────────────────────────────────────
+    const handleSave = async () => {
+        if (!generated?.length) return;
+        setSaveError(null);
+        setStatus('saving');
+
+        try {
+            const res = await quizService.create({
+                title:          topic.trim() || 'AI Quiz',
+                subject,
+                difficulty,
+                question_type:  qType,
+                question_count: generated.length,
+                questions:      generated,
+            });
+
+            invalidateQuizzesCache();
+            const id = res?.data?.id ?? res?.id;
+            navigate(`/lockedin/quizzes/${id}/play`);
+        } catch {
+            setSaveError('Could not save. Please try again.');
+            setStatus('done');
+        }
+    };
 
     return (
         <div className="flex-1 p-4 md:p-6 grid grid-cols-12 gap-4 md:gap-6 items-start">
@@ -214,7 +236,7 @@ export default function AutoQuizTab() {
                             type="text"
                             value={topic}
                             onChange={e => setTopic(e.target.value)}
-                            disabled={isGenerating}
+                            disabled={isGenerating || isSaving}
                             placeholder="e.g. Cell biology, French Revolution…"
                             className="w-full rounded-xl bg-slate-50 border-none px-4 py-3 text-sm text-slate-700 placeholder-slate-400 outline-none focus:ring-2 focus:ring-rose-300/40 transition disabled:opacity-50"
                         />
@@ -232,26 +254,29 @@ export default function AutoQuizTab() {
                             rows={3}
                             value={details}
                             onChange={e => setDetails(e.target.value)}
-                            disabled={isGenerating}
+                            disabled={isGenerating || isSaving}
                             placeholder="Specify scope, key concepts to include, or chapter/unit…"
                             className={`w-full resize-none rounded-xl bg-slate-50 border-none px-4 py-3 text-sm text-slate-700 placeholder-slate-400 outline-none focus:ring-2 transition disabled:opacity-50 ${
                                 detailsOver ? 'ring-2 ring-red-300 focus:ring-red-400' : 'focus:ring-rose-300/40'
                             }`}
                         />
                         {detailsOver && (
-                            <p className="text-[10px] text-red-500">Keep additional context under 50 words.</p>
+                            <p className="text-[10px] text-red-500">Keep context under 50 words.</p>
                         )}
                     </div>
 
                     {/* Question count */}
                     <div className="flex flex-col gap-2">
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Number of Questions</label>
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                            Number of Questions
+                            <span className="ml-1 normal-case font-normal text-slate-300">(free: 1 quiz/day)</span>
+                        </label>
                         <div className="flex gap-2">
                             {QUESTION_COUNTS.map(n => (
                                 <button
                                     key={n}
                                     onClick={() => setQuestionCount(n)}
-                                    disabled={isGenerating}
+                                    disabled={isGenerating || isSaving}
                                     className={`flex-1 py-2 rounded-full text-xs font-bold transition-all disabled:opacity-50 ${
                                         questionCount === n
                                             ? 'bg-rose-100 text-rose-600'
@@ -272,7 +297,7 @@ export default function AutoQuizTab() {
                                 <button
                                     key={t.id}
                                     onClick={() => setQType(t.id)}
-                                    disabled={isGenerating}
+                                    disabled={isGenerating || isSaving}
                                     className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all disabled:opacity-50 text-left ${
                                         qType === t.id
                                             ? 'bg-rose-50 text-rose-600 ring-1 ring-rose-200'
@@ -299,9 +324,9 @@ export default function AutoQuizTab() {
                                 <button
                                     key={d.id}
                                     onClick={() => setDifficulty(d.id)}
-                                    disabled={isGenerating}
+                                    disabled={isGenerating || isSaving}
                                     className={`flex-1 py-2 rounded-full text-xs font-bold transition-all disabled:opacity-50 ${
-                                        difficulty === d.id ? d.active : `${d.bg} ${d.color} hover:opacity-80`
+                                        difficulty === d.id ? d.active : d.rest
                                     }`}
                                 >
                                     {d.label}
@@ -318,7 +343,7 @@ export default function AutoQuizTab() {
                                 <button
                                     key={s.id}
                                     onClick={() => setSubject(s.id)}
-                                    disabled={isGenerating}
+                                    disabled={isGenerating || isSaving}
                                     className={`flex flex-col items-center gap-1 py-2 px-1 rounded-xl text-[9px] font-bold transition-all disabled:opacity-50 ${
                                         subject === s.id
                                             ? `${s.bg} ${s.color} ring-1 ring-current/20`
@@ -334,6 +359,16 @@ export default function AutoQuizTab() {
                         </div>
                     </div>
 
+                    {/* Limit banner */}
+                    {limitReached && (
+                        <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-100 rounded-xl">
+                            <span className="material-icons-round text-amber-500 text-[15px] mt-0.5 shrink-0">workspace_premium</span>
+                            <p className="text-[11px] text-amber-700">
+                                Free plan allows 1 AI quiz per day. Upgrade to Pro for more.
+                            </p>
+                        </div>
+                    )}
+
                     {/* Generate button */}
                     {isGenerating ? (
                         <div className="flex items-center justify-center gap-3 py-4 bg-rose-50 rounded-2xl">
@@ -343,16 +378,22 @@ export default function AutoQuizTab() {
                     ) : (
                         <button
                             onClick={handleGenerate}
-                            disabled={!canGenerate}
+                            disabled={!topic.trim() || detailsOver || limitReached || !loaded || isSaving}
                             className="w-full py-4 bg-primary text-white rounded-full font-extrabold text-sm flex items-center justify-center gap-2 shadow-[0_8px_24px_rgba(101,65,196,0.3)] hover:scale-[0.98] active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:shadow-none"
                         >
-                            <span className="material-icons-round text-[20px]">auto_awesome</span>
-                            {isDone ? 'Regenerate Quiz' : 'Generate Quiz'}
+                            {!loaded ? (
+                                <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            ) : (
+                                <>
+                                    <span className="material-icons-round text-[20px]">auto_awesome</span>
+                                    {isDone ? 'Regenerate Quiz' : 'Generate Quiz'}
+                                </>
+                            )}
                         </button>
                     )}
                 </div>
 
-                {/* Pro — source material */}
+                {/* Pro — source material teaser */}
                 <div className="bg-white rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.06)] p-5 flex flex-col gap-4">
                     <div className="flex items-center justify-between">
                         <p className="text-sm font-bold text-slate-700">Generate from your content</p>
@@ -363,10 +404,10 @@ export default function AutoQuizTab() {
                     </div>
                     <p className="text-[11px] text-slate-400 -mt-2">Generate a quiz directly from your existing Notepaper content.</p>
                     <div className="flex flex-col gap-2">
-                        <LockedSource icon="description"  label="From a Note"           />
-                        <LockedSource icon="article"      label="From a Paper"          />
-                        <LockedSource icon="folder_open"  label="From a Folder"         />
-                        <LockedSource icon="style"        label="From a Flashcard Set"  />
+                        <LockedSource icon="description"  label="From a Note"          />
+                        <LockedSource icon="article"      label="From a Paper"         />
+                        <LockedSource icon="folder_open"  label="From a Folder"        />
+                        <LockedSource icon="style"        label="From a Flashcard Set" />
                     </div>
                 </div>
             </section>
@@ -384,29 +425,27 @@ export default function AutoQuizTab() {
                                 <div className="w-3 h-3 rounded-full bg-green-400" />
                             </div>
                             <span className="text-xs font-bold text-slate-400 tracking-wide">Question Preview</span>
-                            {isDone && (
+                            {isDone && generated && (
                                 <span className="px-2 py-0.5 bg-rose-100 text-rose-600 rounded-full text-[10px] font-bold">
-                                    {questions.length} questions ready
+                                    {generated.length} questions ready
                                 </span>
                             )}
                         </div>
                         {isDone && (
-                            <div className="flex items-center gap-2 text-[10px] text-slate-400 font-semibold">
-                                <span className={`px-2 py-0.5 rounded-full uppercase tracking-wider ${
-                                    difficulty === 'easy'   ? 'bg-emerald-100 text-emerald-600' :
-                                    difficulty === 'medium' ? 'bg-amber-100 text-amber-600'     :
-                                                             'bg-rose-100 text-rose-600'
-                                }`}>
-                                    {difficulty}
-                                </span>
-                            </div>
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                                difficulty === 'easy'   ? 'bg-emerald-100 text-emerald-600' :
+                                difficulty === 'medium' ? 'bg-amber-100 text-amber-600'     :
+                                                         'bg-rose-100 text-rose-600'
+                            }`}>
+                                {difficulty}
+                            </span>
                         )}
                     </div>
 
-                    {/* Content */}
+                    {/* Content area */}
                     <div className="flex-1 overflow-y-auto p-6 md:p-8">
 
-                        {/* Empty state */}
+                        {/* Idle empty state */}
                         {status === 'idle' && (
                             <div className="h-full flex flex-col items-center justify-center gap-6 text-center py-10">
                                 <div className="relative">
@@ -425,7 +464,6 @@ export default function AutoQuizTab() {
                                         <strong className="text-slate-600">Generate Quiz</strong> to build your quiz instantly.
                                     </p>
                                 </div>
-                                {/* Ghost previews */}
                                 <div className="w-full max-w-sm space-y-2 opacity-20 pointer-events-none select-none mt-2">
                                     {[...Array(3)].map((_, i) => (
                                         <div key={i} className="h-20 bg-slate-100 rounded-2xl border-2 border-dashed border-slate-200" />
@@ -455,35 +493,50 @@ export default function AutoQuizTab() {
                             </div>
                         )}
 
-                        {/* Generated questions */}
-                        {isDone && questions.length > 0 && (
-                            <div className="space-y-3">
-                                {questions.map((q, i) => (
-                                    <QuestionPreview key={i} question={q} index={i} />
-                                ))}
+                        {/* Error */}
+                        {status === 'error' && (
+                            <div className="flex items-center gap-2 text-red-500 text-sm mt-4">
+                                <span className="material-icons-round text-[18px]">error_outline</span>
+                                {error}
                             </div>
+                        )}
+
+                        {/* Ready — hidden preview (no questions shown) */}
+                        {isDone && generated && (
+                            <QuizReadyPanel
+                                count={generated.length}
+                                difficulty={difficulty}
+                                subject={subject}
+                            />
+                        )}
+
+                        {saveError && (
+                            <p className="mt-3 text-xs text-red-500 text-center">{saveError}</p>
                         )}
                     </div>
 
                     {/* Footer */}
                     <div className="shrink-0 px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-3">
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                            {isDone
-                                ? `${questions.length} questions · ${SUBJECTS.find(s => s.id === subject)?.label ?? 'General'} · ${difficulty}`
+                            {isDone && generated
+                                ? `${generated.length} questions · ${SUBJECTS.find(s => s.id === subject)?.label ?? 'General'} · ${difficulty}`
                                 : 'Status: Idle'
                             }
                         </span>
                         <button
-                            onClick={() => isDone && navigate('/lockedin/quizzes')}
-                            disabled={!isDone}
+                            onClick={handleSave}
+                            disabled={!isDone || !generated || isSaving}
                             className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary text-white text-xs font-bold hover:scale-[0.98] active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed transition shadow-[0_4px_12px_rgba(101,65,196,0.3)]"
                         >
-                            <span className="material-icons-round text-[16px]">save</span>
-                            Save Quiz
+                            {isSaving ? (
+                                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            ) : (
+                                <span className="material-icons-round text-[16px]">save</span>
+                            )}
+                            {isSaving ? 'Saving…' : 'Save & Play'}
                         </button>
                     </div>
 
-                    {/* Decorative glow */}
                     <div className="absolute -bottom-16 -right-16 w-56 h-56 bg-rose-400/5 rounded-full blur-3xl pointer-events-none" />
                 </div>
             </section>

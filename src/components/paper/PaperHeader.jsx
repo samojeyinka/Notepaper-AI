@@ -202,7 +202,7 @@ export const PaperHeader = ({
                     <button
                         onClick={onGeneratePresentation}
                         title="Generate Presentation from this Paper"
-                        className="flex items-center gap-1 md:gap-1.5 px-1.5 md:px-3 py-1 md:py-1.5 rounded-xl text-[9px] md:text-[10px] font-medium bg-gradient-to-r from-primary to-indigo-500 text-white shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:scale-105 active:scale-95 transition-all"
+                        className="md:ml-3 flex items-center gap-1 md:gap-1.5 px-1.5 md:px-3 py-1 md:py-1.5 rounded md:rounded-md text-[9px] md:text-[10px] font-medium bg-gradient-to-r from-primary to-indigo-500 text-white shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:scale-105 active:scale-95 transition-all"
                     >
                         <span className="material-icons-round text-[12px] md:text-[15px]">slideshow</span>
                         <span className="inline">Generate Slides</span>
