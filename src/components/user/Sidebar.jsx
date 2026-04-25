@@ -100,7 +100,7 @@ export const Sidebar = ({ activePage }) => {
         <div className="p-4">
           <div className="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl p-2 text-white relative overflow-hidden group">
             <div className="relative z-10">
-              <p className="text-[10px] font-medium opacity-80 mb-1">PRO PLAN</p>
+              <p className="text-[10px] font-medium opacity-80 mb-1">STARTER PLAN</p>
               <p className="font-semibold mb-1.5 leading-tight text-[15px]">Unlock AI Insights</p>
               <Link to={'/lockedin/upgrade'} className="bg-white/20 hover:bg-white/30 text-white text-[12px] py-1 px-2 rounded-md transition-all">
                 Upgrade
