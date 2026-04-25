@@ -4,7 +4,7 @@ import {
     LandingPage, PricingPage, SignUpPage,
     SignInPage, ForgotPasswordPage, ResetPasswordPage, RestoreAccountPage, RestoreAccountFinalPage, DeleteAccountPage, CheckMailPage, VerifyEmailPage, TwoFactorPage, AboutUsPage, FeaturesPage,
     ContactUsPage, HowItWorksPage, OurStoryPage, PrivacyPage,
-    LockedInPage, UpgradePage, StudyPlanPage, LibraryPage,
+    LockedInPage, UpgradePage, StudyPlanPage, ScholarPage, LibraryPage,
     BillingPage, ProfileSettingsPage, ChangePasswordPage, ApplicationSettingsPage,
     NotificationsPage, HelpSupportPage, SupportTicketsPage, NewSupportTicketsPage, SupportTicketPage
 } from '../pages/pages';
@@ -160,6 +160,13 @@ const AppRoutes = createBrowserRouter([
         path: '/lockedin/upgrade',
         element: <ProtectedRoute><ScrollToTop>
             <UpgradePage />
+        </ScrollToTop></ProtectedRoute>,
+    },
+
+    {
+        path: '/lockedin/scholar',
+        element: <ProtectedRoute><ScrollToTop>
+            <ScholarPage />
         </ScrollToTop></ProtectedRoute>,
     },
 

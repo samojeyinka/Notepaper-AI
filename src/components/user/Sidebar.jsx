@@ -9,8 +9,10 @@ export const Sidebar = ({ activePage }) => {
   const navItems = [
     { path: '/lockedin', icon: 'grid_view', label: 'Dashboard' },
     { path: '/lockedin/library', icon: 'folder', label: 'Library' },
-    // { path: '/lockedin/study-plan', icon: 'event_note', label: 'Study Plan' },
+    { path: '/lockedin/scholar', icon: 'memory', label: 'Scholar' },
+    { path: '/lockedin/generate', icon: 'psychology', label: 'AI Studio' },
     { path: '/lockedin/quizzes', icon: 'quiz', label: 'Quizzes' },
+    { path: '/lockedin/study-plan', icon: 'event_note', label: 'Study Plan' },
     { path: '/lockedin/support-tickets', icon: 'chat', label: 'Support Tickets' },
     // { path: '/lockedin/application-settings', icon: 'settings', label: 'Settings' }
   ];
@@ -20,13 +22,13 @@ export const Sidebar = ({ activePage }) => {
       {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 bg-background-light border-b border-slate-200 z-30 px-4 py-3 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <img src={logo} alt="Notepaper AI" className="w-8"/>
+          <img src={logo} alt="Notepaper AI" className="w-8" />
           <span className="text-lg font-bold tracking-tight font-serif-elegant text-ink-black">
             Notepaper<span className="text-primary">.ai</span>
           </span>
         </Link>
-        
-        <button 
+
+        <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
         >
@@ -38,7 +40,7 @@ export const Sidebar = ({ activePage }) => {
 
       {/* Overlay */}
       {isMobileMenuOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
@@ -53,7 +55,7 @@ export const Sidebar = ({ activePage }) => {
         {/* Logo - Desktop Only */}
         <div className="p-4 hidden lg:block">
           <Link to="/" className="flex items-center gap-2">
-            <img src={logo} alt="Notepaper AI" className="w-10"/>
+            <img src={logo} alt="Notepaper AI" className="w-10" />
             <span className="text-xl font-bold tracking-tight font-serif-elegant text-ink-black">
               Notepaper<span className="text-primary">.ai</span>
             </span>
@@ -72,8 +74,8 @@ export const Sidebar = ({ activePage }) => {
                 key={item.path}
                 className={`
                   flex items-center space-x-3 px-6 py-3 transition-all
-                  ${isActive 
-                    ? 'relative group text-white nav-active-blob' 
+                  ${isActive
+                    ? 'relative group text-white nav-active-blob'
                     : 'group text-slate-500 dark:text-slate-400 hover:text-purple-500'
                   }
                 `}
@@ -92,10 +94,10 @@ export const Sidebar = ({ activePage }) => {
         </nav>
 
 
-     
+
 
         {/* Pro Plan Card */}
-        {/* <div className="p-4">
+        <div className="p-4">
           <div className="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl p-2 text-white relative overflow-hidden group">
             <div className="relative z-10">
               <p className="text-[10px] font-medium opacity-80 mb-1">PRO PLAN</p>
@@ -108,9 +110,9 @@ export const Sidebar = ({ activePage }) => {
               bolt
             </span>
           </div>
-        </div> */}
+        </div> 
 
-           <UserProfileCard/>
+        <UserProfileCard />
       </aside>
     </>
   );
