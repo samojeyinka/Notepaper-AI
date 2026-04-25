@@ -215,11 +215,11 @@ Rules:
 
                     {/* Header */}
                     <div className="flex items-center gap-3">
-                        <div className="p-2.5 bg-rose-100 rounded-xl shrink-0">
+                        <div className="p-1.5 md:p-2.5 bg-rose-100 rounded-lg md:rounded-xl shrink-0">
                             <span className="material-icons-round text-rose-500 text-[20px]">quiz</span>
                         </div>
                         <div>
-                            <h2 className="text-base font-semibold text-slate-800 leading-tight">Quiz Generator</h2>
+                            <h2 className="text-[15px] md:text-base font-medium md:font-semibold text-slate-800 leading-tight">Quiz Generator</h2>
                             <p className="text-[10px] text-slate-400">AI builds your quiz from a topic</p>
                         </div>
                     </div>

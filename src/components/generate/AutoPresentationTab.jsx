@@ -158,11 +158,11 @@ STRICT RULES:
                 <div className="bg-white rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.06)] p-6 flex flex-col gap-5">
 
                     <div className="flex items-center gap-3">
-                        <div className="p-2.5 bg-indigo-50 rounded-xl shrink-0">
+                        <div className="p-1.5 md:p-2.5 bg-indigo-50 rounded-md md:rounded-xl shrink-0">
                             <span className="material-icons-round text-indigo-500 text-[20px]">slideshow</span>
                         </div>
                         <div>
-                            <h2 className="text-base font-bold text-slate-800 leading-tight">Presentation Generator</h2>
+                            <h2 className="text-[15px] md:text-base font-medium md:font-semibold text-slate-800 leading-tight">Presentation Generator</h2>
                             <p className="text-[10px] text-slate-400">AI builds slides from your topic</p>
                         </div>
                     </div>
@@ -176,7 +176,7 @@ STRICT RULES:
                             onChange={e => setTopic(e.target.value)}
                             disabled={isGenerating || isSaving}
                             placeholder="e.g. Climate Change, Machine Learning Basics…"
-                            className="w-full rounded-xl bg-slate-50 border-none px-4 py-3 text-sm text-slate-700 placeholder-slate-400 outline-none focus:ring-2 focus:ring-primary/25 transition disabled:opacity-50"
+                            className="w-full placeholder:text-[12px] text-[12px] md:text-[15px]  rounded-lg md:rounded-xl bg-slate-50 border-none px-2 md:px-4 py-1.5 md:py-3 text-slate-700 placeholder-slate-400 outline-none focus:ring-2 focus:ring-primary/25 transition disabled:opacity-50"
                         />
                     </div>
 
@@ -184,7 +184,7 @@ STRICT RULES:
                     <div className="flex flex-col gap-2">
                         <div className="flex items-center justify-between">
                             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Additional Details</label>
-                            <span className={`text-[10px] font-bold ${detailsOver ? 'text-red-500' : 'text-slate-400'}`}>
+                            <span className={`text-[10px] font-medium ${detailsOver ? 'text-red-500' : 'text-slate-400'}`}>
                                 {detailsWords}/50 words
                             </span>
                         </div>
@@ -194,7 +194,7 @@ STRICT RULES:
                             onChange={e => setDetails(e.target.value)}
                             disabled={isGenerating || isSaving}
                             placeholder="Audience, key points to cover, tone, level of detail…"
-                            className={`w-full resize-none rounded-xl bg-slate-50 border-none px-4 py-3 text-sm text-slate-700 placeholder-slate-400 outline-none focus:ring-2 transition disabled:opacity-50 ${
+                            className={`w-full resize-none placeholder:text-[12px] text-[12px] md:text-[15px]  rounded-lg md:rounded-xl bg-slate-50 border-none md:px-4 py-1.5 md:py-3 text-slate-700 placeholder-slate-400 outline-none focus:ring-2 transition disabled:opacity-50 ${
                                 detailsOver ? 'ring-2 ring-red-300 focus:ring-red-400' : 'focus:ring-primary/25'
                             }`}
                         />
@@ -264,14 +264,14 @@ STRICT RULES:
                         <button
                             onClick={handleGenerate}
                             disabled={!topic.trim() || detailsOver || limitReached || !loaded || isSaving}
-                            className="w-full py-4 bg-primary text-white rounded-full font-extrabold text-sm flex items-center justify-center gap-2 shadow-[0_8px_24px_rgba(101,65,196,0.3)] hover:scale-[0.98] active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:shadow-none"
+                            className="w-full py-2 md:py-4 bg-primary text-white rounded-lg font-semibold text-sm flex items-center justify-center gap-2 shadow-[0_8px_24px_rgba(101,65,196,0.3)] hover:scale-[0.98] active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:shadow-none"
                         >
                             {!loaded ? (
                                 <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                             ) : (
                                 <>
-                                    <span className="material-icons-round text-[20px]">auto_awesome</span>
-                                    {isDone ? 'Regenerate' : 'Generate Slides'}
+                               
+                                    {isDone ? 'Regenerate' : 'Generate'}
                                 </>
                             )}
                         </button>
@@ -326,7 +326,7 @@ STRICT RULES:
                                     </div>
                                 </div>
                                 <div>
-                                    <h3 className="text-2xl font-bold text-slate-800 mb-2 tracking-tight">AI Presentation Builder</h3>
+                                    <h3 className="text-xl md:text-2xl font-medium md:font-semibold text-slate-800 mb-2 tracking-tight">AI Presentation Builder</h3>
                                     <p className="text-sm text-slate-400 max-w-sm leading-relaxed">
                                         Enter a topic and hit <strong className="text-slate-600">Generate Slides</strong> to build a polished deck instantly.
                                     </p>

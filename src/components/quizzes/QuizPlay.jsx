@@ -208,7 +208,7 @@ const ScoreScreen = ({ score, total, quiz, onRestart, onBack }) => {
     }, []);
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{ background: '#F8F9FA' }}>
+        <div className="min-h-screen flex flex-col items-center justify-center p-6 w-full" style={{ background: '#F8F9FA' }}>
             {/* Ambient */}
             <div className="fixed inset-0 pointer-events-none overflow-hidden">
                 <div className="absolute -top-20 -right-20 w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
@@ -216,17 +216,8 @@ const ScoreScreen = ({ score, total, quiz, onRestart, onBack }) => {
             </div>
 
             <div className="relative z-10 w-full max-w-md">
-                {/* Logo row */}
-                <div className="flex items-center gap-3 mb-8 justify-center">
-                    <div className="w-8 h-8 bg-primary rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary/20">
-                        <span className="material-icons-round text-[16px]">edit_note</span>
-                    </div>
-                    <span className="text-base font-bold text-slate-900">
-                        Notepaper<span className="text-primary">.ai</span>
-                    </span>
-                </div>
-
-                <div className="bg-white rounded-[2rem] shadow-2xl shadow-slate-200/50 border border-slate-100 p-8 text-center space-y-6">
+               
+                <div className="bg-white rounded-[1rem] md:rounded-[2rem] shadow-2xl shadow-slate-200/50 border border-slate-100 p-8 text-center space-y-6">
                     <div className={`w-20 h-20 ${grade.bg} rounded-full flex items-center justify-center mx-auto text-4xl`}>
                         {grade.emoji}
                     </div>
@@ -252,13 +243,13 @@ const ScoreScreen = ({ score, total, quiz, onRestart, onBack }) => {
                     <div className="flex gap-3">
                         <button
                             onClick={onBack}
-                            className="flex-1 py-3.5 rounded-2xl border border-slate-200 text-slate-600 font-semibold text-sm hover:bg-slate-50 transition-colors"
+                            className="flex-1 py-2 md:py-3.5 rounded-md md:rounded-xl border border-slate-200 text-slate-600 font-semibold text-[12px] md:text-sm hover:bg-slate-50 transition-colors"
                         >
                             Back to Quizzes
                         </button>
                         <button
                             onClick={onRestart}
-                            className="flex-1 py-3.5 rounded-2xl bg-slate-900 text-white font-bold text-sm hover:bg-slate-800 transition-colors shadow-xl hover:scale-105 active:scale-95"
+                            className="flex-1 py-2 md:py-3.5 rounded-md md:rounded-xl bg-slate-900 text-white font-bold text-[12px] md:text-sm hover:bg-slate-800 transition-colors shadow-xl hover:scale-105 active:scale-95"
                         >
                             Try Again
                         </button>
@@ -411,10 +402,10 @@ export default function QuizPlay() {
 
     // ── Play UI ───────────────────────────────────────────────────────────────
     return (
-        <div className="flex-1 lg:ml-64 p-4 lg:p-8 pt-20 lg:pt-8 min-w-0 overflow-x-hidden pb-28" style={{ background: '#F8F9FA' }}>
+        <div className="flex-1 lg:ml-64 p-4 lg:p-8 pt-16 md:pt-4 min-w-0 overflow-x-hidden pb-28" style={{ background: '#F8F9FA' }}>
 
             {/* ── Nav ─────────────────────────────────────────────────────── */}
-            <nav className="px-2 md:px-6 pt-3 md:pt-6 pb-2 md:pb-4 flex flex-col md:gap-5">
+            <nav className="px-2 md:px-6 pt-3 pb-2 md:pb-4 flex flex-col md:gap-5">
                 {/* Top row */}
                 <div className="flex items-center justify-between">
                     {/* Right actions */}
@@ -445,7 +436,7 @@ export default function QuizPlay() {
             </nav>
 
             {/* ── Main ────────────────────────────────────────────────────── */}
-            <main className="flex-grow flex items-center justify-center px-4 md:px-6 py-6">
+            <main className="flex-grow flex items-center justify-center px-4 md:px-6 py-3">
                 <div className="w-full max-w-4xl grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
 
                     {/* ── Left column (tip card) — large screens only ──── */}
@@ -490,7 +481,7 @@ export default function QuizPlay() {
 
                             {/* The card itself — pure white, no overflow-hidden */}
                             <div
-                                className={`relative rounded-[1rem] md:rounded-[2.5rem] border border-slate-100 p-8 md:p-10 lg:p-14 shadow-2xl shadow-slate-200/60 transition-shadow ${
+                                className={`relative rounded-[.8rem] md:rounded-[1.5rem] border border-slate-100 p-4 md:p-5 lg:p-7 shadow-2xl shadow-slate-200/60 transition-shadow ${
                                     flash === 'correct' ? 'ring-2 ring-emerald-300/50' :
                                     flash === 'wrong'   ? 'ring-2 ring-rose-300/50'   : ''
                                 }`}
@@ -503,7 +494,7 @@ export default function QuizPlay() {
 
                                 {/* Question text — Instrument Serif, large */}
                                 <h2
-                                    className="text-xl md:text-3xl lg:text-4xl text-slate-800 leading-snug"
+                                    className="text-[16px] md:text-2xl text-slate-800 leading-snug"
                                     style={{ fontFamily: "'Instrument Serif', serif" }}
                                 >
                                     {q.question}
@@ -576,7 +567,7 @@ export default function QuizPlay() {
                                             </div>
 
                                             {/* Option text */}
-                                            <span className={`flex-1 text-[14px] md:text-lg leading-snug transition-colors ${
+                                            <span className={`flex-1 text-[13px] md:text-base leading-snug transition-colors ${
                                                 isCorrect ? 'text-emerald-800 font-medium'
                                                 : isWrong ? 'text-rose-700'
                                                 : isSelected ? 'text-slate-900 font-normal md:font-medium'

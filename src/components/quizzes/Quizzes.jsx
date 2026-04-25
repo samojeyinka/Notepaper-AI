@@ -327,10 +327,9 @@ export default function Quizzes() {
                     {/* Text content */}
                     <div className="relative z-10  p-4 md:p-10 max-w-2xl">
                         <div className="inline-flex items-center gap-1.5 bg-black/30 text-[#ab8eff] px-3 py-1 rounded-full text-[10px] font-medium md:font-black uppercase tracking-tight mb-5">
-                            <span className="material-icons-round text-[11px] md:text-[13px]" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
                             AI Powered
                         </div>
-                        <h2 className="text-2xl md:text-4xl font-black text-white mb-3 leading-tight">
+                        <h2 className="text-[22px] md:text-4xl font-black text-white mb-3 leading-tight">
                             Instant Quizzes from your Notes
                         </h2>
                         <p className="text-white text-[15px] md:text-lg mb-4 md:mb-8 max-w-md">

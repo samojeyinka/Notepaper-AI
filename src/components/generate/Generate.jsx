@@ -223,7 +223,7 @@ export default function Generate() {
             <main className="flex-1 flex flex-col lg:ml-64 min-h-screen">
 
                 {/* ── Top bar ──────────────────────────────────────────────── */}
-                <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100/80 px-6 h-16 flex items-center justify-between shadow-[0_2px_12px_rgba(0,0,0,0.02)] shrink-0">
+                <header className="hidden ticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100/80 px-6 h-16 md:flex items-center justify-between shadow-[0_2px_12px_rgba(0,0,0,0.02)] shrink-0">
                     <div className="flex items-center gap-3">
                         <span className="text-base font-semibold text-slate-900 tracking-tight">AI Studio</span>     
                     </div>
@@ -244,7 +244,7 @@ export default function Generate() {
                 </header>
 
                 {/* ── Tab strip ──────────────────────────────────────────── */}
-                <div className="shrink-0 bg-white border-b border-slate-100 pt-2 px-4 md:px-6 flex items-center gap-1 overflow-x-auto scrollbar-none">
+                <div className="shrink-0 bg-white border-b border-slate-100 pt-2 px-4 md:px-6 flex items-center gap-1 overflow-x-auto scrollbar-none mt-16 md:mt-0">
                     {TABS.map(tab => (
                         <button
                             key={tab.id}
