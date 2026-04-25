@@ -48,6 +48,7 @@ const QuizCard = ({ quiz, onDelete }) => {
     const style    = getSubjectStyle(quiz.subject);
     const best     = getBestScore(quiz.id);
     const [menuOpen, setMenuOpen] = useState(false);
+    const [copied,   setCopied]   = useState(false);
 
     return (
         <div
@@ -85,6 +86,19 @@ const QuizCard = ({ quiz, onDelete }) => {
                                 >
                                     <span className="material-icons-round text-[14px] text-slate-400">play_arrow</span>
                                     Play Quiz
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(`${window.location.origin}/quiz/${quiz.id}`);
+                                        setCopied(true);
+                                        setTimeout(() => { setCopied(false); setMenuOpen(false); }, 1500);
+                                    }}
+                                    className="w-full flex items-center gap-2 px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 transition-colors"
+                                >
+                                    <span className={`material-icons-round text-[14px] ${copied ? 'text-emerald-500' : 'text-slate-400'}`}>
+                                        {copied ? 'check_circle' : 'share'}
+                                    </span>
+                                    {copied ? 'Link copied!' : 'Share Quiz'}
                                 </button>
                                 <div className="h-px bg-slate-100 my-0.5" />
                                 <button

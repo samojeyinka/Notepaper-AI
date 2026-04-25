@@ -18,6 +18,7 @@ import GeneratePage from '../pages/GeneratePage';
 import QuizzesPage from '../pages/QuizzesPage';
 import QuizCreatePage from '../pages/QuizCreatePage';
 import QuizPlayPage from '../pages/QuizPlayPage';
+import PublicQuizPage from '../pages/PublicQuizPage';
 import ScrollToTop from './ScrollToTop';
 import ProtectedRoute, { GuestRoute } from './ProtectedRoute';
 
@@ -291,6 +292,12 @@ const AppRoutes = createBrowserRouter([
     {
         path: '/lockedin/quizzes/:id/play',
         element: <ProtectedRoute><ScrollToTop><QuizPlayPage /></ScrollToTop></ProtectedRoute>,
+    },
+
+    // Public quiz — accessible without login
+    {
+        path: '/quiz/:id',
+        element: <ScrollToTop><PublicQuizPage /></ScrollToTop>,
     },
 
 ]);

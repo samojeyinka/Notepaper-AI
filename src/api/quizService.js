@@ -18,4 +18,6 @@ export const quizService = {
     show: (id) => apiClient(`/workspace/quizzes/${id}`),
 
     delete: (id) => apiClient(`/workspace/quizzes/${id}`, { method: 'DELETE' }),
+
+    getPublic: (id) => apiClient(`/public/quizzes/${id}`),
 };

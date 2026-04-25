@@ -291,6 +291,7 @@ export default function QuizPlay() {
     const [done,       setDone]       = useState(false);
     const [shake,      setShake]      = useState(false);
     const [flash,      setFlash]      = useState(null);   // 'correct' | 'wrong'
+    const [copied,     setCopied]     = useState(false);
     const inputRef = useRef(null);
 
     const q          = questions[currentIdx] ?? null;
@@ -408,13 +409,25 @@ export default function QuizPlay() {
             <nav className="px-2 md:px-6 pt-3 pb-2 md:pb-4 flex flex-col md:gap-5">
                 {/* Top row */}
                 <div className="flex items-center justify-between">
-                    {/* Right actions */}
                     <button
                         onClick={() => navigate('/lockedin/quizzes')}
                         className="flex items-center gap-1.5 px-3 md:px-4 py-2 text-xs md:text-sm font-semibold text-slate-500 hover:text-slate-900 transition-colors"
                     >
                         <span className="material-icons-round text-[14px] md:text-[16px]">close</span>
                         Exit Quiz
+                    </button>
+                    <button
+                        onClick={() => {
+                            navigator.clipboard.writeText(`${window.location.origin}/quiz/${id}`);
+                            setCopied(true);
+                            setTimeout(() => setCopied(false), 2000);
+                        }}
+                        className="flex items-center gap-1.5 px-3 md:px-4 py-2 text-xs md:text-sm font-semibold text-slate-500 hover:text-primary transition-colors"
+                    >
+                        <span className="material-icons-round text-[14px] md:text-[16px]">
+                            {copied ? 'check_circle' : 'share'}
+                        </span>
+                        {copied ? 'Link copied!' : 'Share'}
                     </button>
                 </div>
 
