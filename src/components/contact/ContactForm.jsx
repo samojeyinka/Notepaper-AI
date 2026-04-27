@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Loader from '../globals/Loader';
 import { apiClient } from '../../api/apiClient';
 
 export default function ContactForm() {
@@ -131,7 +132,7 @@ export default function ContactForm() {
             >
               {loading ? (
                 <>
-                  <span className="material-icons-round text-[18px] animate-spin">sync</span>
+                  <Loader size="sm" />
                   Sending…
                 </>
               ) : (

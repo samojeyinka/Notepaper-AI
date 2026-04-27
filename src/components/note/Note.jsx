@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import Loader from '../globals/Loader';
 import { useParams, useNavigate, useSearchParams, useLocation } from "react-router-dom";
 // useSearchParams is used below to read ?folder= on new-note creation
 import { NoteHeader } from "./NoteHeader";
@@ -667,7 +668,7 @@ export const Note = () => {
                     {saveStatus === 'loading' && (
                         <div style={{ position: 'absolute', inset: 0, zIndex: 20, pointerEvents: 'all', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(241,245,249,0.7)', backdropFilter: 'blur(2px)' }}>
                             <div className="flex flex-col items-center justify-center gap-3">
-                                <span className="material-icons-round text-primary text-[40px] animate-spin">sync</span>
+                                <Loader size="xl" />
             
                             </div>
                         </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
+import Loader from '../globals/Loader';
 import { useParams, useNavigate } from "react-router-dom";
 import { presentationService } from "../../api/presentationService";
 
@@ -1212,7 +1213,7 @@ export const Presentation = () => {
 
     if (loading) return (
         <div className="flex flex-col flex-1 h-screen items-center justify-center bg-slate-50 lg:ml-64">
-            <span className="material-icons-round text-primary text-[30pxpx] md:text-[48px] animate-spin">sync</span>
+            <Loader size="xl" />
 
         </div>
     );
@@ -1247,7 +1248,7 @@ export const Presentation = () => {
                     </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                    {saving && <span className="flex items-center gap-1 text-[11px] text-amber-500"><span className="material-icons-round text-[13px] animate-spin">sync</span>Saving…</span>}
+                    {saving && <span className="flex items-center gap-1 text-[11px] text-amber-500"><Loader size="xs" />Saving…</span>}
                     {!saving && saveMsg==='saved' && <span className="flex items-center gap-1 text-[11px] text-green-500"><span className="material-icons-round text-[13px]">check</span>Saved</span>}
                     <button onClick={() => setShowNotes(v=>!v)}
                         className={`flex items-center gap-1 md:gap-1.5 px-1.5 py-1 md:px-3 md:py-1.5 rounded-xl text-[11px] md:text-xs font-medium md:font-semibold transition-all ${showNotes?'bg-amber-50 text-amber-600 border border-amber-200':'text-slate-500 hover:bg-slate-100'}`}>
@@ -1264,7 +1265,7 @@ export const Presentation = () => {
                             className="flex items-center gap-1 md:gap-1.5 px-2 md:px-4 py-1 md:py-1.5 rounded-md md:rounded-xl text-[9px] md:text-xs font-normal md:font-semibold bg-primary text-white hover:bg-primary/90 active:scale-95 transition-all shadow-md shadow-primary/20 disabled:opacity-60"
                         >
                             {(exporting || exportingPdf)
-                                ? <><span className="material-icons-round text-[14px] animate-spin">sync</span>{exportingPdf ? 'Exporting PDF…' : 'Exporting…'}</>
+                                ? <><Loader size="xs" />{exportingPdf ? 'Exporting PDF…' : 'Exporting…'}</>
                                 : <><span className="material-icons-round text-[14px]">download</span>Export<span className="material-icons-round text-[14px] ml-0.5">expand_more</span></>}
                         </button>
                         {showExportMenu && (

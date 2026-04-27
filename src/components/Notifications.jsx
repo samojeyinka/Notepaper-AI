@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import Loader from './globals/Loader';
 import { useNotifications } from '../context/NotificationsContext';
 
 // ─── Type → display config ────────────────────────────────────────────────────
@@ -286,7 +287,7 @@ export const Notifications = () => {
 
                 {loading ? (
                     <div className="flex justify-center py-12">
-                        <span className="material-icons-round text-primary text-[40px] animate-spin">sync</span>
+                        <Loader size="xl" />
                     </div>
                 ) : (
                     <div className="space-y-12">

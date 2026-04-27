@@ -1,10 +1,10 @@
 import { Sidebar } from '../components/user/Sidebar';
-import Sprint from '../components/sprints/Sprint';
+import SprintsList from '../components/sprints/SprintsList';
 
 const SprintPage = () => (
     <div className="flex min-h-screen">
         <Sidebar activePage="/lockedin/sprints" />
-        <Sprint />
+        <SprintsList />
     </div>
 );
 

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import Loader from '../globals/Loader';
 import { useNavigate } from "react-router-dom";
 import { paperService } from "../../api/paperService";
 
@@ -80,7 +81,7 @@ export const PaperPresentationsSidebar = ({ paperId, onClose, onNewPresentation 
             <div className="flex-1 overflow-y-auto custom-scrollbar">
                 {loading && (
                     <div className="flex flex-col items-center justify-center py-16 gap-3 text-slate-400">
-                        <span className="material-icons-round text-[32px] animate-spin">sync</span>
+                        <Loader size="lg" />
                         <p className="text-xs">Loading…</p>
                     </div>
                 )}

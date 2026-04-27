@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import Loader from './globals/Loader';
 import { Link, useParams } from 'react-router-dom';
 import { ticketService, uploadToCloudinary } from '../api/ticketService';
 import { workspaceCache } from '../api/workspaceCache';
@@ -292,7 +293,7 @@ export const ReplyTextarea = ({ value, onChange, onSend, isSending }) => {
                         className="px-2 md:px-4 py-1 md:py-1.5 text-[12px] md:text-base bg-slate-900 text-white rounded-md font-normal md:font-medium hover:shadow-md transition-all flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {busy ? (
-                            <span className="material-symbols-outlined text-sm animate-spin">progress_activity</span>
+                            <Loader size="xs" />
                         ) : (
                             <span className="material-symbols-outlined text-sm">send</span>
                         )}
@@ -442,7 +443,7 @@ export const SupportTicket = () => {
     if (loading) {
         return (
             <main className="flex-1 lg:ml-64 p-3 lg:p-8 pt-20 lg:pt-8 relative z-10 max-w-5xl mx-auto w-full flex items-center justify-center">
-                <span className="material-symbols-outlined animate-spin text-primary text-4xl">progress_activity</span>
+                <Loader size="lg" />
             </main>
         );
     }

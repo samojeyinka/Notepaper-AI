@@ -19,6 +19,9 @@ import QuizzesPage from '../pages/QuizzesPage';
 import QuizCreatePage from '../pages/QuizCreatePage';
 import QuizPlayPage from '../pages/QuizPlayPage';
 import PublicQuizPage from '../pages/PublicQuizPage';
+import SprintCreatePage from '../pages/SprintCreatePage';
+import SprintDetailPage from '../pages/SprintDetailPage';
+import SprintChallengePage from '../pages/SprintChallengePage';
 import ScrollToTop from './ScrollToTop';
 import ProtectedRoute, { GuestRoute } from './ProtectedRoute';
 
@@ -175,6 +178,24 @@ const AppRoutes = createBrowserRouter([
         path: '/lockedin/sprints',
         element: <ProtectedRoute><ScrollToTop>
             <SprintPage />
+        </ScrollToTop></ProtectedRoute>,
+    },
+    {
+        path: '/lockedin/sprints/create',
+        element: <ProtectedRoute><ScrollToTop>
+            <SprintCreatePage />
+        </ScrollToTop></ProtectedRoute>,
+    },
+    {
+        path: '/lockedin/sprints/:id',
+        element: <ProtectedRoute><ScrollToTop>
+            <SprintDetailPage />
+        </ScrollToTop></ProtectedRoute>,
+    },
+    {
+        path: '/lockedin/sprints/:sprintId/challenges/:challengeId',
+        element: <ProtectedRoute><ScrollToTop>
+            <SprintChallengePage />
         </ScrollToTop></ProtectedRoute>,
     },
 

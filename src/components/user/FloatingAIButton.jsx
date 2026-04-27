@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import Loader from '../globals/Loader';
 import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import { folderService } from "../../api/folderService";
@@ -177,7 +178,7 @@ export const CreateFolderModal = ({ onClose, onCreated }) => {
                         <button type="submit" disabled={!name.trim() || loading}
                             className="flex-1 py-1.5 md:py-2.5 rounded-md md:rounded-xl bg-primary text-white text-[12px] md:text-sm font-semibold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
                             {loading
-                                ? <><span className="material-icons-round text-[15px] animate-spin">sync</span>Creating…</>
+                                ? <><Loader size="xs" />Creating…</>
                                 : <><span className="material-icons-round text-[15px]">create_new_folder</span>Create Folder</>}
                         </button>
                     </div>
@@ -287,9 +288,10 @@ export const FloatingAIButton = ({ exclude = [], folderId = null }) => {
                                         boxShadow: `0 4px 18px ${item.shadow}`,
                                     }}
                                 >
-                                    <span className={`material-icons-round text-[15px] md:text-[22px] ${item.loading ? 'animate-spin' : 'group-hover:scale-110 transition-transform duration-200'}`}>
-                                        {item.loading ? 'sync' : item.icon}
-                                    </span>
+                                    {item.loading
+                                        ? <Loader size="xs" />
+                                        : <span className="material-icons-round text-[15px] md:text-[22px] group-hover:scale-110 transition-transform duration-200">{item.icon}</span>
+                                    }
                                 </div>
                             </button>
                         ))}

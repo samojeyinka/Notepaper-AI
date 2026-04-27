@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import Loader from './globals/Loader';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { folderService } from '../api/folderService';
 import { noteService } from '../api/noteService';
@@ -263,7 +264,7 @@ const Pagination = ({ meta, loading, onMore, onLess }) => {
             {meta.current_page < meta.last_page && (
                 <button onClick={onMore} disabled={loading}
                     className="flex items-center gap-1.5 px-1 md:px-4 py-1 md:py-1.5 rounded-md md:rounded-xl border border-slate-200 text-[12px] md:text-[13px] font-medium text-slate-500 hover:border-primary hover:text-primary disabled:opacity-40 transition-colors">
-                    {loading ? <span className="material-icons-round text-[15px] animate-spin">sync</span> : <span className="material-icons-round text-[15px]">expand_more</span>}
+                    {loading ? <Loader size="xs" /> : <span className="material-icons-round text-[15px]">expand_more</span>}
                     View more
                 </button>
             )}
@@ -561,7 +562,7 @@ export const LibraryContent = () => {
             {/* Content */}
             {tabLoading && tabData.length === 0 ? (
                 <div className="flex justify-center py-16">
-                    <span className="material-icons-round text-primary text-[36px] animate-spin">sync</span>
+                    <Loader size="lg" />
                 </div>
             ) : tabData.length === 0 ? (
                 <>
@@ -627,7 +628,7 @@ export const LibraryContent = () => {
                                 <button onClick={handleCreatePresentation} disabled={creatingPresentation}
                                     className="border-2 border-dashed border-emerald-100 rounded-xl flex flex-col items-center justify-center text-slate-300 hover:text-emerald-500 hover:border-emerald-300 transition-all group aspect-video gap-2 disabled:opacity-60">
                                     {creatingPresentation
-                                        ? <span className="material-icons-round text-[20px] md:text-[30px] animate-spin">sync</span>
+                                        ? <Loader size="md" />
                                         : <span className="material-icons-round text-[20px] md:text-[30px] group-hover:scale-110 transition-transform">add_circle</span>
                                     }
                                     <span className="text-sm medium md:font-semibold">New Slides</span>
