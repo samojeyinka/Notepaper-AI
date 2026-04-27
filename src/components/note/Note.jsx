@@ -666,9 +666,9 @@ export const Note = () => {
                     {/* Loading overlay — blocks interaction while note data is being fetched */}
                     {saveStatus === 'loading' && (
                         <div style={{ position: 'absolute', inset: 0, zIndex: 20, pointerEvents: 'all', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(241,245,249,0.7)', backdropFilter: 'blur(2px)' }}>
-                            <div className="flex flex-col items-center gap-3">
+                            <div className="flex flex-col items-center justify-center gap-3">
                                 <span className="material-icons-round text-primary text-[40px] animate-spin">sync</span>
-                                <p className="text-xs font-semibold text-slate-500 tracking-wide">Loading note…</p>
+            
                             </div>
                         </div>
                     )}
