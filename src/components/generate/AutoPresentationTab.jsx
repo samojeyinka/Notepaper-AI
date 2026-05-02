@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { generateText } from 'ai';
 import { usePlan } from '../../hooks/usePlan';
+import { callDeepSeek } from '../../utils/deepseek';
 import { presentationService } from '../../api/presentationService';
 import GenerateFromContent from './GenerateFromContent';
 import LimitBanner from './LimitBanner';
@@ -17,7 +18,7 @@ const THEMES = [
     { id: 'pastel',    label: 'Pastel',    gradient: 'from-pink-100 to-indigo-100',      accent: '#8b5cf6', dark: true },
 ];
 
-const SLIDE_COUNT_OPTIONS = [5, 8, 10, 12, 15, 20];
+const ALL_SLIDE_COUNTS = [5, 8, 10, 12, 15, 20, 25, 30, 40, 50, 60, 75, 100, 125, 150];
 
 const countWords = (str) => str.trim().split(/\s+/).filter(Boolean).length;
 
@@ -53,7 +54,7 @@ const SlidePreview = ({ slide, theme, index }) => {
 // ── Main component ────────────────────────────────────────────────────────────
 export default function AutoPresentationTab() {
     const navigate = useNavigate();
-    const { canUseAI, increment, loaded } = usePlan();
+    const { canUseAI, increment, loaded, isPaid, planLimit } = usePlan();
 
     const [topic,      setTopic]      = useState('');
     const [details,    setDetails]    = useState('');
@@ -67,10 +68,12 @@ export default function AutoPresentationTab() {
     const [saveError,    setSaveError]    = useState(null);
     const [mobilePreview, setMobilePreview] = useState(false);
 
-    const limitReached = loaded && !canUseAI('ai_presentation');
-    const detailsWords = countWords(details);
-    const detailsOver  = detailsWords > 50;
-    const activeTheme  = THEMES.find(t => t.id === theme) ?? THEMES[0];
+    const limitReached      = loaded && !canUseAI('ai_presentation');
+    const detailsWords      = countWords(details);
+    const detailsOver       = detailsWords > 50;
+    const activeTheme       = THEMES.find(t => t.id === theme) ?? THEMES[0];
+    const maxSlides         = planLimit('max_slide_count') ?? 20;
+    const SLIDE_COUNT_OPTIONS = ALL_SLIDE_COUNTS.filter(n => n <= maxSlides);
 
     const handleGenerate = async () => {
         if (!topic.trim() || detailsOver) return;
@@ -102,11 +105,9 @@ STRICT RULES:
         const userPrompt = `Generate ${slideCount} slides for a presentation titled "${topic.trim()}"${detailsClause}`;
 
         try {
-            const { text } = await generateText({
-                model: google('gemini-2.5-flash-lite'),
-                system: systemPrompt,
-                prompt: userPrompt,
-            });
+            const text = isPaid
+                ? await callDeepSeek(userPrompt, systemPrompt)
+                : (await generateText({ model: google('gemini-2.5-flash-lite'), system: systemPrompt, prompt: userPrompt })).text;
 
             setProgress('Processing slides…');
 
@@ -205,7 +206,14 @@ STRICT RULES:
 
                     {/* Slide count */}
                     <div className="flex flex-col gap-2">
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Number of Slides</label>
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                            Number of Slides
+                            {loaded && (
+                                <span className="ml-1 normal-case font-normal text-slate-300">
+                                    (max {maxSlides} on {isPaid ? 'your plan' : 'free'})
+                                </span>
+                            )}
+                        </label>
                         <div className="flex flex-wrap gap-2">
                             {SLIDE_COUNT_OPTIONS.map(n => (
                                 <button

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { generateText } from 'ai';
 import { usePlan } from '../../hooks/usePlan';
+import { callDeepSeek } from '../../utils/deepseek';
 import { quizService } from '../../api/quizService';
 import GenerateFromContent from './GenerateFromContent';
 import LimitBanner from './LimitBanner';
@@ -11,7 +12,7 @@ import { invalidateQuizzesCache } from '../quizzes/Quizzes';
 const google = createGoogleGenerativeAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
 
 // ── Constants ─────────────────────────────────────────────────────────────────
-const QUESTION_COUNTS = [5, 10, 15, 20];
+const ALL_QUESTION_COUNTS = [5, 10, 15, 20, 25, 30, 40, 50, 75, 100, 150, 200, 300, 400, 500, 600, 750, 1000];
 
 const DIFFICULTIES = [
     { id: 'easy',   label: 'Easy',   active: 'bg-emerald-500 text-white', rest: 'bg-emerald-100 text-emerald-600' },
@@ -98,7 +99,7 @@ const QuizReadyPanel = ({ count, difficulty, subject, onSave, isSaving }) => {
 // ── Main component ────────────────────────────────────────────────────────────
 export default function AutoQuizTab() {
     const navigate = useNavigate();
-    const { canUseAI, increment, loaded } = usePlan();
+    const { canUseAI, increment, loaded, isPaid, planLimit } = usePlan();
 
     const [topic,         setTopic]         = useState('');
     const [details,       setDetails]       = useState('');
@@ -113,9 +114,11 @@ export default function AutoQuizTab() {
     const [saveError,   setSaveError]   = useState(null);
     const [mobilePreview, setMobilePreview] = useState(false);
 
-    const limitReached = loaded && !canUseAI('ai_quiz');
-    const detailsWords = countWords(details);
-    const detailsOver  = detailsWords > 50;
+    const limitReached      = loaded && !canUseAI('ai_quiz');
+    const detailsWords      = countWords(details);
+    const detailsOver       = detailsWords > 50;
+    const maxQuestions      = planLimit('max_quiz_count') ?? 20;
+    const QUESTION_COUNTS   = ALL_QUESTION_COUNTS.filter(n => n <= maxQuestions);
 
     const isGenerating = status === 'generating';
     const isSaving     = status === 'saving';
@@ -157,10 +160,9 @@ Rules:
 - Never repeat questions`;
 
         try {
-            const { text } = await generateText({
-                model: google('gemini-2.5-flash-lite'),
-                prompt,
-            });
+            const text = isPaid
+                ? await callDeepSeek(prompt)
+                : (await generateText({ model: google('gemini-2.5-flash-lite'), prompt })).text;
 
             let raw = text.trim();
             if (raw.startsWith('```')) raw = raw.replace(/^```[a-z]*\n?/, '').replace(/```$/, '').trim();
@@ -264,7 +266,11 @@ Rules:
                     <div className="flex flex-col gap-2">
                         <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                             Number of Questions
-                            <span className="ml-1 normal-case font-normal text-slate-300">(free: 1 quiz/day)</span>
+                            {loaded && (
+                                <span className="ml-1 normal-case font-normal text-slate-300">
+                                    (max {maxQuestions} on {isPaid ? 'your plan' : 'free'})
+                                </span>
+                            )}
                         </label>
                         <div className="flex gap-2">
                             {QUESTION_COUNTS.map(n => (

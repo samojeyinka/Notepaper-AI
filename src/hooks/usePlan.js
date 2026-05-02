@@ -53,6 +53,9 @@ export const usePlan = () => {
     /** Remaining count for a feature. null = unlimited, undefined = loading */
     const remaining = (feature) => usage?.remaining?.[feature] ?? undefined;
 
+    /** Static plan limit for a key (e.g. 'max_flashcard_count'). Returns null if not loaded yet */
+    const planLimit = (key) => usage?.limits?.[key] ?? null;
+
     /** Call after a successful AI generation to refresh the cache */
     const invalidate = () => {
         _cache = null;
@@ -77,6 +80,7 @@ export const usePlan = () => {
         isPaid: usage?.is_paid ?? false,
         canUseAI,
         remaining,
+        planLimit,
         invalidate,
         increment,
         loaded: !!usage,

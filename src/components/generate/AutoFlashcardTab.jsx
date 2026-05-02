@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { generateText } from 'ai';
 import { usePlan } from '../../hooks/usePlan';
+import { callDeepSeek } from '../../utils/deepseek';
 import { flashcardService } from '../../api/flashcardService';
 import { TEMPLATES } from '../flashcard/flashcardTemplates';
 import GenerateFromContent from './GenerateFromContent';
@@ -10,8 +11,7 @@ import LimitBanner from './LimitBanner';
 
 const google = createGoogleGenerativeAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
 
-const CARD_COUNTS = [5, 10, 15, 20, 25, 30];
-const FREE_MAX   = 30;
+const ALL_CARD_COUNTS = [5, 10, 15, 20, 25, 30, 40, 50, 75, 100, 150, 200, 300, 500, 750, 1000];
 
 // ── Inline colour picker ──────────────────────────────────────────────────────
 const ColorSwatch = ({ label, value, onChange }) => (
@@ -44,7 +44,7 @@ const CardPreview = ({ card, index, bgColor, textColor, TemplateDecoration }) =>
 // ── Main component ────────────────────────────────────────────────────────────
 export default function AutoFlashcardTab() {
     const navigate = useNavigate();
-    const { canUseAI, increment, loaded } = usePlan();
+    const { canUseAI, increment, loaded, isPaid, planLimit } = usePlan();
 
     const [topic,     setTopic]     = useState('');
     const [details,   setDetails]   = useState('');
@@ -59,9 +59,11 @@ export default function AutoFlashcardTab() {
     const [saveError,     setSaveError]     = useState(null);
     const [mobilePreview, setMobilePreview] = useState(false);
 
-    const limitReached  = loaded && !canUseAI('ai_flashcard');
-    const detailsWords  = countWords(details);
-    const detailsOver   = detailsWords > 50;
+    const limitReached   = loaded && !canUseAI('ai_flashcard');
+    const detailsWords   = countWords(details);
+    const detailsOver    = detailsWords > 50;
+    const maxCards       = planLimit('max_flashcard_count') ?? 30;
+    const CARD_COUNTS    = ALL_CARD_COUNTS.filter(n => n <= maxCards);
     const tpl           = TEMPLATES[template] ?? TEMPLATES.girlies;
     const Decoration    = tpl.Decoration;
 
@@ -94,10 +96,9 @@ Rules:
 - Never repeat the same card`;
 
         try {
-            const { text } = await generateText({
-                model:  google('gemini-2.5-flash-lite'),
-                prompt,
-            });
+            const text = isPaid
+                ? await callDeepSeek(prompt)
+                : (await generateText({ model: google('gemini-2.5-flash-lite'), prompt })).text;
 
             let raw = text.trim();
             if (raw.startsWith('```')) raw = raw.replace(/^```[a-z]*\n?/, '').replace(/```$/, '').trim();
@@ -201,7 +202,11 @@ Rules:
                     <div className="flex flex-col gap-2">
                         <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                             Number of Cards
-                            <span className="ml-1 normal-case font-normal text-slate-300">(max {FREE_MAX} on free)</span>
+                            {loaded && (
+                                <span className="ml-1 normal-case font-normal text-slate-300">
+                                    (max {maxCards} on {isPaid ? 'your plan' : 'free'})
+                                </span>
+                            )}
                         </label>
                         <div className="flex flex-wrap gap-2">
                             {CARD_COUNTS.map(n => (
