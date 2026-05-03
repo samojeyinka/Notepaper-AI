@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { logo } from "../../assets/assets";
 import { useState } from "react";
 import UserProfileCard from "./UserProfileCard";
+import { SidebarPlanCard } from "./SidebarPlanCard";
 
 export const Sidebar = ({ activePage }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -97,21 +98,7 @@ export const Sidebar = ({ activePage }) => {
 
 
 
-        {/* Pro Plan Card */}
-        <div className="p-4">
-          <div className="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl p-2 text-white relative overflow-hidden group">
-            <div className="relative z-10">
-              <p className="text-[10px] font-medium opacity-80 mb-1">STARTER PLAN</p>
-              <p className="font-semibold mb-1.5 leading-tight text-[15px]">Unlock AI Insights</p>
-              <Link to={'/lockedin/upgrade'} className="bg-white/20 hover:bg-white/30 text-white text-[12px] py-1 px-2 rounded-md transition-all">
-                Upgrade
-              </Link>
-            </div>
-            <span className="material-icons-round absolute -right-4 -bottom-4 text-white/10 text-8xl group-hover:scale-110 transition-transform">
-              bolt
-            </span>
-          </div>
-        </div> 
+        <SidebarPlanCard />
 
         <UserProfileCard />
       </aside>

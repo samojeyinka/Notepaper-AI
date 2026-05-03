@@ -22,6 +22,7 @@ import PublicQuizPage from '../pages/PublicQuizPage';
 import SprintCreatePage from '../pages/SprintCreatePage';
 import SprintDetailPage from '../pages/SprintDetailPage';
 import SprintChallengePage from '../pages/SprintChallengePage';
+import PaymentCallbackPage from '../pages/PaymentCallbackPage';
 import ScrollToTop from './ScrollToTop';
 import ProtectedRoute, { GuestRoute } from './ProtectedRoute';
 
@@ -326,6 +327,12 @@ const AppRoutes = createBrowserRouter([
     {
         path: '/quiz/:id',
         element: <ScrollToTop><PublicQuizPage /></ScrollToTop>,
+    },
+
+    // Payment callback — Paystack redirects here after checkout
+    {
+        path: '/payment/callback',
+        element: <ProtectedRoute><ScrollToTop><PaymentCallbackPage /></ScrollToTop></ProtectedRoute>,
     },
 
 ]);

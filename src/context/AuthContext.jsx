@@ -89,6 +89,15 @@ export function AuthProvider({ children }) {
     });
   }, []);
 
+  /** Re-fetch the user profile from the server and update context */
+  const refreshUser = useCallback(async () => {
+    try {
+      const res = await userService.getProfile();
+      setUser(res.data);
+      writeSession(res.data);
+    } catch (_) {}
+  }, []);
+
   const logout = useCallback(async () => {
     try {
       await authService.logout();
@@ -107,7 +116,7 @@ export function AuthProvider({ children }) {
   const isAdmin = user?.roles?.some(r => ['admin', 'super_admin'].includes(r?.name ?? r)) ?? false;
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, isAdmin, login, verify2fa, updateUser, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, isAdmin, login, verify2fa, updateUser, refreshUser, logout }}>
       {children}
     </AuthContext.Provider>
   );
