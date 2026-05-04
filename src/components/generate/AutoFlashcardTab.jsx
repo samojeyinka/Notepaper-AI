@@ -5,9 +5,12 @@ import { generateText } from 'ai';
 import { usePlan } from '../../hooks/usePlan';
 import { callDeepSeek } from '../../utils/deepseek';
 import { flashcardService } from '../../api/flashcardService';
+import { generateService } from '../../api/generateService';
 import { TEMPLATES } from '../flashcard/flashcardTemplates';
-import GenerateFromContent from './GenerateFromContent';
+import GenerateFromContent, { TAB_CONFIG } from './GenerateFromContent';
 import LimitBanner from './LimitBanner';
+
+const EMPTY_SELECTED = { Notes: [], Papers: [], Slides: [], Flashcards: [] };
 
 const google = createGoogleGenerativeAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
 
@@ -59,9 +62,17 @@ export default function AutoFlashcardTab() {
     const [saveError,     setSaveError]     = useState(null);
     const [mobilePreview, setMobilePreview] = useState(false);
 
+    // Content sources (paid only)
+    const [selected,      setSelected]      = useState(EMPTY_SELECTED);
+    const [uploadedFiles, setUploadedFiles] = useState([]);
+
+    const totalSelected  = Object.values(selected).reduce((a, b) => a + b.length, 0);
+    const hasContent     = totalSelected > 0 || uploadedFiles.length > 0;
+
     const limitReached   = loaded && !canUseAI('ai_flashcard');
+    const maxDetails     = planLimit('max_details_words') ?? 50;
     const detailsWords   = countWords(details);
-    const detailsOver    = detailsWords > 50;
+    const detailsOver    = detailsWords > maxDetails;
     const maxCards       = planLimit('max_flashcard_count') ?? 30;
     const CARD_COUNTS    = ALL_CARD_COUNTS.filter(n => n <= maxCards);
     const tpl           = TEMPLATES[template] ?? TEMPLATES.girlies;
@@ -74,16 +85,38 @@ export default function AutoFlashcardTab() {
     };
 
     const handleGenerate = async () => {
-        if (!topic.trim() || detailsOver) return;
+        if ((!topic.trim() && !hasContent) || detailsOver) return;
         setError(null);
         setCards([]);
         setStatus('generating');
         setMobilePreview(true);
 
-        const detailsClause = details.trim()
-            ? `\nAdditional context: ${details.trim()}`
-            : '';
+        // ── Backend: generate from selected content ───────────────────────────
+        if (hasContent) {
+            const materialIds = Object.entries(selected).flatMap(([tab, items]) =>
+                items.map(item => ({ type: TAB_CONFIG[tab].type, id: item.id }))
+            );
+            try {
+                const topicWithDetails = [topic.trim(), details.trim()].filter(Boolean).join(' — ') || undefined;
+                const res = await generateService.flashcards({
+                    materialIds,
+                    uploads: uploadedFiles,
+                    count:   cardCount,
+                    topic:   topicWithDetails,
+                });
+                const result = res?.data?.cards ?? res?.cards ?? [];
+                setCards(result);
+                setStatus('done');
+            } catch (err) {
+                const msg = Object.values(err?.errors ?? {})?.[0]?.[0] ?? err?.message ?? 'Generation failed. Please try again.';
+                setError(msg);
+                setStatus('error');
+            }
+            return;
+        }
 
+        // ── Frontend: generate from topic only ────────────────────────────────
+        const detailsClause = details.trim() ? `\nAdditional context: ${details.trim()}` : '';
         const prompt = `Generate exactly ${cardCount} flashcards on this topic: "${topic.trim()}"${detailsClause}
 
 Return ONLY a valid JSON array, no markdown fences, no explanation:
@@ -180,7 +213,7 @@ Rules:
                         <div className="flex items-center justify-between">
                             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Additional Details</label>
                             <span className={`text-[10px] font-medium ${detailsOver ? 'text-red-500' : 'text-slate-400'}`}>
-                                {detailsWords}/50 words
+                                {detailsWords}/{maxDetails} words
                             </span>
                         </div>
                         <textarea
@@ -194,7 +227,7 @@ Rules:
                             }`}
                         />
                         {detailsOver && (
-                            <p className="text-[10px] text-red-500">Please keep additional details under 50 words.</p>
+                            <p className="text-[10px] text-red-500">Please keep additional details under {maxDetails} words.</p>
                         )}
                     </div>
 
@@ -260,15 +293,15 @@ Rules:
                     ) : (
                         <button
                             onClick={handleGenerate}
-                            disabled={!topic.trim() || detailsOver || limitReached || !loaded || isSaving}
+                            disabled={(!topic.trim() && !hasContent) || detailsOver || limitReached || !loaded || isSaving}
                             className="w-full py-2 md:py-4 bg-primary text-white rounded-lg font-semibold text-sm flex items-center justify-center gap-2 shadow-[0_8px_24px_rgba(101,65,196,0.3)] hover:scale-[0.98] active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:shadow-none"
                         >
                             {!loaded ? (
                                 <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                             ) : (
                                 <>
-                   
-                                    {isDone ? 'Regenerate' : 'Generate'}
+                                    <span className="material-icons-round text-[16px]">{hasContent ? 'auto_awesome' : 'style'}</span>
+                                    {isDone ? 'Regenerate' : hasContent ? 'Generate from Content' : 'Generate'}
                                 </>
                             )}
                         </button>
@@ -284,6 +317,10 @@ Rules:
                         { icon: 'slideshow',   label: 'From a Presentation' },
                         { icon: 'style',       label: 'From another Flashcard set' },
                     ]}
+                    selected={selected}
+                    onSelectedChange={setSelected}
+                    uploadedFiles={uploadedFiles}
+                    onUploadedFilesChange={setUploadedFiles}
                 />
             </section>
 

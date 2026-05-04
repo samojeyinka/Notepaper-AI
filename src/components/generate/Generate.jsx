@@ -3,11 +3,14 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { streamText } from "ai";
 import { usePlan } from "../../hooks/usePlan";
+import { generateService } from "../../api/generateService";
 import AutoFlashcardTab from "./AutoFlashcardTab";
 import AutoPresentationTab from "./AutoPresentationTab";
 import AutoQuizTab from "./AutoQuizTab";
-import GenerateFromContent from "./GenerateFromContent";
+import GenerateFromContent, { TAB_CONFIG } from "./GenerateFromContent";
 import LimitBanner from "./LimitBanner";
+
+const EMPTY_SELECTED = { Notes: [], Papers: [], Slides: [], Flashcards: [] };
 
 const google = createGoogleGenerativeAI({
     apiKey: import.meta.env.VITE_GEMINI_API_KEY,
@@ -118,6 +121,11 @@ export default function Generate() {
     const [copied, setCopied]   = useState(false);
     const [wordCount, setWordCount] = useState(0);
     const [mobilePreview, setMobilePreview] = useState(false);
+    const [contentSelected, setContentSelected] = useState(EMPTY_SELECTED);
+    const [contentFiles, setContentFiles] = useState([]);
+
+    const totalSelected = Object.values(contentSelected).reduce((sum, arr) => sum + arr.length, 0);
+    const hasContent = totalSelected > 0 || contentFiles.length > 0;
 
     const limitReached = loaded && !canUseAI('ai_use');
 
@@ -176,9 +184,34 @@ export default function Generate() {
         }
     };
 
-    const handleGenerate = () => {
-        if (!prompt.trim() || status === "streaming") return;
+    const handleGenerate = async () => {
+        if ((!prompt.trim() && !hasContent) || status === "streaming") return;
         setMobilePreview(true);
+
+        if (hasContent) {
+            setOutput("");
+            setStatus("streaming");
+            const materialIds = Object.entries(contentSelected).flatMap(([tab, items]) =>
+                items.map(item => ({ type: TAB_CONFIG[tab].type, id: item.id }))
+            );
+            try {
+                const res = await generateService.notes({
+                    materialIds,
+                    uploads: contentFiles,
+                    topic: prompt.trim() || undefined,
+                    tone,
+                    length,
+                });
+                setOutput(res?.data?.content ?? res?.content ?? '');
+                setStatus("done");
+                increment('ai_use');
+            } catch (err) {
+                console.error("[Generate]", err);
+                setStatus("error");
+            }
+            return;
+        }
+
         runGenerate(buildUserMessage());
     };
 
@@ -367,15 +400,14 @@ export default function Generate() {
                             ) : (
                                 <button
                                     onClick={handleGenerate}
-                                    disabled={!prompt.trim() || limitReached || !loaded}
+                                    disabled={(!prompt.trim() && !hasContent) || limitReached || !loaded}
                                     className="w-full py-2 md:py-3 bg-primary text-white rounded-lg font-medium md:font-bold text-[12px] md:text-sm flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(51,33,95,0.3)] hover:scale-[0.98] active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:shadow-none"
                                 >
                                     {!loaded ? (
                                         <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                                     ) : (
                                         <>
-                                     
-                                            {isDone ? "Regenerate" : "Generate"}
+                                            {isDone ? "Regenerate" : hasContent ? "Generate from Content" : "Generate"}
                                         </>
                                     )}
                                 </button>
@@ -392,12 +424,16 @@ export default function Generate() {
                         </div>
 
                         <GenerateFromContent
-                            description="Upgrade to generate content directly from your existing Notepaper notes and papers."
+                            description="Generate content directly from your existing Notepaper notes and papers."
                             sources={[
                                 { icon: 'description', label: 'From a Note' },
                                 { icon: 'article',     label: 'From a Paper' },
                                 { icon: 'folder_open', label: 'From a Folder' },
                             ]}
+                            selected={contentSelected}
+                            onSelectedChange={setContentSelected}
+                            uploadedFiles={contentFiles}
+                            onUploadedFilesChange={setContentFiles}
                         />
                     </section>
 
