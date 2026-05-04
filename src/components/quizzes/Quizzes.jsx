@@ -76,100 +76,149 @@ const QuizListHeader = () => (
 );
 
 const QuizRow = ({ quiz, onDelete }) => {
-    const navigate = useNavigate();
-    const style    = getSubjectStyle(quiz.subject);
-    const best     = getBestScore(quiz.id);
-    const btnRef   = useRef(null);
+    const navigate      = useNavigate();
+    const style         = getSubjectStyle(quiz.subject);
+    const best          = getBestScore(quiz.id);
+    const btnRefMobile  = useRef(null);
+    const btnRefDesktop = useRef(null);
     const [menuOpen, setMenuOpen] = useState(false);
     const [menuPos,  setMenuPos]  = useState({ top: 0, right: 0 });
     const [copied,   setCopied]   = useState(false);
 
-    const openMenu = () => {
-        if (btnRef.current) {
-            const r = btnRef.current.getBoundingClientRect();
+    const openMenu = (ref) => {
+        if (ref.current) {
+            const r = ref.current.getBoundingClientRect();
             setMenuPos({ top: r.bottom + 4, right: window.innerWidth - r.right });
         }
         setMenuOpen(v => !v);
     };
 
+    const DropdownMenu = menuOpen && createPortal(
+        <div
+            style={{ position: 'fixed', top: menuPos.top, right: menuPos.right, zIndex: 9999 }}
+            className="bg-white rounded-xl shadow-lg border border-slate-100 py-1 w-36"
+            onMouseLeave={() => setMenuOpen(false)}
+        >
+            <button
+                onClick={() => {
+                    navigator.clipboard.writeText(`${window.location.origin}/quiz/${quiz.id}`);
+                    setCopied(true);
+                    setTimeout(() => { setCopied(false); setMenuOpen(false); }, 1500);
+                }}
+                className="w-full flex items-center gap-2 px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 transition-colors"
+            >
+                <span className={`material-icons-round text-[14px] ${copied ? 'text-emerald-500' : 'text-slate-400'}`}>
+                    {copied ? 'check_circle' : 'share'}
+                </span>
+                {copied ? 'Link copied!' : 'Share Quiz'}
+            </button>
+            <div className="h-px bg-slate-100 my-0.5" />
+            <button
+                onClick={() => { setMenuOpen(false); onDelete(quiz.id); }}
+                className="w-full flex items-center gap-2 px-3 py-2 text-xs text-red-500 hover:bg-red-50 transition-colors"
+            >
+                <span className="material-icons-round text-[14px]">delete_outline</span>
+                Delete
+            </button>
+        </div>,
+        document.body
+    );
+
     return (
-        <div className="grid grid-cols-1 md:grid-cols-12 items-center gap-4 px-6 py-4 border-b border-slate-100 last:border-0 hover:bg-slate-50/50 transition-colors">
-            <div className="col-span-5 flex items-center gap-3 min-w-0">
-                <div className={`w-10 h-10 rounded-xl ${style.bg} flex items-center justify-center shrink-0`}>
-                    <span className={`material-icons-round text-[18px] ${style.text}`}>{style.icon}</span>
+        <div className="px-6 py-4 border-b border-slate-100 last:border-0 hover:bg-slate-50/50 transition-colors">
+
+            {/* ── Mobile layout ── */}
+            <div className="flex flex-col gap-3 md:hidden">
+                <div className="flex items-center gap-3 min-w-0">
+                    <div className={`w-7 h-7 rounded-md ${style.bg} flex items-center justify-center shrink-0`}>
+                        <span className={`material-icons-round text-[16px] ${style.text}`}>{style.icon}</span>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                        <h3 className="text-[14px] font-semibold text-slate-900 truncate">{quiz.title}</h3>
+                        <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                            {quiz.subject && <span className="text-[9px] text-slate-400 capitalize">{quiz.subject}</span>}
+                            {quiz.difficulty && (
+                                <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wide ${DIFF_BADGE[quiz.difficulty] ?? 'bg-slate-100 text-slate-500'}`}>
+                                    {quiz.difficulty}
+                                </span>
+                            )}
+                        </div>
+                    </div>
+                    <button
+                        ref={btnRefMobile}
+                        onClick={() => openMenu(btnRefMobile)}
+                        className="p-1.5 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors shrink-0"
+                    >
+                        <span className="material-icons-round text-[18px]">more_vert</span>
+                    </button>
                 </div>
-                <div className="min-w-0">
-                    <h3 className="text-[14px] font-semibold text-slate-900 truncate">{quiz.title}</h3>
-                    <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                        {quiz.subject && <span className="text-[11px] text-slate-400 capitalize">{quiz.subject}</span>}
-                        {quiz.difficulty && (
-                            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wide ${DIFF_BADGE[quiz.difficulty] ?? 'bg-slate-100 text-slate-500'}`}>
-                                {quiz.difficulty}
-                            </span>
-                        )}
+
+                <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1.5 text-[13px] text-slate-500">
+                        <span className="material-icons-round text-[15px] text-slate-400">format_list_bulleted</span>
+                        {quiz.question_count}
+                    </div>
+                    <div className="flex items-center">
+                        {best !== null
+                            ? <CircleProgress pct={best} />
+                            : <span className="text-[13px] text-slate-300 font-medium">—</span>
+                        }
+                    </div>
+                    <button
+                        onClick={() => navigate(`/lockedin/quizzes/${quiz.id}/play`)}
+                        className="ml-auto hover:bg-primary/10 text-primary p-1 rounded-md transition-all active:scale-95"
+                    >
+                        <span className="material-icons-round text-[20px]">play_arrow</span>
+                    </button>
+                </div>
+            </div>
+
+            {/* ── Desktop layout ── */}
+            <div className="hidden md:grid grid-cols-12 items-center gap-4">
+                <div className="col-span-5 flex items-center gap-3 min-w-0">
+                    <div className={`w-10 h-10 rounded-xl ${style.bg} flex items-center justify-center shrink-0`}>
+                        <span className={`material-icons-round text-[18px] ${style.text}`}>{style.icon}</span>
+                    </div>
+                    <div className="min-w-0">
+                        <h3 className="text-[14px] font-semibold text-slate-900 truncate">{quiz.title}</h3>
+                        <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                            {quiz.subject && <span className="text-[11px] text-slate-400 capitalize">{quiz.subject}</span>}
+                            {quiz.difficulty && (
+                                <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wide ${DIFF_BADGE[quiz.difficulty] ?? 'bg-slate-100 text-slate-500'}`}>
+                                    {quiz.difficulty}
+                                </span>
+                            )}
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            <div className="col-span-2 flex items-center gap-1.5 text-[13px] text-slate-500">
-                <span className="material-icons-round text-[15px] text-slate-400">format_list_bulleted</span>
-                {quiz.question_count}
-            </div>
-
-            <div className="col-span-2 flex justify-center">
-                {best !== null
-                    ? <CircleProgress pct={best} />
-                    : <span className="text-[13px] text-slate-300 font-medium">—</span>
-                }
-            </div>
-
-            <div className="col-span-3 flex justify-end items-center gap-2">
-                <button
-                    ref={btnRef}
-                    onClick={openMenu}
-                    className="p-2 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
-                >
-                    <span className="material-icons-round text-[18px]">more_vert</span>
-                </button>
-
-                {menuOpen && createPortal(
-                    <div
-                        style={{ position: 'fixed', top: menuPos.top, right: menuPos.right, zIndex: 9999 }}
-                        className="bg-white rounded-xl shadow-lg border border-slate-100 py-1 w-36"
-                        onMouseLeave={() => setMenuOpen(false)}
+                <div className="col-span-2 flex items-center gap-1.5 text-[13px] text-slate-500">
+                    <span className="material-icons-round text-[15px] text-slate-400">format_list_bulleted</span>
+                    {quiz.question_count}
+                </div>
+                <div className="col-span-2 flex justify-center">
+                    {best !== null
+                        ? <CircleProgress pct={best} />
+                        : <span className="text-[13px] text-slate-300 font-medium">—</span>
+                    }
+                </div>
+                <div className="col-span-3 flex justify-end items-center gap-2">
+                    <button
+                        ref={btnRefDesktop}
+                        onClick={() => openMenu(btnRefDesktop)}
+                        className="p-2 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
                     >
-                        <button
-                            onClick={() => {
-                                navigator.clipboard.writeText(`${window.location.origin}/quiz/${quiz.id}`);
-                                setCopied(true);
-                                setTimeout(() => { setCopied(false); setMenuOpen(false); }, 1500);
-                            }}
-                            className="w-full flex items-center gap-2 px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 transition-colors"
-                        >
-                            <span className={`material-icons-round text-[14px] ${copied ? 'text-emerald-500' : 'text-slate-400'}`}>
-                                {copied ? 'check_circle' : 'share'}
-                            </span>
-                            {copied ? 'Link copied!' : 'Share Quiz'}
-                        </button>
-                        <div className="h-px bg-slate-100 my-0.5" />
-                        <button
-                            onClick={() => { setMenuOpen(false); onDelete(quiz.id); }}
-                            className="w-full flex items-center gap-2 px-3 py-2 text-xs text-red-500 hover:bg-red-50 transition-colors"
-                        >
-                            <span className="material-icons-round text-[14px]">delete_outline</span>
-                            Delete
-                        </button>
-                    </div>,
-                    document.body
-                )}
-
-                <button
-                    onClick={() => navigate(`/lockedin/quizzes/${quiz.id}/play`)}
-                    className="bg-primary/10 text-primary px-5 py-2 rounded-lg text-[13px] font-semibold hover:bg-primary hover:text-white transition-all active:scale-95"
-                >
-                    Play
-                </button>
+                        <span className="material-icons-round text-[18px]">more_vert</span>
+                    </button>
+                    <button
+                        onClick={() => navigate(`/lockedin/quizzes/${quiz.id}/play`)}
+                        className="bg-primary/10 text-primary px-5 py-2 rounded-lg text-[13px] font-semibold hover:bg-primary hover:text-white transition-all active:scale-95"
+                    >
+                        Play
+                    </button>
+                </div>
             </div>
+
+            {DropdownMenu}
         </div>
     );
 };
@@ -273,12 +322,7 @@ export default function Quizzes() {
                 {/* ── Page title row ─────────────────────────────────────── */}
                 <div className="flex items-center justify-between mb-4 md:mb-8">
                     <div className="flex items-center gap-3">
-                        <button
-                            onClick={() => navigate('/lockedin')}
-                            className="w-5 h-5 md:w-9 md:h-9 rounded-full bg-white flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors shadow-sm"
-                        >
-                            <span className="material-icons-round text-[14px] md:text-[18px]">arrow_back</span>
-                        </button>
+                      
                         <div>
                             <h1 className="text-[15px] md:text-2xl font-semibold text-slate-900 leading-tight mb-1">Quizzes</h1>
                             <p className="text-[10px] md:text-[11px] text-slate-400 uppercase tracking-widest md:font-bold">The Curated Workspace</p>
@@ -328,10 +372,10 @@ export default function Quizzes() {
                                 <span className={`material-icons-round text-[14px] md:text-[22px] ${stat.text}`}>{stat.icon}</span>
                             </div>
                             <div>
-                                <p className="text-[8px]  md:text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">{stat.label}</p>
-                                <p className="text-2xl md:text-3xl font-black text-slate-900 leading-none">
+                                <p className="text-[8px]  md:text-[10px] font-medium text-slate-400 uppercase tracking-widest mb-0.5">{stat.label}</p>
+                                <p className="text-xl md:text-3xl font-semibold text-slate-900 leading-none">
                                     {stat.value}
-                                    {stat.unit && <span className="text-[11px] md:text-sm font-bold text-slate-400 ml-1">{stat.unit}</span>}
+                                    {stat.unit && <span className="text-[11px] md:text-sm font-semibold text-slate-400 ml-1">{stat.unit}</span>}
                                 </p>
                             </div>
                         </div>
@@ -340,7 +384,7 @@ export default function Quizzes() {
 
                 {/* ── AI Banner ──────────────────────────────────────────── */}
                 <div
-                    className="relative overflow-hidden rounded-2xl mb-8 bg-primary cursor-pointer group"
+                    className="relative overflow-hidden rounded-xl  md:rounded-2xl mb-8 bg-primary cursor-pointer group"
                     onClick={() => navigate('/lockedin/generate?tab=quizzes')}
                     style={{ boxShadow: '0 20px 60px rgba(101,65,196,0.25)' }}
                 >
@@ -358,14 +402,14 @@ export default function Quizzes() {
                         <div className="inline-flex items-center gap-1.5 bg-black/30 text-[#ab8eff] px-3 py-1 rounded-full text-[10px] font-medium md:font-black uppercase tracking-tight mb-5">
                             AI Powered
                         </div>
-                        <h2 className="text-[22px] md:text-4xl font-black text-white mb-3 leading-tight">
+                        <h2 className="text-[20px] md:text-4xl font-bold md:font-black text-white mb-1.5 md:mb-3 leading-tight">
                             Instant Quizzes from your Notes
                         </h2>
                         <p className="text-white text-[15px] md:text-lg mb-4 md:mb-8 max-w-md">
                             Transform any lecture, document, or rough draft into a comprehensive quiz in seconds using Notepaper AI.
                         </p>
                         <button
-                            className="inline-flex items-center gap-3 bg-amber-400 text-slate-900 px-3 md:px-7 py-1.5 md:py-3.5 rounded-full font-medium md:font-black text-[12px] md:text-sm hover:bg-amber-300 transition-colors active:scale-95"
+                            className="inline-flex items-center gap-1.5 md:gap-3 bg-amber-400 text-slate-900 px-3 md:px-7 py-1 md:py-3.5 rounded-md font-medium md:font-black text-[12px] md:text-sm hover:bg-amber-300 transition-colors active:scale-95"
                             onClick={e => { e.stopPropagation(); navigate('/lockedin/generate?tab=quizzes'); }}
                         >
                             Generate Quiz with AI

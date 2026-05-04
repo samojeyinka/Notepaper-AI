@@ -59,29 +59,29 @@ const SprintGenerating = ({ sprint, onReady }) => {
             </div>
 
             <div className="relative z-10 w-full max-w-md text-center">
-                <div className="relative w-24 h-24 mx-auto mb-8">
+                <div className="relative w-16 h-16 md:w-24 md:h-24 mx-auto mb-8">
                     <div className="absolute inset-0 bg-primary/20 rounded-full animate-ping" />
-                    <div className="relative w-24 h-24 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/30">
+                    <div className="relative w-16 h-16 md:w-24 md:h-24 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/30">
                         <span className="material-icons-round text-white text-[40px]" style={{ fontVariationSettings: "'FILL' 1" }}>bolt</span>
                     </div>
                 </div>
 
-                <h2 className="text-2xl font-semibold text-slate-900 mb-1">Building your sprint</h2>
+                <h2 className="text-[18px] md:text-2xl font-semibold text-slate-900 mb-1">Building your sprint</h2>
                 <p className="text-[14px] text-slate-500 mb-1">{sprint.title}</p>
-                <p className="text-[13px] text-primary font-semibold mb-8">{PHASES[phase]}</p>
+                <p className="text-[12px] md:text-[13px] text-primary font-medium mb-4 md:mb-8">{PHASES[phase]}</p>
 
                 <div className="h-2 bg-slate-200 rounded-full overflow-hidden mb-2">
                     <div className="h-full bg-primary rounded-full transition-all duration-1000" style={{ width: `${pct}%` }} />
                 </div>
                 <p className="text-[12px] text-slate-400 mb-8">Checking every 5 seconds…</p>
 
-                <div className="bg-white rounded-2xl p-6 text-left space-y-4" style={{ boxShadow: '0 10px 30px rgba(44,47,50,0.06)' }}>
+                <div className="bg-white rounded-xl md:rounded-2xl p-4 md:p-6 text-left space-y-4" style={{ boxShadow: '0 10px 30px rgba(44,47,50,0.06)' }}>
                     <p className="text-[13px] text-slate-600 leading-relaxed">
                         This usually takes <span className="font-semibold text-slate-800">2–4 minutes</span>. You can safely go back — come back to this sprint when you're ready.
                     </p>
                     <button
                         onClick={() => navigate('/lockedin/sprints')}
-                        className="w-full py-2.5 rounded-xl border border-slate-200 text-slate-600 font-semibold text-[13px] hover:bg-slate-50 transition-all active:scale-95"
+                        className="w-full py-1 md:py-2.5 rounded-lg md:rounded-xl border border-slate-200 text-slate-600 font-medium text-[13px] hover:bg-slate-50 transition-all active:scale-95"
                     >
                         Back to Sprints
                     </button>

@@ -69,11 +69,11 @@ const SprintRow = ({ sprint, onNavigate }) => {
                 <div className="min-w-0">
                     <h3 className="text-[14px] font-semibold text-slate-900 leading-snug truncate">{sprint.title}</h3>
                     {sprint.goal && <p className="text-[11px] text-slate-400 truncate">{sprint.goal}</p>}
-                    <span className={`inline-block mt-1 text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wide ${meta.badge}`}>{meta.label}</span>
+                    <span className={`inline-block mt-1 text-[8px] md:text-[9px] font-medium px-2 py-0.5 rounded-full uppercase tracking-wide ${meta.badge}`}>{meta.label}</span>
                 </div>
             </div>
 
-            <div className="col-span-2 text-[13px] text-slate-500">
+            <div className="col-span-2 text-[10px] md:text-[13px] text-slate-500">
                 {fmt(sprint.start_date)} – {fmt(sprint.end_date)}
             </div>
 
@@ -87,7 +87,7 @@ const SprintRow = ({ sprint, onNavigate }) => {
             <div className="col-span-3 flex justify-end">
                 <button
                     onClick={() => onNavigate(sprint.id)}
-                    className="bg-primary/10 text-primary px-5 py-2 rounded-lg text-[13px] font-semibold hover:bg-primary hover:text-white transition-all active:scale-95"
+                    className="bg-primary/10 text-primary px-2.5 md:px-5 py-1 md:py-2 rounded-md text-[10px] md:text-[12px] font-medium hover:bg-primary hover:text-white transition-all active:scale-95"
                 >
                     {sprint.status === 'completed' ? 'View' : 'Continue'}
                 </button>
@@ -166,15 +166,15 @@ const SprintsList = () => {
         <div className="flex-1 lg:ml-64 p-4 lg:p-8 pt-20 lg:pt-8 min-w-0 overflow-x-hidden pb-28" style={{ background: '#F8F9FA' }}>
 
             {/* Stats */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 md:gap-4 mb-5 md:mb-8">
                 {STATS.map(stat => (
-                    <div key={stat.label} className="bg-white p-5 rounded-xl flex items-center justify-between" style={{ boxShadow: '0px 4px 20px rgba(0,0,0,0.03)' }}>
+                    <div key={stat.label} className="bg-white p-2 md:p-5 rounded-md md:rounded-lg flex items-center justify-between" style={{ boxShadow: '0px 2px 10px rgba(0,0,0,0.03)' }}>
                         <div>
-                            <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-widest mb-1">{stat.label}</p>
-                            <p className="text-2xl font-bold text-primary">{loading ? '—' : stat.value}</p>
+                            <p className="text-[9px] md:text-[11px] font-semibold text-slate-500 uppercase tracking-widest mb-1">{stat.label}</p>
+                            <p className="text-[16px] md:text-2xl font-bold text-primary">{loading ? '—' : stat.value}</p>
                         </div>
-                        <div className={`${stat.bg} p-3 rounded-lg ${stat.text} shrink-0`}>
-                            <span className="material-icons-round text-[20px]">{stat.icon}</span>
+                        <div className={`p-1.5 md:p-3 rounded-md ${stat.text} shrink-0`}>
+                            <span className="material-icons-round text-[15px] md:text-[20px]">{stat.icon}</span>
                         </div>
                     </div>
                 ))}
@@ -182,10 +182,10 @@ const SprintsList = () => {
 
             {/* Section header */}
             <div className="flex items-center justify-between mb-4">
-                <h1 className="text-xl md:text-2xl font-bold text-slate-900">All Sprints</h1>
+                <h1 className="text-[15px] md:text-2xl font-medium md:font-bold text-slate-900">All Sprints</h1>
                 <button
                     onClick={() => navigate('/lockedin/sprints/create')}
-                    className="bg-primary text-white px-5 py-2 rounded-lg text-[13px] font-semibold hover:bg-primary/90 active:scale-95 transition-all shadow-sm"
+                    className="bg-primary text-white px-2.5 md:px-5 py-1 md:py-2 rounded-md md:rounded-lg text-[13px] font-medium md:font-semibold hover:bg-primary/90 active:scale-95 transition-all shadow-sm"
                 >
                     New Sprint
                 </button>

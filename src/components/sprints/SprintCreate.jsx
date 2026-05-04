@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { DayPicker } from 'react-day-picker';
+import { format } from 'date-fns';
+import 'react-day-picker/style.css';
 import { apiClient } from '../../api/apiClient';
 import { sprintService } from '../../api/sprintService';
 import Alert from '../globals/Alert';
@@ -30,6 +33,101 @@ const WIZARD_STEPS = [
 ];
 
 const today = () => new Date().toISOString().split('T')[0];
+
+// ── Date Picker ───────────────────────────────────────────────────────────────
+
+const RDP_CLS = {
+    root:             'select-none font-sans',
+    month_caption:    'flex justify-between items-center mb-3 px-1',
+    caption_label:    'text-[14px] font-semibold text-slate-800',
+    nav:              'flex items-center gap-0.5',
+    button_previous:  'w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 transition-colors',
+    button_next:      'w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 transition-colors',
+    weekday:          'text-center text-[10px] font-semibold text-slate-400 uppercase pb-2 w-9',
+    day:              'p-0.5',
+    day_button:       'w-9 h-9 rounded-xl text-[13px] font-medium w-full h-full transition-all hover:bg-violet-50 hover:text-primary focus:outline-none',
+    today:            'font-bold text-primary',
+    selected:         '!bg-primary !text-white hover:!bg-primary/90 !rounded-xl',
+    disabled:         'opacity-30 pointer-events-none',
+    outside:          'opacity-30',
+};
+
+const toYMD = (d) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+};
+
+const parseYMD = (str) => {
+    if (!str) return undefined;
+    const d = new Date(str + 'T00:00:00');
+    return isNaN(d.getTime()) ? undefined : d;
+};
+
+const DatePickerInput = ({ label, value, onChange, minDate, required, alignRight }) => {
+    const [open, setOpen] = useState(false);
+    const ref = useRef(null);
+
+    const selected = parseYMD(value);
+    const minObj   = parseYMD(minDate);
+
+    useEffect(() => {
+        if (!open) return;
+        const h = (e) => { if (!ref.current?.contains(e.target)) setOpen(false); };
+        document.addEventListener('mousedown', h);
+        return () => document.removeEventListener('mousedown', h);
+    }, [open]);
+
+    const handleSelect = (date) => {
+        if (!date) return;
+        onChange(toYMD(date));
+        setOpen(false);
+    };
+
+    const display = selected ? format(selected, 'MMM d, yyyy') : null;
+
+    return (
+        <div className="space-y-2">
+            <label className="text-[11px] font-semibold text-slate-600 uppercase tracking-widest block">
+                {label} {required && <span className="text-red-400">*</span>}
+            </label>
+            <div ref={ref} className="relative">
+                <button
+                    type="button"
+                    onClick={() => setOpen(v => !v)}
+                    className={`w-full bg-slate-50 border rounded-xl px-4 py-3 text-[14px] text-left flex items-center gap-2 outline-none transition-all ${
+                        open ? 'ring-2 ring-primary/20 border-primary/30' : 'border-slate-200 hover:border-slate-300'
+                    }`}
+                >
+                    <span className="material-icons-round text-slate-400 text-[16px]">calendar_today</span>
+                    <span className={display ? 'text-slate-800 flex-1' : 'text-slate-400 font-light flex-1'}>
+                        {display ?? 'Pick a date'}
+                    </span>
+                    <span className={`material-icons-round text-slate-300 text-[14px] transition-transform ${open ? 'rotate-180' : ''}`}>
+                        expand_more
+                    </span>
+                </button>
+
+                {open && (
+                    <div
+                        className={`absolute top-full mt-2 z-50 bg-white rounded-2xl shadow-xl border border-slate-100 p-4 ${alignRight ? 'right-0' : 'left-0'}`}
+                        style={{ '--rdp-accent-color': '#A78BFA', '--rdp-day_button-border-radius': '0.75rem' }}
+                    >
+                        <DayPicker
+                            mode="single"
+                            selected={selected}
+                            onSelect={handleSelect}
+                            disabled={minObj ? { before: minObj } : undefined}
+                            defaultMonth={selected ?? minObj ?? new Date()}
+                            classNames={RDP_CLS}
+                        />
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
 
 // ── Material Picker Modal ─────────────────────────────────────────────────────
 
@@ -319,16 +417,21 @@ const SprintCreate = () => {
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
-                                {[
-                                    { label: 'Start Date', val: startDate, set: setStartDate, min: today()     },
-                                    { label: 'End Date',   val: endDate,   set: setEndDate,   min: startDate || today() },
-                                ].map(({ label, val, set, min }) => (
-                                    <div key={label} className="space-y-2">
-                                        <label className="text-[11px] font-semibold text-slate-600 uppercase tracking-widest block">{label} <span className="text-red-400">*</span></label>
-                                        <input type="date" value={val} min={min} onChange={e => set(e.target.value)}
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] text-slate-800 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all" />
-                                    </div>
-                                ))}
+                                <DatePickerInput
+                                    label="Start Date"
+                                    value={startDate}
+                                    onChange={setStartDate}
+                                    minDate={today()}
+                                    required
+                                />
+                                <DatePickerInput
+                                    label="End Date"
+                                    value={endDate}
+                                    onChange={setEndDate}
+                                    minDate={startDate || today()}
+                                    required
+                                    alignRight
+                                />
                             </div>
 
                             {durationDays && (
