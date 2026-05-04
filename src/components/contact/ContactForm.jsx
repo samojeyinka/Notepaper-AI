@@ -133,7 +133,6 @@ export default function ContactForm() {
               {loading ? (
                 <>
                   <Loader size="sm" />
-                  Sending…
                 </>
               ) : (
                 <>

@@ -256,7 +256,7 @@ STRICT RULES:
                                     key={n}
                                     onClick={() => setSlideCount(n)}
                                     disabled={isGenerating || isSaving}
-                                    className={`px-3.5 py-2 rounded-full text-xs font-bold transition-all disabled:opacity-50
+                                    className={`p-2 rounded-full text-[8px] md:text-[10px] md:font-medium transition-all disabled:opacity-50
                                         ${slideCount === n
                                             ? 'bg-primary/15 text-primary'
                                             : 'bg-slate-100 text-slate-500 hover:bg-slate-200'

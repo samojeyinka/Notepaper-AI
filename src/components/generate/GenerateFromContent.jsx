@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiClient } from '../../api/apiClient';
 import { usePlan } from '../../hooks/usePlan';
+import { workspaceCache } from '../../api/workspaceCache';
 import Loader from '../globals/Loader';
 import { createPortal } from 'react-dom';
 
@@ -121,7 +122,7 @@ const MaterialPickerModal = ({
                         <button onClick={() => onLoadMore(tab)} disabled={libLoadingMore[tab]}
                             className="w-full py-2.5 rounded-xl border border-slate-200 text-[13px] font-semibold text-slate-500 hover:bg-slate-50 disabled:opacity-50 transition-all flex items-center justify-center gap-2">
                             {libLoadingMore[tab]
-                                ? <><Loader size="sm" /> Loading…</>
+                                ? <><Loader size="sm" /></>
                                 : <><span className="material-icons-round text-[16px]">expand_more</span> Load more</>
                             }
                         </button>
@@ -170,16 +171,43 @@ export default function GenerateFromContent({
     const totalFiles    = uploadedFiles?.length ?? 0;
     const hasAny        = totalSelected > 0 || totalFiles > 0;
 
+    const CACHE_GETTERS = {
+        Notes:      () => workspaceCache.getNotes(),
+        Papers:     () => workspaceCache.getPapers(),
+        Slides:     () => workspaceCache.getPresentations(),
+        Flashcards: () => null,
+    };
+
+    const parseLibRes = (res) => {
+        const d        = res.data ?? res;
+        const items    = d.data ?? (Array.isArray(d) ? d : []);
+        const curPage  = d.current_page ?? 1;
+        const lastPage = d.last_page    ?? 1;
+        return { items, hasMore: curPage < lastPage };
+    };
+
     const fetchLibTab = (tab, page, append = false) => {
+        if (!append && page === 1) {
+            const cached = CACHE_GETTERS[tab]?.();
+            if (cached?.data?.length) {
+                setLibrary(prev => ({
+                    ...prev,
+                    [tab]: cached.data.map(item => ({ id: item.id, title: item.title ?? 'Untitled' })),
+                }));
+                const hasMore = (cached.meta?.current_page ?? 1) < (cached.meta?.last_page ?? 1);
+                setLibHasMore(prev => ({ ...prev, [tab]: hasMore }));
+                return;
+            }
+        }
+
         const setLoading = append ? setLibLoadingMore : setLibLoading;
         setLoading(prev => ({ ...prev, [tab]: true }));
         apiClient(`${LIBRARY_ENDPOINTS[tab]}?page=${page}`)
             .then(res => {
-                const d     = res.data ?? res;
-                const items = d.data ?? (Array.isArray(d) ? d : []);
-                const mapped = items.map(item => ({ id: item.id, title: item.title ?? 'Untitled' }));
+                const { items: raw, hasMore } = parseLibRes(res);
+                const mapped = raw.map(item => ({ id: item.id, title: item.title ?? 'Untitled' }));
                 setLibrary(prev => ({ ...prev, [tab]: append ? [...prev[tab], ...mapped] : mapped }));
-                setLibHasMore(prev => ({ ...prev, [tab]: (d.current_page ?? 1) < (d.last_page ?? 1) }));
+                setLibHasMore(prev => ({ ...prev, [tab]: hasMore }));
                 setLibPage(prev => ({ ...prev, [tab]: page }));
             })
             .catch(() => {})

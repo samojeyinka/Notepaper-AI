@@ -324,13 +324,13 @@ Rules:
                                 </span>
                             )}
                         </label>
-                        <div className="flex gap-2">
+                        <div className="flex flex-wrap gap-2">
                             {QUESTION_COUNTS.map(n => (
                                 <button
                                     key={n}
                                     onClick={() => setQuestionCount(n)}
                                     disabled={isGenerating || isSaving}
-                                    className={`flex-1 py-2 rounded-full text-xs font-medium transition-all disabled:opacity-50 ${
+                                    className={`p-1 rounded-full text-[8px] md:text-[10px] md:font-medium transition-all disabled:opacity-50 ${
                                         questionCount === n
                                             ? 'bg-rose-100 text-rose-600'
                                             : 'bg-slate-100 text-slate-500 hover:bg-slate-200'

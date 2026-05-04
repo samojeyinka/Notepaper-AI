@@ -194,7 +194,7 @@ const SprintsLanding = ({ sprints, onCreate, onOpen }) => {
                     { label: 'Completed',           value: completed.length, icon: 'military_tech', bg: 'bg-emerald-100', text: 'text-emerald-600' },
                     { label: 'Challenges Done',     value: totalDone,        icon: 'check_circle',  bg: 'bg-amber-100',   text: 'text-amber-600'   },
                 ].map(stat => (
-                    <div key={stat.label} className="bg-white rounded-xl md:rounded-2xl p-3 md:p-5 flex flex-col md:flex-row md:items-center gap-2 md:gap-4" style={{ boxShadow: '0 10px 30px rgba(44,47,50,0.06)' }}>
+                    <div key={stat.label} className="bg-white rounded-md md:rounded-2xl p-3 md:p-5 flex flex-col md:flex-row md:items-center gap-2 md:gap-4" style={{ boxShadow: '0 10px 30px rgba(44,47,50,0.06)' }}>
                         <div className={`w-8 h-8 md:w-12 md:h-12 ${stat.bg} rounded-xl flex items-center justify-center shrink-0`}>
                             <span className={`material-icons-round text-[16px] md:text-[22px] ${stat.text}`}>{stat.icon}</span>
                         </div>

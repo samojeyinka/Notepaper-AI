@@ -124,7 +124,6 @@ const WebToTextModal = ({ onClose, onInsert }) => {
                     {status === 'fetching' && (
                         <div className="flex items-center justify-center py-8 gap-2 text-slate-400">
                             <Loader size="sm" />
-                            <span className="text-[12px]">Extracting content…</span>
                         </div>
                     )}
 

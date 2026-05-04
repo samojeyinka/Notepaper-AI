@@ -483,7 +483,7 @@ export const Paper = () => {
                         <div style={{ position:'absolute',inset:0,zIndex:20,pointerEvents:'all',display:'flex',alignItems:'center',justifyContent:'center',background:'rgba(241,245,249,0.7)',backdropFilter:'blur(2px)' }}>
                             <div className="flex flex-col items-center gap-3">
                                 <Loader size="xl" />
-                                <p className="text-xs font-semibold text-slate-500 tracking-wide">Loading paper…</p>
+
                             </div>
                         </div>
                     )}

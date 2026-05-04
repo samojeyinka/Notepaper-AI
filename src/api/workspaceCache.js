@@ -8,6 +8,8 @@ const cache = {
     papers:        null,
     presentations: null,
     tickets:       null,
+    activeSprint:  null,
+    sprintsList:   null,
 };
 
 export const workspaceCache = {
@@ -27,7 +29,15 @@ export const workspaceCache = {
     setPresentations: (data, meta) => { cache.presentations = { data, meta, fetchedAt: Date.now() }; },
     invalidatePresentations: () => { cache.presentations = null; },
 
-    invalidateAll: () => { cache.folders = null; cache.notes = null; cache.papers = null; cache.presentations = null; },
+    getActiveSprint: () => cache.activeSprint ?? null,
+    setActiveSprint: (sprint, challenges) => { cache.activeSprint = { sprint, challenges, fetchedAt: Date.now() }; },
+    invalidateActiveSprint: () => { cache.activeSprint = null; },
+
+    getSprintsList: () => cache.sprintsList?.data ?? null,
+    setSprintsList: (data) => { cache.sprintsList = { data, fetchedAt: Date.now() }; },
+    invalidateSprintsList: () => { cache.sprintsList = null; },
+
+    invalidateAll: () => { cache.folders = null; cache.notes = null; cache.papers = null; cache.presentations = null; cache.activeSprint = null; cache.sprintsList = null; },
 
     getTickets: () => cache.tickets?.data ?? null,
     setTickets: (data) => { cache.tickets = { data, fetchedAt: Date.now() }; },

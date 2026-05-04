@@ -483,7 +483,7 @@ const FolderPage = () => {
                                                         className="flex items-center gap-2 px-6 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:border-primary hover:text-primary disabled:opacity-40 transition-colors"
                                                     >
                                                         {notesLoading
-                                                            ? <><Loader size="xs" />Loading…</>
+                                                            ? <><Loader size="xs" /></>
                                                             : <>Load more</>
                                                         }
                                                     </button>

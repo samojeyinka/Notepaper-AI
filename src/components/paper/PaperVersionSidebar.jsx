@@ -126,7 +126,7 @@ const VersionPreviewModal = ({ versions, selectedIdx, onSelectIdx, onClose, onRe
                         <button onClick={()=>onRevert(version.id)} disabled={reverting===version?.id}
                             className="flex items-center gap-1.5 md:gap-2 px-3 md:px-6 py-1.5 md:py-2.5 rounded-lg md:rounded-xl bg-primary text-white text-[11px] md:text-sm font-medium hover:bg-primary/90 active:scale-95 transition-all disabled:opacity-60 shadow-lg shadow-primary/20">
                             {reverting===version?.id
-                                ? <><Loader size="xs" />Restoring…</>
+                                ? <><Loader size="xs" /></>
                                 : <><span className="material-icons-round text-[15px]">restore</span>Restore this version</>}
                         </button>
                     </div>
@@ -183,7 +183,7 @@ export const PaperVersionSidebar = ({ paperId, onClose, onRevert }) => {
                 </button>
             </div>
             <div className="flex-1 overflow-y-auto custom-scrollbar">
-                {loading && <div className="flex flex-col items-center justify-center py-16 gap-3 text-slate-400"><Loader size="lg" /><p className="text-xs">Loading history…</p></div>}
+                {loading && <div className="flex flex-col items-center justify-center py-16 gap-3 text-slate-400"><Loader size="lg" /></div>}
                 {error && <div className="m-4 p-3 bg-red-50 rounded-xl text-xs text-red-500 font-medium flex items-center gap-2"><span className="material-icons-round text-[16px]">error_outline</span>{error}</div>}
                 {!loading && !error && versions.length === 0 && (
                     <div className="flex flex-col items-center justify-center py-16 gap-3 px-6 text-center">

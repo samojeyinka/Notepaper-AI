@@ -308,7 +308,7 @@ const VersionPreviewModal = ({
                             className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary/90 active:scale-95 transition-all disabled:opacity-60 shadow-lg shadow-primary/20"
                         >
                             {reverting === version?.id ? (
-                                <><Loader size="xs" /> Restoring…</>
+                                <><Loader size="xs" /></>
                             ) : (
                                 <><span className="material-icons-round text-[15px]">restore</span> Restore this version</>
                             )}
@@ -400,7 +400,6 @@ export const NoteVersionSidebar = ({
                 {loading && (
                     <div className="flex flex-col items-center justify-center py-16 gap-3 text-slate-400">
                         <Loader size="sm" />
-                        <p className="text-[9px] md:text-xs font-normal">Loading history…</p>
                     </div>
                 )}
 

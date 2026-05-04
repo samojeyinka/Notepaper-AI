@@ -376,7 +376,6 @@ const ChallengeInterface = () => {
             <div className="flex-1 lg:ml-64 flex items-center justify-center min-h-screen" style={{ background: '#F8F9FA' }}>
                 <div className="flex flex-col items-center gap-3">
                     <Loader size="xl" />
-                    <p className="text-slate-400 text-sm">Loading challenge…</p>
                 </div>
             </div>
         );
@@ -445,7 +444,7 @@ const ChallengeInterface = () => {
                     <button onClick={handleComplete} disabled={completing}
                         className="w-full py-3 bg-primary text-white rounded-xl font-semibold text-[15px] hover:bg-primary/90 disabled:opacity-50 transition-all active:scale-[0.98] shadow-md shadow-primary/20 flex items-center justify-center gap-2">
                         {completing
-                            ? <><Loader size="sm" /> Saving…</>
+                            ? <><Loader size="sm" /></>
                             : <><span className="material-icons-round text-[18px]">check_circle</span> Mark as Complete</>
                         }
                     </button>

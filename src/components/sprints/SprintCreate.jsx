@@ -78,7 +78,6 @@ const MaterialPickerModal = ({ tab, setTab, search, setSearch, selected, onToggl
                     {libLoading[tab] && (
                         <div className="py-10 flex flex-col items-center gap-2 text-slate-300">
                             <Loader size="lg" />
-                            <p className="text-[13px]">Loading…</p>
                         </div>
                     )}
                     {!libLoading[tab] && items.length === 0 && (
@@ -112,7 +111,7 @@ const MaterialPickerModal = ({ tab, setTab, search, setSearch, selected, onToggl
                         <button onClick={() => onLoadMore(tab)} disabled={libLoadingMore[tab]}
                             className="w-full py-2.5 rounded-xl border border-slate-200 text-[13px] font-semibold text-slate-500 hover:bg-slate-50 disabled:opacity-50 transition-all flex items-center justify-center gap-2">
                             {libLoadingMore[tab]
-                                ? <><Loader size="sm" /> Loading…</>
+                                ? <><Loader size="sm" /></>
                                 : <><span className="material-icons-round text-[16px]">expand_more</span> Load more</>
                             }
                         </button>
@@ -571,7 +570,7 @@ const SprintCreate = () => {
                     <button onClick={handleCreate} disabled={submitting}
                         className="flex items-center gap-2 bg-primary text-white px-6 py-2.5 rounded-xl font-semibold text-[13px] shadow-md shadow-primary/20 hover:bg-primary/90 disabled:opacity-50 transition-all active:scale-95">
                         {submitting
-                            ? <><Loader size="sm" /> Creating…</>
+                            ? <><Loader size="sm" /></>
                             : <><span className="material-icons-round text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>bolt</span> Create Sprint</>
                         }
                     </button>

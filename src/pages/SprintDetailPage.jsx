@@ -26,7 +26,6 @@ const SprintDetailPage = () => {
                 <div className="flex-1 lg:ml-64 flex items-center justify-center min-h-screen" style={{ background: '#F8F9FA' }}>
                     <div className="flex flex-col items-center gap-3">
                         <Loader size="xl" />
-                        <p className="text-slate-400 text-sm">Loading sprint…</p>
                     </div>
                 </div>
             );

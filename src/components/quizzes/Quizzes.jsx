@@ -1,6 +1,8 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { quizService } from '../../api/quizService';
+import Loader from '../globals/Loader';
 
 // ── Module-level quiz list cache ──────────────────────────────────────────────
 let _cache    = null;
@@ -35,130 +37,142 @@ const DIFF_BADGE = {
     hard:   'bg-rose-50 text-rose-500',
 };
 
-const scoreBarColor = (pct) => {
-    if (pct === null) return 'bg-slate-200';
-    if (pct >= 80)   return 'bg-emerald-500';
-    if (pct >= 55)   return 'bg-primary';
-    return 'bg-rose-400';
+const CIRC = 2 * Math.PI * 20;
+const PAGE_SIZE = 8;
+
+const scoreColor = (pct) => {
+    if (pct >= 80) return 'text-emerald-500';
+    if (pct >= 55) return 'text-primary';
+    return 'text-rose-400';
 };
 
-// ── Quiz Card ─────────────────────────────────────────────────────────────────
-const QuizCard = ({ quiz, onDelete }) => {
+const CircleProgress = ({ pct }) => (
+    <div className="relative w-11 h-11 flex items-center justify-center">
+        <svg className="w-full h-full -rotate-90" viewBox="0 0 48 48">
+            <circle cx="24" cy="24" r="20" fill="transparent" stroke="currentColor" strokeWidth="4" className="text-slate-100" />
+            <circle cx="24" cy="24" r="20" fill="transparent" stroke="currentColor" strokeWidth="4"
+                strokeDasharray={CIRC}
+                strokeDashoffset={CIRC * (1 - pct / 100)}
+                strokeLinecap="round"
+                className={`${scoreColor(pct)} transition-all duration-700`}
+            />
+        </svg>
+        <span className={`absolute text-[10px] font-bold ${scoreColor(pct)}`}>{pct}%</span>
+    </div>
+);
+
+// ── Quiz list row ─────────────────────────────────────────────────────────────
+const QuizListHeader = () => (
+    <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-3 border-b border-slate-100 bg-slate-50/50">
+        {[
+            { label: 'Quiz',       cls: 'col-span-5'             },
+            { label: 'Questions',  cls: 'col-span-2'             },
+            { label: 'Best Score', cls: 'col-span-2 text-center' },
+            { label: 'Action',     cls: 'col-span-3 text-right'  },
+        ].map(({ label, cls }) => (
+            <div key={label} className={`text-[11px] font-semibold text-slate-400 uppercase tracking-widest ${cls}`}>{label}</div>
+        ))}
+    </div>
+);
+
+const QuizRow = ({ quiz, onDelete }) => {
     const navigate = useNavigate();
     const style    = getSubjectStyle(quiz.subject);
     const best     = getBestScore(quiz.id);
+    const btnRef   = useRef(null);
     const [menuOpen, setMenuOpen] = useState(false);
+    const [menuPos,  setMenuPos]  = useState({ top: 0, right: 0 });
     const [copied,   setCopied]   = useState(false);
 
+    const openMenu = () => {
+        if (btnRef.current) {
+            const r = btnRef.current.getBoundingClientRect();
+            setMenuPos({ top: r.bottom + 4, right: window.innerWidth - r.right });
+        }
+        setMenuOpen(v => !v);
+    };
+
     return (
-        <div
-            className="group bg-white rounded-lg md:rounded-2xl p-3 md:p-6 flex flex-col md:h-64 cursor-pointer border border-transparent hover:border-primary/10 hover:-translate-y-2 transition-all duration-200"
-            style={{ boxShadow: '0 10px 30px rgba(44,47,50,0.06)' }}
-            onClick={() => navigate(`/lockedin/quizzes/${quiz.id}/play`)}
-        >
-            {/* Top row */}
-            <div className="flex items-start justify-between mb-3 md:mb-6">
-                <div className={`w-7 h-7 md:w-12 md:h-12 ${style.bg} rounded-md md:rounded-xl flex items-center justify-center shrink-0`}>
-                    <span className={`material-icons-round text-[13px] md:text-[22px] ${style.text}`}>{style.icon}</span>
+        <div className="grid grid-cols-1 md:grid-cols-12 items-center gap-4 px-6 py-4 border-b border-slate-100 last:border-0 hover:bg-slate-50/50 transition-colors">
+            <div className="col-span-5 flex items-center gap-3 min-w-0">
+                <div className={`w-10 h-10 rounded-xl ${style.bg} flex items-center justify-center shrink-0`}>
+                    <span className={`material-icons-round text-[18px] ${style.text}`}>{style.icon}</span>
                 </div>
-                <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
-                    {quiz.difficulty && (
-                        <span className={`text-[8px] md:text-[10px] font-medium md:font-black px-1.5 md:px-3 py-0.5 md:py-1 rounded-full uppercase tracking-widest ${DIFF_BADGE[quiz.difficulty] ?? 'bg-slate-100 text-slate-500'}`}>
-                            {quiz.difficulty}
-                        </span>
-                    )}
-                    {/* Overflow menu */}
-                    <div className="relative">
-                        <button
-                            onClick={() => setMenuOpen(v => !v)}
-                            className="w-7 h-7 rounded-full flex items-center justify-center text-slate-300 hover:text-slate-600 hover:bg-slate-100 transition-colors"
-                        >
-                            <span className="material-icons-round text-[16px]">more_vert</span>
-                        </button>
-                        {menuOpen && (
-                            <div
-                                className="absolute right-0 top-8 bg-white rounded-xl shadow-lg border border-slate-100 py-1 w-36 z-50"
-                                onMouseLeave={() => setMenuOpen(false)}
-                            >
-                                <button
-                                    onClick={() => { setMenuOpen(false); navigate(`/lockedin/quizzes/${quiz.id}/play`); }}
-                                    className="w-full flex items-center gap-2 px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 transition-colors"
-                                >
-                                    <span className="material-icons-round text-[14px] text-slate-400">play_arrow</span>
-                                    Play Quiz
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        navigator.clipboard.writeText(`${window.location.origin}/quiz/${quiz.id}`);
-                                        setCopied(true);
-                                        setTimeout(() => { setCopied(false); setMenuOpen(false); }, 1500);
-                                    }}
-                                    className="w-full flex items-center gap-2 px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 transition-colors"
-                                >
-                                    <span className={`material-icons-round text-[14px] ${copied ? 'text-emerald-500' : 'text-slate-400'}`}>
-                                        {copied ? 'check_circle' : 'share'}
-                                    </span>
-                                    {copied ? 'Link copied!' : 'Share Quiz'}
-                                </button>
-                                <div className="h-px bg-slate-100 my-0.5" />
-                                <button
-                                    onClick={() => { setMenuOpen(false); onDelete(quiz.id); }}
-                                    className="w-full flex items-center gap-2 px-3 py-2 text-xs text-red-500 hover:bg-red-50 transition-colors"
-                                >
-                                    <span className="material-icons-round text-[14px]">delete_outline</span>
-                                    Delete
-                                </button>
-                            </div>
+                <div className="min-w-0">
+                    <h3 className="text-[14px] font-semibold text-slate-900 truncate">{quiz.title}</h3>
+                    <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                        {quiz.subject && <span className="text-[11px] text-slate-400 capitalize">{quiz.subject}</span>}
+                        {quiz.difficulty && (
+                            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wide ${DIFF_BADGE[quiz.difficulty] ?? 'bg-slate-100 text-slate-500'}`}>
+                                {quiz.difficulty}
+                            </span>
                         )}
                     </div>
                 </div>
             </div>
 
-            {/* Title */}
-            <h4 className="text-[15px] md:text-[17px] font-medium md:font-bold text-slate-900 leading-snug line-clamp-2 mb-auto group-hover:text-primary transition-colors">
-                {quiz.title}
-            </h4>
+            <div className="col-span-2 flex items-center gap-1.5 text-[13px] text-slate-500">
+                <span className="material-icons-round text-[15px] text-slate-400">format_list_bulleted</span>
+                {quiz.question_count}
+            </div>
 
-            {/* Footer */}
-            <div className="mt-3 md:mt-6">
-                <div className="flex items-center justify-between text-sm mb-3">
-                    <div className="flex items-center gap-1.5 text-slate-400">
-                        <span className="material-icons-round text-[16px]">format_list_bulleted</span>
-                        <span className="font-medium md:font-bold text-xs">{quiz.question_count} Questions</span>
-                    </div>
-                    {best !== null ? (
-                        <div className="flex items-center gap-1 text-primary">
-                            <span className="material-icons-round text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>stars</span>
-                            <span className="font-bold text-xs">Best: {best}%</span>
-                        </div>
-                    ) : (
-                        <span className="text-slate-300 text-xs md:font-medium">Not played yet</span>
-                    )}
-                </div>
-                {/* Progress bar */}
-                <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+            <div className="col-span-2 flex justify-center">
+                {best !== null
+                    ? <CircleProgress pct={best} />
+                    : <span className="text-[13px] text-slate-300 font-medium">—</span>
+                }
+            </div>
+
+            <div className="col-span-3 flex justify-end items-center gap-2">
+                <button
+                    ref={btnRef}
+                    onClick={openMenu}
+                    className="p-2 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
+                >
+                    <span className="material-icons-round text-[18px]">more_vert</span>
+                </button>
+
+                {menuOpen && createPortal(
                     <div
-                        className={`h-full rounded-full transition-all duration-700 ${scoreBarColor(best)}`}
-                        style={{ width: best !== null ? `${best}%` : '0%' }}
-                    />
-                </div>
+                        style={{ position: 'fixed', top: menuPos.top, right: menuPos.right, zIndex: 9999 }}
+                        className="bg-white rounded-xl shadow-lg border border-slate-100 py-1 w-36"
+                        onMouseLeave={() => setMenuOpen(false)}
+                    >
+                        <button
+                            onClick={() => {
+                                navigator.clipboard.writeText(`${window.location.origin}/quiz/${quiz.id}`);
+                                setCopied(true);
+                                setTimeout(() => { setCopied(false); setMenuOpen(false); }, 1500);
+                            }}
+                            className="w-full flex items-center gap-2 px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 transition-colors"
+                        >
+                            <span className={`material-icons-round text-[14px] ${copied ? 'text-emerald-500' : 'text-slate-400'}`}>
+                                {copied ? 'check_circle' : 'share'}
+                            </span>
+                            {copied ? 'Link copied!' : 'Share Quiz'}
+                        </button>
+                        <div className="h-px bg-slate-100 my-0.5" />
+                        <button
+                            onClick={() => { setMenuOpen(false); onDelete(quiz.id); }}
+                            className="w-full flex items-center gap-2 px-3 py-2 text-xs text-red-500 hover:bg-red-50 transition-colors"
+                        >
+                            <span className="material-icons-round text-[14px]">delete_outline</span>
+                            Delete
+                        </button>
+                    </div>,
+                    document.body
+                )}
+
+                <button
+                    onClick={() => navigate(`/lockedin/quizzes/${quiz.id}/play`)}
+                    className="bg-primary/10 text-primary px-5 py-2 rounded-lg text-[13px] font-semibold hover:bg-primary hover:text-white transition-all active:scale-95"
+                >
+                    Play
+                </button>
             </div>
         </div>
     );
 };
-
-// ── New Quiz dashed card ──────────────────────────────────────────────────────
-const NewQuizCard = ({ onClick }) => (
-    <button
-        onClick={onClick}
-        className="group border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center gap-4 h-72 hover:border-primary/40 hover:bg-primary/5 transition-all cursor-pointer w-full"
-    >
-        <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center group-hover:bg-primary group-hover:text-white text-slate-400 transition-all">
-            <span className="material-icons-round text-[28px]">add</span>
-        </div>
-        <span className="font-bold text-slate-400 group-hover:text-primary transition-colors">New Quiz</span>
-    </button>
-);
 
 // ── Empty state (no quizzes at all) ──────────────────────────────────────────
 const EmptyState = ({ onCreate }) => (
@@ -184,11 +198,12 @@ const EmptyState = ({ onCreate }) => (
 export default function Quizzes() {
     const navigate = useNavigate();
 
-    const [quizzes, setQuizzes]   = useState([]);
-    const [loading, setLoading]   = useState(true);
-    const [search, setSearch]     = useState('');
-    const [sortBy, setSortBy]     = useState('newest');
+    const [quizzes,  setQuizzes]  = useState([]);
+    const [loading,  setLoading]  = useState(true);
+    const [search,   setSearch]   = useState('');
+    const [sortBy,   setSortBy]   = useState('newest');
     const [sortOpen, setSortOpen] = useState(false);
+    const [page,     setPage]     = useState(1);
 
     const SORT_OPTIONS = [
         { id: 'newest',     label: 'Newest'     },
@@ -369,14 +384,14 @@ export default function Quizzes() {
                         <input
                             type="text"
                             value={search}
-                            onChange={e => setSearch(e.target.value)}
+                            onChange={e => { setSearch(e.target.value); setPage(1); }}
                             placeholder="Search your quizzes..."
                             className="w-full bg-slate-50 border border-slate-200 rounded-md md:rounded-lg py-1.5 md:py-3 pl-11 pr-4 text-[12px] md:text-sm text-slate-700 placeholder-slate-400 outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                             style={{ boxShadow: '0 4px 12px rgba(44,47,50,0.06)' }}
                         />
                         {search && (
                             <button
-                                onClick={() => setSearch('')}
+                                onClick={() => { setSearch(''); setPage(1); }}
                                 className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
                             >
                                 <span className="material-icons-round text-[16px]">close</span>
@@ -403,7 +418,7 @@ export default function Quizzes() {
                                 {SORT_OPTIONS.map(opt => (
                                     <button
                                         key={opt.id}
-                                        onClick={() => { setSortBy(opt.id); setSortOpen(false); }}
+                                        onClick={() => { setSortBy(opt.id); setSortOpen(false); setPage(1); }}
                                         className={`w-full flex items-center justify-between px-4 py-2.5 text-sm font-medium transition-colors ${sortBy === opt.id ? 'text-primary bg-primary/5' : 'text-slate-600 hover:bg-slate-50'}`}
                                     >
                                         {opt.label}
@@ -415,9 +430,9 @@ export default function Quizzes() {
                     </div>
                 </div>
 
-                {/* ── Quiz grid ──────────────────────────────────────────── */}
+                {/* ── Quiz list ──────────────────────────────────────────── */}
                 <div>
-                    <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center justify-between mb-4">
                         <h3 className="text-[15px] md:text-xl font-semibold text-slate-900">My Quizzes</h3>
                         {search && displayed.length > 0 && (
                             <p className="text-xs text-slate-400 font-medium">{displayed.length} result{displayed.length !== 1 ? 's' : ''}</p>
@@ -425,36 +440,59 @@ export default function Quizzes() {
                     </div>
 
                     {loading ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                            {[...Array(3)].map((_, i) => (
-                                <div key={i} className="bg-white rounded-2xl p-6 h-72 animate-pulse" style={{ boxShadow: '0 10px 30px rgba(44,47,50,0.06)' }}>
-                                    <div className="flex items-start justify-between mb-6">
-                                        <div className="w-12 h-12 bg-slate-100 rounded-xl" />
-                                        <div className="w-16 h-6 bg-slate-100 rounded-full" />
-                                    </div>
-                                    <div className="h-5 bg-slate-100 rounded-full w-4/5 mb-2" />
-                                    <div className="h-4 bg-slate-100 rounded-full w-3/5 mb-auto" />
-                                    <div className="mt-auto pt-6">
-                                        <div className="h-1.5 bg-slate-100 rounded-full w-full" />
-                                    </div>
-                                </div>
-                            ))}
+                        <div className="flex justify-center py-24">
+                            <Loader size="xl" />
                         </div>
                     ) : quizzes.length === 0 ? (
                         <EmptyState onCreate={() => navigate('/lockedin/generate?tab=quizzes')} />
-                    ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                    
-                            {displayed.length === 0 ? (
-                                <div className="col-span-full py-16 flex flex-col items-center text-center">
-                                    <span className="material-icons-round text-slate-300 text-[48px] mb-3">search_off</span>
-                                    <p className="text-slate-500 font-bold">No quizzes match "{search}"</p>
-                                    <button onClick={() => setSearch('')} className="mt-3 text-primary text-sm font-bold hover:underline">Clear search</button>
-                                </div>
-                            ) : displayed.map(quiz => (
-                                <QuizCard key={quiz.id} quiz={quiz} onDelete={handleDelete} />
-                            ))}
+                    ) : displayed.length === 0 ? (
+                        <div className="py-16 flex flex-col items-center text-center">
+                            <span className="material-icons-round text-slate-300 text-[48px] mb-3">search_off</span>
+                            <p className="text-slate-500 font-bold">No quizzes match "{search}"</p>
+                            <button onClick={() => { setSearch(''); setPage(1); }} className="mt-3 text-primary text-sm font-bold hover:underline">Clear search</button>
                         </div>
+                    ) : (
+                        <>
+                            <div className="bg-white rounded-xl overflow-hidden" style={{ boxShadow: '0px 4px 20px rgba(0,0,0,0.03)' }}>
+                                <QuizListHeader />
+                                {displayed.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map(quiz => (
+                                    <QuizRow key={quiz.id} quiz={quiz} onDelete={handleDelete} />
+                                ))}
+                            </div>
+
+                            {Math.ceil(displayed.length / PAGE_SIZE) > 1 && (
+                                <div className="flex items-center justify-between mt-5 px-1">
+                                    <p className="text-[12px] text-slate-400">
+                                        Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, displayed.length)} of {displayed.length}
+                                    </p>
+                                    <div className="flex items-center gap-1">
+                                        <button
+                                            onClick={() => setPage(p => Math.max(1, p - 1))}
+                                            disabled={page === 1}
+                                            className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:bg-white hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                                        >
+                                            <span className="material-icons-round text-[18px]">chevron_left</span>
+                                        </button>
+                                        {Array.from({ length: Math.ceil(displayed.length / PAGE_SIZE) }, (_, i) => i + 1).map(n => (
+                                            <button
+                                                key={n}
+                                                onClick={() => setPage(n)}
+                                                className={`w-8 h-8 rounded-lg text-[13px] font-semibold transition-all ${n === page ? 'bg-primary text-white' : 'text-slate-500 hover:bg-white hover:text-primary'}`}
+                                            >
+                                                {n}
+                                            </button>
+                                        ))}
+                                        <button
+                                            onClick={() => setPage(p => Math.min(Math.ceil(displayed.length / PAGE_SIZE), p + 1))}
+                                            disabled={page === Math.ceil(displayed.length / PAGE_SIZE)}
+                                            className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:bg-white hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                                        >
+                                            <span className="material-icons-round text-[18px]">chevron_right</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
 

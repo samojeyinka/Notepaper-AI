@@ -75,7 +75,7 @@ export const Sidebar = ({ activePage }) => {
               <Link
                 key={item.path}
                 className={`
-                  flex items-center space-x-3 px-6 py-3 transition-all
+                   flex items-center space-x-3 px-4 md:px-6 py-2 md:py-3 transition-all
                   ${isActive
                     ? 'relative group text-white nav-active-blob'
                     : 'group text-slate-500 dark:text-slate-400 hover:text-purple-500'
@@ -84,10 +84,10 @@ export const Sidebar = ({ activePage }) => {
                 to={item.path}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                <span className={`material-icons-round ${isActive ? 'relative z-10' : ''}`}>
+                <span className={`text-[14px] md:text-base material-icons-round ${isActive ? 'relative z-10' : ''}`}>
                   {item.icon}
                 </span>
-                <span className={isActive ? 'font-semibold relative z-10' : ''}>
+                <span className={`text-[14px] md:text-base ${isActive ? 'font-medium relative z-10' : ''}`}>
                   {item.label}
                 </span>
               </Link>

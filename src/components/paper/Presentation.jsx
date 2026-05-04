@@ -1214,7 +1214,6 @@ export const Presentation = () => {
     if (loading) return (
         <div className="flex flex-col flex-1 h-screen items-center justify-center bg-slate-50 lg:ml-64">
             <Loader size="xl" />
-
         </div>
     );
     if (error || !presentation) return (
@@ -1248,7 +1247,7 @@ export const Presentation = () => {
                     </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                    {saving && <span className="flex items-center gap-1 text-[11px] text-amber-500"><Loader size="xs" />Saving…</span>}
+                    {saving && <span className="flex items-center gap-1 text-[11px] text-amber-500"><Loader size="xs" /></span>}
                     {!saving && saveMsg==='saved' && <span className="flex items-center gap-1 text-[11px] text-green-500"><span className="material-icons-round text-[13px]">check</span>Saved</span>}
                     <button onClick={() => setShowNotes(v=>!v)}
                         className={`flex items-center gap-1 md:gap-1.5 px-1.5 py-1 md:px-3 md:py-1.5 rounded-xl text-[11px] md:text-xs font-medium md:font-semibold transition-all ${showNotes?'bg-amber-50 text-amber-600 border border-amber-200':'text-slate-500 hover:bg-slate-100'}`}>

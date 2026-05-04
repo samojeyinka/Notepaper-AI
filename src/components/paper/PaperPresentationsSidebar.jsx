@@ -82,7 +82,6 @@ export const PaperPresentationsSidebar = ({ paperId, onClose, onNewPresentation 
                 {loading && (
                     <div className="flex flex-col items-center justify-center py-16 gap-3 text-slate-400">
                         <Loader size="lg" />
-                        <p className="text-xs">Loading…</p>
                     </div>
                 )}
                 {error && (

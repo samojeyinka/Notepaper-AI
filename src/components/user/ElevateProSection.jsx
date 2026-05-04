@@ -5,8 +5,8 @@ import { usePlan } from '../../hooks/usePlan';
 
 export const FeatureItem = ({ label }) => (
     <li className="flex items-center space-x-1">
-        <span className="material-symbols-outlined text-yellow-300 text-[13px]">check_circle</span>
-        <span className="text-sm font-normal text-[12px]">{label}</span>
+        <span className="material-symbols-outlined text-yellow-300 text-[10px] md:text-[13px]">check_circle</span>
+        <span className="text-sm font-normal text-[10px] md:text-[12px]">{label}</span>
     </li>
 );
 
@@ -67,7 +67,7 @@ const UPGRADE_CONFIG = {
     pro: {
         targetPlan: 'premium',
         headline: 'Go unlimited with Premium',
-        sub: 'No caps on AI writes, presentations, or note generation — ever.',
+        sub: 'No caps on AI writes, presentations, or note generation ever.',
         features: ['Unlimited AI presentations', 'Unlimited AI writes', 'Personalised AI study plans'],
         cta: 'Try Premium',
         ctaColor: 'bg-amber-500 hover:bg-amber-600 shadow-amber-500/20',
@@ -114,7 +114,7 @@ const ElevateProSection = () => {
     const handleCta = () => subscribe(config.targetPlan, interval, currency);
 
     return (
-        <section className="mb-6 lg:mb-8 bg-gradient-to-br from-slate-900 to-indigo-950 rounded-2xl p-4 sm:p-6 text-white relative overflow-hidden">
+        <section className="mb-6 lg:mb-8 bg-gradient-to-br from-slate-900 to-indigo-950 rounded-lg md:rounded-2xl p-4 sm:p-6 text-white relative overflow-hidden">
             {/* Close */}
             <button
                 onClick={() => setIsVisible(false)}
@@ -172,7 +172,7 @@ const ElevateProSection = () => {
                     <button
                         onClick={handleCta}
                         disabled={loading}
-                        className={`${config.ctaColor} text-white px-8 sm:px-10 py-2 rounded-xl font-medium text-sm shadow-xl transition-all flex items-center space-x-2 disabled:opacity-60 disabled:cursor-not-allowed`}
+                        className={`${config.ctaColor} text-white px-4 md:px-8 sm:px-10 py-1 md:py-2 rounded-md md:rounded-lg font-medium text-sm shadow-xl transition-all flex items-center space-x-2 disabled:opacity-60 disabled:cursor-not-allowed`}
                     >
                         {loading ? (
                             <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
