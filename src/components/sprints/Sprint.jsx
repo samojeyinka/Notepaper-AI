@@ -590,8 +590,11 @@ const GENERATING_PHASES = [
 ];
 
 const SprintGenerating = ({ sprintName, onDone, onLeave }) => {
-    const [phase,   setPhase]   = useState(0);
-    const [seconds, setSeconds] = useState(180);
+    const [phase,       setPhase]       = useState(0);
+    const [seconds,     setSeconds]     = useState(180);
+    const [cardVisible, setCardVisible] = useState(true);
+    const onDoneRef = useRef(onDone);
+    useEffect(() => { onDoneRef.current = onDone; }, [onDone]);
 
     useEffect(() => {
         const t = setInterval(() => setPhase(p => Math.min(p + 1, GENERATING_PHASES.length - 1)), 36000);
@@ -601,14 +604,12 @@ const SprintGenerating = ({ sprintName, onDone, onLeave }) => {
     useEffect(() => {
         const t = setInterval(() => {
             setSeconds(s => {
-                if (s <= 1) { clearInterval(t); return 0; }
+                if (s <= 1) { clearInterval(t); onDoneRef.current(); return 0; }
                 return s - 1;
             });
         }, 1000);
         return () => clearInterval(t);
     }, []);
-
-    useEffect(() => { if (seconds === 0) onDone(); }, [seconds, onDone]);
 
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -640,21 +641,23 @@ const SprintGenerating = ({ sprintName, onDone, onLeave }) => {
                     ~{mins}:{String(secs).padStart(2, '0')} remaining
                 </p>
 
-                <div className="bg-white rounded-2xl p-6 text-left space-y-4" style={{ boxShadow: '0 10px 30px rgba(44,47,50,0.06)' }}>
-                    <p className="text-[13px] text-slate-600 leading-relaxed">
-                        This usually takes <span className="font-semibold text-slate-800">2–4 minutes</span>. You can safely close this tab — we'll send you an email when your sprint is ready.
-                    </p>
-                    <div className="flex gap-3">
-                        <button onClick={onLeave}
-                            className="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-semibold text-[13px] hover:bg-slate-50 transition-all active:scale-95">
-                            Leave &amp; get email
-                        </button>
-                        <button onClick={onDone}
-                            className="flex-1 py-2.5 rounded-xl bg-primary text-white font-semibold text-[13px] hover:bg-primary/90 transition-all active:scale-95">
-                            Wait here
-                        </button>
+                {cardVisible && (
+                    <div className="bg-white rounded-2xl p-6 text-left space-y-4" style={{ boxShadow: '0 10px 30px rgba(44,47,50,0.06)' }}>
+                        <p className="text-[13px] text-slate-600 leading-relaxed">
+                            This usually takes <span className="font-semibold text-slate-800">2–4 minutes</span>. You can safely close this tab — we'll send you an email when your sprint is ready.
+                        </p>
+                        <div className="flex gap-3">
+                            <button onClick={onLeave}
+                                className="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-semibold text-[13px] hover:bg-slate-50 transition-all active:scale-95">
+                                Leave &amp; get email
+                            </button>
+                            <button onClick={() => setCardVisible(false)}
+                                className="flex-1 py-2.5 rounded-xl bg-primary text-white font-semibold text-[13px] hover:bg-primary/90 transition-all active:scale-95">
+                                Wait here
+                            </button>
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
         </div>
     );

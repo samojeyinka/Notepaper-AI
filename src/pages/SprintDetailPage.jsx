@@ -43,7 +43,9 @@ const SprintDetailPage = () => {
         }
 
         if (sprint.status === 'generating') {
-            return <SprintGenerating sprint={sprint} onReady={setSprint} />;
+            return <SprintGenerating sprint={sprint} onReady={() => {
+                sprintService.show(id).then(res => setSprint(res.data)).catch(() => {});
+            }} />;
         }
 
         return <SprintRoadmap sprint={sprint} />;

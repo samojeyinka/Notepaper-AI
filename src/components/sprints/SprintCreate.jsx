@@ -353,7 +353,7 @@ const SprintCreate = () => {
                 material_ids: materialIds,
                 uploads:      uploadedFiles,
             });
-            navigate('/lockedin/sprints');
+            navigate(`/lockedin/sprints/${res.data.id}`);
         } catch (err) {
             const msg = Object.values(err?.errors ?? {})?.[0]?.[0]
                 ?? err?.message
