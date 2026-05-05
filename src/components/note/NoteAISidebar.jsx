@@ -4,34 +4,9 @@ import { naomi } from "../../assets/assets";
 import { usePlan } from '../../hooks/usePlan';
 import { generateService } from '../../api/generateService';
 import { quizService } from '../../api/quizService';
-import { noteService } from '../../api/noteService';
 import { invalidateQuizzesCache } from '../quizzes/Quizzes';
-import { createGoogleGenerativeAI } from "@ai-sdk/google";
-import { generateText } from "ai";
-
-const google = createGoogleGenerativeAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
 
 const Q_TYPE_MAP = { multiple: 'multiple_choice', input: 'short_answer', both: 'mixed' };
-
-function mdToHtml(md) {
-    const lines = md.split('\n');
-    const out = [];
-    let inUl = false, inOl = false;
-    const close = () => { if (inUl) { out.push('</ul>'); inUl = false; } if (inOl) { out.push('</ol>'); inOl = false; } };
-    const esc = t => t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>');
-    for (const raw of lines) {
-        const line = raw.trimEnd();
-        if (/^### /.test(line))        { close(); out.push(`<h3>${esc(line.slice(4))}</h3>`); }
-        else if (/^## /.test(line))    { close(); out.push(`<h2>${esc(line.slice(3))}</h2>`); }
-        else if (/^# /.test(line))     { close(); out.push(`<h1>${esc(line.slice(2))}</h1>`); }
-        else if (/^[-*] /.test(line))  { if (!inUl) { close(); out.push('<ul>'); inUl = true; } out.push(`<li>${esc(line.slice(2))}</li>`); }
-        else if (/^\d+\. /.test(line)) { if (!inOl) { close(); out.push('<ol>'); inOl = true; } out.push(`<li>${esc(line.replace(/^\d+\. /,''))}</li>`); }
-        else if (line.trim() === '')   { close(); out.push('<br>'); }
-        else { close(); out.push(`<div>${esc(line)}</div>`); }
-    }
-    close();
-    return out.join('');
-}
 
 const DIFFICULTIES = [
     { id: 'easy',   label: 'Easy',   active: 'bg-emerald-500 text-white' },
@@ -121,7 +96,7 @@ export const NoteAISidebar = ({ noteId, noteTitle = 'Untitled Note' }) => {
             });
             invalidateQuizzesCache();
             const id = res?.data?.id ?? res?.id;
-            navigate(`/lockedin/quizzes/${id}/play`);
+            window.open(`/lockedin/quizzes/${id}/play`, '_blank');
         } catch {
             setQuizStatus('ready');
         }
@@ -133,36 +108,10 @@ export const NoteAISidebar = ({ noteId, noteTitle = 'Untitled Note' }) => {
         setExpandError(null);
         setExpandStatus('generating');
         try {
-            const contentRes = await generateService.notes({
-                materialIds: [{ type: 'note', id: noteId }],
-                length: 'detailed',
-            });
-            const rawContent = contentRes?.data?.content ?? contentRes?.content ?? '';
-
-            let newTitle = `Expanded: ${noteTitle}`;
-            try {
-                const titleRes = await generateText({
-                    model: google('gemini-2.5-flash-lite'),
-                    prompt: `Write a short, specific academic title (max 8 words) for an in-depth companion note that expands on "${noteTitle}". Return only the title, nothing else.`,
-                    maxTokens: 30,
-                });
-                const t = titleRes.text.trim().replace(/^["']|["']$/g, '');
-                if (t) newTitle = t;
-            } catch { /* keep fallback title */ }
-
-            const res = await noteService.create({
-                title:   newTitle,
-                content: JSON.stringify({
-                    pages:       [mdToHtml(rawContent)],
-                    fontSize:    18,
-                    lineSpacing: 32,
-                    drawingData: [''],
-                }),
-            });
-            increment('ai_use');
+            const res = await generateService.expand({ source_type: 'note', source_id: noteId });
             const newId = res?.data?.id ?? res?.id;
             setExpandStatus('done');
-            navigate(`/lockedin/notes/${newId}`);
+            window.open(`/lockedin/notes/${newId}`, '_blank');
         } catch (err) {
             setExpandError(err?.message ?? 'Failed to expand topic. Please try again.');
             setExpandStatus('error');

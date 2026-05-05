@@ -5,6 +5,7 @@ import { PaperHeader } from "./PaperHeader";
 import { PaperToolbar } from "./PaperToolbar";
 import { PaperEditor } from "./PaperEditor";
 import { PaperAISidebar } from "./PaperAISidebar";
+import { useExpandTopicChannel } from "../../hooks/useExpandTopicChannel";
 import { PaperPreferencesSidebar } from "./PaperPreferencesSidebar";
 import { PaperVersionSidebar } from "./PaperVersionSidebar";
 import { PaperPresentationsSidebar } from "./PaperPresentationsSidebar";
@@ -58,7 +59,8 @@ export const Paper = () => {
     const location        = useLocation();
 
     // Core state
-    const [paperId, setPaperId]   = useState(routeId ?? null);
+    const [paperId, setPaperId]       = useState(routeId ?? null);
+    const [isAIGenerating, setIsAIGenerating] = useState(false);
     const [folderId, setFolderId] = useState(() => searchParams.get('folder') ?? null);
     const [folder, setFolder]     = useState(null);
     const [title, setTitle]       = useState("Untitled Paper");
@@ -188,6 +190,11 @@ export const Paper = () => {
     useEffect(() => {
         if (!paperId) return;
         loadPaper(paperId, (serverPaper) => {
+            if (serverPaper.ai_generating) {
+                setIsAIGenerating(true);
+                setTitle(serverPaper.title ?? 'Untitled Paper');
+                return;
+            }
             const s = deserializePaper(serverPaper);
             setTitle(s.title); setPages(s.pages); setFontSize(s.fontSize); setLineSpacing(s.lineSpacing);
             setDrawingData(s.drawingData); setTextColor(s.textColor); setFontFamily(s.fontFamily);
@@ -398,8 +405,34 @@ export const Paper = () => {
         savedRangeRef.current = null;
     };
 
+    useExpandTopicChannel(isAIGenerating ? paperId : null, () => {
+        loadPaper(paperId, (serverPaper) => {
+            const s = deserializePaper(serverPaper);
+            setTitle(s.title); setPages(s.pages); setFontSize(s.fontSize); setLineSpacing(s.lineSpacing);
+            setDrawingData(s.drawingData); setTextColor(s.textColor); setFontFamily(s.fontFamily);
+            setPaddingX(s.paddingX); setPaddingY(s.paddingY);
+            if (s.folderId) setFolderId(s.folderId);
+            if (s.folder)   setFolder(s.folder);
+            setIsAIGenerating(false);
+        });
+    });
+
     return (
         <div className="flex flex-col flex-1 h-screen overflow-hidden bg-white border-l border-slate-200 lg:ml-64 pt-16 lg:pt-0">
+            {isAIGenerating && (
+                <div className="absolute inset-0 z-50 bg-white/95 backdrop-blur flex flex-col items-center justify-center gap-6">
+                    <div className="relative">
+                        <div className="w-20 h-20 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <span className="material-icons-round text-primary text-[26px]">article</span>
+                        </div>
+                    </div>
+                    <div className="text-center max-w-xs">
+                        <h3 className="text-xl font-bold text-slate-800 mb-2">Schola is writing…</h3>
+                        <p className="text-sm text-slate-500">Expanding the topic into a full companion paper. This runs in the background — the page will update automatically when it's ready.</p>
+                    </div>
+                </div>
+            )}
             <PaperHeader
                 title={title}
                 onTitleChange={(v) => { pushNow(); setTitle(v); markDirty('title'); }}
@@ -537,7 +570,7 @@ export const Paper = () => {
                     )}
                 </div>
 
-                {isAISidebarOpen && <PaperAISidebar />}
+                {isAISidebarOpen && <PaperAISidebar paperId={paperId} paperTitle={title} />}
 
                 {isWebImportOpen && (
                     <YouTubeTranscriptModal

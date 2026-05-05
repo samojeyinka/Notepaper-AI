@@ -6,6 +6,7 @@ import { NoteHeader } from "./NoteHeader";
 import { NoteToolbar } from "./NoteToolbar";
 import { NoteEditor } from "./NoteEditor";
 import { NoteAISidebar } from "./NoteAISidebar";
+import { useExpandTopicChannel } from "../../hooks/useExpandTopicChannel";
 import { NoteSettingsSidebar } from "./NoteSettingsSidebar";
 import { NotePageSidebar } from "./NotePageSidebar";
 import * as htmlToImage from 'html-to-image';
@@ -70,6 +71,7 @@ export const Note = () => {
 
     // Note Data
     const [noteId, setNoteId] = useState(routeId ?? null);
+    const [isAIGenerating, setIsAIGenerating] = useState(false);
     // folderId — set from ?folder= query param on new notes, or from loaded note
     const [folderId, setFolderId] = useState(() => searchParams.get('folder') ?? null);
     const [folder, setFolder]     = useState(null);
@@ -326,6 +328,11 @@ export const Note = () => {
     useEffect(() => {
         if (!noteId) return;
         loadNote(noteId, (serverNote) => {
+            if (serverNote.ai_generating) {
+                setIsAIGenerating(true);
+                setTitle(serverNote.title ?? 'Untitled Note');
+                return;
+            }
             const s = deserializeNote(serverNote);
             setTitle(s.title);
             setPages(s.pages);
@@ -543,8 +550,41 @@ export const Note = () => {
         }
     };
 
+    useExpandTopicChannel(isAIGenerating ? noteId : null, () => {
+        loadNote(noteId, (serverNote) => {
+            const s = deserializeNote(serverNote);
+            setTitle(s.title);
+            setPages(s.pages);
+            setFontSize(s.fontSize);
+            setLineSpacing(s.lineSpacing);
+            setDrawingData(s.drawingData);
+            setPaperStyle(s.paperStyle);
+            setPaperColor(s.paperColor);
+            setLineColor(s.lineColor);
+            setTextColor(s.textColor);
+            setFontFamily(s.fontFamily);
+            if (s.folderId) setFolderId(s.folderId);
+            if (s.folder)   setFolder(s.folder);
+            setIsAIGenerating(false);
+        });
+    });
+
     return (
         <div className="flex flex-col flex-1 h-screen overflow-hidden bg-white border-l border-slate-200 lg:ml-64 pt-16 lg:pt-0">
+            {isAIGenerating && (
+                <div className="absolute inset-0 z-50 bg-white/95 backdrop-blur flex flex-col items-center justify-center gap-6">
+                    <div className="relative">
+                        <div className="w-20 h-20 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <span className="material-icons-round text-primary text-[26px]">description</span>
+                        </div>
+                    </div>
+                    <div className="text-center max-w-xs">
+                        <h3 className="text-xl font-bold text-slate-800 mb-2">Schola is writing…</h3>
+                        <p className="text-sm text-slate-500">Expanding the topic into a full companion note. This runs in the background — the page will update automatically when it's ready.</p>
+                    </div>
+                </div>
+            )}
             <NoteHeader
                 title={title}
                 onTitleChange={(v) => { pushNow(); setTitle(v); markDirty('title'); }}
@@ -741,7 +781,7 @@ export const Note = () => {
                 </div>
 
                 {isAISidebarOpen && (
-                    <NoteAISidebar />
+                    <NoteAISidebar noteId={noteId} noteTitle={title} />
                 )}
 
                 {isYouTubeOpen && (

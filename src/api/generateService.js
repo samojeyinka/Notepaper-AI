@@ -27,6 +27,18 @@ const post = async (endpoint, { materialIds = [], uploads = [], ...params }) => 
     return Promise.reject(result);
 };
 
+const expandPost = async ({ source_type, source_id }) => {
+    const response = await fetch(`${BASE_URL}/ai/expand`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ source_type, source_id }),
+    });
+    const result = await response.json();
+    if (response.ok) return result;
+    return Promise.reject(result);
+};
+
 export const generateService = {
     flashcards: ({ materialIds, uploads, count, topic }) =>
         post('/flashcards', { materialIds, uploads, count, topic }),
@@ -39,4 +51,7 @@ export const generateService = {
 
     notes: ({ materialIds, uploads, topic, tone, length }) =>
         post('/notes', { materialIds, uploads, topic, tone, length }),
+
+    expand: ({ source_type, source_id }) =>
+        expandPost({ source_type, source_id }),
 };
