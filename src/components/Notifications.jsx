@@ -37,6 +37,18 @@ const TYPE_CONFIG = {
         iconColor: 'text-violet-500',
         buttonClass: 'bg-violet-500 hover:bg-violet-600 text-white',
     },
+    'App\\Notifications\\ExpandTopicDone': {
+        icon: 'lightbulb',
+        iconBgColor: 'bg-amber-50',
+        iconColor: 'text-amber-500',
+        buttonClass: 'bg-amber-500 hover:bg-amber-600 text-white',
+    },
+    'App\\Notifications\\SimplifyTopicDone': {
+        icon: 'filter_alt',
+        iconBgColor: 'bg-green-50',
+        iconColor: 'text-green-600',
+        buttonClass: 'bg-green-600 hover:bg-green-700 text-white',
+    },
 };
 
 const DEFAULT_CONFIG = {

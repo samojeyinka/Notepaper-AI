@@ -7,6 +7,7 @@ import { NoteToolbar } from "./NoteToolbar";
 import { NoteEditor } from "./NoteEditor";
 import { NoteAISidebar } from "./NoteAISidebar";
 import { useExpandTopicChannel } from "../../hooks/useExpandTopicChannel";
+import { useSimplifyTopicChannel } from "../../hooks/useSimplifyTopicChannel";
 import { NoteSettingsSidebar } from "./NoteSettingsSidebar";
 import { NotePageSidebar } from "./NotePageSidebar";
 import * as htmlToImage from 'html-to-image';
@@ -578,8 +579,33 @@ export const Note = () => {
         loadNote(noteId, applyExpanded);
     });
 
-    // Polling fallback: catches cases where ExpandTopicReady fired before this tab
-    // subscribed (tab opened after the event was broadcast) — resolves spinner-forever.
+    useSimplifyTopicChannel(isAIGenerating ? noteId : null, () => {
+        clearTimeout(expandRetryTimerRef.current);
+        const applySimplified = (serverNote) => {
+            const s = deserializeNote(serverNote);
+            if (!s.pages.some(p => p?.trim()) && (applySimplified._attempts = (applySimplified._attempts ?? 0) + 1) <= 5) {
+                expandRetryTimerRef.current = setTimeout(() => loadNote(noteId, applySimplified), 2000);
+                return;
+            }
+            setTitle(s.title);
+            setPages(s.pages);
+            setFontSize(s.fontSize);
+            setLineSpacing(s.lineSpacing);
+            setDrawingData(s.drawingData);
+            setPaperStyle(s.paperStyle);
+            setPaperColor(s.paperColor);
+            setLineColor(s.lineColor);
+            setTextColor(s.textColor);
+            setFontFamily(s.fontFamily);
+            if (s.folderId) setFolderId(s.folderId);
+            if (s.folder)   setFolder(s.folder);
+            setIsAIGenerating(false);
+        };
+        loadNote(noteId, applySimplified);
+    });
+
+    // Polling fallback: catches cases where ExpandTopicReady/SimplifyTopicReady fired before
+    // this tab subscribed (tab opened after the event was broadcast) — resolves spinner-forever.
     useEffect(() => {
         if (!isAIGenerating || !noteId) return;
         const timer = setInterval(async () => {
@@ -621,7 +647,7 @@ export const Note = () => {
                     </div>
                     <div className="text-center max-w-xs">
                         <h3 className="text-xl font-bold text-slate-800 mb-2">Schola is writing…</h3>
-                        <p className="text-sm text-slate-500">Expanding the topic into a full companion note. This runs in the background — the page will update automatically when it's ready.</p>
+                        <p className="text-sm text-slate-500">Schola is preparing your note in the background — the page will update automatically when it's ready.</p>
                     </div>
                 </div>
             )}

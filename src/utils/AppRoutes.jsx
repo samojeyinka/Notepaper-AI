@@ -23,6 +23,7 @@ import SprintCreatePage from '../pages/SprintCreatePage';
 import SprintDetailPage from '../pages/SprintDetailPage';
 import SprintChallengePage from '../pages/SprintChallengePage';
 import PaymentCallbackPage from '../pages/PaymentCallbackPage';
+import AIGeneratingPage from '../pages/AIGeneratingPage';
 import ScrollToTop from './ScrollToTop';
 import ProtectedRoute, { GuestRoute } from './ProtectedRoute';
 
@@ -321,6 +322,11 @@ const AppRoutes = createBrowserRouter([
     {
         path: '/lockedin/quizzes/:id/play',
         element: <ProtectedRoute><ScrollToTop><QuizPlayPage /></ScrollToTop></ProtectedRoute>,
+    },
+
+    {
+        path: '/lockedin/ai-generating/:type/:id',
+        element: <ProtectedRoute><ScrollToTop><AIGeneratingPage /></ScrollToTop></ProtectedRoute>,
     },
 
     // Public quiz — accessible without login

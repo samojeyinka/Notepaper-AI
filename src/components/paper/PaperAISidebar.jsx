@@ -39,6 +39,10 @@ export const PaperAISidebar = ({ paperId, paperTitle = 'Untitled Paper' }) => {
     const [expandStatus, setExpandStatus] = useState('idle');
     const [expandError,  setExpandError]  = useState(null);
 
+    // ── Simplify state ──────────────────────────────────────────────────────────
+    const [simplifyStatus, setSimplifyStatus] = useState('idle');
+    const [simplifyError,  setSimplifyError]  = useState(null);
+
     // ── Study plan state ────────────────────────────────────────────────────────
     const [planName, setPlanName] = useState('');
     const [planDate, setPlanDate] = useState('');
@@ -111,11 +115,29 @@ export const PaperAISidebar = ({ paperId, paperTitle = 'Untitled Paper' }) => {
         try {
             const res = await generateService.expand({ source_type: 'paper', source_id: paperId });
             const newId = res?.data?.id ?? res?.id;
-            setExpandStatus('done');
-            window.open(`/lockedin/papers/${newId}`, '_blank');
+            window.open(`/lockedin/ai-generating/paper/${newId}?action=expand`, '_blank');
+            setExpandStatus('opened');
+            setTimeout(() => setExpandStatus('idle'), 4000);
         } catch (err) {
             setExpandError(err?.message ?? 'Failed to expand topic. Please try again.');
             setExpandStatus('error');
+        }
+    };
+
+    // ── Simplify Topic — creates a simplified Paper via backend job ────────────
+    const handleSimplifyTopic = async () => {
+        if (!paperId || noAIUses) return;
+        setSimplifyError(null);
+        setSimplifyStatus('generating');
+        try {
+            const res = await generateService.simplify({ source_type: 'paper', source_id: paperId });
+            const newId = res?.data?.id ?? res?.id;
+            window.open(`/lockedin/ai-generating/paper/${newId}?action=simplify`, '_blank');
+            setSimplifyStatus('opened');
+            setTimeout(() => setSimplifyStatus('idle'), 4000);
+        } catch (err) {
+            setSimplifyError(err?.message ?? 'Failed to simplify topic. Please try again.');
+            setSimplifyStatus('error');
         }
     };
 
@@ -360,10 +382,10 @@ export const PaperAISidebar = ({ paperId, paperTitle = 'Untitled Paper' }) => {
                                         </div>
                                     )}
 
-                                    {expandStatus === 'done' && (
-                                        <div className="bg-emerald-50 rounded-xl p-2.5 flex items-center gap-2">
-                                            <span className="material-icons-round text-emerald-600 text-[16px]">check_circle</span>
-                                            <p className="text-[11px] font-semibold text-emerald-700">Paper created! Opening…</p>
+                                    {expandStatus === 'opened' && (
+                                        <div className="bg-primary/5 rounded-xl p-2.5 flex items-center gap-2">
+                                            <span className="material-icons-round text-primary text-[16px]">open_in_new</span>
+                                            <p className="text-[11px] font-semibold text-primary">Generating in new tab…</p>
                                         </div>
                                     )}
 
@@ -371,6 +393,61 @@ export const PaperAISidebar = ({ paperId, paperTitle = 'Untitled Paper' }) => {
                                         <p className="text-[10px] text-red-500 flex items-center gap-1">
                                             <span className="material-icons-round text-[12px]">error_outline</span>
                                             {expandError}
+                                        </p>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* ── Simplify Topic ── */}
+                            <FeatureCard
+                                id="simplify" icon="filter_alt" title="Simplify Topic"
+                                desc="Schola rewrites this paper in simpler, easier-to-understand language."
+                                color="bg-green-100 text-green-500"
+                            />
+
+                            {activeFeature === 'simplify' && isPaid && (
+                                <div className="bg-white border border-slate-100 rounded-xl p-3 flex flex-col gap-2.5">
+                                    <p className="text-[10px] text-slate-500 leading-relaxed">
+                                        Schola reads this paper and creates a new, simplified version with clearer language, shorter sentences, and easier explanations.
+                                    </p>
+
+                                    {noAIUses && (
+                                        <p className="text-[10px] text-amber-700 bg-amber-50 rounded-lg px-2 py-1.5 flex items-center gap-1">
+                                            <span className="material-icons-round text-[12px]">warning</span>
+                                            AI limit reached. Upgrade for more.
+                                        </p>
+                                    )}
+
+                                    {(simplifyStatus === 'idle' || simplifyStatus === 'error') && (
+                                        <button onClick={handleSimplifyTopic}
+                                            disabled={!paperId || noAIUses}
+                                            className="w-full py-2 bg-green-600 text-white rounded-lg text-[11px] font-bold flex items-center justify-center gap-1.5 hover:bg-green-700 active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                                            <span className="material-icons-round text-[13px]">filter_alt</span>
+                                            Simplify This Topic
+                                        </button>
+                                    )}
+
+                                    {simplifyStatus === 'generating' && (
+                                        <div className="flex flex-col items-center gap-2 py-3 bg-green-50 rounded-xl">
+                                            <div className="flex items-center gap-2">
+                                                <span className="w-3.5 h-3.5 border-2 border-green-300 border-t-green-600 rounded-full animate-spin" />
+                                                <span className="text-[11px] text-green-700 font-semibold">Simplifying paper…</span>
+                                            </div>
+                                            <p className="text-[9px] text-green-400">This may take a moment</p>
+                                        </div>
+                                    )}
+
+                                    {simplifyStatus === 'opened' && (
+                                        <div className="bg-green-50 rounded-xl p-2.5 flex items-center gap-2">
+                                            <span className="material-icons-round text-green-600 text-[16px]">open_in_new</span>
+                                            <p className="text-[11px] font-semibold text-green-700">Generating in new tab…</p>
+                                        </div>
+                                    )}
+
+                                    {simplifyStatus === 'error' && simplifyError && (
+                                        <p className="text-[10px] text-red-500 flex items-center gap-1">
+                                            <span className="material-icons-round text-[12px]">error_outline</span>
+                                            {simplifyError}
                                         </p>
                                     )}
                                 </div>

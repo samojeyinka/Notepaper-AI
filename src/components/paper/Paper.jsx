@@ -6,6 +6,7 @@ import { PaperToolbar } from "./PaperToolbar";
 import { PaperEditor } from "./PaperEditor";
 import { PaperAISidebar } from "./PaperAISidebar";
 import { useExpandTopicChannel } from "../../hooks/useExpandTopicChannel";
+import { useSimplifyTopicChannel } from "../../hooks/useSimplifyTopicChannel";
 import { PaperPreferencesSidebar } from "./PaperPreferencesSidebar";
 import { PaperVersionSidebar } from "./PaperVersionSidebar";
 import { PaperPresentationsSidebar } from "./PaperPresentationsSidebar";
@@ -426,8 +427,26 @@ export const Paper = () => {
         loadPaper(paperId, applyExpanded);
     });
 
-    // Polling fallback: catches cases where ExpandTopicReady fired before this tab
-    // subscribed (tab opened after the event was broadcast) — resolves spinner-forever.
+    useSimplifyTopicChannel(isAIGenerating ? paperId : null, () => {
+        clearTimeout(expandRetryTimerRef.current);
+        const applySimplified = (serverPaper) => {
+            const s = deserializePaper(serverPaper);
+            if (!s.pages.some(p => p?.trim()) && (applySimplified._attempts = (applySimplified._attempts ?? 0) + 1) <= 5) {
+                expandRetryTimerRef.current = setTimeout(() => loadPaper(paperId, applySimplified), 2000);
+                return;
+            }
+            setTitle(s.title); setPages(s.pages); setFontSize(s.fontSize); setLineSpacing(s.lineSpacing);
+            setDrawingData(s.drawingData); setTextColor(s.textColor); setFontFamily(s.fontFamily);
+            setPaddingX(s.paddingX); setPaddingY(s.paddingY);
+            if (s.folderId) setFolderId(s.folderId);
+            if (s.folder)   setFolder(s.folder);
+            setIsAIGenerating(false);
+        };
+        loadPaper(paperId, applySimplified);
+    });
+
+    // Polling fallback: catches cases where ExpandTopicReady/SimplifyTopicReady fired before
+    // this tab subscribed (tab opened after the event was broadcast) — resolves spinner-forever.
     useEffect(() => {
         if (!isAIGenerating || !paperId) return;
         const timer = setInterval(async () => {
@@ -462,7 +481,7 @@ export const Paper = () => {
                     </div>
                     <div className="text-center max-w-xs">
                         <h3 className="text-xl font-bold text-slate-800 mb-2">Schola is writing…</h3>
-                        <p className="text-sm text-slate-500">Expanding the topic into a full companion paper. This runs in the background — the page will update automatically when it's ready.</p>
+                        <p className="text-sm text-slate-500">Schola is preparing your paper in the background — the page will update automatically when it's ready.</p>
                     </div>
                 </div>
             )}

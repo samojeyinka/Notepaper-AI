@@ -39,6 +39,19 @@ const expandPost = async ({ source_type, source_id }) => {
     return Promise.reject(result);
 };
 
+const simplifyPost = async ({ source_type, source_id }) => {
+    const response = await fetch(`${BASE_URL}/ai/simplify`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ source_type, source_id }),
+    });
+    const result = await response.json();
+    if (response.ok) return result;
+    return Promise.reject(result);
+};
+
+
 export const generateService = {
     flashcards: ({ materialIds, uploads, count, topic }) =>
         post('/flashcards', { materialIds, uploads, count, topic }),
@@ -54,4 +67,8 @@ export const generateService = {
 
     expand: ({ source_type, source_id }) =>
         expandPost({ source_type, source_id }),
+
+     simplify: ({ source_type, source_id }) =>
+        simplifyPost({ source_type, source_id }),
+    
 };
