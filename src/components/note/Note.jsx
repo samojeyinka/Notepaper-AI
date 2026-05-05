@@ -550,9 +550,17 @@ export const Note = () => {
         }
     };
 
+    const expandRetryTimerRef = useRef(null);
+
     useExpandTopicChannel(isAIGenerating ? noteId : null, () => {
-        loadNote(noteId, (serverNote) => {
+        clearTimeout(expandRetryTimerRef.current);
+        const applyExpanded = (serverNote) => {
             const s = deserializeNote(serverNote);
+            // If content is empty the backend hasn't committed yet — retry up to 5×
+            if (!s.pages.some(p => p?.trim()) && (applyExpanded._attempts = (applyExpanded._attempts ?? 0) + 1) <= 5) {
+                expandRetryTimerRef.current = setTimeout(() => loadNote(noteId, applyExpanded), 2000);
+                return;
+            }
             setTitle(s.title);
             setPages(s.pages);
             setFontSize(s.fontSize);
@@ -566,8 +574,40 @@ export const Note = () => {
             if (s.folderId) setFolderId(s.folderId);
             if (s.folder)   setFolder(s.folder);
             setIsAIGenerating(false);
-        });
+        };
+        loadNote(noteId, applyExpanded);
     });
+
+    // Polling fallback: catches cases where ExpandTopicReady fired before this tab
+    // subscribed (tab opened after the event was broadcast) — resolves spinner-forever.
+    useEffect(() => {
+        if (!isAIGenerating || !noteId) return;
+        const timer = setInterval(async () => {
+            try {
+                const res = await noteService.get(noteId);
+                const serverNote = res.data;
+                if (!serverNote.ai_generating && serverNote.content) {
+                    clearInterval(timer);
+                    const s = deserializeNote(serverNote);
+                    setTitle(s.title);
+                    setPages(s.pages);
+                    setFontSize(s.fontSize);
+                    setLineSpacing(s.lineSpacing);
+                    setDrawingData(s.drawingData);
+                    setPaperStyle(s.paperStyle);
+                    setPaperColor(s.paperColor);
+                    setLineColor(s.lineColor);
+                    setTextColor(s.textColor);
+                    setFontFamily(s.fontFamily);
+                    if (s.folderId) setFolderId(s.folderId);
+                    if (s.folder)   setFolder(s.folder);
+                    setIsAIGenerating(false);
+                }
+            } catch { /* ignore poll errors */ }
+        }, 5000);
+        return () => { clearInterval(timer); clearTimeout(expandRetryTimerRef.current); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isAIGenerating]);
 
     return (
         <div className="flex flex-col flex-1 h-screen overflow-hidden bg-white border-l border-slate-200 lg:ml-64 pt-16 lg:pt-0">

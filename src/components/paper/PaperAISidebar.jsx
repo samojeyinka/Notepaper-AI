@@ -377,13 +377,13 @@ export const PaperAISidebar = ({ paperId, paperTitle = 'Untitled Paper' }) => {
                             )}
 
                             {/* ── Study Plan ── */}
-                            <FeatureCard
+                            {/* <FeatureCard
                                 id="plan" icon="event_note" title="Create Study Plan"
                                 desc="Build a day-by-day schedule for your upcoming exam."
                                 color="bg-emerald-100 text-emerald-600"
-                            />
+                            /> */}
 
-                            {activeFeature === 'plan' && isPaid && (
+                            {/* {activeFeature === 'plan' && isPaid && (
                                 <div className="bg-white border border-slate-100 rounded-xl p-3 flex flex-col gap-2.5">
                                     <div>
                                         <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Exam / Plan Title</label>
@@ -413,7 +413,7 @@ export const PaperAISidebar = ({ paperId, paperTitle = 'Untitled Paper' }) => {
                                         Set Up Study Plan
                                     </button>
                                 </div>
-                            )}
+                            )} */}
                         </div>
                     )}
                 </div>

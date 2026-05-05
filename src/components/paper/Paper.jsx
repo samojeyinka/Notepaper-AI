@@ -405,17 +405,50 @@ export const Paper = () => {
         savedRangeRef.current = null;
     };
 
+    const expandRetryTimerRef = useRef(null);
+
     useExpandTopicChannel(isAIGenerating ? paperId : null, () => {
-        loadPaper(paperId, (serverPaper) => {
+        clearTimeout(expandRetryTimerRef.current);
+        const applyExpanded = (serverPaper) => {
             const s = deserializePaper(serverPaper);
+            // If content is empty the backend hasn't committed yet — retry up to 5×
+            if (!s.pages.some(p => p?.trim()) && (applyExpanded._attempts = (applyExpanded._attempts ?? 0) + 1) <= 5) {
+                expandRetryTimerRef.current = setTimeout(() => loadPaper(paperId, applyExpanded), 2000);
+                return;
+            }
             setTitle(s.title); setPages(s.pages); setFontSize(s.fontSize); setLineSpacing(s.lineSpacing);
             setDrawingData(s.drawingData); setTextColor(s.textColor); setFontFamily(s.fontFamily);
             setPaddingX(s.paddingX); setPaddingY(s.paddingY);
             if (s.folderId) setFolderId(s.folderId);
             if (s.folder)   setFolder(s.folder);
             setIsAIGenerating(false);
-        });
+        };
+        loadPaper(paperId, applyExpanded);
     });
+
+    // Polling fallback: catches cases where ExpandTopicReady fired before this tab
+    // subscribed (tab opened after the event was broadcast) — resolves spinner-forever.
+    useEffect(() => {
+        if (!isAIGenerating || !paperId) return;
+        const timer = setInterval(async () => {
+            try {
+                const res = await paperService.get(paperId);
+                const serverPaper = res.data;
+                if (!serverPaper.ai_generating && serverPaper.content) {
+                    clearInterval(timer);
+                    const s = deserializePaper(serverPaper);
+                    setTitle(s.title); setPages(s.pages); setFontSize(s.fontSize); setLineSpacing(s.lineSpacing);
+                    setDrawingData(s.drawingData); setTextColor(s.textColor); setFontFamily(s.fontFamily);
+                    setPaddingX(s.paddingX); setPaddingY(s.paddingY);
+                    if (s.folderId) setFolderId(s.folderId);
+                    if (s.folder)   setFolder(s.folder);
+                    setIsAIGenerating(false);
+                }
+            } catch { /* ignore poll errors */ }
+        }, 5000);
+        return () => { clearInterval(timer); clearTimeout(expandRetryTimerRef.current); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isAIGenerating]);
 
     return (
         <div className="flex flex-col flex-1 h-screen overflow-hidden bg-white border-l border-slate-200 lg:ml-64 pt-16 lg:pt-0">
