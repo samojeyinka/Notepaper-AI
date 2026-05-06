@@ -328,26 +328,31 @@ export const Note = () => {
     // Load existing note on mount
     useEffect(() => {
         if (!noteId) return;
-        loadNote(noteId, (serverNote) => {
-            if (serverNote.ai_generating) {
+        let cancelled = false;
+        loadNote(noteId, (data) => {
+            if (cancelled) return;
+            if (data.ai_generating) {
                 setIsAIGenerating(true);
-                setTitle(serverNote.title ?? 'Untitled Note');
+                setTitle(data.title ?? 'Untitled Note');
                 return;
             }
-            const s = deserializeNote(serverNote);
+            // data is either a raw server response (has .content JSON string)
+            // or a localStorage draft (already has .pages array directly).
+            const s = Array.isArray(data.pages) ? data : deserializeNote(data);
             setTitle(s.title);
             setPages(s.pages);
             setFontSize(s.fontSize);
             setLineSpacing(s.lineSpacing);
             setDrawingData(s.drawingData);
-            setPaperStyle(s.paperStyle);
-            setPaperColor(s.paperColor);
-            setLineColor(s.lineColor);
-            setTextColor(s.textColor);
-            setFontFamily(s.fontFamily);
+            setPaperStyle(s.paperStyle ?? 'ruled');
+            setPaperColor(s.paperColor ?? '#ffffff');
+            setLineColor(s.lineColor ?? '#cbd5e1');
+            setTextColor(s.textColor ?? '#1e293b');
+            setFontFamily(s.fontFamily ?? 'sans');
             if (s.folderId) setFolderId(s.folderId);
             if (s.folder)   setFolder(s.folder);
         });
+        return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -556,7 +561,7 @@ export const Note = () => {
     useExpandTopicChannel(isAIGenerating ? noteId : null, () => {
         clearTimeout(expandRetryTimerRef.current);
         const applyExpanded = (serverNote) => {
-            const s = deserializeNote(serverNote);
+            const s = Array.isArray(serverNote.pages) ? serverNote : deserializeNote(serverNote);
             // If content is empty the backend hasn't committed yet — retry up to 5×
             if (!s.pages.some(p => p?.trim()) && (applyExpanded._attempts = (applyExpanded._attempts ?? 0) + 1) <= 5) {
                 expandRetryTimerRef.current = setTimeout(() => loadNote(noteId, applyExpanded), 2000);
@@ -582,7 +587,7 @@ export const Note = () => {
     useSimplifyTopicChannel(isAIGenerating ? noteId : null, () => {
         clearTimeout(expandRetryTimerRef.current);
         const applySimplified = (serverNote) => {
-            const s = deserializeNote(serverNote);
+            const s = Array.isArray(serverNote.pages) ? serverNote : deserializeNote(serverNote);
             if (!s.pages.some(p => p?.trim()) && (applySimplified._attempts = (applySimplified._attempts ?? 0) + 1) <= 5) {
                 expandRetryTimerRef.current = setTimeout(() => loadNote(noteId, applySimplified), 2000);
                 return;

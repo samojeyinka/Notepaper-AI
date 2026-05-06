@@ -45,8 +45,8 @@ export const NoteAISidebar = ({ noteId, noteTitle = 'Untitled Note' }) => {
     const [planName, setPlanName] = useState('');
     const [planDate, setPlanDate] = useState('');
 
-    const maxQuestions   = planLimit('max_quiz_count') ?? 20;
-    const QUIZ_COUNTS    = [5, 10, 15, 20].filter(n => n <= maxQuestions);
+    const maxQuestions   = planLimit('max_quiz_count') ?? 150;
+    const QUIZ_COUNTS    = [5, 10, 15, 20, 50, 100, 150].filter(n => n <= maxQuestions);
     const noQuizUses     = loaded && !canUseAI('ai_quiz');
     const noAIUses       = loaded && !canUseAI('ai_use');
 
@@ -240,10 +240,10 @@ export const NoteAISidebar = ({ noteId, noteTitle = 'Untitled Note' }) => {
                                     {/* Count */}
                                     <div>
                                         <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Questions</p>
-                                        <div className="flex flex-wrap gap-1">
+                                        <div className="flex flex-wrap gap-1.5">
                                             {QUIZ_COUNTS.map(n => (
                                                 <button key={n} onClick={() => setQuizCount(n)}
-                                                    className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold transition-all ${quizCount === n ? 'bg-primary text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}>
+                                                    className={`px-2 py-0.5 rounded-full text-[10px] font-semibold transition-all ${quizCount === n ? 'bg-primary text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}>
                                                     {n}
                                                 </button>
                                             ))}

@@ -130,26 +130,26 @@ export default function AIGeneratingPage() {
                         </div>
                     </div>
 
-                    <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">Schola is done!</h2>
+                    <h2 className="text-2xl md:text-3xl font-semibold md:font-bold text-slate-900 mb-2">Schola is done!</h2>
                     <p className="text-[14px] text-slate-500 mb-1">
                         Your {actionLabel.toLowerCase()} {typeLabel.toLowerCase()} is ready.
                     </p>
                     {resultTitle && (
-                        <p className="text-[13px] font-semibold text-slate-700 mb-8 px-4 truncate">"{resultTitle}"</p>
+                        <p className="text-[13px] font-medium md:font-semibold text-slate-700 mb-8 px-4 truncate">"{resultTitle}"</p>
                     )}
-                    {!resultTitle && <div className="mb-8" />}
+                    {!resultTitle && <div className="mb-4 md:mb-8" />}
 
-                    <div className="bg-white rounded-2xl p-6 flex flex-col gap-3" style={{ boxShadow: '0 10px 30px rgba(44,47,50,0.07)' }}>
+                    <div className="bg-white rounded-lg md:rounded-xl p-3 md:p-6 flex flex-col gap-3" style={{ boxShadow: '0 10px 30px rgba(44,47,50,0.07)' }}>
                         <button
                             onClick={() => navigate(targetPath)}
-                            className="w-full py-3.5 bg-primary text-white rounded-xl text-[14px] font-bold flex items-center justify-center gap-2 hover:bg-primary/90 active:scale-[0.98] transition-all shadow-lg shadow-primary/20"
+                            className="w-full py-2 md:py-3 bg-primary text-white rounded-md md:rounded-lg text-[14px] font-semibold flex items-center justify-center gap-2 hover:bg-primary/90 active:scale-[0.98] transition-all shadow-lg shadow-primary/20"
                         >
-                            <span className="material-icons-round text-[18px]">{isNote ? 'description' : 'article'}</span>
+                      
                             Open {typeLabel}
                         </button>
                         <button
                             onClick={() => window.close()}
-                            className="w-full py-2.5 border border-slate-200 text-slate-500 rounded-xl text-[13px] font-medium hover:bg-slate-50 transition-all"
+                            className="w-full py-1.5 md:py-2 border border-slate-200 text-slate-500 rounded-md md:rounded-lg text-[13px] font-medium hover:bg-slate-50 transition-all"
                         >
                             Close this tab
                         </button>
@@ -213,7 +213,7 @@ export default function AIGeneratingPage() {
                 <h2 className="text-xl md:text-2xl font-semibold text-slate-900 mb-1">
                     Schola is {action === 'simplify' ? 'simplifying' : 'expanding'} your {typeLabel.toLowerCase()}
                 </h2>
-                <p className="text-[13px] md:text-[14px] text-primary font-medium mb-6 md:mb-8">{phases[phase]}</p>
+                <p className="text-[12px] md:text-[14px] text-primary font-medium mb-6 md:mb-8">{phases[phase]}</p>
 
                 {/* Progress bar */}
                 <div className="h-2 bg-slate-200 rounded-full overflow-hidden mb-2">
@@ -222,7 +222,7 @@ export default function AIGeneratingPage() {
                         style={{ width: `${pct}%` }}
                     />
                 </div>
-                <p className="text-[11px] text-slate-400 mb-8">Checking every 3 seconds…</p>
+             
 
                 {/* Info card */}
                 <div

@@ -190,19 +190,24 @@ export const Paper = () => {
     // Load existing paper
     useEffect(() => {
         if (!paperId) return;
-        loadPaper(paperId, (serverPaper) => {
-            if (serverPaper.ai_generating) {
+        let cancelled = false;
+        loadPaper(paperId, (data) => {
+            if (cancelled) return;
+            if (data.ai_generating) {
                 setIsAIGenerating(true);
-                setTitle(serverPaper.title ?? 'Untitled Paper');
+                setTitle(data.title ?? 'Untitled Paper');
                 return;
             }
-            const s = deserializePaper(serverPaper);
+            // data is either a raw server response (has .content JSON string)
+            // or a localStorage draft (already has .pages array directly).
+            const s = Array.isArray(data.pages) ? data : deserializePaper(data);
             setTitle(s.title); setPages(s.pages); setFontSize(s.fontSize); setLineSpacing(s.lineSpacing);
             setDrawingData(s.drawingData); setTextColor(s.textColor); setFontFamily(s.fontFamily);
-            setPaddingX(s.paddingX); setPaddingY(s.paddingY);
+            setPaddingX(s.paddingX ?? 96); setPaddingY(s.paddingY ?? 80);
             if (s.folderId) setFolderId(s.folderId);
             if (s.folder)   setFolder(s.folder);
         });
+        return () => { cancelled = true; };
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Load presentation count
@@ -411,7 +416,7 @@ export const Paper = () => {
     useExpandTopicChannel(isAIGenerating ? paperId : null, () => {
         clearTimeout(expandRetryTimerRef.current);
         const applyExpanded = (serverPaper) => {
-            const s = deserializePaper(serverPaper);
+            const s = Array.isArray(serverPaper.pages) ? serverPaper : deserializePaper(serverPaper);
             // If content is empty the backend hasn't committed yet — retry up to 5×
             if (!s.pages.some(p => p?.trim()) && (applyExpanded._attempts = (applyExpanded._attempts ?? 0) + 1) <= 5) {
                 expandRetryTimerRef.current = setTimeout(() => loadPaper(paperId, applyExpanded), 2000);
@@ -430,7 +435,7 @@ export const Paper = () => {
     useSimplifyTopicChannel(isAIGenerating ? paperId : null, () => {
         clearTimeout(expandRetryTimerRef.current);
         const applySimplified = (serverPaper) => {
-            const s = deserializePaper(serverPaper);
+            const s = Array.isArray(serverPaper.pages) ? serverPaper : deserializePaper(serverPaper);
             if (!s.pages.some(p => p?.trim()) && (applySimplified._attempts = (applySimplified._attempts ?? 0) + 1) <= 5) {
                 expandRetryTimerRef.current = setTimeout(() => loadPaper(paperId, applySimplified), 2000);
                 return;
@@ -445,8 +450,7 @@ export const Paper = () => {
         loadPaper(paperId, applySimplified);
     });
 
-    // Polling fallback: catches cases where ExpandTopicReady/SimplifyTopicReady fired before
-    // this tab subscribed (tab opened after the event was broadcast) — resolves spinner-forever.
+
     useEffect(() => {
         if (!isAIGenerating || !paperId) return;
         const timer = setInterval(async () => {
