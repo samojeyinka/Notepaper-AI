@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useRef, useCallback, useState } from "react";
+import { forwardRef, useEffect, useLayoutEffect, useRef, useCallback, useState } from "react";
 import { createPortal } from "react-dom";
 
 const PAGE_WIDTH  = 816;
@@ -52,7 +52,7 @@ const PaperPage = ({
   const checkOverflowRef = useRef(checkOverflow);
   useEffect(() => { checkOverflowRef.current = checkOverflow; });
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (pageRef.current) {
       pageRef.current.innerHTML = content ?? "";
       if (content) checkOverflowRef.current();
@@ -60,7 +60,7 @@ const PaperPage = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!pageRef.current) return;
     if (isLocalChange.current) { isLocalChange.current = false; return; }
     if (pageRef.current.innerHTML !== content) {

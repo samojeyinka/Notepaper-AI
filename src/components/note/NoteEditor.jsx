@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useRef, useCallback, useState } from "react";
+import { forwardRef, useEffect, useLayoutEffect, useRef, useCallback, useState } from "react";
 import { createPortal } from "react-dom";
 
 // US Letter dimensions at 96 dpi: 816 × 1056 px
@@ -63,7 +63,7 @@ const NotePage = ({
   useEffect(() => { checkOverflowRef.current = checkOverflow; });
 
   // Set initial content on mount; if it's already overflowing, cascade immediately.
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (pageRef.current) {
       pageRef.current.innerHTML = content ?? "";
       if (content) checkOverflowRef.current();
@@ -73,7 +73,7 @@ const NotePage = ({
 
   // Sync content from parent when it changes from outside (e.g. overflow cascade).
   // After syncing, check if THIS page now overflows so cascading works.
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!pageRef.current) return;
     if (isLocalChangeRef.current) {
       isLocalChangeRef.current = false;

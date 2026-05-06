@@ -5,7 +5,7 @@ import { useParams, useNavigate, useSearchParams, useLocation } from "react-rout
 import { NoteHeader } from "./NoteHeader";
 import { NoteToolbar } from "./NoteToolbar";
 import { NoteEditor } from "./NoteEditor";
-import { NoteAISidebar } from "./NoteAISidebar";
+import { AISidebar } from "../shared/AISidebar";
 import { useExpandTopicChannel } from "../../hooks/useExpandTopicChannel";
 import { useSimplifyTopicChannel } from "../../hooks/useSimplifyTopicChannel";
 import { NoteSettingsSidebar } from "./NoteSettingsSidebar";
@@ -272,6 +272,15 @@ export const Note = () => {
             navigate(`/lockedin/notes/${id}`, { replace: true });
         }
     );
+
+    const [showLoader, setShowLoader] = useState(false);
+    useEffect(() => {
+        if (saveStatus === 'loading') {
+            const t = setTimeout(() => setShowLoader(true), 1000);
+            return () => clearTimeout(t);
+        }
+        setShowLoader(false);
+    }, [saveStatus]);
 
     // Keep the Ctrl+S handler in sync with the latest forceFlush
     forceFlushRef.current = forceFlush;
@@ -775,8 +784,8 @@ export const Note = () => {
                 />
 
                 <div className="flex-1 overflow-hidden flex" style={{ position: 'relative' }}>
-                    {/* Loading overlay — blocks interaction while note data is being fetched */}
-                    {saveStatus === 'loading' && (
+                    {/* Loading overlay — only shown if fetch takes longer than 1 s */}
+                    {saveStatus === 'loading' && showLoader && (
                         <div style={{ position: 'absolute', inset: 0, zIndex: 20, pointerEvents: 'all', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(241,245,249,0.7)', backdropFilter: 'blur(2px)' }}>
                             <div className="flex flex-col items-center justify-center gap-3">
                                 <Loader size="xl" />
@@ -852,7 +861,7 @@ export const Note = () => {
                 </div>
 
                 {isAISidebarOpen && (
-                    <NoteAISidebar noteId={noteId} noteTitle={title} />
+                    <AISidebar sourceType="note" sourceId={noteId} sourceTitle={title} />
                 )}
 
                 {isYouTubeOpen && (

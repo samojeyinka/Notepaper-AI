@@ -4,7 +4,7 @@ import { useParams, useNavigate, useSearchParams, useLocation } from "react-rout
 import { PaperHeader } from "./PaperHeader";
 import { PaperToolbar } from "./PaperToolbar";
 import { PaperEditor } from "./PaperEditor";
-import { PaperAISidebar } from "./PaperAISidebar";
+import { AISidebar } from "../shared/AISidebar";
 import { useExpandTopicChannel } from "../../hooks/useExpandTopicChannel";
 import { useSimplifyTopicChannel } from "../../hooks/useSimplifyTopicChannel";
 import { PaperPreferencesSidebar } from "./PaperPreferencesSidebar";
@@ -157,6 +157,15 @@ export const Paper = () => {
         (id) => { setPaperId(id); navigate(`/lockedin/papers/${id}`, { replace: true }); }
     );
     forceFlushRef.current = forceFlush;
+
+    const [showLoader, setShowLoader] = useState(false);
+    useEffect(() => {
+        if (saveStatus === 'loading') {
+            const t = setTimeout(() => setShowLoader(true), 1000);
+            return () => clearTimeout(t);
+        }
+        setShowLoader(false);
+    }, [saveStatus]);
 
     // Undo/redo
     const applySnapshot = useCallback((snapshot) => {
@@ -568,7 +577,7 @@ export const Paper = () => {
                 />
 
                 <div className="flex-1 overflow-hidden flex" style={{ position:'relative' }}>
-                    {saveStatus === 'loading' && (
+                    {saveStatus === 'loading' && showLoader && (
                         <div style={{ position:'absolute',inset:0,zIndex:20,pointerEvents:'all',display:'flex',alignItems:'center',justifyContent:'center',background:'rgba(241,245,249,0.7)',backdropFilter:'blur(2px)' }}>
                             <div className="flex flex-col items-center gap-3">
                                 <Loader size="xl" />
@@ -626,7 +635,7 @@ export const Paper = () => {
                     )}
                 </div>
 
-                {isAISidebarOpen && <PaperAISidebar paperId={paperId} paperTitle={title} />}
+                {isAISidebarOpen && <AISidebar sourceType="paper" sourceId={paperId} sourceTitle={title} />}
 
                 {isWebImportOpen && (
                     <YouTubeTranscriptModal

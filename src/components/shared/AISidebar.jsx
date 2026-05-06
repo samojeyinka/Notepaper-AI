@@ -9,18 +9,52 @@ import { invalidateQuizzesCache } from '../quizzes/Quizzes';
 const Q_TYPE_MAP = { multiple: 'multiple_choice', input: 'short_answer', both: 'mixed' };
 
 const DIFFICULTIES = [
-    { id: 'easy',   label: 'Easy',   active: 'bg-emerald-500 text-white' },
-    { id: 'medium', label: 'Medium', active: 'bg-amber-500 text-white'   },
-    { id: 'hard',   label: 'Hard',   active: 'bg-rose-500 text-white'    },
+    { id: 'easy',   label: 'Easy'   },
+    { id: 'medium', label: 'Medium' },
+    { id: 'hard',   label: 'Hard'   },
 ];
 
 const Q_TYPES = [
-    { id: 'multiple', label: 'Multiple Choice', icon: 'check_box'     },
-    { id: 'input',    label: 'Short Answer',    icon: 'edit_note'      },
-    { id: 'both',     label: 'Mixed',           icon: 'shuffle'        },
+    { id: 'multiple', label: 'Multiple Choice', icon: 'check_box'  },
+    { id: 'input',    label: 'Short Answer',    icon: 'edit_note'   },
+    { id: 'both',     label: 'Mixed',           icon: 'shuffle'     },
 ];
 
-export const NoteAISidebar = ({ noteId, noteTitle = 'Untitled Note' }) => {
+const CONFIG = {
+    note: {
+        defaultTitle:        'Untitled Note',
+        quizDesc:            'Turn this note into a personalised practice test.',
+        expandIcon:          'unfold_more',
+        expandDesc:          'Schola writes a deep companion note on this topic.',
+        expandDetailDesc:    'Schola reads this note and creates a detailed separate note with deeper research, examples, and explanations.',
+        expandBtnClass:      'bg-gray-900 hover:bg-gray-600',
+        expandSpinnerText:   'Writing expanded note…',
+        simplifyDesc:        'Schola writes a concise, simplified note on this topic.',
+        simplifyDetailDesc:  'Schola reads this note and creates a simplified version, reducing it by 60% while keeping the key points.',
+        simplifySpinnerText: 'Writing simplified note…',
+        quizCountOptions:    [5, 10, 15, 20, 50, 100, 150],
+        maxQDefault:         150,
+    },
+    paper: {
+        defaultTitle:        'Untitled Paper',
+        quizDesc:            'Turn this paper into a personalised practice test.',
+        expandIcon:          'lightbulb',
+        expandDesc:          'Schola writes a deep companion paper on this topic.',
+        expandDetailDesc:    'Schola reads this paper and creates a detailed separate paper with deeper research, examples, and explanations. Title is AI-determined.',
+        expandBtnClass:      'bg-amber-500 hover:bg-amber-600',
+        expandSpinnerText:   'Writing expanded paper…',
+        simplifyDesc:        'Schola rewrites this paper in simpler, easier-to-understand language.',
+        simplifyDetailDesc:  'Schola reads this paper and creates a new, simplified version with clearer language, shorter sentences, and easier explanations.',
+        simplifySpinnerText: 'Simplifying paper…',
+        quizCountOptions:    [5, 10, 15, 20],
+        maxQDefault:         20,
+    },
+};
+
+export const AISidebar = ({ sourceType, sourceId, sourceTitle }) => {
+    const cfg = CONFIG[sourceType];
+    const title = sourceTitle || cfg.defaultTitle;
+
     const navigate = useNavigate();
     const { isPaid, canUseAI, increment, planLimit, loaded } = usePlan();
     const [scholaOpen, setScholaOpen] = useState(true);
@@ -30,25 +64,26 @@ export const NoteAISidebar = ({ noteId, noteTitle = 'Untitled Note' }) => {
     const [quizCount,      setQuizCount]      = useState(10);
     const [quizDifficulty, setQuizDifficulty] = useState('medium');
     const [quizType,       setQuizType]       = useState('multiple');
-    const [quizStatus,     setQuizStatus]     = useState('idle'); // idle|generating|ready|saving|error
+    const [quizStatus,     setQuizStatus]     = useState('idle');
     const [quizGenerated,  setQuizGenerated]  = useState(null);
     const [quizError,      setQuizError]      = useState(null);
 
     // ── Expand state ────────────────────────────────────────────────────────────
-    const [expandStatus, setExpandStatus] = useState('idle'); // idle|generating|done|error
+    const [expandStatus, setExpandStatus] = useState('idle');
     const [expandError,  setExpandError]  = useState(null);
 
-    const [simplifyStatus, setSimplifyStatus] = useState('idle'); // idle|generating|done|error
+    // ── Simplify state ──────────────────────────────────────────────────────────
+    const [simplifyStatus, setSimplifyStatus] = useState('idle');
     const [simplifyError,  setSimplifyError]  = useState(null);
 
     // ── Study plan state ────────────────────────────────────────────────────────
     const [planName, setPlanName] = useState('');
     const [planDate, setPlanDate] = useState('');
 
-    const maxQuestions   = planLimit('max_quiz_count') ?? 150;
-    const QUIZ_COUNTS    = [5, 10, 15, 20, 50, 100, 150].filter(n => n <= maxQuestions);
-    const noQuizUses     = loaded && !canUseAI('ai_quiz');
-    const noAIUses       = loaded && !canUseAI('ai_use');
+    const maxQuestions = planLimit('max_quiz_count') ?? cfg.maxQDefault;
+    const QUIZ_COUNTS  = cfg.quizCountOptions.filter(n => n <= maxQuestions);
+    const noQuizUses   = loaded && !canUseAI('ai_quiz');
+    const noAIUses     = loaded && !canUseAI('ai_use');
 
     const toggleFeature = (id) => {
         if (!isPaid) return;
@@ -57,13 +92,13 @@ export const NoteAISidebar = ({ noteId, noteTitle = 'Untitled Note' }) => {
 
     // ── Generate Quiz ───────────────────────────────────────────────────────────
     const handleGenerateQuiz = async () => {
-        if (!noteId || noQuizUses) return;
+        if (!sourceId || noQuizUses) return;
         setQuizError(null);
         setQuizGenerated(null);
         setQuizStatus('generating');
         try {
             const res = await generateService.quiz({
-                materialIds:   [{ type: 'note', id: noteId }],
+                materialIds:   [{ type: sourceType, id: sourceId }],
                 count:         quizCount,
                 difficulty:    quizDifficulty,
                 question_type: Q_TYPE_MAP[quizType],
@@ -90,7 +125,7 @@ export const NoteAISidebar = ({ noteId, noteTitle = 'Untitled Note' }) => {
         }));
         try {
             const res = await quizService.create({
-                title:          `${noteTitle} Quiz`,
+                title:          `${title} Quiz`,
                 subject:        'auto',
                 difficulty:     quizDifficulty,
                 question_type:  quizType,
@@ -107,13 +142,13 @@ export const NoteAISidebar = ({ noteId, noteTitle = 'Untitled Note' }) => {
 
     // ── Expand Topic ────────────────────────────────────────────────────────────
     const handleExpandTopic = async () => {
-        if (!noteId || noAIUses) return;
+        if (!sourceId || noAIUses) return;
         setExpandError(null);
         setExpandStatus('generating');
         try {
-            const res = await generateService.expand({ source_type: 'note', source_id: noteId });
+            const res = await generateService.expand({ source_type: sourceType, source_id: sourceId });
             const newId = res?.data?.id ?? res?.id;
-            window.open(`/lockedin/ai-generating/note/${newId}?action=expand`, '_blank');
+            window.open(`/lockedin/ai-generating/${sourceType}/${newId}?action=expand`, '_blank');
             setExpandStatus('opened');
             setTimeout(() => setExpandStatus('idle'), 4000);
         } catch (err) {
@@ -122,15 +157,15 @@ export const NoteAISidebar = ({ noteId, noteTitle = 'Untitled Note' }) => {
         }
     };
 
-    // ── Simplify Topic ────────────────────────────────────────────────────────────
+    // ── Simplify Topic ──────────────────────────────────────────────────────────
     const handleSimplifyTopic = async () => {
-        if (!noteId || noAIUses) return;
+        if (!sourceId || noAIUses) return;
         setSimplifyError(null);
         setSimplifyStatus('generating');
         try {
-            const res = await generateService.simplify({ source_type: 'note', source_id: noteId });
+            const res = await generateService.simplify({ source_type: sourceType, source_id: sourceId });
             const newId = res?.data?.id ?? res?.id;
-            window.open(`/lockedin/ai-generating/note/${newId}?action=simplify`, '_blank');
+            window.open(`/lockedin/ai-generating/${sourceType}/${newId}?action=simplify`, '_blank');
             setSimplifyStatus('opened');
             setTimeout(() => setSimplifyStatus('idle'), 4000);
         } catch (err) {
@@ -139,24 +174,23 @@ export const NoteAISidebar = ({ noteId, noteTitle = 'Untitled Note' }) => {
         }
     };
 
-
     // ── Study Plan ──────────────────────────────────────────────────────────────
     const handleCreatePlan = () => {
         navigate('/lockedin/study-plan', {
             state: {
                 startCreate:  true,
-                planName:     planName || noteTitle,
+                planName:     planName || title,
                 examDate:     planDate,
-                sourceId:     noteId,
-                sourceType:   'note',
-                sourceTitle:  noteTitle,
+                sourceId,
+                sourceType,
+                sourceTitle:  title,
             },
         });
     };
 
     // ── Feature card wrapper ────────────────────────────────────────────────────
-    const FeatureCard = ({ id, icon, title, desc, color }) => {
-        const isActive = activeFeature === id;
+    const FeatureCard = ({ id, icon, title: cardTitle, desc, color }) => {
+        const isActive  = activeFeature === id;
         const clickable = isPaid;
         return (
             <div
@@ -183,7 +217,7 @@ export const NoteAISidebar = ({ noteId, noteTitle = 'Untitled Note' }) => {
                     </div>
                     <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1">
-                            <p className="md:font-medium text-[10.5px] md:text-xs text-slate-800">{title}</p>
+                            <p className="md:font-medium text-[10.5px] md:text-xs text-slate-800">{cardTitle}</p>
                             {!isPaid && <span className="material-icons-round text-[12px] text-amber-400">workspace_premium</span>}
                             {clickable && (
                                 <span className={`ml-auto material-icons-round text-[14px] text-slate-400 transition-transform duration-200 ${isActive ? 'rotate-180' : ''}`}>
@@ -230,14 +264,13 @@ export const NoteAISidebar = ({ noteId, noteTitle = 'Untitled Note' }) => {
                             {/* ── Generate Quiz ── */}
                             <FeatureCard
                                 id="quiz" icon="quiz" title="Generate Quiz"
-                                desc="Turn this note into a personalised practice test."
+                                desc={cfg.quizDesc}
                                 color="bg-primary/15 text-primary"
                             />
 
                             {activeFeature === 'quiz' && isPaid && (
                                 <div className="bg-white border border-slate-100 rounded-xl p-3 flex flex-col gap-3">
 
-                                    {/* Count */}
                                     <div>
                                         <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Questions</p>
                                         <div className="flex flex-wrap gap-1.5">
@@ -250,20 +283,18 @@ export const NoteAISidebar = ({ noteId, noteTitle = 'Untitled Note' }) => {
                                         </div>
                                     </div>
 
-                                    {/* Difficulty */}
                                     <div>
                                         <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Difficulty</p>
-                                        <div className="flex gap-1">
+                                        <div className="flex rounded-lg overflow-hidden border border-slate-200">
                                             {DIFFICULTIES.map(d => (
                                                 <button key={d.id} onClick={() => setQuizDifficulty(d.id)}
-                                                    className={`flex-1 py-1 rounded-lg text-[10px] font-semibold transition-all ${quizDifficulty === d.id ? d.active : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}>
+                                                    className={`flex-1 py-1 text-[10px] font-semibold transition-all border-r last:border-r-0 border-slate-200 ${quizDifficulty === d.id ? 'bg-primary text-white' : 'bg-white text-slate-500 hover:bg-slate-50'}`}>
                                                     {d.label}
                                                 </button>
                                             ))}
                                         </div>
                                     </div>
 
-                                    {/* Type */}
                                     <div>
                                         <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Question Type</p>
                                         <div className="flex flex-col gap-1">
@@ -285,10 +316,9 @@ export const NoteAISidebar = ({ noteId, noteTitle = 'Untitled Note' }) => {
                                         </p>
                                     )}
 
-                                    {/* Actions */}
                                     {(quizStatus === 'idle' || quizStatus === 'error') && (
                                         <button onClick={handleGenerateQuiz}
-                                            disabled={!noteId || noQuizUses}
+                                            disabled={!sourceId || noQuizUses}
                                             className="w-full py-2 bg-primary text-white rounded-lg text-[11px] font-bold flex items-center justify-center gap-1.5 hover:bg-primary/90 active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
                                             <span className="material-icons-round text-[13px]">quiz</span>
                                             Generate Quiz
@@ -348,16 +378,14 @@ export const NoteAISidebar = ({ noteId, noteTitle = 'Untitled Note' }) => {
 
                             {/* ── Expand Topic ── */}
                             <FeatureCard
-                                id="expand" icon="unfold_more" title="Expand Topic"
-                                desc="Schola writes a deep companion note on this topic."
+                                id="expand" icon={cfg.expandIcon} title="Expand Topic"
+                                desc={cfg.expandDesc}
                                 color="bg-amber-100 text-amber-500"
                             />
 
                             {activeFeature === 'expand' && isPaid && (
                                 <div className="bg-white border border-slate-100 rounded-xl p-3 flex flex-col gap-2.5">
-                                    <p className="text-[10px] text-slate-500 leading-relaxed">
-                                        Schola reads this note and creates a detailed separate note with deeper research, examples, and explanations.
-                                    </p>
+                                    <p className="text-[10px] text-slate-500 leading-relaxed">{cfg.expandDetailDesc}</p>
 
                                     {noAIUses && (
                                         <p className="text-[10px] text-amber-700 bg-amber-50 rounded-lg px-2 py-1.5 flex items-center gap-1">
@@ -368,9 +396,9 @@ export const NoteAISidebar = ({ noteId, noteTitle = 'Untitled Note' }) => {
 
                                     {(expandStatus === 'idle' || expandStatus === 'error') && (
                                         <button onClick={handleExpandTopic}
-                                            disabled={!noteId || noAIUses}
-                                            className="w-full py-2 bg-gray-900 text-white rounded-lg text-[11px] font-bold flex items-center justify-center gap-1.5 hover:bg-gray-600 active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
-    
+                                            disabled={!sourceId || noAIUses}
+                                            className={`w-full py-2 text-white rounded-lg text-[11px] font-bold flex items-center justify-center gap-1.5 active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed ${cfg.expandBtnClass}`}>
+                                            <span className="material-icons-round text-[13px]">{cfg.expandIcon}</span>
                                             Expand This Topic
                                         </button>
                                     )}
@@ -379,7 +407,7 @@ export const NoteAISidebar = ({ noteId, noteTitle = 'Untitled Note' }) => {
                                         <div className="flex flex-col items-center gap-2 py-3 bg-amber-50 rounded-xl">
                                             <div className="flex items-center gap-2">
                                                 <span className="w-3.5 h-3.5 border-2 border-amber-300 border-t-amber-500 rounded-full animate-spin" />
-                                                <span className="text-[11px] text-amber-700 font-semibold">Writing expanded note…</span>
+                                                <span className="text-[11px] text-amber-700 font-semibold">{cfg.expandSpinnerText}</span>
                                             </div>
                                             <p className="text-[9px] text-amber-400">This may take a moment</p>
                                         </div>
@@ -401,21 +429,16 @@ export const NoteAISidebar = ({ noteId, noteTitle = 'Untitled Note' }) => {
                                 </div>
                             )}
 
-
-
-
-                                {/* ── Simplify Topic ── */}
+                            {/* ── Simplify Topic ── */}
                             <FeatureCard
                                 id="simplify" icon="filter_alt" title="Simplify Topic"
-                                desc="Schola writes a concise, simplified note on this topic."
+                                desc={cfg.simplifyDesc}
                                 color="bg-green-100 text-green-500"
                             />
 
                             {activeFeature === 'simplify' && isPaid && (
                                 <div className="bg-white border border-slate-100 rounded-xl p-3 flex flex-col gap-2.5">
-                                    <p className="text-[10px] text-slate-500 leading-relaxed">
-                                        Schola reads this note and creates a simplified version, reducing it by 60% while keeping the key points.
-                                    </p>
+                                    <p className="text-[10px] text-slate-500 leading-relaxed">{cfg.simplifyDetailDesc}</p>
 
                                     {noAIUses && (
                                         <p className="text-[10px] text-amber-700 bg-amber-50 rounded-lg px-2 py-1.5 flex items-center gap-1">
@@ -426,7 +449,7 @@ export const NoteAISidebar = ({ noteId, noteTitle = 'Untitled Note' }) => {
 
                                     {(simplifyStatus === 'idle' || simplifyStatus === 'error') && (
                                         <button onClick={handleSimplifyTopic}
-                                            disabled={!noteId || noAIUses}
+                                            disabled={!sourceId || noAIUses}
                                             className="w-full py-2 bg-green-600 text-white rounded-lg text-[11px] font-bold flex items-center justify-center gap-1.5 hover:bg-green-700 active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
                                             <span className="material-icons-round text-[13px]">filter_alt</span>
                                             Simplify This Topic
@@ -437,7 +460,7 @@ export const NoteAISidebar = ({ noteId, noteTitle = 'Untitled Note' }) => {
                                         <div className="flex flex-col items-center gap-2 py-3 bg-green-50 rounded-xl">
                                             <div className="flex items-center gap-2">
                                                 <span className="w-3.5 h-3.5 border-2 border-green-300 border-t-green-500 rounded-full animate-spin" />
-                                                <span className="text-[11px] text-green-700 font-semibold">Writing simplified note…</span>
+                                                <span className="text-[11px] text-green-700 font-semibold">{cfg.simplifySpinnerText}</span>
                                             </div>
                                             <p className="text-[9px] text-green-400">This may take a moment</p>
                                         </div>
@@ -459,13 +482,7 @@ export const NoteAISidebar = ({ noteId, noteTitle = 'Untitled Note' }) => {
                                 </div>
                             )}
 
-                            {/* ── Study Plan ── */}
-                            {/* <FeatureCard
-                                id="plan" icon="event_note" title="Create Study Plan"
-                                desc="Build a day-by-day schedule for your upcoming exam."
-                                color="bg-emerald-100 text-emerald-600"
-                            /> */}
-
+                            {/* ── Study Plan (commented out) ── */}
                             {activeFeature === 'plan' && isPaid && (
                                 <div className="bg-white border border-slate-100 rounded-xl p-3 flex flex-col gap-2.5">
                                     <div>
@@ -474,7 +491,7 @@ export const NoteAISidebar = ({ noteId, noteTitle = 'Untitled Note' }) => {
                                             type="text"
                                             value={planName}
                                             onChange={e => setPlanName(e.target.value)}
-                                            placeholder={noteTitle}
+                                            placeholder={title}
                                             className="w-full bg-slate-50 rounded-lg px-2.5 py-2 text-[11px] text-slate-700 placeholder-slate-300 outline-none focus:ring-2 focus:ring-primary/20 transition-all border border-slate-100"
                                         />
                                     </div>
