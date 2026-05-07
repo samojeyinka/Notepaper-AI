@@ -223,7 +223,7 @@ const SprintRoadmap = ({ sprint }) => {
                                             <button
                                                 onClick={() => isAccessible && toggleSelect(challenge.id)}
                                                 disabled={!isAccessible}
-                                                className={`relative w-[72px] h-[72px] rounded-full ring-4 ${nodeCfg.ring} flex items-center justify-center transition-all duration-200
+                                                className={`relative w-[46px] h-[46px] md:w-[72px] md:h-[72px] rounded-full ring-4 ${nodeCfg.ring} flex items-center justify-center transition-all duration-200
                                                     ${isAccessible
                                                         ? `cursor-pointer hover:scale-110 active:scale-95 shadow-lg ${nodeCfg.shadow}`
                                                         : 'cursor-default opacity-50'

@@ -3,6 +3,10 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { sprintService } from '../../api/sprintService';
 import Loader from '../globals/Loader';
 
+// ── Instrument Serif font loader ──────────────────────────────────────────────
+const SERIF_FONT_URL =
+    'https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap';
+
 // ── Sound Engine ──────────────────────────────────────────────────────────────
 const createSound = (ctx, type) => {
     const now = ctx.currentTime;
@@ -74,11 +78,15 @@ const playSound = (() => {
     };
 })();
 
+// ── Letter labels ─────────────────────────────────────────────────────────────
+const LETTERS = ['A', 'B', 'C', 'D'];
+
 // ── Quiz ─────────────────────────────────────────────────────────────────────
 const QuizView = ({ content }) => {
     const [current,  setCurrent]  = useState(0);
     const [selected, setSelected] = useState(null);
     const [revealed, setRevealed] = useState(false);
+    const [inputVal, setInputVal] = useState('');
     const [score,    setScore]    = useState(0);
     const [done,     setDone]     = useState(false);
     const [shake,    setShake]    = useState(false);
@@ -91,41 +99,60 @@ const QuizView = ({ content }) => {
     if (done) {
         const pct = Math.round((score / questions.length) * 100);
         const grade =
-            pct >= 90 ? { label: 'Outstanding!', icon: 'emoji_events',   color: 'text-emerald-600', bg: 'bg-emerald-100', ring: 'ring-emerald-200' }
-            : pct >= 75 ? { label: 'Great job!',  icon: 'celebration',    color: 'text-violet-600',  bg: 'bg-violet-100',  ring: 'ring-violet-200'  }
-            : pct >= 50 ? { label: 'Good effort', icon: 'thumb_up',       color: 'text-amber-600',   bg: 'bg-amber-100',   ring: 'ring-amber-200'   }
-            :             { label: 'Keep going!', icon: 'fitness_center', color: 'text-rose-600',    bg: 'bg-rose-100',    ring: 'ring-rose-200'    };
+            pct >= 90 ? { label: 'Excellent!',   emoji: '🏆', color: 'text-emerald-600', bg: 'bg-emerald-50' }
+            : pct >= 75 ? { label: 'Great job!',  emoji: '🎉', color: 'text-violet-600',  bg: 'bg-violet-50'  }
+            : pct >= 50 ? { label: 'Good effort', emoji: '👍', color: 'text-amber-600',   bg: 'bg-amber-50'   }
+            :             { label: 'Keep trying!',emoji: '💪', color: 'text-rose-600',    bg: 'bg-rose-50'    };
+
         return (
-            <div className="flex flex-col items-center justify-center py-10 text-center space-y-5">
-                <div className={`w-24 h-24 ${grade.bg} ring-4 ${grade.ring} rounded-full flex items-center justify-center`}>
-                    <span className={`material-icons-round text-[44px] ${grade.color}`}>{grade.icon}</span>
-                </div>
-                <div>
-                    <p className={`text-base font-bold ${grade.color}`}>{grade.label}</p>
-                    <p className="text-5xl font-bold text-slate-900 mt-1">{pct}%</p>
-                    <p className="text-slate-400 text-sm mt-1">{score} / {questions.length} correct</p>
-                </div>
-                {streak >= 3 && (
-                    <div className="flex items-center gap-2 px-4 py-2 bg-orange-50 rounded-full border border-orange-100">
-                        <span className="material-icons-round text-orange-500 text-[18px]">local_fire_department</span>
-                        <span className="text-[12px] font-semibold text-orange-600">Best streak: {streak}</span>
+            <div className="flex flex-col items-center justify-center py-6 md:py-12 w-full animate-[fadeIn_0.5s_ease]">
+                <div className="bg-white rounded-[1.5rem] md:rounded-[2.5rem] shadow-2xl shadow-slate-200/50 border border-slate-100 p-6 md:p-10 text-center space-y-6 md:space-y-8 w-full max-w-lg">
+                    <div className={`w-20 h-20 md:w-24 md:h-24 ${grade.bg} rounded-full flex items-center justify-center mx-auto text-3xl md:text-5xl`}>
+                        {grade.emoji}
                     </div>
-                )}
-                <button
-                    onClick={() => {
-                        setCurrent(0); setSelected(null); setRevealed(false);
-                        setScore(0); setDone(false); setFlash(null); setStreak(0);
-                    }}
-                    className="flex items-center gap-2 px-8 py-3 bg-primary text-white rounded-xl font-semibold text-[14px] hover:bg-primary/90 transition-all active:scale-95 shadow-md shadow-primary/20"
-                >
-                    <span className="material-icons-round text-[18px]">replay</span>
-                    Try Again
-                </button>
+                    <div>
+                        <p className={`text-base font-bold ${grade.color}`}>{grade.label}</p>
+                        <h2 className="text-slate-900 font-bold text-5xl md:text-6xl mt-1" style={{ fontFamily: "'Instrument Serif', serif" }}>{pct}%</h2>
+                        <p className="text-slate-500 text-sm mt-1">{score} out of {questions.length} correct</p>
+                    </div>
+
+                    <div className="bg-slate-100 rounded-full h-2 md:h-3 overflow-hidden">
+                        <div
+                            className="h-full bg-gradient-to-r from-primary via-indigo-400 to-primary rounded-full transition-all duration-1000"
+                            style={{ width: `${pct}%` }}
+                        />
+                    </div>
+
+                    <div className="bg-slate-50 rounded-2xl p-4 text-left flex items-center justify-between">
+                        <div>
+                            <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-1">Performance</p>
+                            <p className="text-slate-800 font-semibold">Streak: {streak}</p>
+                        </div>
+                        <div className="text-right">
+                             <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-1">Status</p>
+                             <p className="text-slate-800 font-semibold">{pct >= 50 ? 'Passed' : 'Review Required'}</p>
+                        </div>
+                    </div>
+
+                    <button
+                        onClick={() => {
+                            setCurrent(0); setSelected(null); setRevealed(false); setInputVal('');
+                            setScore(0); setDone(false); setFlash(null); setStreak(0);
+                        }}
+                        className="w-full py-3.5 md:py-4 rounded-xl md:rounded-2xl bg-slate-900 text-white font-bold text-sm md:text-base hover:bg-slate-800 transition-colors shadow-xl hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
+                    >
+                        <span className="material-icons-round text-[20px]">replay</span>
+                        Try Again
+                    </button>
+                </div>
             </div>
         );
     }
 
     if (!q) return null;
+
+    const isMultiple = q.options && q.options.length > 0;
+    const progress   = Math.round((current / questions.length) * 100);
 
     const handleSelect = (i) => {
         if (revealed) return;
@@ -134,8 +161,17 @@ const QuizView = ({ content }) => {
     };
 
     const handleSubmit = () => {
-        if (selected === null || revealed) return;
-        const correct = selected === q.correct_index;
+        if (revealed) return;
+        let correct = false;
+        
+        if (isMultiple) {
+            if (selected === null) return;
+            correct = selected === q.correct_index;
+        } else {
+            if (!inputVal.trim()) return;
+            correct = inputVal.trim().toLowerCase() === q.correct_answer?.toLowerCase();
+        }
+
         setRevealed(true);
         setFlash(correct ? 'correct' : 'wrong');
         playSound(correct ? 'correct' : 'wrong');
@@ -158,99 +194,179 @@ const QuizView = ({ content }) => {
             setSelected(null);
             setRevealed(false);
             setFlash(null);
+            setInputVal('');
         }
     };
 
     return (
-        <div className="space-y-5">
-            <div className="flex items-center justify-between text-[11px] font-semibold text-slate-400 uppercase tracking-widest">
-                <span>Question {current + 1} of {questions.length}</span>
-                <span className="flex items-center gap-1.5">
-                    {streak >= 2 && <span className="material-icons-round text-orange-500 text-[16px] animate-bounce">local_fire_department</span>}
-                    {score} correct
-                </span>
-            </div>
-            <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                <div className="h-full bg-primary rounded-full transition-all duration-500"
-                    style={{ width: `${(current / questions.length) * 100}%` }} />
+        <div className="space-y-6 md:space-y-8 animate-[fadeIn_0.4s_ease]">
+            {/* Progress bar */}
+            <div>
+                <div className="flex items-end justify-between mb-2">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                        Question {current + 1} of {questions.length}
+                    </span>
+                    <span className="text-[10px] font-bold text-primary">{progress}% Completed</span>
+                </div>
+                <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                        className="h-full bg-gradient-to-r from-primary via-indigo-400 to-primary rounded-full transition-all duration-700 ease-out"
+                        style={{ width: `${progress}%`, boxShadow: '0 0 12px rgba(167,139,250,0.3)' }}
+                    />
+                </div>
             </div>
 
-            <div className={`bg-white rounded-2xl p-6 shadow-sm border-2 transition-all duration-300 ${
-                flash === 'correct' ? 'border-emerald-400 shadow-emerald-100/60' :
-                flash === 'wrong'   ? 'border-red-400 shadow-red-100/60' :
-                'border-slate-100'
-            } ${shake ? 'animate-[shake_0.4s_ease]' : ''}`}>
-                <p className="text-[15px] font-semibold text-slate-900 leading-snug">{q.question}</p>
-                {revealed && (
-                    <div className={`mt-4 flex items-start gap-2 p-3 rounded-xl text-[12px] leading-relaxed ${
-                        flash === 'correct' ? 'bg-emerald-50 text-emerald-800' : 'bg-red-50 text-red-800'
-                    }`}>
-                        <span className={`material-icons-round text-[18px] shrink-0 mt-0.5 ${flash === 'correct' ? 'text-emerald-500' : 'text-red-500'}`}>
-                            {flash === 'correct' ? 'check_circle' : 'cancel'}
-                        </span>
-                        <div>
-                            <p className="font-bold mb-0.5">{flash === 'correct' ? 'Correct!' : 'Not quite!'}</p>
-                            <p className="opacity-90">{q.explanation}</p>
+            {/* Question card */}
+            <div className={`relative ${shake ? 'animate-[shake_0.4s_ease]' : ''}`}>
+                <div
+                    className="absolute -top-6 -right-6 w-24 h-24 bg-primary/5 blur-2xl pointer-events-none"
+                    style={{ borderRadius: '42% 58% 70% 30%/45% 45% 55% 55%' }}
+                />
+
+                <div
+                    className={`relative bg-white rounded-2xl md:rounded-[2rem] p-6 md:p-8 shadow-2xl shadow-slate-200/50 border border-slate-100 transition-all duration-300 ${
+                        flash === 'correct' ? 'ring-2 ring-emerald-300/50' :
+                        flash === 'wrong'   ? 'ring-2 ring-rose-300/50'   : ''
+                    }`}
+                >
+                    <span className="inline-block px-3 py-1 bg-slate-50 text-slate-400 text-[9px] font-bold uppercase tracking-widest rounded-full mb-4">
+                        {isMultiple ? 'Multiple Choice' : 'Short Answer'}
+                    </span>
+
+                    <h2
+                        className="text-[18px] md:text-2xl text-slate-800 leading-snug"
+                        style={{ fontFamily: "'Instrument Serif', serif" }}
+                    >
+                        {q.question}
+                    </h2>
+
+                    {revealed && (
+                        <div className={`mt-6 flex items-start gap-3 p-4 rounded-xl md:rounded-2xl text-sm ${
+                            flash === 'correct'
+                                ? 'bg-emerald-50 text-emerald-700'
+                                : 'bg-rose-50 text-rose-700'
+                        }`}>
+                            <span className="material-icons-round text-[18px] shrink-0 mt-0.5">
+                                {flash === 'correct' ? 'check_circle' : 'cancel'}
+                            </span>
+                            <div>
+                                <p className="font-bold text-[13px] mb-1">
+                                    {flash === 'correct' ? 'Correct!' : `Incorrect${!isMultiple ? ` — Answer: ${q.correct_answer}` : ''}`}
+                                </p>
+                                <p className="text-[12px] leading-relaxed opacity-90">{q.explanation}</p>
+                            </div>
                         </div>
-                    </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Options / Input */}
+            {isMultiple ? (
+                <div className="grid grid-cols-1 gap-3 md:gap-4">
+                    {q.options.map((opt, i) => {
+                        const isSelected = selected === i;
+                        const isCorrect  = revealed && i === q.correct_index;
+                        const isWrong    = revealed && isSelected && i !== q.correct_index;
+                        const isDim      = revealed && !isCorrect && !isWrong;
+
+                        return (
+                            <button
+                                key={i}
+                                onClick={() => handleSelect(i)}
+                                disabled={revealed}
+                                className={`group w-full flex items-center gap-4 p-3 md:p-5 border-2 rounded-xl md:rounded-[1.2rem] text-left transition-all duration-200 ${
+                                    isCorrect
+                                        ? 'bg-white border-emerald-400 shadow-lg shadow-emerald-100'
+                                        : isWrong
+                                            ? 'bg-rose-50 border-rose-300'
+                                            : isSelected
+                                                ? 'bg-white border-primary shadow-lg shadow-primary/10'
+                                                : isDim
+                                                    ? 'opacity-40 border-slate-100 grayscale-[0.5]'
+                                                    : 'bg-white border-slate-100 hover:border-primary/30 shadow-sm hover:shadow-md'
+                                }`}
+                            >
+                                <div className={`w-8 h-8 md:w-10 md:h-10 flex-shrink-0 flex items-center justify-center rounded-lg md:rounded-xl font-bold text-sm transition-colors ${
+                                    isCorrect
+                                        ? 'bg-emerald-500 text-white'
+                                        : isWrong
+                                            ? 'bg-rose-400 text-white'
+                                            : isSelected
+                                                ? 'bg-primary text-white'
+                                                : 'bg-slate-100 text-slate-500 group-hover:bg-primary group-hover:text-white'
+                                }`}>
+                                    {isCorrect
+                                        ? <span className="material-icons-round text-[16px]">check</span>
+                                        : isWrong
+                                            ? <span className="material-icons-round text-[16px]">close</span>
+                                            : LETTERS[i]
+                                    }
+                                </div>
+
+                                <span className={`flex-1 text-[14px] md:text-[15px] leading-snug transition-colors ${
+                                    isCorrect ? 'text-emerald-800 font-medium'
+                                    : isWrong ? 'text-rose-700'
+                                    : isSelected ? 'text-slate-900 font-medium'
+                                    : 'text-slate-600 group-hover:text-slate-900'
+                                }`}>
+                                    {opt}
+                                </span>
+
+                                {isSelected && !revealed && (
+                                    <span className="material-icons-round text-primary text-[18px] ml-auto">
+                                        check_circle
+                                    </span>
+                                )}
+                            </button>
+                        );
+                    })}
+                </div>
+            ) : (
+                <div className={`bg-white rounded-2xl md:rounded-[2rem] border-2 p-6 shadow-sm transition-all ${
+                    revealed
+                        ? flash === 'correct' ? 'border-emerald-400' : 'border-rose-300'
+                        : 'border-slate-100 focus-within:border-primary/40 focus-within:shadow-md'
+                }`}>
+                    <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-3">
+                        Your Answer
+                    </label>
+                    <input
+                        type="text"
+                        value={inputVal}
+                        onChange={e => setInputVal(e.target.value)}
+                        disabled={revealed}
+                        placeholder="Type your answer…"
+                        className="w-full bg-transparent text-lg md:text-xl text-slate-800 border-none outline-none placeholder-slate-200 disabled:opacity-60"
+                        style={{ fontFamily: "'Instrument Serif', serif" }}
+                        onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); revealed ? handleNext() : handleSubmit(); } }}
+                    />
+                </div>
+            )}
+
+            {/* Navigation row */}
+            <div className="pt-4">
+                {!revealed ? (
+                    <button
+                        onClick={handleSubmit}
+                        disabled={isMultiple ? selected === null : !inputVal.trim()}
+                        className="w-full py-2 md:py-4 bg-slate-900 text-white rounded-lg md:rounded-xl font-medium text-[14px] md:text-base shadow-xl hover:scale-[1.02] active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                    >
+                        Submit Answer
+                    </button>
+                ) : (
+                    <button
+                        onClick={handleNext}
+                        className={`w-full py-4 text-white rounded-xl md:rounded-2xl font-bold text-[14px] md:text-base shadow-xl hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 ${
+                            flash === 'correct'
+                                ? 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-200'
+                                : 'bg-primary hover:bg-primary/90 shadow-primary/20'
+                        }`}
+                    >
+                        {current + 1 >= questions.length ? 'See Results' : 'Next Question'}
+                        <span className="material-icons-round text-[20px]">arrow_forward</span>
+                    </button>
                 )}
             </div>
-
-            <div className="space-y-2.5">
-                {q.options.map((opt, i) => {
-                    const isSelected = selected === i;
-                    const isCorrect  = revealed && i === q.correct_index;
-                    const isWrong    = revealed && isSelected && i !== q.correct_index;
-                    const isDim      = revealed && !isCorrect && !isWrong;
-
-                    let cls = 'border-slate-200 bg-white text-slate-700 hover:border-primary/40 hover:shadow-sm cursor-pointer';
-                    if (isSelected && !revealed) cls = 'border-primary bg-primary/5 text-slate-900 shadow-md shadow-primary/10 cursor-pointer';
-                    if (isCorrect)  cls = 'border-emerald-400 bg-emerald-50 text-emerald-800 cursor-default';
-                    if (isWrong)    cls = 'border-red-400 bg-red-50 text-red-800 cursor-default';
-                    if (isDim)      cls = 'border-slate-100 bg-slate-50 text-slate-400 cursor-default';
-
-                    return (
-                        <button key={i} onClick={() => handleSelect(i)}
-                            className={`w-full text-left flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all text-[14px] font-medium active:scale-[0.98] ${cls}`}>
-                            <span className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 text-[11px] font-bold transition-all ${
-                                isCorrect    ? 'border-emerald-400 bg-emerald-400 text-white'
-                                : isWrong   ? 'border-red-400 bg-red-400 text-white'
-                                : isSelected ? 'border-primary bg-primary text-white'
-                                : 'border-current'
-                            }`}>
-                                {isCorrect
-                                    ? <span className="material-icons-round text-[13px]">check</span>
-                                    : isWrong
-                                        ? <span className="material-icons-round text-[13px]">close</span>
-                                        : String.fromCharCode(65 + i)
-                                }
-                            </span>
-                            <span className="flex-1">{opt}</span>
-                            {isCorrect && <span className="material-icons-round text-emerald-500 text-[18px]">check_circle</span>}
-                            {isWrong   && <span className="material-icons-round text-red-400 text-[18px]">cancel</span>}
-                        </button>
-                    );
-                })}
-            </div>
-
-            {!revealed ? (
-                <button onClick={handleSubmit} disabled={selected === null}
-                    className="w-full py-3 bg-slate-900 text-white rounded-xl font-semibold text-[14px] hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-[0.98] shadow-lg">
-                    Submit Answer
-                </button>
-            ) : (
-                <button onClick={handleNext}
-                    className={`w-full py-3 text-white rounded-xl font-semibold text-[14px] transition-all active:scale-[0.98] shadow-lg flex items-center justify-center gap-2 ${
-                        flash === 'correct'
-                            ? 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-200'
-                            : 'bg-primary hover:bg-primary/90 shadow-primary/20'
-                    }`}>
-                    <span className="material-icons-round text-[18px]">
-                        {current + 1 >= questions.length ? 'flag' : 'arrow_forward'}
-                    </span>
-                    {current + 1 >= questions.length ? 'See Results' : flash === 'correct' ? 'Keep going!' : 'Next Question'}
-                </button>
-            )}
         </div>
     );
 };
@@ -349,6 +465,15 @@ const ChallengeInterface = () => {
     const [error,      setError]      = useState(null);
     const [completing, setCompleting] = useState(false);
     const [completed,  setCompleted]  = useState(false);
+
+    // Load Instrument Serif
+    useEffect(() => {
+        if (document.querySelector(`link[href="${SERIF_FONT_URL}"]`)) return;
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = SERIF_FONT_URL;
+        document.head.appendChild(link);
+    }, []);
 
     useEffect(() => {
         sprintService.showChallenge(sprintId, challengeId)
