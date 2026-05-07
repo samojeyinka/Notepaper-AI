@@ -271,7 +271,7 @@ export const FloatingAIButton = ({ exclude = [], folderId = null }) => {
                                     translate-x-2 group-hover:translate-x-0
                                     transition-all duration-200
                                     text-[10px] md:text-[12px] font-normal md:font-semibold text-white
-                                    px-1.5 md:px-3 py-1 md:py-1.5 rounded-md md:rounded-xl whitespace-nowrap
+                                    px-1.5 md:px-3 py-1 md:py-1.5 rounded-sm md:rounded-md whitespace-nowrap
                                     shadow-lg select-none pointer-events-none
                                 " style={{ background: item.color }}>
                                     {item.label}

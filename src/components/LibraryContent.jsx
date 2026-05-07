@@ -331,7 +331,7 @@ const FAB = ({ onNote, onPaper, onFolder, onPresentation, onFlashcard }) => {
             {open && items.map((item, i) => (
                 <div key={i} className="flex items-center gap-3"
                     style={{ animation: `slideUpFade 0.18s ease both`, animationDelay: `${i * 40}ms` }}>
-                    <span className="text-[11px] md:text-[12px] md:font-semibold text-slate-700 bg-white shadow-md px-2.5 py-1 rounded-md md:rounded-lg whitespace-nowrap select-none">
+                    <span className="text-[11px] md:text-[12px] md:font-medium text-slate-700 bg-white shadow-md px-2.5 py-1 rounded-sm md:rounded-md whitespace-nowrap select-none">
                         {item.label}
                     </span>
                     <button
