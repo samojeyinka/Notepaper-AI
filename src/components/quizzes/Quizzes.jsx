@@ -330,9 +330,9 @@ export default function Quizzes() {
                     </div>
                     <button
                         onClick={() => navigate('/lockedin/generate?tab=quizzes')}
-                        className="flex items-center gap-2 px-1 md:px-5 py-1 md:py-3 rounded-full bg-primary text-white text-sm md:font-semibold shadow-md shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95"
+                        className="flex items-center gap-2 px-1 md:px-5 py-1 md:py-2 rounded-lg bg-primary text-white text-[12px] md:font-semibold shadow-md shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95"
                     >
-                        <span className="material-icons-round text-[15px] md:text-[16px]">add_circle</span>
+                        <span className="material-icons-round text-[14px] md:text-[15px]">add_circle</span>
                         <span className="hidden sm:inline">Create New Quiz</span>
                     </button>
                 </div>

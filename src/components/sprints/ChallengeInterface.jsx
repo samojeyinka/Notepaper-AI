@@ -400,17 +400,17 @@ const ChallengeInterface = () => {
     return (
         <div className="flex-1 lg:ml-64 min-h-screen" style={{ background: '#F8F9FA' }}>
 
-            <div className="sticky top-0 z-20 bg-white/95 backdrop-blur border-b border-slate-100 px-4 md:px-8 pt-16 lg:pt-0 py-4 flex items-center gap-4">
+            <div className="sticky top-3 md:top-0 z-20 bg-white/95 backdrop-blur border-b border-slate-100 px-4 md:px-8 pt-16 lg:pt-0 py-4 flex items-center gap-4">
                 <button onClick={() => navigate(`/lockedin/sprints/${sprintId}`)}
-                    className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 transition-colors shrink-0">
-                    <span className="material-icons-round text-[18px]">arrow_back</span>
+                    className="w-7 h-7 md:w-9 md:h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 transition-colors shrink-0">
+                    <span className="material-icons-round text-[15px] md:text-[18px]">arrow_back</span>
                 </button>
                 <div className="flex-1 min-w-0">
-                    <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-widest ${meta.bg} ${meta.color} mb-0.5`}>
-                        <span className="material-icons-round text-[12px]">{meta.icon}</span>
+                    <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[8px] md:text-[10px] font-semibold uppercase tracking-widest ${meta.bg} ${meta.color} mb-0.5`}>
+                        <span className="material-icons-round text-[10px] md:text-[12px]">{meta.icon}</span>
                         {meta.label}
                     </div>
-                    <h1 className="text-[15px] font-semibold text-slate-900 truncate">{challenge.title}</h1>
+                    <h1 className="text-[14px] md:text-[15px] font-medium md:font-semibold text-slate-900 truncate">{challenge.title}</h1>
                 </div>
                 {alreadyDone && (
                     <span className="text-emerald-600 flex items-center gap-1 text-[11px] font-semibold shrink-0">
@@ -442,24 +442,24 @@ const ChallengeInterface = () => {
             {!alreadyDone && challenge.content && (
                 <div className="fixed bottom-0 left-0 lg:left-64 right-0 z-50 px-6 py-4 bg-white/95 backdrop-blur border-t border-slate-100">
                     <button onClick={handleComplete} disabled={completing}
-                        className="w-full py-3 bg-primary text-white rounded-xl font-semibold text-[15px] hover:bg-primary/90 disabled:opacity-50 transition-all active:scale-[0.98] shadow-md shadow-primary/20 flex items-center justify-center gap-2">
+                        className="w-full py-2 bg-primary text-white rounded-lg font-medium text-[14px] md:text-[15px] hover:bg-primary/90 disabled:opacity-50 transition-all active:scale-[0.98] shadow-md shadow-primary/20 flex items-center justify-center gap-2">
                         {completing
                             ? <><Loader size="sm" /></>
-                            : <><span className="material-icons-round text-[18px]">check_circle</span> Mark as Complete</>
+                            : <><span className="material-icons-round text-[14px] md:text-[16px]">check_circle</span> Mark as Complete</>
                         }
                     </button>
                 </div>
             )}
 
             {completed && (
-                <div className="fixed bottom-0 left-0 lg:left-64 right-0 z-50 px-6 py-5 bg-emerald-600 border-t border-emerald-500">
+                <div className="fixed bottom-0 left-0 lg:left-64 right-0 z-50 px-4 py-2.5 bg-emerald-600 border-t border-emerald-500">
                     <p className="text-white font-semibold text-[15px] text-center flex items-center justify-center gap-2 mb-3">
                         <span className="material-icons-round text-[20px]">celebration</span>
                         Challenge Complete!
                         <span className="material-icons-round text-[20px]">emoji_events</span>
                     </p>
                     <button onClick={() => navigate(`/lockedin/sprints/${sprintId}`)}
-                        className="w-full py-3 bg-white text-emerald-700 rounded-xl font-semibold text-[15px] hover:bg-emerald-50 transition-all active:scale-[0.98] shadow-md flex items-center justify-center gap-2">
+                        className="w-full py-2 bg-white text-emerald-700 rounded-lg font-semibold text-[15px] hover:bg-emerald-50 transition-all active:scale-[0.98] shadow-md flex items-center justify-center gap-2">
                         <span className="material-icons-round text-[18px]">arrow_back</span>
                         Back to Sprint Roadmap
                     </button>
