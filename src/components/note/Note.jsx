@@ -13,6 +13,7 @@ import { NotePageSidebar } from "./NotePageSidebar";
 import * as htmlToImage from 'html-to-image';
 import { jsPDF } from "jspdf";
 import JSZip from 'jszip';
+import { usePlan } from "../../hooks/usePlan";
 import { useNoteSync } from "../../hooks/useNoteSync";
 import { useUndoHistory } from "../../hooks/useUndoHistory";
 import { deserializeNote, noteService } from "../../api/noteService";
@@ -92,6 +93,8 @@ export const Note = () => {
     // read the latest active page index without capturing a stale closure value.
     const activePageIndexRef = useRef(0);
     const [isRecording, setIsRecording] = useState(false);
+
+    const { isPaid } = usePlan();
 
     // Layout State
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -475,13 +478,14 @@ export const Note = () => {
     const slug = () => title.replace(/\s+/g, '-').toLowerCase() || 'note';
 
     const applyWatermark = (canvas) => {
+        if (isPaid) return;
         const ctx = canvas.getContext('2d');
         const ratio = 2;
 
-        const smallSize = 13 * ratio;
-        const largeSize = 20 * ratio;
-        const lineGap = 8 * ratio;
-        const paddingBottom = 28 * ratio;
+        const smallSize = 11 * ratio;
+        const largeSize = 16 * ratio;
+        const lineGap = 6 * ratio;
+        const paddingBottom = 22 * ratio;
 
         const cx = canvas.width / 2;
         const largeY = canvas.height - paddingBottom;
@@ -491,12 +495,12 @@ export const Note = () => {
         ctx.textBaseline = 'alphabetic';
 
         ctx.font = `300 ${smallSize}px 'DM Sans', sans-serif`;
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
         ctx.fillText('Written with', cx, smallY);
 
-        ctx.font = `500 ${largeSize}px 'DM Sans', sans-serif`;
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.28)';
-        ctx.fillText('Notepaper-ai.com', cx, largeY);
+        ctx.font = `600 ${largeSize}px 'DM Sans', sans-serif`;
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
+        ctx.fillText('NotepaperAI', cx, largeY);
     };
 
     const capturePages = async () => {

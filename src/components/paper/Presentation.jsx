@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import Loader from '../globals/Loader';
 import { useParams, useNavigate } from "react-router-dom";
+import { usePlan } from "../../hooks/usePlan";
 import { presentationService } from "../../api/presentationService";
 
 // ── Theme definitions ─────────────────────────────────────────────────────────
@@ -949,9 +950,10 @@ const addThemeArtToPptx = (slide, PptxGenJS, themeId, t) => {
 };
 
 // ── PPTX export ───────────────────────────────────────────────────────────────
-const exportAsPPTX = async (slides, themeId, title) => {
+const exportAsPPTX = async (slides, themeId, title, isPaid) => {
     const PptxGenJS = (await import('pptxgenjs')).default;
     const pptx = new PptxGenJS();
+    pptx.isPaid = isPaid; // Pass down to slides loop
     const t    = getTheme(themeId);
     pptx.title  = title||'Presentation';
     pptx.author = 'NotepaperAI';
@@ -965,6 +967,18 @@ const exportAsPPTX = async (slides, themeId, title) => {
         const filledBullets = (s.bullets??[]).filter(b=>stripHtml(b).trim());
         const titleHex  = (s.titleColor||'').replace('#','')||t.pptxText;
         const bodyHex   = (s.bodyColor||'').replace('#','')||t.pptxSub;
+
+        // Watermark: NotepaperAI
+        if (!pptx.isPaid) {
+            slide.addText('NotepaperAI', {
+                x: '85%', y: '92%', w: '12%', h: 0.3,
+                fontSize: 10,
+                bold: true,
+                color: '94a3b8', // slate-400
+                align: 'right',
+                fontFace: 'Calibri'
+            });
+        }
 
         // Background: custom > theme
         const customBgHex = s.bgColor ? extractHexForPptx(s.bgColor) : null;
@@ -1027,6 +1041,7 @@ const exportAsPPTX = async (slides, themeId, title) => {
 export const Presentation = () => {
     const { id }   = useParams();
     const navigate = useNavigate();
+    const { isPaid } = usePlan();
 
     const [presentation, setPresentation] = useState(null);
     const [slides, setSlides]             = useState([]);
@@ -1177,7 +1192,18 @@ export const Presentation = () => {
                     filter: (node) => !node.dataset?.pdfHide,
                 });
                 if (i > 0) pdf.addPage([W, H], 'landscape');
+
+                // Add watermark to the image before adding to PDF
+                // We do this by drawing on a temporary canvas or using jsPDF text
+                // Since we already have the dataUrl (screenshot), we can just draw text over it in PDF
                 pdf.addImage(dataUrl, 'PNG', 0, 0, W, H);
+
+                // PDF Watermark
+                if (!isPaid) {
+                    pdf.setFontSize(8);
+                    pdf.setTextColor(148, 163, 184); // slate-400
+                    pdf.text('NotepaperAI', W - 10, H - 8, { align: 'right' });
+                }
             }
             pdf.save(`${(title || 'presentation').replace(/\s+/g, '-').toLowerCase()}.pdf`);
         } catch (e) {
@@ -1203,7 +1229,7 @@ export const Presentation = () => {
     const handleExportPPTX = async () => {
         if (!presentation) return;
         setExporting(true);
-        try { await exportAsPPTX(slides, themeId, title); }
+        try { await exportAsPPTX(slides, themeId, title, isPaid); }
         catch (e) { console.error(e); alert('Export failed.'); }
         finally { setExporting(false); }
     };

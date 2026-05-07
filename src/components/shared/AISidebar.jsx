@@ -258,7 +258,20 @@ export const AISidebar = ({ sourceType, sourceId, sourceTitle }) => {
                     </button>
 
                     {scholaOpen && (
-                        <div className="px-2 md:px-3 pb-2 md:pb-3 flex flex-col gap-2 border-t border-primary/10">
+                        <div className="px-2 md:px-3 pb-2 md:pb-3 flex flex-col gap-2 border-t border-primary/10 relative">
+                            {!isPaid && (
+                                <div className="absolute inset-0 z-20 bg-white/40 backdrop-blur-[2px] flex flex-col items-center justify-center p-6 text-center">
+                                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg mb-3">
+                                        <span className="material-icons-round text-white text-[24px]">workspace_premium</span>
+                                    </div>
+                                    <h4 className="text-sm font-bold text-slate-800 mb-1">Premium Features</h4>
+                                    <p className="text-[10px] text-slate-500 mb-4 leading-relaxed">Upgrade to Pro to unlock Quizzes, Topic Expansion, and Simplification.</p>
+                                    <button onClick={() => navigate('/lockedin/upgrade')}
+                                        className="px-4 py-2 bg-slate-900 text-white rounded-xl text-[11px] font-bold shadow-lg hover:bg-black transition-all active:scale-95">
+                                        View Plans
+                                    </button>
+                                </div>
+                            )}
                             <p className="text-[8px] md:text-[9px] font-normal text-primary/60 uppercase tracking-widest px-1 pt-2.5">Powered by Schola</p>
 
                             {/* ── Generate Quiz ── */}

@@ -15,7 +15,7 @@ const THEMES = [
     { id: 'pastel',    label: 'Pastel',    gradient: 'from-pink-100 to-indigo-100', accent: '#8b5cf6', dark: true },
 ];
 
-const SLIDE_COUNT_OPTIONS = [5, 8, 10, 12, 15, 20];
+const SLIDE_COUNT_OPTIONS = [5, 8, 10, 12, 15, 20, 25, 30, 40, 50, 60, 75, 100, 125, 150];
 
 function stripHtml(html) {
     const div = document.createElement('div');
@@ -24,8 +24,9 @@ function stripHtml(html) {
 }
 
 export const GeneratePresentationModal = ({ onClose, paperId, paperTitle, pages, onGenerated }) => {
-    const { canUseAI, increment, loaded } = usePlan();
-    const [slideCount, setSlideCount] = useState(10);
+    const { canUseAI, increment, loaded, planLimit } = usePlan();
+    const maxSlides = planLimit('max_slide_count') ?? 20;
+    const [slideCount, setSlideCount] = useState(Math.min(10, maxSlides));
     const [theme, setTheme]           = useState('modern');
     const [status, setStatus]         = useState('idle'); // idle | generating | saving | done | error
     const [error, setError]           = useState(null);
@@ -132,13 +133,13 @@ STRICT RULES:
                             <div>
                                 <p className="text-[10px] md:text-[11px] font-medium md:font-bold text-slate-500 uppercase tracking-widest mb-3">Number of Slides</p>
                                 <div className="flex flex-wrap gap-2">
-                                    {SLIDE_COUNT_OPTIONS.map(n => (
+                                    {SLIDE_COUNT_OPTIONS.filter(n => n <= maxSlides).map(n => (
                                         <button key={n} onClick={() => setSlideCount(n)}
                                             className={`px-2 py-1 md:px-4 md:py-2 rounded-md md:rounded-xl text-[12px] md:text-sm font-medium md:font-semibold transition-all border ${slideCount===n?'bg-primary text-white border-primary shadow-lg shadow-primary/20':'bg-slate-50 text-slate-600 border-slate-100 hover:border-slate-200'}`}>
                                             {n}
                                         </button>
                                     ))}
-                                    <input type="number" min={3} max={50} value={slideCount} onChange={(e) => setSlideCount(Math.min(50, Math.max(3, Number(e.target.value))))}
+                                    <input type="number" min={3} max={maxSlides} value={slideCount} onChange={(e) => setSlideCount(Math.min(maxSlides, Math.max(3, Number(e.target.value))))}
                                         className="w-16 md:w-20 px-3 py-2 rounded-xl text-sm font-semibold text-center border border-slate-200 bg-slate-50 text-slate-600 outline-none focus:border-primary"
                                         placeholder="Custom" />
                                 </div>

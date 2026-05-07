@@ -15,6 +15,7 @@ import { DocumentImportModal } from "./DocumentImportModal";
 import { GeneratePresentationModal } from "./GeneratePresentationModal";
 import ShakespeareModal from "../note/ShakespeareModal";
 import YouTubeTranscriptModal from "../note/YouTubeTranscriptModal";
+import { usePlan } from "../../hooks/usePlan";
 import { usePaperSync } from "../../hooks/usePaperSync";
 import { useUndoHistory } from "../../hooks/useUndoHistory";
 import { deserializePaper, paperService } from "../../api/paperService";
@@ -58,6 +59,8 @@ export const Paper = () => {
     const navigate        = useNavigate();
     const [searchParams]  = useSearchParams();
     const location        = useLocation();
+
+    const { isPaid } = usePlan();
 
     // Core state
     const [paperId, setPaperId]       = useState(routeId ?? null);
@@ -326,17 +329,37 @@ export const Paper = () => {
     // Export
     const slug = () => title.replace(/\s+/g,'-').toLowerCase() || 'paper';
 
-    // const applyWatermark = (canvas) => {
-    //     const ctx = canvas.getContext('2d'); const r = 2;
-    //     const lY = canvas.height - 28*r, sY = lY - 20*r - 8*r;
-    //     ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
-    //     ctx.font = `300 ${13*r}px 'DM Sans',sans-serif`; ctx.fillStyle = 'rgba(0,0,0,0.2)'; ctx.fillText('Written with', canvas.width/2, sY);
-    //     ctx.font = `500 ${20*r}px 'DM Sans',sans-serif`; ctx.fillStyle = 'rgba(0,0,0,0.28)'; ctx.fillText('Notepaper-ai.com', canvas.width/2, lY);
-    // };
+    const applyWatermark = (canvas) => {
+        if (isPaid) return;
+        const ctx = canvas.getContext('2d');
+        const ratio = 2;
+        const smallSize = 11 * ratio;
+        const largeSize = 16 * ratio;
+        const lineGap = 6 * ratio;
+        const paddingBottom = 22 * ratio;
+
+        const cx = canvas.width / 2;
+        const largeY = canvas.height - paddingBottom;
+        const smallY = largeY - largeSize - lineGap;
+
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'alphabetic';
+        ctx.font = `300 ${smallSize}px 'DM Sans', sans-serif`;
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+        ctx.fillText('Written with', cx, smallY);
+
+        ctx.font = `600 ${largeSize}px 'DM Sans', sans-serif`;
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
+        ctx.fillText('NotepaperAI', cx, largeY);
+    };
 
     const capturePages = async () => {
         const refs = pageRefsRef.current.filter(Boolean); const canvases = [];
-        for (const el of refs) { const c = await htmlToImage.toCanvas(el, { pixelRatio:2,useCORS:true }); canvases.push(c); }
+        for (const el of refs) {
+            const c = await htmlToImage.toCanvas(el, { pixelRatio:2,useCORS:true });
+            applyWatermark(c);
+            canvases.push(c);
+        }
         return canvases;
     };
 
