@@ -56,7 +56,7 @@ const MaterialPickerModal = ({
             onClick={onClose}
         >
             <div
-                className="bg-white w-full sm:max-w-md rounded-t-[2rem] sm:rounded-[2rem] shadow-2xl flex flex-col overflow-hidden"
+                className="bg-white w-full sm:max-w-md rounded-t-[1rem] sm:rounded-[1rem] shadow-2xl flex flex-col overflow-hidden"
                 style={{ maxHeight: '85vh' }}
                 onClick={e => e.stopPropagation()}
             >

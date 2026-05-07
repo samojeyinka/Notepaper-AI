@@ -76,7 +76,7 @@ const MaterialPickerModal = ({ tab, setTab, search, setSearch, selected, onToggl
 
     return (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" style={{ background: 'rgba(15,23,42,0.5)', backdropFilter: 'blur(4px)' }}>
-            <div ref={ref} className="bg-white w-full sm:max-w-md rounded-t-[2rem] sm:rounded-[2rem] shadow-2xl flex flex-col overflow-hidden" style={{ maxHeight: '85vh' }}>
+            <div ref={ref} className="bg-white w-full sm:max-w-md rounded-t-[1rem] sm:rounded-[1rem] shadow-2xl flex flex-col overflow-hidden" style={{ maxHeight: '85vh' }}>
                 <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-slate-100 shrink-0">
                     <h3 className="font-semibold text-[15px] text-slate-800">Add Materials</h3>
                     <button onClick={onClose} className="w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:bg-slate-100 transition-colors">

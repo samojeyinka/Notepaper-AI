@@ -73,7 +73,6 @@ const SprintGenerating = ({ sprint, onReady }) => {
                 <div className="h-2 bg-slate-200 rounded-full overflow-hidden mb-2">
                     <div className="h-full bg-primary rounded-full transition-all duration-1000" style={{ width: `${pct}%` }} />
                 </div>
-                <p className="text-[12px] text-slate-400 mb-8">Checking every 5 seconds…</p>
 
                 <div className="bg-white rounded-xl md:rounded-2xl p-4 md:p-6 text-left space-y-4" style={{ boxShadow: '0 10px 30px rgba(44,47,50,0.06)' }}>
                     <p className="text-[13px] text-slate-600 leading-relaxed">
