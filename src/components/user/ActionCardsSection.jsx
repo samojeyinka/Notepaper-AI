@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Loader from '../globals/Loader';
 import { useNavigate } from "react-router-dom";
 import { presentationService } from "../../api/presentationService";
 import { CreateFolderModal } from "./FloatingAIButton";
@@ -8,9 +9,7 @@ export const ActionCard = ({ icon, label, shapeClass, bgColor, url, onClick, loa
   const inner = (
     <>
       <div className={`${shapeClass} ${bgColor} w-8 h-8 md:w-24 md:h-24 flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform`}>
-        <span className={`material-icons-round text-[14px] md:text-3xl ${loading ? 'animate-spin' : ''}`}>
-          {loading ? 'sync' : icon}
-        </span>
+        {loading ? <Loader size="xs" /> : <span className="material-icons-round text-[14px] md:text-3xl">{icon}</span>}
       </div>
       <span className="font-medium md:font-semibold text-[12px] md:text-lg">{label}</span>
     </>
@@ -67,7 +66,7 @@ export const ActionCardsSection = () => {
     // Page 2
     { icon: 'folder_open',           label: 'New Folder',    shapeClass: 'rounded-xl',     bgColor: 'bg-orange-400', onClick: () => setShowFolderModal(true) },
     { icon: 'collections_bookmark',  label: 'Library',       shapeClass: 'rounded-full',   bgColor: 'bg-teal-500',   url: 'library' },
-    { icon: 'quiz',                  label: 'AI Quiz',       shapeClass: 'blob-shape',     bgColor: 'bg-rose-500',   url: 'generate' },
+    { icon: 'quiz',                  label: 'AI Quiz',       shapeClass: 'blob-shape',     bgColor: 'bg-rose-500',   url: 'quizzes' },
   ];
 
   const TOTAL_PAGES = Math.ceil(ALL_CARDS.length / PAGE_SIZE);

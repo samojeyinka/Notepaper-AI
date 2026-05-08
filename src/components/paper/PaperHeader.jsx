@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import Loader from '../globals/Loader';
 import { Link } from "react-router-dom";
 
 const STATUS_CONFIG = {
@@ -172,7 +173,7 @@ export const PaperHeader = ({
                     />
                     {status.label && (
                         <span className={`flex items-center gap-0.5 md:gap-1 px-1 md:px-2 py-0.5 md:py-1 rounded-lg text-[8px] md:text-[10px] font-medium uppercase tracking-wider transition-all duration-300 ${status.cls}`}>
-                            <span className={`material-icons-round text-[10px] md:text-[14px] ${saveStatus === 'saving' ? 'animate-spin' : ''}`}>{status.icon}</span>
+                            {saveStatus === 'saving' ? <Loader size="xs" /> : <span className="material-icons-round text-[10px] md:text-[14px]">{status.icon}</span>}
                             {status.label}
                         </span>
                     )}
@@ -202,7 +203,7 @@ export const PaperHeader = ({
                     <button
                         onClick={onGeneratePresentation}
                         title="Generate Presentation from this Paper"
-                        className="flex items-center gap-1 md:gap-1.5 px-1.5 md:px-3 py-1 md:py-1.5 rounded-xl text-[9px] md:text-[10px] font-medium bg-gradient-to-r from-primary to-indigo-500 text-white shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:scale-105 active:scale-95 transition-all"
+                        className="md:ml-3 flex items-center gap-1 md:gap-1.5 px-1.5 md:px-3 py-1 md:py-1.5 rounded md:rounded-md text-[9px] md:text-[10px] font-medium bg-gradient-to-r from-primary to-indigo-500 text-white shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:scale-105 active:scale-95 transition-all"
                     >
                         <span className="material-icons-round text-[12px] md:text-[15px]">slideshow</span>
                         <span className="inline">Generate Slides</span>

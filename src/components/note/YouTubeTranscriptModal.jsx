@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import Loader from '../globals/Loader';
 import { createPortal } from 'react-dom';
 
 // ─── Fetch readable text from any URL via Jina Reader ────────────────────────
@@ -122,8 +123,7 @@ const WebToTextModal = ({ onClose, onInsert }) => {
 
                     {status === 'fetching' && (
                         <div className="flex items-center justify-center py-8 gap-2 text-slate-400">
-                            <span className="material-icons-round text-primary text-[16px] md:text-[28px] animate-spin">sync</span>
-                            <span className="text-[12px]">Extracting content…</span>
+                            <Loader size="sm" />
                         </div>
                     )}
 

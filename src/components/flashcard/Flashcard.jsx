@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import Loader from '../globals/Loader';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { flashcardService } from '../../api/flashcardService';
 import { invalidateFlashcardCache } from '../../pages/FlashcardsPage';
@@ -165,7 +166,7 @@ export const Flashcard = ({ id }) => {
     if (loading) {
         return (
             <div className="flex-1 lg:ml-64 flex items-center justify-center h-screen">
-                <span className="material-icons-round text-primary text-[40px] animate-spin">sync</span>
+                <Loader size="xl" />
             </div>
         );
     }

@@ -79,7 +79,7 @@ function OtpInput({ value, onChange, disabled }) {
           onKeyDown={(e) => handleKeyDown(i, e)}
           disabled={disabled}
           autoFocus={i === 0}
-          className={`w-10 h-12 text-center text-lg font-bold rounded-xl border-2 outline-none transition-all duration-150 focus:border-purple-500 focus:ring-2 focus:ring-purple-100 ${digit ? 'border-purple-400 bg-purple-50' : 'border-slate-200 bg-white'}`}
+          className={`w-7 md:w-10 h-7 md:h-12 text-center text-[15px] md:text-lg font-medium md:font-bold rounded-lg md:rounded-xl border-2 outline-none transition-all duration-150 focus:border-purple-500 focus:ring-2 focus:ring-purple-100 ${digit ? 'border-purple-400 bg-purple-50' : 'border-slate-200 bg-white'}`}
           style={{ color: '#1e293b', caretColor: '#7c3aed' }}
         />
       ))}
@@ -176,37 +176,37 @@ export default function TwoFactorModal({ isOpen, onClose, currentlyEnabled, onSu
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
+        className="bg-white rounded-xl md:rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
         style={{ boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)' }}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-purple-100 flex items-center justify-center">
+            <div className="w-7 h-7 md:w-9 md:h-9 rounded-lg md:rounded-xl bg-purple-100 flex items-center justify-center">
               <span className="material-symbols-outlined text-purple-600" style={{ fontSize: '20px' }}>
                 {mode === 'enable' ? 'security' : 'lock_open'}
               </span>
             </div>
             <div>
-              <h3 className="font-bold text-slate-900 text-[15px]">
+              <h3 className="font-medium md:font-bold text-slate-900 text-[15px]">
                 {mode === 'enable' ? 'Enable 2FA' : 'Disable 2FA'}
               </h3>
-              <p className="text-xs text-slate-400">
+              <p className="text-[11.5px] md:text-xs text-slate-400">
                 {mode === 'enable' ? 'Add an extra layer of security' : 'Remove two-factor authentication'}
               </p>
             </div>
           </div>
-          <button onClick={onClose} className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center transition-colors">
+          <button onClick={onClose} className="w-6 h-6 md:w-8 md:h-8 rounded-full hover:bg-slate-100 flex items-center justify-center transition-colors">
             <span className="material-symbols-outlined text-slate-400" style={{ fontSize: '18px' }}>close</span>
           </button>
         </div>
 
         {/* Body */}
-        <div className="px-6 py-6">
+        <div className="px-3 py-3 md:px-6 md:py-6">
 
           {/* Error */}
           {error && (
-            <div className="mb-4 flex items-start gap-2 p-3 bg-red-50 border border-red-100 rounded-xl text-sm text-red-600">
+            <div className="mb-2 md:mb-4 flex items-start gap-2 p-1.5 md:p-3 bg-red-50 border border-red-100 rounded-md md:rounded-xl text-[12px] md:text-sm text-red-600">
               <span className="material-symbols-outlined mt-0.5" style={{ fontSize: '16px' }}>error</span>
               <span>{error}</span>
             </div>
@@ -215,17 +215,17 @@ export default function TwoFactorModal({ isOpen, onClose, currentlyEnabled, onSu
           {/* ── STEP: setup ──────────────────────────── */}
           {step === 'setup' && (
             <div className="text-center">
-              <div className="w-16 h-16 rounded-2xl bg-indigo-50 flex items-center justify-center mx-auto mb-4">
+              <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-indigo-50 flex items-center justify-center mx-auto mb-4">
                 <span className="material-symbols-outlined text-indigo-500 text-4xl">qr_code_2</span>
               </div>
-              <h4 className="font-bold text-slate-800 mb-2">Set Up Authenticator</h4>
-              <p className="text-slate-500 text-sm mb-6 leading-relaxed">
+              <h4 className="text-[14px] md:text-base font-medium md:font-bold text-slate-800 mb-2">Set Up Authenticator</h4>
+              <p className="text-slate-500 text-[12px] md:text-sm mb-3 md:mb-6 leading-relaxed">
                 You'll need an authenticator app like <strong>Google Authenticator</strong> or <strong>Authy</strong> to scan the QR code on the next step.
               </p>
               <button
                 onClick={handleSetup}
                 disabled={loading}
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-1.5 rounded-xl transition-all active:scale-[0.98] disabled:opacity-60"
+                className="w-full text-[14px] md:text-base bg-purple-600 hover:bg-purple-700 text-white font-medium py-1.5  rounded-md md:rounded-xl transition-all active:scale-[0.98] disabled:opacity-60"
                 style={{ boxShadow: '0 10px 20px -5px rgba(124,58,237,0.3)' }}
               >
                 {loading ? 'Generating QR Code...' : 'Generate QR Code →'}
@@ -239,17 +239,17 @@ export default function TwoFactorModal({ isOpen, onClose, currentlyEnabled, onSu
               {/* Show QR only when enabling */}
               {mode === 'enable' && setupData && (
                 <div className="mb-6">
-                  <p className="text-sm font-semibold text-slate-700 mb-3 text-center">
+                  <p className="text-[14px] md:text-sm font-medium md:font-semibold text-slate-700 mb-3 text-center">
                     Scan with your authenticator app
                   </p>
                   <div className="flex flex-col items-center gap-3">
                     <QrCanvas value={setupData.qr_url} />
                     {/* Manual entry fallback */}
                     <details className="w-full text-center">
-                      <summary className="text-xs text-slate-400 cursor-pointer hover:text-slate-600 transition-colors">
+                      <summary className="text-[11px] md:text-xs text-slate-400 cursor-pointer hover:text-slate-600 transition-colors">
                         Can't scan? Enter manually
                       </summary>
-                      <div className="mt-2 p-3 bg-slate-50 rounded-xl font-mono text-xs text-slate-600 break-all select-all border border-slate-200">
+                      <div className="w-[fit-content] m-auto mt-1 md:mt-2 p-1.5 md:p-3 bg-slate-50 rounded-md md:rounded-xl font-mono text-xs text-slate-600 break-all select-all border border-slate-200">
                         {setupData.secret_key}
                       </div>
                     </details>
@@ -258,10 +258,10 @@ export default function TwoFactorModal({ isOpen, onClose, currentlyEnabled, onSu
                 </div>
               )}
 
-              <p className="text-sm font-semibold text-slate-700 mb-1 text-center">
+              <p className="text-[13px] md:text-sm font-medium md:font-semibold text-slate-700 mb-1 text-center">
                 {mode === 'enable' ? 'Enter the 6-digit code shown in your app' : 'Enter your current authenticator code to confirm'}
               </p>
-              <p className="text-xs text-slate-400 text-center mb-4">
+              <p className="text-[11px] md:text-xs text-slate-400 text-center mb-4">
                 The code refreshes every 30 seconds
               </p>
 
@@ -270,7 +270,7 @@ export default function TwoFactorModal({ isOpen, onClose, currentlyEnabled, onSu
               <button
                 onClick={handleVerify}
                 disabled={loading || otp.length < 6}
-                className="mt-6 w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-xl transition-all active:scale-[0.98] disabled:opacity-60"
+                className="mt-6 w-full bg-purple-600 hover:bg-purple-700 text-white font-medium md:font-bold py-1.5 md:py-3 rounded-lg md:rounded-xl transition-all active:scale-[0.98] disabled:opacity-60"
                 style={{ boxShadow: '0 10px 20px -5px rgba(124,58,237,0.3)' }}
               >
                 {loading ? 'Verifying...' : mode === 'enable' ? 'Enable 2FA' : 'Disable 2FA'}
@@ -300,7 +300,7 @@ export default function TwoFactorModal({ isOpen, onClose, currentlyEnabled, onSu
               </p>
               <button
                 onClick={onClose}
-                className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl transition-all active:scale-[0.98]"
+                className="w-full text-[14px] md:text-base bg-slate-900 hover:bg-slate-800 text-white font-medium md:font-bold py-1.5 md:py-3 rounded-md md:rounded-xl transition-all active:scale-[0.98]"
               >
                 Done
               </button>

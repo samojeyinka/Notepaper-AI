@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
+import Loader from '../globals/Loader';
 import { useParams, useNavigate } from "react-router-dom";
+import { usePlan } from "../../hooks/usePlan";
 import { presentationService } from "../../api/presentationService";
 
 // ── Theme definitions ─────────────────────────────────────────────────────────
@@ -948,9 +950,10 @@ const addThemeArtToPptx = (slide, PptxGenJS, themeId, t) => {
 };
 
 // ── PPTX export ───────────────────────────────────────────────────────────────
-const exportAsPPTX = async (slides, themeId, title) => {
+const exportAsPPTX = async (slides, themeId, title, isPaid) => {
     const PptxGenJS = (await import('pptxgenjs')).default;
     const pptx = new PptxGenJS();
+    pptx.isPaid = isPaid; // Pass down to slides loop
     const t    = getTheme(themeId);
     pptx.title  = title||'Presentation';
     pptx.author = 'NotepaperAI';
@@ -964,6 +967,18 @@ const exportAsPPTX = async (slides, themeId, title) => {
         const filledBullets = (s.bullets??[]).filter(b=>stripHtml(b).trim());
         const titleHex  = (s.titleColor||'').replace('#','')||t.pptxText;
         const bodyHex   = (s.bodyColor||'').replace('#','')||t.pptxSub;
+
+        // Watermark: NotepaperAI
+        if (!pptx.isPaid) {
+            slide.addText('NotepaperAI', {
+                x: '85%', y: '92%', w: '12%', h: 0.3,
+                fontSize: 10,
+                bold: true,
+                color: '94a3b8', // slate-400
+                align: 'right',
+                fontFace: 'Calibri'
+            });
+        }
 
         // Background: custom > theme
         const customBgHex = s.bgColor ? extractHexForPptx(s.bgColor) : null;
@@ -1026,6 +1041,7 @@ const exportAsPPTX = async (slides, themeId, title) => {
 export const Presentation = () => {
     const { id }   = useParams();
     const navigate = useNavigate();
+    const { isPaid } = usePlan();
 
     const [presentation, setPresentation] = useState(null);
     const [slides, setSlides]             = useState([]);
@@ -1176,7 +1192,18 @@ export const Presentation = () => {
                     filter: (node) => !node.dataset?.pdfHide,
                 });
                 if (i > 0) pdf.addPage([W, H], 'landscape');
+
+                // Add watermark to the image before adding to PDF
+                // We do this by drawing on a temporary canvas or using jsPDF text
+                // Since we already have the dataUrl (screenshot), we can just draw text over it in PDF
                 pdf.addImage(dataUrl, 'PNG', 0, 0, W, H);
+
+                // PDF Watermark
+                if (!isPaid) {
+                    pdf.setFontSize(8);
+                    pdf.setTextColor(148, 163, 184); // slate-400
+                    pdf.text('NotepaperAI', W - 10, H - 8, { align: 'right' });
+                }
             }
             pdf.save(`${(title || 'presentation').replace(/\s+/g, '-').toLowerCase()}.pdf`);
         } catch (e) {
@@ -1202,7 +1229,7 @@ export const Presentation = () => {
     const handleExportPPTX = async () => {
         if (!presentation) return;
         setExporting(true);
-        try { await exportAsPPTX(slides, themeId, title); }
+        try { await exportAsPPTX(slides, themeId, title, isPaid); }
         catch (e) { console.error(e); alert('Export failed.'); }
         finally { setExporting(false); }
     };
@@ -1212,8 +1239,7 @@ export const Presentation = () => {
 
     if (loading) return (
         <div className="flex flex-col flex-1 h-screen items-center justify-center bg-slate-50 lg:ml-64">
-            <span className="material-icons-round text-primary text-[30pxpx] md:text-[48px] animate-spin">sync</span>
-
+            <Loader size="xl" />
         </div>
     );
     if (error || !presentation) return (
@@ -1247,7 +1273,7 @@ export const Presentation = () => {
                     </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                    {saving && <span className="flex items-center gap-1 text-[11px] text-amber-500"><span className="material-icons-round text-[13px] animate-spin">sync</span>Saving…</span>}
+                    {saving && <span className="flex items-center gap-1 text-[11px] text-amber-500"><Loader size="xs" /></span>}
                     {!saving && saveMsg==='saved' && <span className="flex items-center gap-1 text-[11px] text-green-500"><span className="material-icons-round text-[13px]">check</span>Saved</span>}
                     <button onClick={() => setShowNotes(v=>!v)}
                         className={`flex items-center gap-1 md:gap-1.5 px-1.5 py-1 md:px-3 md:py-1.5 rounded-xl text-[11px] md:text-xs font-medium md:font-semibold transition-all ${showNotes?'bg-amber-50 text-amber-600 border border-amber-200':'text-slate-500 hover:bg-slate-100'}`}>
@@ -1264,7 +1290,7 @@ export const Presentation = () => {
                             className="flex items-center gap-1 md:gap-1.5 px-2 md:px-4 py-1 md:py-1.5 rounded-md md:rounded-xl text-[9px] md:text-xs font-normal md:font-semibold bg-primary text-white hover:bg-primary/90 active:scale-95 transition-all shadow-md shadow-primary/20 disabled:opacity-60"
                         >
                             {(exporting || exportingPdf)
-                                ? <><span className="material-icons-round text-[14px] animate-spin">sync</span>{exportingPdf ? 'Exporting PDF…' : 'Exporting…'}</>
+                                ? <><Loader size="xs" />{exportingPdf ? 'Exporting PDF…' : 'Exporting…'}</>
                                 : <><span className="material-icons-round text-[14px]">download</span>Export<span className="material-icons-round text-[14px] ml-0.5">expand_more</span></>}
                         </button>
                         {showExportMenu && (

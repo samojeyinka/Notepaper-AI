@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import Loader from './globals/Loader';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { folderService } from '../api/folderService';
 import { noteService } from '../api/noteService';
@@ -249,6 +250,40 @@ const FlashcardCard = ({ deck, onClick }) => {
     );
 };
 
+// ── List row (shared across tabs) ─────────────────────────────────────────────
+const ListRow = ({ icon, iconBg, iconText, title, sub, meta, date, onClick }) => (
+    <button
+        onClick={onClick}
+        className="w-full grid grid-cols-1 md:grid-cols-12 items-center gap-3 px-5 py-3.5 border-b border-slate-100 last:border-0 hover:bg-slate-50/60 transition-colors text-left"
+    >
+        <div className="col-span-6 flex items-center gap-3 min-w-0">
+            <div className={`w-9 h-9 rounded-xl ${iconBg} flex items-center justify-center shrink-0`}>
+                <span className={`material-icons-round text-[17px] ${iconText}`}>{icon}</span>
+            </div>
+            <div className="min-w-0">
+                <p className="text-[13px] font-semibold text-slate-800 truncate">{title}</p>
+                {sub && <p className="text-[11px] text-slate-400 truncate mt-0.5">{sub}</p>}
+            </div>
+        </div>
+        <div className="col-span-3 text-[12px] text-slate-400 truncate">{meta}</div>
+        <div className="col-span-3 text-[12px] text-slate-400 text-right">{date}</div>
+    </button>
+);
+
+const ListHeader = ({ cols }) => (
+    <div className="hidden md:grid grid-cols-12 gap-3 px-5 py-2.5 border-b border-slate-100 bg-slate-50/60">
+        {cols.map(({ label, cls }) => (
+            <div key={label} className={`text-[10px] font-semibold text-slate-400 uppercase tracking-widest ${cls}`}>{label}</div>
+        ))}
+    </div>
+);
+
+const LIST_HEADER_COLS = [
+    { label: 'Name',    cls: 'col-span-6' },
+    { label: 'Details', cls: 'col-span-3' },
+    { label: 'Updated', cls: 'col-span-3 text-right' },
+];
+
 // ── Pagination controls ───────────────────────────────────────────────────────
 const Pagination = ({ meta, loading, onMore, onLess }) => {
     if (!meta || meta.last_page <= 1) return null;
@@ -263,7 +298,7 @@ const Pagination = ({ meta, loading, onMore, onLess }) => {
             {meta.current_page < meta.last_page && (
                 <button onClick={onMore} disabled={loading}
                     className="flex items-center gap-1.5 px-1 md:px-4 py-1 md:py-1.5 rounded-md md:rounded-xl border border-slate-200 text-[12px] md:text-[13px] font-medium text-slate-500 hover:border-primary hover:text-primary disabled:opacity-40 transition-colors">
-                    {loading ? <span className="material-icons-round text-[15px] animate-spin">sync</span> : <span className="material-icons-round text-[15px]">expand_more</span>}
+                    {loading ? <Loader size="xs" /> : <span className="material-icons-round text-[15px]">expand_more</span>}
                     View more
                 </button>
             )}
@@ -296,7 +331,7 @@ const FAB = ({ onNote, onPaper, onFolder, onPresentation, onFlashcard }) => {
             {open && items.map((item, i) => (
                 <div key={i} className="flex items-center gap-3"
                     style={{ animation: `slideUpFade 0.18s ease both`, animationDelay: `${i * 40}ms` }}>
-                    <span className="text-[11px] md:text-[12px] md:font-semibold text-slate-700 bg-white shadow-md px-2.5 py-1 rounded-md md:rounded-lg whitespace-nowrap select-none">
+                    <span className="text-[11px] md:text-[12px] md:font-medium text-slate-700 bg-white shadow-md px-2.5 py-1 rounded-sm md:rounded-md whitespace-nowrap select-none">
                         {item.label}
                     </span>
                     <button
@@ -342,6 +377,7 @@ export const LibraryContent = () => {
         flashcards: SORT_OPTIONS.flashcards[0].v,
     });
     const [search, setSearch] = useState(urlQ);
+    const [view,   setView]   = useState(() => localStorage.getItem('library_view') ?? 'grid');
     const [showCreateFolder, setShowCreateFolder] = useState(false);
     const [creatingPresentation, setCreatingPresentation] = useState(false);
 
@@ -466,6 +502,8 @@ export const LibraryContent = () => {
         }, 400);
     };
 
+    const toggleView = (v) => { setView(v); localStorage.setItem('library_view', v); };
+
     const handleSortChange = (tab, val) => {
         setSort(s => ({ ...s, [tab]: val }));
         LOADERS[tab]?.({ p:1, q:search, sortVal:val });
@@ -556,12 +594,26 @@ export const LibraryContent = () => {
                 {sortOpts.length > 0 && (
                     <SortSelect value={tabSort} options={sortOpts} onChange={val => handleSortChange(activeTab, val)} />
                 )}
+                <div className="flex items-center bg-slate-100 rounded-lg p-0.5 shrink-0">
+                    {[
+                        { v: 'grid', icon: 'grid_view'  },
+                        { v: 'list', icon: 'view_list'  },
+                    ].map(({ v, icon }) => (
+                        <button
+                            key={v}
+                            onClick={() => toggleView(v)}
+                            className={`w-7 h-7 rounded-md flex items-center justify-center transition-all ${view === v ? 'bg-white shadow-sm text-primary' : 'text-slate-400 hover:text-slate-600'}`}
+                        >
+                            <span className="material-icons-round text-[17px]">{icon}</span>
+                        </button>
+                    ))}
+                </div>
             </div>
 
             {/* Content */}
             {tabLoading && tabData.length === 0 ? (
                 <div className="flex justify-center py-16">
-                    <span className="material-icons-round text-primary text-[36px] animate-spin">sync</span>
+                    <Loader size="lg" />
                 </div>
             ) : tabData.length === 0 ? (
                 <>
@@ -573,73 +625,133 @@ export const LibraryContent = () => {
                 </>
             ) : (
                 <>
-                    {activeTab === 'notes' && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
-                            {tabData.map(note => (
-                                <NoteCard key={note.id} note={note} onClick={() => navigate(`/lockedin/notes/${note.id}`)} />
-                            ))}
-                            {!search && (
-                                <button onClick={() => navigate('/lockedin/notes/new')}
-                                    className="border-2 border-dashed border-slate-200 rounded-xl flex flex-col items-center justify-center text-slate-300 hover:text-primary hover:border-primary transition-all group py-8 gap-2">
-                                    <span className="material-icons-round text-[20px] md:text-[30px] group-hover:scale-110 transition-transform">add_circle</span>
-                                    <span className="text-sm medium md:font-semibold">New Note</span>
-                                </button>
+                    {/* ── Grid view ── */}
+                    {view === 'grid' && (
+                        <>
+                            {activeTab === 'notes' && (
+                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+                                    {tabData.map(note => (
+                                        <NoteCard key={note.id} note={note} onClick={() => navigate(`/lockedin/notes/${note.id}`)} />
+                                    ))}
+                                    {!search && (
+                                        <button onClick={() => navigate('/lockedin/notes/new')}
+                                            className="border-2 border-dashed border-slate-200 rounded-xl flex flex-col items-center justify-center text-slate-300 hover:text-primary hover:border-primary transition-all group py-8 gap-2">
+                                            <span className="material-icons-round text-[20px] md:text-[30px] group-hover:scale-110 transition-transform">add_circle</span>
+                                            <span className="text-sm medium md:font-semibold">New Note</span>
+                                        </button>
+                                    )}
+                                </div>
                             )}
-                        </div>
+                            {activeTab === 'papers' && (
+                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+                                    {tabData.map(paper => (
+                                        <PaperCard key={paper.id} paper={paper} onClick={() => navigate(`/lockedin/papers/${paper.id}`)} />
+                                    ))}
+                                    {!search && (
+                                        <button onClick={() => navigate('/lockedin/papers/new')}
+                                            className="border-2 border-dashed border-indigo-100 rounded-xl flex flex-col items-center justify-center text-slate-300 hover:text-indigo-400 hover:border-indigo-300 transition-all group py-8 gap-2">
+                                            <span className="material-icons-round text-[20px] md:text-[30px] group-hover:scale-110 transition-transform">add_circle</span>
+                                            <span className="text-sm medium md:font-semibold">New Paper</span>
+                                        </button>
+                                    )}
+                                </div>
+                            )}
+                            {activeTab === 'folders' && (
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
+                                    {tabData.map(f => (
+                                        <FolderGridCard key={f.id} folder={f} onClick={() => navigate(`/lockedin/folders/${f.id}`)} />
+                                    ))}
+                                    {!search && (
+                                        <button onClick={() => setShowCreateFolder(true)}
+                                            className="border-2 border-dashed border-amber-100 rounded-2xl flex flex-col items-center justify-center text-slate-300 hover:text-amber-400 hover:border-amber-300 transition-all group aspect-square gap-2">
+                                            <span className="material-icons-round text-[20px] md:text-[30px] group-hover:scale-110 transition-transform">create_new_folder</span>
+                                            <span className="text-sm medium md:font-semibold">New Folder</span>
+                                        </button>
+                                    )}
+                                </div>
+                            )}
+                            {activeTab === 'presentations' && (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
+                                    {tabData.map(pres => (
+                                        <PresentationCard key={pres.id} pres={pres} onClick={() => navigate(`/lockedin/presentations/${pres.id}`)} />
+                                    ))}
+                                    {!search && (
+                                        <button onClick={handleCreatePresentation} disabled={creatingPresentation}
+                                            className="border-2 border-dashed border-emerald-100 rounded-xl flex flex-col items-center justify-center text-slate-300 hover:text-emerald-500 hover:border-emerald-300 transition-all group aspect-video gap-2 disabled:opacity-60">
+                                            {creatingPresentation ? <Loader size="md" /> : <span className="material-icons-round text-[20px] md:text-[30px] group-hover:scale-110 transition-transform">add_circle</span>}
+                                            <span className="text-sm medium md:font-semibold">New Slides</span>
+                                        </button>
+                                    )}
+                                </div>
+                            )}
+                            {activeTab === 'flashcards' && (
+                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+                                    {tabData.map(deck => (
+                                        <FlashcardCard key={deck.id} deck={deck} onClick={() => navigate(`/lockedin/flashcards/${deck.id}`)} />
+                                    ))}
+                                </div>
+                            )}
+                        </>
                     )}
 
-                    {activeTab === 'papers' && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
-                            {tabData.map(paper => (
-                                <PaperCard key={paper.id} paper={paper} onClick={() => navigate(`/lockedin/papers/${paper.id}`)} />
-                            ))}
-                            {!search && (
-                                <button onClick={() => navigate('/lockedin/papers/new')}
-                                    className="border-2 border-dashed border-indigo-100 rounded-xl flex flex-col items-center justify-center text-slate-300 hover:text-indigo-400 hover:border-indigo-300 transition-all group py-8 gap-2">
-                                    <span className="material-icons-round text-[20px] md:text-[30px] group-hover:scale-110 transition-transform">add_circle</span>
-                                    <span className="text-sm medium md:font-semibold">New Paper</span>
-                                </button>
-                            )}
-                        </div>
-                    )}
+                    {/* ── List view ── */}
+                    {view === 'list' && (
+                        <div className="bg-white rounded-xl overflow-hidden" style={{ boxShadow: '0px 4px 20px rgba(0,0,0,0.03)' }}>
+                            <ListHeader cols={LIST_HEADER_COLS} />
 
-                    {activeTab === 'folders' && (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
-                            {tabData.map(f => (
-                                <FolderGridCard key={f.id} folder={f} onClick={() => navigate(`/lockedin/folders/${f.id}`)} />
+                            {activeTab === 'notes' && tabData.map(note => (
+                                <ListRow key={note.id}
+                                    icon="description" iconBg="bg-violet-50" iconText="text-violet-500"
+                                    title={note.title || 'Untitled Note'}
+                                    sub={extractSnippet(note.snippet ?? note.content ?? '')}
+                                    meta={note.folder?.name ?? '—'}
+                                    date={timeAgo(note.updated_at)}
+                                    onClick={() => navigate(`/lockedin/notes/${note.id}`)}
+                                />
                             ))}
-                            {!search && (
-                                <button onClick={() => setShowCreateFolder(true)}
-                                    className="border-2 border-dashed border-amber-100 rounded-2xl flex flex-col items-center justify-center text-slate-300 hover:text-amber-400 hover:border-amber-300 transition-all group aspect-square gap-2">
-                                    <span className="material-icons-round text-[20px] md:text-[30px] group-hover:scale-110 transition-transform">create_new_folder</span>
-                                    <span className="text-sm medium md:font-semibold">New Folder</span>
-                                </button>
-                            )}
-                        </div>
-                    )}
 
-                    {activeTab === 'presentations' && (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
-                            {tabData.map(pres => (
-                                <PresentationCard key={pres.id} pres={pres} onClick={() => navigate(`/lockedin/presentations/${pres.id}`)} />
+                            {activeTab === 'papers' && tabData.map(paper => (
+                                <ListRow key={paper.id}
+                                    icon="article" iconBg="bg-indigo-50" iconText="text-indigo-500"
+                                    title={paper.title || 'Untitled Paper'}
+                                    sub={extractSnippet(paper.snippet ?? paper.content ?? '')}
+                                    meta={paper.folder?.name ?? '—'}
+                                    date={timeAgo(paper.updated_at)}
+                                    onClick={() => navigate(`/lockedin/papers/${paper.id}`)}
+                                />
                             ))}
-                            {!search && (
-                                <button onClick={handleCreatePresentation} disabled={creatingPresentation}
-                                    className="border-2 border-dashed border-emerald-100 rounded-xl flex flex-col items-center justify-center text-slate-300 hover:text-emerald-500 hover:border-emerald-300 transition-all group aspect-video gap-2 disabled:opacity-60">
-                                    {creatingPresentation
-                                        ? <span className="material-icons-round text-[20px] md:text-[30px] animate-spin">sync</span>
-                                        : <span className="material-icons-round text-[20px] md:text-[30px] group-hover:scale-110 transition-transform">add_circle</span>
-                                    }
-                                    <span className="text-sm medium md:font-semibold">New Slides</span>
-                                </button>
-                            )}
-                        </div>
-                    )}
 
-                    {activeTab === 'flashcards' && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
-                            {tabData.map(deck => (
-                                <FlashcardCard key={deck.id} deck={deck} onClick={() => navigate(`/lockedin/flashcards/${deck.id}`)} />
+                            {activeTab === 'folders' && tabData.map(f => (
+                                <ListRow key={f.id}
+                                    icon={f.icon ?? 'folder'} iconBg="bg-amber-50" iconText="text-amber-500"
+                                    title={f.name}
+                                    sub={null}
+                                    meta={null}
+                                    date={timeAgo(f.updated_at)}
+                                    onClick={() => navigate(`/lockedin/folders/${f.id}`)}
+                                />
+                            ))}
+
+                            {activeTab === 'presentations' && tabData.map(pres => (
+                                <ListRow key={pres.id}
+                                    icon="slideshow" iconBg="bg-emerald-50" iconText="text-emerald-500"
+                                    title={pres.title || 'Untitled Presentation'}
+                                    sub={pres.theme ? `Theme: ${pres.theme}` : null}
+                                    meta={`${pres.slide_count ?? 0} slides`}
+                                    date={timeAgo(pres.updated_at)}
+                                    onClick={() => navigate(`/lockedin/presentations/${pres.id}`)}
+                                />
+                            ))}
+
+                            {activeTab === 'flashcards' && tabData.map(deck => (
+                                <ListRow key={deck.id}
+                                    icon="style" iconBg="bg-rose-50" iconText="text-rose-500"
+                                    title={deck.title || 'Untitled Deck'}
+                                    sub={deck.cards?.[0]?.front ?? null}
+                                    meta={`${deck.cards_count ?? deck.card_count ?? deck.cards?.length ?? 0} cards`}
+                                    date={timeAgo(deck.updated_at)}
+                                    onClick={() => navigate(`/lockedin/flashcards/${deck.id}`)}
+                                />
                             ))}
                         </div>
                     )}

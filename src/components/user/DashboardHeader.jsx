@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import Loader from '../globals/Loader';
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import NotificationIcon from "./NotificationIcon";
@@ -33,7 +34,7 @@ const Highlight = ({ text = '', query = '' }) => {
 
 // ── Global Search Dropdown ────────────────────────────────────────────────────
 export const DashboardHeader = () => {
-    const { user }   = useAuth();
+    const { user }   = useAuth(); 
     const navigate   = useNavigate();
     const wrapperRef = useRef(null);
     const inputRef   = useRef(null);
@@ -121,7 +122,7 @@ export const DashboardHeader = () => {
                     {/* Input */}
                     <div className={`flex items-center gap-2 bg-white rounded-xl md:rounded-2xl px-1.5 md:px-3 py-1 md:py-2 transition-all duration-200 outline-none focus-within:outline-none focus-within:ring-0 ${open ? 'shadow-md shadow-primary/10 w-72 md:w-96' : 'w-52 md:w-64'}`}>
                         {loading
-                            ? <span className="material-icons-round text-primary text-[16px] animate-spin shrink-0">sync</span>
+                            ? <Loader size="sm" className="shrink-0" />
                             : <span className="material-icons-round text-slate-400 text-[16px] shrink-0">search</span>
                         }
                         <input
@@ -153,7 +154,7 @@ export const DashboardHeader = () => {
 
                                 {loading && totalResults === 0 ? (
                                     <div className="flex items-center justify-center gap-2 py-8 text-slate-400 text-sm">
-                                        <span className="material-icons-round text-[18px] animate-spin">sync</span>
+                                        <Loader size="sm" />
                                         Searching…
                                     </div>
                                 ) : totalResults === 0 ? (

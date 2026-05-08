@@ -93,7 +93,7 @@ export default function Footer() {
         </div>
 
         <div className="pt-5 md:pt-10 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-slate-500 text-[12px] md:text-sm">© 2026 Notepaper AI. Crafted with intention.</p>
+          <p className="text-slate-500 text-[12px] md:text-sm">© 2026 Notepaper AI.</p>
         </div>
       </div>
     </footer>

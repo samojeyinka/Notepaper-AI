@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { shakespeare } from '../../assets/assets';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { streamText } from 'ai';
+import { usePlan } from '../../hooks/usePlan';
 
 const google = createGoogleGenerativeAI({
     apiKey: import.meta.env.VITE_GEMINI_API_KEY,
@@ -74,6 +75,7 @@ const PremiumBadge = () => {
 };
 
 const ShakespeareModal = ({ onClose, onInsert }) => {
+    const { canUseAI, increment, loaded } = usePlan();
     const [prompt, setPrompt] = useState('');
     const [output, setOutput] = useState('');
     const [status, setStatus] = useState('idle'); // idle | streaming | done | error
@@ -81,6 +83,8 @@ const ShakespeareModal = ({ onClose, onInsert }) => {
     const abortRef = useRef(null);
     const outputRef = useRef(null);
     const inputRef = useRef(null);
+
+    const limitReached = loaded && !canUseAI('ai_use');
 
     // Focus input on mount
     useEffect(() => { inputRef.current?.focus(); }, []);
@@ -119,6 +123,7 @@ const ShakespeareModal = ({ onClose, onInsert }) => {
                 setOutput(prev => prev + chunk);
             }
             setStatus('done');
+            increment('ai_use');
         } catch (err) {
             if (err.name === 'AbortError') {
                 setStatus('done');
@@ -193,16 +198,23 @@ const ShakespeareModal = ({ onClose, onInsert }) => {
                     {/* Prompt input — only shown before first generation */}
                     {status === 'idle' && (
                         <>
-                            <textarea
-                                ref={inputRef}
-                                rows={3}
-                                value={prompt}
-                                onChange={e => setPrompt(e.target.value)}
-                                onKeyDown={handleKeyDown}
-                                placeholder="What should Shakespeare write?  e.g. a short intro to photosynthesis…"
-                                className="w-full bg-slate-50 border border-slate-200 rounded-md md:rounded-xl md:px-3 px-1.5 py-1.5 md:py-2.5 text-[10px] md:text-[12px] text-slate-700 placeholder-slate-400 outline-none focus:border-primary resize-none leading-relaxed"
-                            />
-                            
+                            {limitReached ? (
+                                <div className="flex flex-col items-center gap-2 py-4 px-3 bg-amber-50 border border-amber-200 rounded-md md:rounded-xl text-center">
+                                    <span className="material-icons-round text-amber-500 text-[22px]">workspace_premium</span>
+                                    <p className="text-[11px] font-semibold text-amber-800">Daily limit reached</p>
+                                    <p className="text-[10px] text-amber-700">You've used all your free AI generations for today. Upgrade to Pro for more daily uses.</p>
+                                </div>
+                            ) : (
+                                <textarea
+                                    ref={inputRef}
+                                    rows={3}
+                                    value={prompt}
+                                    onChange={e => setPrompt(e.target.value)}
+                                    onKeyDown={handleKeyDown}
+                                    placeholder="What should Shakespeare write?  e.g. a short intro to photosynthesis…"
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-md md:rounded-xl md:px-3 px-1.5 py-1.5 md:py-2.5 text-[10px] md:text-[12px] text-slate-700 placeholder-slate-400 outline-none focus:border-primary resize-none leading-relaxed"
+                                />
+                            )}
                         </>
                     )}
 
@@ -278,7 +290,7 @@ const ShakespeareModal = ({ onClose, onInsert }) => {
                                 className="w-[fit-conetent] flex items-center justify-center gap-1 p-1 rounded-md bg-red-50 border border-red-200 text-red-500 text-[11px] font-normal hover:bg-red-100 active:scale-[0.98] transition-all"
                             >
                         
-                              <span class="material-symbols-outlined">stop_circle</span>
+                              <span className="material-symbols-outlined">stop_circle</span>
                             </button>
                         ) : status === 'done' ? (
                             <>
@@ -294,10 +306,13 @@ const ShakespeareModal = ({ onClose, onInsert }) => {
                         ) : (
                             <button
                                 onClick={handleGenerate}
-                                disabled={!prompt.trim()}
-                                className="w-[fit-content] ml-auto px-2 md:px-4 py-1 md:py-2 rounded-md md:rounded-xl bg-gradient-to-r from-gray-700 to-black text-white text-[10px] md:text-[11px] font-medium shadow hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                                disabled={!prompt.trim() || limitReached || !loaded}
+                                className="w-[fit-content] ml-auto px-2 md:px-4 py-1 md:py-2 rounded-md md:rounded-xl bg-gradient-to-r from-gray-700 to-black text-white text-[10px] md:text-[11px] font-medium shadow hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5"
                             >
-                                Create
+                                {!loaded
+                                    ? <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                    : 'Create'
+                                }
                             </button>
                         )}
                     </div>

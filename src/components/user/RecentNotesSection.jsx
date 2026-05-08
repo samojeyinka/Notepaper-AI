@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import Loader from '../globals/Loader';
 import { Link, useNavigate } from 'react-router-dom';
 import { noteService } from '../../api/noteService';
 import { paperService } from '../../api/paperService';
@@ -269,7 +270,7 @@ export default function RecentNotesSection() {
       {/* Content */}
       {isLoading ? (
         <div className="flex justify-center py-10">
-          <span className="material-icons-round text-primary text-[30px] animate-spin">sync</span>
+          <Loader size="lg" />
         </div>
       ) : items.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-10 gap-3 text-center">

@@ -1,272 +1,320 @@
-// Plan Feature Item Component - Reusable
+import { useEffect, useState } from 'react';
+import { billingService } from '../../api/billingService';
+import { useBilling } from '../../hooks/useBilling';
+import { usePlan } from '../../hooks/usePlan';
 
-
-export const PlanFeature = ({
-  icon,
-  shapeClass,
-  bgColor,
-  title,
-  description,
-  disabled = false,
-  handwriting = false,
-}) => {
-  return (
-    <div className="flex items-center gap-4">
-      <div
-        className={`w-7 h-7 ${shapeClass} ${bgColor} flex-shrink-0 flex items-center justify-center ${
-          disabled ? 'text-slate-500' : 'text-white'
-        }`}
-      >
-        <span className="material-symbols-outlined text-base">{icon}</span>
-      </div>
-      <div>
-        <h4 className={`font-medium text-[15px] ${disabled ? 'text-slate-400' : ''}`}>{title}</h4>
-        <p
-          className={`text-[12px] ${
-            disabled ? 'text-slate-400 italic' : 'text-slate-500'
-          } ${handwriting ? 'font-handwriting text-primary text-[14px]' : ''}`}
-        >
-          {description}
-        </p>
-      </div>
-    </div>
-  );
+// ── Static plan metadata (features, styling) ─────────────────────────────────
+const PLAN_META = {
+    free: {
+        badge: null,
+        accent: 'text-slate-500',
+        ring: 'ring-slate-200',
+        ctaStyle: 'bg-slate-100 text-slate-400 cursor-default',
+        features: [
+            'Unlimited notes, papers & folders',
+            'Basic flashcard decks',
+            '5 AI presentation builds / day',
+            '10 AI writes / day',
+            'Unlimited voice to text',
+        ],
+    },
+    starter: {
+        badge: { label: 'Popular', cls: 'bg-emerald-100 text-emerald-700' },
+        accent: 'text-primary',
+        ring: 'ring-primary/30',
+        ctaStyle: 'bg-primary text-white hover:bg-primary/90 shadow-[0_4px_14px_rgba(101,65,196,0.35)]',
+        features: [
+            'Everything in Free',
+            '20 AI presentation builds / day',
+            '50 AI writes / day',
+            'DeepSeek AI — smarter model',
+            'All premium themes & slide art',
+            'Full PDF & PPTX export',
+            'Generate from your content',
+        ],
+    },
+    pro: {
+        badge: null,
+        accent: 'text-indigo-600',
+        ring: 'ring-indigo-200',
+        ctaStyle: 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-[0_4px_14px_rgba(79,70,229,0.3)]',
+        features: [
+            'Everything in Starter',
+            '50 AI presentation builds / day',
+            '150 AI writes / day',
+            'AI quiz generator from notes',
+            '10 auto note generations / day',
+            'Smart study reminders',
+            'Early access to new features',
+        ],
+    },
+    premium: {
+        badge: { label: 'Best Value', cls: 'bg-amber-100 text-amber-700' },
+        accent: 'text-amber-600',
+        ring: 'ring-amber-200',
+        ctaStyle: 'bg-amber-500 text-white hover:bg-amber-600 shadow-[0_4px_14px_rgba(245,158,11,0.3)]',
+        features: [
+            'Everything in Pro',
+            'Unlimited AI presentations',
+            'Unlimited AI writes',
+            'Unlimited auto note generation',
+            'Personalised AI study plans',
+            'Auto flashcard generation',
+            'All future AI features — first access',
+        ],
+    },
+    team: {
+        badge: null,
+        accent: 'text-yellow-500',
+        ring: 'ring-yellow-200',
+        ctaStyle: 'bg-white text-slate-900 hover:bg-slate-100',
+        features: [
+            'Everything in Premium',
+            '5 seats — full Premium for everyone',
+            'One invoice, owner invites by email',
+            'Team collaboration features',
+        ],
+    },
 };
 
-// Plan Card Component - Reusable
-
-export const PlanCard = ({
-  name,
-  price,
-  period,
-  description,
-  features,
-  buttonText,
-  buttonVariant,
-  isRecommended = false,
-  onButtonClick,
-}) => {
-  const isPrimary = buttonVariant === 'primary';
-
-  return (
-    <div className={isRecommended ? 'relative group' : ''}>
-      {/* Gradient Blur Effect for Recommended */}
-      {isRecommended && (
-        <div className="absolute -inset-1 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-4xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-      )}
-
-      {/* Card */}
-      <div
-        className={`relative ${
-          isRecommended
-            ? 'bg-white  rounded-xl p-5 shadow-md flex flex-col h-full border border-purple-500/20 bg-gradient-to-br from-white to-purple-500/5'
-            : 'bg-white  rounded-xl p-5 shadow-sm border border-slate-100  flex flex-col h-full hover:shadow-md transition-all'
-        }`}
-      >
-        {/* Recommended Badge */}
-        {isRecommended && (
-          <div className="absolute top-6 right-6 px-2 py-0.5 bg-purple-500 text-white text-[10px] font-normal rounded-full uppercase tracking-wider">
-            Recommended
-          </div>
-        )}
-
-        {/* Plan Header */}
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-1">{name}</h2>
-          <div className="flex items-baseline mb-2">
-            <span className={`text-4xl font-extrabold ${isPrimary ? 'text-purple-500' : ''}`}>
-              {price}
-            </span>
-            <span className="text-slate-400 ml-2 font-normal">/ {period}</span>
-          </div>
-          <p className="text-slate-500 text-[14px]">{description}</p>
-        </div>
-
-        {/* Features List */}
-        <div className="space-y-3 flex-1">
-          {features.map((feature, index) => (
-            <PlanFeature
-              key={index}
-              icon={feature.icon}
-              shapeClass={feature.shapeClass}
-              bgColor={feature.bgColor}
-              title={feature.title}
-              description={feature.description}
-              disabled={feature.disabled}
-              handwriting={feature.handwriting}
-            />
-          ))}
-        </div>
-
-        {/* CTA Button */}
-        <button
-          onClick={onButtonClick}
-          className={`mt-6 w-full py-2 rounded-xl font-semibold text-[15px] transition-all ${
-            isPrimary
-              ? 'bg-purple-500 text-white hover:bg-purple-600 shadow-md shadow-purple-500/25'
-              : 'bg-slate-100 text-slate-900  hover:bg-slate-200'
-          }`}
-        >
-          {buttonText}
-        </button>
-      </div>
-    </div>
-  );
+const fmt = (n, symbol = '₦') => {
+    if (n === 0) return `${symbol}0`;
+    return `${symbol}${Number.isInteger(n) ? n.toLocaleString() : n.toFixed(2)}`;
 };
 
-export const ComparisonFeature = ({ icon, label }) => {
-  return (
-    <div className="flex flex-col items-center">
-      <span className="material-symbols-outlined text-purple-500 mb-2">{icon}</span>
-      <span className="text-sm font-medium">{label}</span>
-    </div>
-  );
-};
+const REGULAR_KEYS = ['free', 'starter', 'pro', 'premium'];
 
-// All Plans Comparison Section
-export const AllPlansFeaturesSection = () => {
-  const features = [
-    { icon: 'cloud_done', label: 'Cloud Sync' },
-    { icon: 'devices', label: 'Cross-platform' },
-    { icon: 'lock', label: 'End-to-End Encryption' },
-    { icon: 'support_agent', label: '24/7 Support' },
-  ];
-
-  return (
-    <div className="max-w-4xl mx-auto mt-10 text-center">
-      <h3 className="text-xl font-semibold mb-4">All plans include:</h3>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-        {features.map((feature, index) => (
-          <ComparisonFeature key={index} icon={feature.icon} label={feature.label} />
-        ))}
-      </div>
-    </div>
-  );
-};
-
-// Main Pricing Page Header
-export const PricingHeader = () => {
-  return (
-    <header className="max-w-4xl mx-auto text-center mb-8">
-      <h1 className="text-3xl font-semibold text-slate-900 mb-2">
-        Pricing Plans
-      </h1>
-      <p className="text-[15px] text-slate-500">
-        Choose the perfect plan for your learning journey.
-      </p>
-    </header>
-  );
-};
-
-// Complete Pricing Page Content
-export const PricingPage = () => {
-  // Free Plan Features
-  const freePlanFeatures = [
-    {
-      icon: 'description',
-      shapeClass: 'pentagon-shape',
-      bgColor: 'bg-yellow-400',
-      title: '10 Monthly Notes',
-      description: 'Essential storage for your ideas.',
-    },
-    {
-      icon: 'mic_off',
-      shapeClass: 'rounded-full',
-      bgColor: 'bg-slate-100',
-      title: 'No Voice Recording',
-      description: 'Upgrade to unlock voice-to-text',
-      disabled: true,
-      handwriting: false,
-    },
-    {
-      icon: 'auto_awesome',
-      shapeClass: 'blob-shape',
-      bgColor: 'bg-slate-100',
-      title: 'Basic AI Summaries',
-      description: 'Short summaries for your notes.',
-    },
-  ];
-
-  // Premium Plan Features
-  const premiumPlanFeatures = [
-    {
-      icon: 'all_inclusive',
-      shapeClass: 'pentagon-shape',
-      bgColor: 'bg-yellow-400',
-      title: 'Unlimited Notes',
-      description: 'Create as much as your heart desires.',
-    },
-    {
-      icon: 'mic',
-      shapeClass: 'rounded-full',
-      bgColor: 'bg-green-500',
-      title: 'Unlimited Voice Records',
-      description: 'Record lectures and meetings directly.',
-    },
-    {
-      icon: 'history_edu',
-      shapeClass: 'blob-shape',
-      bgColor: 'bg-purple-500',
-      title: 'Custom Handwriting Styles',
-      description: 'Make it feel like your own paper',
-      handwriting: true,
-    },
-    {
-      icon: 'quiz',
-      shapeClass: 'rounded-2xl',
-      bgColor: 'bg-indigo-500',
-      title: 'AI Quiz Generation',
-      description: 'Turn any note into a study quiz instantly.',
-    },
-  ];
-
-  return (
-    <main className="flex-1 p-8 lg:px-8 lg:py-2">
-      <PricingHeader />
-
-      {/* Plans Grid */}
-      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
-        {/* Free Plan */}
-        <PlanCard
-          name="Free"
-          price="$0"
-          period="forever"
-          description="Perfect for getting started with smart note-taking."
-          features={freePlanFeatures}
-          buttonText="Current Plan"
-          buttonVariant="secondary"
-          isRecommended={false}
-        />
-
-        {/* Premium Plan */}
-        <PlanCard
-          name="Premium"
-          price="$7.99"
-          period="month"
-          description="Full AI power for students and professionals."
-          features={premiumPlanFeatures}
-          buttonText="Upgrade Now"
-          buttonVariant="primary"
-          isRecommended={true}
-          onButtonClick={() => {
-            console.log('Upgrade clicked');
-          }}
-        />
-      </div>
-
-      {/* All Plans Features */}
-      <AllPlansFeaturesSection />
-    </main>
-  );
-};
-
-
-
-// Complete Pricing Layout
 export const PricingLayout = () => {
-  return (
-    <div className="flex-1 lg:ml-64 p-3 lg:p-8 pt-20 lg:pt-8">
-      <PricingPage />
-    </div>
-  );
+    const [annual, setAnnual]         = useState(false);
+    const [priceMap, setPriceMap]     = useState({});   // key → { prices, currency, symbol }
+    const [pricesLoaded, setPricesLoaded] = useState(false);
+
+    const { plan: currentPlan, loaded } = usePlan();
+    const { subscribe, loading, error } = useBilling();
+
+    const currency = priceMap['starter']?.currency ?? 'ngn';
+    const symbol   = priceMap['starter']?.symbol   ?? '₦';
+
+    useEffect(() => {
+        billingService.getPlans()
+            .then(res => {
+                const list = res?.data ?? res ?? [];
+                const map = {};
+                list.forEach(p => { map[p.key] = p; });
+                setPriceMap(map);
+                setPricesLoaded(true);
+            })
+            .catch(() => setPricesLoaded(true));
+    }, []);
+
+    const handleSubscribe = (planKey) => {
+        subscribe(planKey, annual ? 'yearly' : 'monthly', currency);
+    };
+
+    const fmtPrice = (n) => fmt(n, symbol);
+
+    // When annual: show per-month equivalent (yearly ÷ 12), bill line shows yearly total
+    const displayPrice = (prices) => {
+        if (!prices) return null;
+        if (!annual) return prices.monthly ?? 0;
+        return prices.yearly != null ? prices.yearly / 12 : null;
+    };
+
+    const teamPlan = priceMap['team'] ?? null;
+
+    return (
+        <div className="flex-1 lg:ml-64 min-h-screen bg-slate-50">
+            <div className="max-w-5xl mx-auto px-4 py-8 md:py-10">
+
+                {/* Header */}
+                <div className="mb-8">
+                    <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Upgrade your plan</h1>
+                    {loaded && (
+                        <p className="text-sm text-slate-400 mt-1">
+                            You're currently on the{' '}
+                            <span className="font-semibold text-slate-600 capitalize">{currentPlan}</span> plan.
+                            {currentPlan === 'free' && ' Unlock more AI power below.'}
+                        </p>
+                    )}
+                </div>
+
+                {/* Billing toggle */}
+                <div className="flex items-center gap-3 mb-8">
+                    <span className={`text-sm font-semibold ${!annual ? 'text-slate-800' : 'text-slate-400'}`}>Monthly</span>
+                    <button
+                        onClick={() => setAnnual(v => !v)}
+                        className={`relative w-11 h-6 rounded-full transition-colors ${annual ? 'bg-primary' : 'bg-slate-200'}`}
+                    >
+                        <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all ${annual ? 'left-6' : 'left-1'}`} />
+                    </button>
+                    <span className={`text-sm font-semibold ${annual ? 'text-slate-800' : 'text-slate-400'}`}>
+                        Annual
+                        <span className="ml-2 px-1.5 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-md">Save ~30%</span>
+                    </span>
+                </div>
+
+                {/* Error */}
+                {error && (
+                    <div className="mb-4 flex items-center gap-2 px-4 py-3 bg-red-50 text-red-600 rounded-xl text-sm">
+                        <span className="material-icons-round text-[16px]">error_outline</span>
+                        {error}
+                    </div>
+                )}
+
+                {/* Plan cards — always render, skeleton only in price area */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {REGULAR_KEYS.map((key) => {
+                        const meta       = PLAN_META[key];
+                        const prices     = priceMap[key]?.prices ?? null;
+                        const perMonth   = displayPrice(prices);
+                        const isFree     = key === 'free';
+                        const isCurrent  = loaded && currentPlan === key;
+                        const isDowngrade = loaded && !isFree && currentPlan !== 'free' &&
+                            REGULAR_KEYS.indexOf(key) < REGULAR_KEYS.indexOf(currentPlan);
+                        const planName   = key.charAt(0).toUpperCase() + key.slice(1);
+
+                        let ctaLabel    = `Upgrade to ${planName}`;
+                        let ctaDisabled = false;
+                        let ctaStyle    = meta.ctaStyle;
+
+                        if (isCurrent) {
+                            ctaLabel    = 'Current Plan';
+                            ctaDisabled = true;
+                            ctaStyle    = isFree
+                                ? 'bg-slate-100 text-slate-400 cursor-default'
+                                : 'bg-slate-100 text-slate-500 cursor-default ring-1 ring-slate-200';
+                        } else if (isFree) {
+                            ctaLabel    = 'Free Forever';
+                            ctaDisabled = true;
+                            ctaStyle    = 'bg-slate-100 text-slate-400 cursor-default';
+                        } else if (isDowngrade) {
+                            ctaLabel = `Switch to ${planName}`;
+                        }
+
+                        return (
+                            <div
+                                key={key}
+                                className={`relative bg-white rounded-2xl p-5 flex flex-col gap-4 ring-1 shadow-sm transition-shadow hover:shadow-md ${meta.ring} ${isCurrent ? 'ring-2' : ''}`}
+                            >
+                                {meta.badge && !isCurrent && (
+                                    <span className={`absolute top-4 right-4 text-[10px] font-bold px-2 py-0.5 rounded-full ${meta.badge.cls}`}>
+                                        {meta.badge.label}
+                                    </span>
+                                )}
+                                {isCurrent && (
+                                    <span className="absolute top-4 right-4 flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">
+                                        <span className="material-icons-round text-[11px]">check_circle</span>
+                                        Current
+                                    </span>
+                                )}
+
+                                {/* Name + price */}
+                                <div>
+                                    <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${meta.accent}`}>{planName}</p>
+                                    {!pricesLoaded ? (
+                                        <div className="h-9 w-28 bg-slate-100 rounded-lg animate-pulse" />
+                                    ) : (
+                                        <>
+                                            <div className="flex items-baseline gap-1">
+                                                <span className="text-3xl font-bold text-slate-800">
+                                                    {perMonth === 0 ? `${symbol}0` : fmtPrice(Math.round(perMonth))}
+                                                </span>
+                                                <span className="text-sm text-slate-400 font-medium">
+                                                    {perMonth === 0 ? '/ forever' : '/ mo'}
+                                                </span>
+                                            </div>
+                                            {annual && prices?.yearly > 0 && (
+                                                <p className="text-[11px] text-slate-400 mt-0.5">
+                                                    Billed {fmtPrice(prices.yearly)} / year
+                                                </p>
+                                            )}
+                                        </>
+                                    )}
+                                </div>
+
+                                {/* Features */}
+                                <ul className="flex flex-col gap-2 flex-1">
+                                    {meta.features.map((f, i) => (
+                                        <li key={i} className="flex items-start gap-2 text-[13px] text-slate-600">
+                                            <span className={`material-icons-round text-[15px] mt-0.5 shrink-0 ${ctaDisabled ? 'text-slate-300' : meta.accent}`}>check</span>
+                                            <span className={i === 0 && key !== 'free' ? 'font-semibold text-slate-700' : ''}>{f}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+
+                                {/* CTA */}
+                                <button
+                                    disabled={ctaDisabled || loading}
+                                    onClick={() => !ctaDisabled && handleSubscribe(key)}
+                                    className={`w-full py-2.5 rounded-xl text-sm font-bold transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100 ${ctaStyle}`}
+                                >
+                                    {loading ? (
+                                        <span className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
+                                    ) : ctaLabel}
+                                </button>
+                            </div>
+                        );
+                    })}
+                </div>
+
+                {/* Team plan */}
+                <div className="mt-4 relative bg-slate-900 rounded-2xl p-6 overflow-hidden">
+                    <div className="absolute -top-16 -right-16 w-56 h-56 bg-primary/20 rounded-full blur-3xl pointer-events-none" />
+                    <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
+
+                    <div className="relative z-10 flex flex-col sm:flex-row sm:items-center gap-6">
+                        <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                                <span className="material-icons-round text-yellow-400 text-[20px]">groups</span>
+                                <span className="text-[10px] font-black uppercase tracking-widest text-yellow-400">Team Plan</span>
+                            </div>
+                            <h3 className="text-lg font-bold text-white mb-1">Study Together.</h3>
+                            <p className="text-[13px] text-slate-400 max-w-sm">
+                                5 seats, full Premium for everyone. One invoice, the owner invites by email.
+                            </p>
+                            {!pricesLoaded ? (
+                                <div className="h-8 w-24 bg-white/10 rounded-lg animate-pulse mt-3" />
+                            ) : (
+                                <div className="flex items-baseline gap-1 mt-3">
+                                    <span className="text-2xl font-bold text-white">
+                                        {fmtPrice(Math.round(annual
+                                            ? (teamPlan?.prices?.yearly ?? 0) / 12
+                                            : (teamPlan?.prices?.monthly ?? 0)
+                                        ))}
+                                    </span>
+                                    <span className="text-slate-400 text-sm">/ mo</span>
+                                </div>
+                            )}
+                            {annual && teamPlan?.prices?.yearly > 0 && (
+                                <p className="text-slate-500 text-[11px] mt-0.5">
+                                    Billed {fmtPrice(teamPlan.prices.yearly)} / year
+                                </p>
+                            )}
+                        </div>
+                        {currentPlan === 'team' ? (
+                            <div className="shrink-0 flex items-center gap-2 px-6 py-3 bg-emerald-500/20 text-emerald-400 font-bold text-sm rounded-xl">
+                                <span className="material-icons-round text-[16px]">check_circle</span>
+                                Current Plan
+                            </div>
+                        ) : (
+                            <button
+                                disabled={loading}
+                                onClick={() => handleSubscribe('team')}
+                                className="shrink-0 px-6 py-3 bg-white text-slate-900 font-bold text-sm rounded-xl hover:bg-slate-100 active:scale-95 transition-all flex items-center gap-2 disabled:opacity-60"
+                            >
+                                {loading
+                                    ? <span className="w-4 h-4 border-2 border-slate-400/30 border-t-slate-700 rounded-full animate-spin" />
+                                    : 'Launch Team'
+                                }
+                            </button>
+                        )}
+                    </div>
+                </div>
+
+                <p className="text-center text-[11px] text-slate-400 mt-6">
+                    All paid plans can be cancelled anytime · Secure payment via Paystack
+                </p>
+            </div>
+        </div>
+    );
 };

@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import Loader from '../globals/Loader';
 import { createPortal } from "react-dom";
 
 const MAX_FILE_MB = 10;
@@ -102,7 +103,7 @@ export const DocumentImportModal = ({ onClose, onInsert }) => {
                         </div>
                     ) : status === 'parsing' ? (
                         <div className="border-2 border-slate-100 rounded-xl p-8 flex flex-col items-center gap-3">
-                            <span className="material-icons-round text-[40px] text-primary animate-spin">sync</span>
+                            <Loader size="xl" />
                             <p className="text-sm font-semibold text-slate-700">Parsing {fileName}…</p>
                             <p className="text-[11px] text-slate-400">Extracting text content</p>
                         </div>

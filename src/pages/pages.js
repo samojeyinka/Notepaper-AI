@@ -15,6 +15,8 @@ import PrivacyPage from './PrivacyPage';
 import LockedInPage from './LockedInPage';
 import UpgradePage from './UpgradePage';
 import StudyPlanPage from './StudyPlanPage';
+import SprintPage from './SprintPage';
+import ScholarPage from './ScholarPage';
 import LibraryPage from './LibraryPage';
 import BillingPage from './BillingPage';
 import ProfileSettingsPage from './ProfileSettingsPage';
@@ -55,6 +57,8 @@ export{
     LockedInPage,
     UpgradePage,
     StudyPlanPage,
+    ScholarPage,
+    SprintPage,
     LibraryPage,
     BillingPage,
     ProfileSettingsPage,

@@ -83,7 +83,7 @@ export default function DeleteAccountConfirm() {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto py-12 px-4">
+    <div className="w-full max-w-2xl mx-auto py-0 md:py-12 px-4">
       {toast && (
         <Toast
           type={toast.type}
@@ -92,29 +92,29 @@ export default function DeleteAccountConfirm() {
         />
       )}
 
-      <div className="paper-scrap p-8 md:p-12 border-2 border-red-100 shadow-xl relative overflow-hidden">
+      <div className="paper-scrap  p-4 md:p-12 border-2 border-red-100 shadow-xl relative overflow-hidden">
         <header className="mb-10 text-center relative z-10">
-          <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner ring-4 ring-red-50/50">
+          <div className="w-10 h-10 md:w-16 md:h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner ring-4 ring-red-50/50">
             <span className="material-symbols-outlined text-4xl text-red-600">person_off</span>
           </div>
-          <h1 className="text-2xl font-semibold text-slate-900 mb-2">Final Confirmation</h1>
-          <p className="text-slate-500 font-handwriting text-[15px]">
+          <h1 className="text-xl md:text-2xl font-medium md:font-semibold text-slate-900 mb-2">Final Confirmation</h1>
+          <p className="text-slate-500 font-handwriting text-[13px] md:text-[15px]">
             This is the last step. How would you like to proceed?
           </p>
         </header>
 
-        <div className="space-y-8 relative z-10">
+        <div className="space-y-4 md:space-y-8 relative z-10">
           {/* Options Card */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <button
               onClick={() => setPermanent(false)}
-              className={`p-6 rounded-2xl border-2 transition-all text-left flex flex-col gap-3 ${
+              className={`p-3 md:p-6 rounded-2xl border-2 transition-all text-left flex flex-col gap-2 md:gap-3 ${
                 !permanent 
                   ? 'border-primary bg-primary/5 shadow-md ring-4 ring-primary/5' 
                   : 'border-slate-100 hover:border-slate-200 bg-white'
               }`}
             >
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${!permanent ? 'bg-primary text-white' : 'bg-slate-100 text-slate-400'}`}>
+              <div className={`w-8 h-8 md:w-10 md:h-10 rounded-xl flex items-center justify-center ${!permanent ? 'bg-primary text-white' : 'bg-slate-100 text-slate-400'}`}>
                 <span className="material-symbols-outlined">restart_alt</span>
               </div>
               <div>
@@ -147,7 +147,7 @@ export default function DeleteAccountConfirm() {
 
           {/* Reason for leaving */}
           <div className="space-y-2">
-            <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest px-1">
+            <label className="block text-[11px] md:text-xs font-medium md:font-bold text-slate-400 uppercase tracking-widest px-1">
               Why are you leaving us? (Optional)
             </label>
             <textarea
@@ -160,7 +160,7 @@ export default function DeleteAccountConfirm() {
 
           <div className="p-2 bg-amber-50 border border-amber-200 rounded-md flex gap-3 text-sm text-amber-800">
             <span className="material-symbols-outlined text-amber-600 shrink-0">info</span>
-            <p className="leading-relaxed italic font-normal">
+            <p className="leading-relaxed italic font-normal text-[12px] md:text-[14px]">
               By confirming, your current session will be terminated and you will be logged out immediately.
             </p>
           </div>
@@ -169,7 +169,7 @@ export default function DeleteAccountConfirm() {
             <button
               onClick={handleDelete}
               disabled={loading || !token}
-              className={`w-full py-2 rounded-xl font-medium shadow-lg transition-all active:scale-[0.95] flex items-center justify-center gap-3 ${
+              className={`w-full py-1 md:py-2 text-[13px] rounded-lg md:rounded-xl md:font-medium shadow-lg transition-all active:scale-[0.95] flex items-center justify-center gap-3 ${
                 permanent 
                   ? 'bg-red-600 hover:bg-black text-white' 
                   : 'bg-slate-900 hover:bg-black text-white'
@@ -187,7 +187,7 @@ export default function DeleteAccountConfirm() {
                onClick={handleResendLink}
                disabled={resending || resendTimer > 0}
                className={`
-                 group flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-all
+                 group flex items-center gap-2 px-3 md:px-6 py-1.5 md:py-2.5 rounded-lg md:rounded-xl text-[11px] md:text-xs font-medium md:font-bold uppercase tracking-widest transition-all
                  ${resendTimer > 0 
                    ? 'bg-slate-50 text-slate-400 border border-slate-100 cursor-not-allowed'
                    : 'bg-red-50 text-red-600 border border-red-100 hover:border-red-200 active:scale-95 shadow-sm'}

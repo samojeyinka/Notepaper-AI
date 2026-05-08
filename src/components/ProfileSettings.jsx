@@ -9,10 +9,10 @@ export const ProfileHeader = () => {
  
 
   return (
-    <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+    <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2 md:mb-4">
       <div>
-        <h1 className="text-xl font-semibold tracking-tight">Profile Settings</h1>
-        <p className="text-slate-500 mt-1 font-handwriting text-[14px]">Personalize your creative space...</p>
+        <h1 className="text-[16px] md:text-xl font-medium md:font-semibold tracking-tight">Profile Settings</h1>
+        <p className="text-slate-500 md:mt-1 font-handwriting text-[12px] md:text-[14px]">Personalize your creative space...</p>
       </div>
       <div className="flex items-center gap-4 relative">
         <div className="absolute -left-36 top-1/2 -translate-y-1/2 text-slate-400 hidden xl:block">
@@ -55,7 +55,7 @@ export const ProfileFooter = () => {
   return (
     <div className="mt-4 text-center pb-12">
       <div className="inline-block relative">
-        <p className="font-sketch text-slate-400 text-sm max-w-xs mx-auto">
+        <p className="font-sketch text-slate-400 text-[10px] md:text-sm max-w-xs mx-auto">
           All changes are secured with end-to-end encryption. Your privacy is our priority.
         </p>
         <div className="absolute -left-16 top-0 text-primary opacity-30">
@@ -81,7 +81,7 @@ export const ProfileSettings = () => {
     <main className="flex-1 lg:ml-64 p-3 lg:p-8 pt-20 lg:pt-8">
       <ProfileHeader />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 mb-4 md:mb-8">
         <PersonalInfoSection />
         {/* <SubscriptionSection /> */}
         <SecuritySection />

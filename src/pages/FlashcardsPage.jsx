@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import Loader from '../components/globals/Loader';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { flashcardService } from '../api/flashcardService';
 import { TEMPLATES } from '../components/flashcard/flashcardTemplates';
@@ -162,7 +163,7 @@ const FlashcardsContent = () => {
                         className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-primary text-white text-sm font-semibold shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-[0.98] transition-all disabled:opacity-60"
                     >
                         {creating
-                            ? <span className="material-icons-round text-[18px] animate-spin">sync</span>
+                            ? <Loader size="sm" />
                             : <span className="material-icons-round text-[18px]">add</span>
                         }
                         New Deck
@@ -172,7 +173,7 @@ const FlashcardsContent = () => {
                 {/* Grid */}
                 {loading && flashcards.length === 0 ? (
                     <div className="flex justify-center py-20">
-                        <span className="material-icons-round text-primary text-[40px] animate-spin">sync</span>
+                        <Loader size="xl" />
                     </div>
                 ) : flashcards.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-24 gap-4">

@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import Loader from './globals/Loader';
 import { useNotifications } from '../context/NotificationsContext';
 
 // ─── Type → display config ────────────────────────────────────────────────────
@@ -36,6 +37,18 @@ const TYPE_CONFIG = {
         iconColor: 'text-violet-500',
         buttonClass: 'bg-violet-500 hover:bg-violet-600 text-white',
     },
+    'App\\Notifications\\ExpandTopicDone': {
+        icon: 'lightbulb',
+        iconBgColor: 'bg-amber-50',
+        iconColor: 'text-amber-500',
+        buttonClass: 'bg-amber-500 hover:bg-amber-600 text-white',
+    },
+    'App\\Notifications\\SimplifyTopicDone': {
+        icon: 'filter_alt',
+        iconBgColor: 'bg-green-50',
+        iconColor: 'text-green-600',
+        buttonClass: 'bg-green-600 hover:bg-green-700 text-white',
+    },
 };
 
 const DEFAULT_CONFIG = {
@@ -71,15 +84,15 @@ function buildActions(data) {
 // ─── Header ───────────────────────────────────────────────────────────────────
 
 export const NotificationsHeader = ({ onMarkAllAsRead }) => (
-    <header className="flex justify-between md:items-end mb-8 flex-col md:flex-row">
+    <header className="flex justify-between md:items-end mb-4 md:mb-8 flex-col md:flex-row">
         <div>
-            <h1 className="text-xl font-semibold text-slate-900 mb-2 font-display">Notifications</h1>
-            <p className="font-handwriting text-[15px] text-slate-500 italic">Stay on top of your digital paper trail...</p>
+            <h1 className="text-[15px] md:text-xl font-semibold text-slate-900 mb-2 font-display">Notifications</h1>
+            <p className="font-handwriting text-[12px] md:text-[15px] text-slate-500 italic">Stay on top of your digital paper trail...</p>
         </div>
         <div className="relative pb-4 mt-2 md:mt-0">
             <button
                 onClick={onMarkAllAsRead}
-                className="flex items-center space-x-2 text-primary hover:text-primary/80 transition-colors font-medium text-[14px] group"
+                className="flex items-center space-x-2 text-primary hover:text-primary/80 transition-colors font-medium text-[13px] md:text-[14px] group"
             >
                 <span className="material-symbols-outlined">done_all</span>
                 <span>Mark all as read</span>
@@ -118,7 +131,7 @@ export const NotificationCard = ({
     onDelete,
 }) => (
     <div
-        className={`paper-scrap-n relative p-3 rounded-lg ${rotation} flex items-start space-x-3 ${
+        className={`paper-scrap-n relative p-1.5 md:p-3 rounded-lg ${rotation} flex items-start space-x-1.5 md:space-x-3 ${
             isUnread ? 'unread-blob-n' : ''
         }`}
     >
@@ -126,9 +139,9 @@ export const NotificationCard = ({
 
         {/* Icon */}
         <div
-            className={`w-9 h-9 flex-shrink-0 rounded-xl shadow-sm border border-slate-100 flex items-center justify-center relative overflow-hidden ${iconBgColor}`}
+            className={`w-5 h-5 md:w-9 md:h-9 flex-shrink-0 rounded-md md:rounded-xl shadow-sm border border-slate-100 flex items-center justify-center relative overflow-hidden ${iconBgColor}`}
         >
-            <span className={`material-symbols-outlined text-3xl ${iconColor}`}>{icon}</span>
+            <span className={`material-symbols-outlined text-xl md:text-3xl ${iconColor}`}>{icon}</span>
             {isUnread && (
                 <div className="absolute inset-0 opacity-10 pointer-events-none">
                     <svg className="w-full h-full" viewBox="0 0 100 100">
@@ -141,21 +154,21 @@ export const NotificationCard = ({
         {/* Content */}
         <div className="flex-1 min-w-0">
             <div className="flex justify-between items-start gap-2">
-                <h3 className="font-semibold text-[16px] text-slate-800 truncate">{title}</h3>
+                <h3 className="font-semibold text-[13px] md:text-[16px] text-slate-800 truncate">{title}</h3>
                 {isUnread && (
                     <span className="flex-shrink-0 text-[10px] font-normal text-primary bg-primary/10 px-2 py-0.5 rounded-full">
                         NEW
                     </span>
                 )}
             </div>
-            <p className={`mt-1 text-[13px] ${isUnread ? '' : 'text-slate-600 italic'}`}>{description}</p>
+            <p className={`mt-1 text-[11px] md:text-[13px] ${isUnread ? '' : 'text-slate-600 italic'}`}>{description}</p>
 
             {timestamp && (
                 <div className="mt-1 text-[10px] text-slate-400 font-normal uppercase tracking-wider">{timestamp}</div>
             )}
 
             {actions.length > 0 && (
-                <div className="mt-4 flex space-x-3">
+                <div className="mt-4 flex space-x-1.5 md:space-x-3">
                     {actions.map((action, index) => (
                         <button
                             key={index}
@@ -177,7 +190,7 @@ export const NotificationCard = ({
                     title="Mark as read"
                     className="text-slate-300 hover:text-primary transition-colors"
                 >
-                    <span className="material-symbols-outlined text-[20px]">done</span>
+                    <span className="material-symbols-outlined text-[15px] md:text-[20px]">done</span>
                 </button>
             )}
             {onDelete && (
@@ -186,7 +199,7 @@ export const NotificationCard = ({
                     title="Delete"
                     className="text-slate-300 hover:text-red-400 transition-colors"
                 >
-                    <span className="material-symbols-outlined text-[20px]">close</span>
+                    <span className="material-symbols-outlined text-[15px] md:text-[20px]">close</span>
                 </button>
             )}
         </div>
@@ -259,7 +272,7 @@ function Section({ label, children }) {
 
 export const NotificationsFooter = () => (
     <div className="mt-20 pt-10 border-t border-slate-200 border-dashed flex justify-between items-center text-slate-400">
-        <p className="font-handwriting text-xl rotate-2">End of the roll...</p>
+        <p className="font-handwriting text-[13px] md:text-xl rotate-2">End of the roll...</p>
     </div>
 );
 
@@ -286,7 +299,7 @@ export const Notifications = () => {
 
                 {loading ? (
                     <div className="flex justify-center py-12">
-                        <span className="material-icons-round text-primary text-[40px] animate-spin">sync</span>
+                        <Loader size="xl" />
                     </div>
                 ) : (
                     <div className="space-y-12">

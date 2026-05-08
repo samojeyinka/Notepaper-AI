@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import Loader from '../globals/Loader';
 import { useParams, useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { PaperHeader } from "./PaperHeader";
 import { PaperToolbar } from "./PaperToolbar";
 import { PaperEditor } from "./PaperEditor";
-import { PaperAISidebar } from "./PaperAISidebar";
+import { AISidebar } from "../shared/AISidebar";
+import { useExpandTopicChannel } from "../../hooks/useExpandTopicChannel";
+import { useSimplifyTopicChannel } from "../../hooks/useSimplifyTopicChannel";
 import { PaperPreferencesSidebar } from "./PaperPreferencesSidebar";
 import { PaperVersionSidebar } from "./PaperVersionSidebar";
 import { PaperPresentationsSidebar } from "./PaperPresentationsSidebar";
@@ -12,6 +15,7 @@ import { DocumentImportModal } from "./DocumentImportModal";
 import { GeneratePresentationModal } from "./GeneratePresentationModal";
 import ShakespeareModal from "../note/ShakespeareModal";
 import YouTubeTranscriptModal from "../note/YouTubeTranscriptModal";
+import { usePlan } from "../../hooks/usePlan";
 import { usePaperSync } from "../../hooks/usePaperSync";
 import { useUndoHistory } from "../../hooks/useUndoHistory";
 import { deserializePaper, paperService } from "../../api/paperService";
@@ -56,8 +60,11 @@ export const Paper = () => {
     const [searchParams]  = useSearchParams();
     const location        = useLocation();
 
+    const { isPaid } = usePlan();
+
     // Core state
-    const [paperId, setPaperId]   = useState(routeId ?? null);
+    const [paperId, setPaperId]       = useState(routeId ?? null);
+    const [isAIGenerating, setIsAIGenerating] = useState(false);
     const [folderId, setFolderId] = useState(() => searchParams.get('folder') ?? null);
     const [folder, setFolder]     = useState(null);
     const [title, setTitle]       = useState("Untitled Paper");
@@ -154,6 +161,15 @@ export const Paper = () => {
     );
     forceFlushRef.current = forceFlush;
 
+    const [showLoader, setShowLoader] = useState(false);
+    useEffect(() => {
+        if (saveStatus === 'loading') {
+            const t = setTimeout(() => setShowLoader(true), 1000);
+            return () => clearTimeout(t);
+        }
+        setShowLoader(false);
+    }, [saveStatus]);
+
     // Undo/redo
     const applySnapshot = useCallback((snapshot) => {
         if (!snapshot) return;
@@ -186,14 +202,24 @@ export const Paper = () => {
     // Load existing paper
     useEffect(() => {
         if (!paperId) return;
-        loadPaper(paperId, (serverPaper) => {
-            const s = deserializePaper(serverPaper);
+        let cancelled = false;
+        loadPaper(paperId, (data) => {
+            if (cancelled) return;
+            if (data.ai_generating) {
+                setIsAIGenerating(true);
+                setTitle(data.title ?? 'Untitled Paper');
+                return;
+            }
+            // data is either a raw server response (has .content JSON string)
+            // or a localStorage draft (already has .pages array directly).
+            const s = Array.isArray(data.pages) ? data : deserializePaper(data);
             setTitle(s.title); setPages(s.pages); setFontSize(s.fontSize); setLineSpacing(s.lineSpacing);
             setDrawingData(s.drawingData); setTextColor(s.textColor); setFontFamily(s.fontFamily);
-            setPaddingX(s.paddingX); setPaddingY(s.paddingY);
+            setPaddingX(s.paddingX ?? 96); setPaddingY(s.paddingY ?? 80);
             if (s.folderId) setFolderId(s.folderId);
             if (s.folder)   setFolder(s.folder);
         });
+        return () => { cancelled = true; };
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Load presentation count
@@ -304,16 +330,36 @@ export const Paper = () => {
     const slug = () => title.replace(/\s+/g,'-').toLowerCase() || 'paper';
 
     const applyWatermark = (canvas) => {
-        const ctx = canvas.getContext('2d'); const r = 2;
-        const lY = canvas.height - 28*r, sY = lY - 20*r - 8*r;
-        ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
-        ctx.font = `300 ${13*r}px 'DM Sans',sans-serif`; ctx.fillStyle = 'rgba(0,0,0,0.2)'; ctx.fillText('Written with', canvas.width/2, sY);
-        ctx.font = `500 ${20*r}px 'DM Sans',sans-serif`; ctx.fillStyle = 'rgba(0,0,0,0.28)'; ctx.fillText('Notepaper-ai.com', canvas.width/2, lY);
+        if (isPaid) return;
+        const ctx = canvas.getContext('2d');
+        const ratio = 2;
+        const smallSize = 11 * ratio;
+        const largeSize = 16 * ratio;
+        const lineGap = 6 * ratio;
+        const paddingBottom = 22 * ratio;
+
+        const cx = canvas.width / 2;
+        const largeY = canvas.height - paddingBottom;
+        const smallY = largeY - largeSize - lineGap;
+
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'alphabetic';
+        ctx.font = `300 ${smallSize}px 'DM Sans', sans-serif`;
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+        ctx.fillText('Written with', cx, smallY);
+
+        ctx.font = `600 ${largeSize}px 'DM Sans', sans-serif`;
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
+        ctx.fillText('NotepaperAI', cx, largeY);
     };
 
     const capturePages = async () => {
         const refs = pageRefsRef.current.filter(Boolean); const canvases = [];
-        for (const el of refs) { const c = await htmlToImage.toCanvas(el, { pixelRatio:2,useCORS:true }); applyWatermark(c); canvases.push(c); }
+        for (const el of refs) {
+            const c = await htmlToImage.toCanvas(el, { pixelRatio:2,useCORS:true });
+            applyWatermark(c);
+            canvases.push(c);
+        }
         return canvases;
     };
 
@@ -397,8 +443,84 @@ export const Paper = () => {
         savedRangeRef.current = null;
     };
 
+    const expandRetryTimerRef = useRef(null);
+
+    useExpandTopicChannel(isAIGenerating ? paperId : null, () => {
+        clearTimeout(expandRetryTimerRef.current);
+        const applyExpanded = (serverPaper) => {
+            const s = Array.isArray(serverPaper.pages) ? serverPaper : deserializePaper(serverPaper);
+            // If content is empty the backend hasn't committed yet — retry up to 5×
+            if (!s.pages.some(p => p?.trim()) && (applyExpanded._attempts = (applyExpanded._attempts ?? 0) + 1) <= 5) {
+                expandRetryTimerRef.current = setTimeout(() => loadPaper(paperId, applyExpanded), 2000);
+                return;
+            }
+            setTitle(s.title); setPages(s.pages); setFontSize(s.fontSize); setLineSpacing(s.lineSpacing);
+            setDrawingData(s.drawingData); setTextColor(s.textColor); setFontFamily(s.fontFamily);
+            setPaddingX(s.paddingX); setPaddingY(s.paddingY);
+            if (s.folderId) setFolderId(s.folderId);
+            if (s.folder)   setFolder(s.folder);
+            setIsAIGenerating(false);
+        };
+        loadPaper(paperId, applyExpanded);
+    });
+
+    useSimplifyTopicChannel(isAIGenerating ? paperId : null, () => {
+        clearTimeout(expandRetryTimerRef.current);
+        const applySimplified = (serverPaper) => {
+            const s = Array.isArray(serverPaper.pages) ? serverPaper : deserializePaper(serverPaper);
+            if (!s.pages.some(p => p?.trim()) && (applySimplified._attempts = (applySimplified._attempts ?? 0) + 1) <= 5) {
+                expandRetryTimerRef.current = setTimeout(() => loadPaper(paperId, applySimplified), 2000);
+                return;
+            }
+            setTitle(s.title); setPages(s.pages); setFontSize(s.fontSize); setLineSpacing(s.lineSpacing);
+            setDrawingData(s.drawingData); setTextColor(s.textColor); setFontFamily(s.fontFamily);
+            setPaddingX(s.paddingX); setPaddingY(s.paddingY);
+            if (s.folderId) setFolderId(s.folderId);
+            if (s.folder)   setFolder(s.folder);
+            setIsAIGenerating(false);
+        };
+        loadPaper(paperId, applySimplified);
+    });
+
+
+    useEffect(() => {
+        if (!isAIGenerating || !paperId) return;
+        const timer = setInterval(async () => {
+            try {
+                const res = await paperService.get(paperId);
+                const serverPaper = res.data;
+                if (!serverPaper.ai_generating && serverPaper.content) {
+                    clearInterval(timer);
+                    const s = deserializePaper(serverPaper);
+                    setTitle(s.title); setPages(s.pages); setFontSize(s.fontSize); setLineSpacing(s.lineSpacing);
+                    setDrawingData(s.drawingData); setTextColor(s.textColor); setFontFamily(s.fontFamily);
+                    setPaddingX(s.paddingX); setPaddingY(s.paddingY);
+                    if (s.folderId) setFolderId(s.folderId);
+                    if (s.folder)   setFolder(s.folder);
+                    setIsAIGenerating(false);
+                }
+            } catch { /* ignore poll errors */ }
+        }, 5000);
+        return () => { clearInterval(timer); clearTimeout(expandRetryTimerRef.current); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isAIGenerating]);
+
     return (
         <div className="flex flex-col flex-1 h-screen overflow-hidden bg-white border-l border-slate-200 lg:ml-64 pt-16 lg:pt-0">
+            {isAIGenerating && (
+                <div className="absolute inset-0 z-50 bg-white/95 backdrop-blur flex flex-col items-center justify-center gap-6">
+                    <div className="relative">
+                        <div className="w-20 h-20 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <span className="material-icons-round text-primary text-[26px]">article</span>
+                        </div>
+                    </div>
+                    <div className="text-center max-w-xs">
+                        <h3 className="text-xl font-bold text-slate-800 mb-2">Schola is writing…</h3>
+                        <p className="text-sm text-slate-500">Schola is preparing your paper in the background — the page will update automatically when it's ready.</p>
+                    </div>
+                </div>
+            )}
             <PaperHeader
                 title={title}
                 onTitleChange={(v) => { pushNow(); setTitle(v); markDirty('title'); }}
@@ -478,11 +600,11 @@ export const Paper = () => {
                 />
 
                 <div className="flex-1 overflow-hidden flex" style={{ position:'relative' }}>
-                    {saveStatus === 'loading' && (
+                    {saveStatus === 'loading' && showLoader && (
                         <div style={{ position:'absolute',inset:0,zIndex:20,pointerEvents:'all',display:'flex',alignItems:'center',justifyContent:'center',background:'rgba(241,245,249,0.7)',backdropFilter:'blur(2px)' }}>
                             <div className="flex flex-col items-center gap-3">
-                                <span className="material-icons-round text-primary text-[40px] animate-spin">sync</span>
-                                <p className="text-xs font-semibold text-slate-500 tracking-wide">Loading paper…</p>
+                                <Loader size="xl" />
+
                             </div>
                         </div>
                     )}
@@ -536,7 +658,7 @@ export const Paper = () => {
                     )}
                 </div>
 
-                {isAISidebarOpen && <PaperAISidebar />}
+                {isAISidebarOpen && <AISidebar sourceType="paper" sourceId={paperId} sourceTitle={title} />}
 
                 {isWebImportOpen && (
                     <YouTubeTranscriptModal

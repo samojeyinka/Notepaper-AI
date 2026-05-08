@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import Loader from '../components/globals/Loader';
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Sidebar } from "../components/user/Sidebar";
 import { FloatingAIButton, FolderShape } from "../components/user/FloatingAIButton";
@@ -349,7 +350,7 @@ const FolderPage = () => {
             <main className="flex-1 lg:ml-64 pt-16 lg:pt-0 min-h-screen flex flex-col">
                 {folderLoading ? (
                     <div className="flex-1 flex items-center justify-center">
-                        <span className="material-icons-round text-primary text-[40px] animate-spin">sync</span>
+                        <Loader size="xl" />
                     </div>
                 ) : folderError ? (
                     <div className="flex-1 flex items-center justify-center flex-col gap-3 text-slate-400">
@@ -447,7 +448,7 @@ const FolderPage = () => {
 
                                     {notesLoading && notes.length === 0 ? (
                                         <div className="flex justify-center py-20">
-                                            <span className="material-icons-round text-primary text-[36px] animate-spin">sync</span>
+                                            <Loader size="lg" />
                                         </div>
                                     ) : notes.length === 0 ? (
                                         <EmptyTab icon="edit_note" message={search ? 'No notes match your search' : `No notes in this folder yet`} sub={search ? 'Try a different keyword.' : 'Use the + button to create your first note.'} />
@@ -460,7 +461,7 @@ const FolderPage = () => {
                                                         : <><span className="font-semibold text-slate-700">{notesMeta?.total ?? notes.length}</span> {(notesMeta?.total ?? notes.length) === 1 ? 'note' : 'notes'}</>
                                                     }
                                                 </p>
-                                                {notesLoading && <span className="material-icons-round text-primary text-[18px] animate-spin">sync</span>}
+                                                {notesLoading && <Loader size="sm" />}
                                             </div>
 
                                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -482,7 +483,7 @@ const FolderPage = () => {
                                                         className="flex items-center gap-2 px-6 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:border-primary hover:text-primary disabled:opacity-40 transition-colors"
                                                     >
                                                         {notesLoading
-                                                            ? <><span className="material-icons-round text-[15px] animate-spin">sync</span>Loading…</>
+                                                            ? <><Loader size="xs" /></>
                                                             : <>Load more</>
                                                         }
                                                     </button>
@@ -498,7 +499,7 @@ const FolderPage = () => {
                                 <div>
                                     {papersLoading ? (
                                         <div className="flex justify-center py-20">
-                                            <span className="material-icons-round text-primary text-[36px] animate-spin">sync</span>
+                                            <Loader size="lg" />
                                         </div>
                                     ) : papers.length === 0 ? (
                                         <EmptyTab icon="article" message="No papers in this folder yet" sub="Use the + button to create a new paper." />
@@ -521,7 +522,7 @@ const FolderPage = () => {
                                 <div>
                                     {flashcardsLoading ? (
                                         <div className="flex justify-center py-20">
-                                            <span className="material-icons-round text-primary text-[36px] animate-spin">sync</span>
+                                            <Loader size="lg" />
                                         </div>
                                     ) : flashcards.length === 0 ? (
                                         <EmptyTab icon="style" message="No flashcard decks in this folder yet" sub="Use the + button to create a new deck." />
@@ -544,7 +545,7 @@ const FolderPage = () => {
                                 <div>
                                     {presentationsLoading ? (
                                         <div className="flex justify-center py-20">
-                                            <span className="material-icons-round text-primary text-[36px] animate-spin">sync</span>
+                                            <Loader size="lg" />
                                         </div>
                                     ) : presentations.length === 0 ? (
                                         <EmptyTab icon="slideshow" message="No presentations in this folder yet" sub="Use the + button to create new slides." />

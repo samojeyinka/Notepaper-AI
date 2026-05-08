@@ -1,15 +1,19 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import Loader from '../globals/Loader';
 import { useParams, useNavigate, useSearchParams, useLocation } from "react-router-dom";
 // useSearchParams is used below to read ?folder= on new-note creation
 import { NoteHeader } from "./NoteHeader";
 import { NoteToolbar } from "./NoteToolbar";
 import { NoteEditor } from "./NoteEditor";
-import { NoteAISidebar } from "./NoteAISidebar";
+import { AISidebar } from "../shared/AISidebar";
+import { useExpandTopicChannel } from "../../hooks/useExpandTopicChannel";
+import { useSimplifyTopicChannel } from "../../hooks/useSimplifyTopicChannel";
 import { NoteSettingsSidebar } from "./NoteSettingsSidebar";
 import { NotePageSidebar } from "./NotePageSidebar";
 import * as htmlToImage from 'html-to-image';
 import { jsPDF } from "jspdf";
 import JSZip from 'jszip';
+import { usePlan } from "../../hooks/usePlan";
 import { useNoteSync } from "../../hooks/useNoteSync";
 import { useUndoHistory } from "../../hooks/useUndoHistory";
 import { deserializeNote, noteService } from "../../api/noteService";
@@ -69,6 +73,7 @@ export const Note = () => {
 
     // Note Data
     const [noteId, setNoteId] = useState(routeId ?? null);
+    const [isAIGenerating, setIsAIGenerating] = useState(false);
     // folderId — set from ?folder= query param on new notes, or from loaded note
     const [folderId, setFolderId] = useState(() => searchParams.get('folder') ?? null);
     const [folder, setFolder]     = useState(null);
@@ -88,6 +93,8 @@ export const Note = () => {
     // read the latest active page index without capturing a stale closure value.
     const activePageIndexRef = useRef(0);
     const [isRecording, setIsRecording] = useState(false);
+
+    const { isPaid } = usePlan();
 
     // Layout State
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -269,6 +276,15 @@ export const Note = () => {
         }
     );
 
+    const [showLoader, setShowLoader] = useState(false);
+    useEffect(() => {
+        if (saveStatus === 'loading') {
+            const t = setTimeout(() => setShowLoader(true), 1000);
+            return () => clearTimeout(t);
+        }
+        setShowLoader(false);
+    }, [saveStatus]);
+
     // Keep the Ctrl+S handler in sync with the latest forceFlush
     forceFlushRef.current = forceFlush;
 
@@ -324,21 +340,31 @@ export const Note = () => {
     // Load existing note on mount
     useEffect(() => {
         if (!noteId) return;
-        loadNote(noteId, (serverNote) => {
-            const s = deserializeNote(serverNote);
+        let cancelled = false;
+        loadNote(noteId, (data) => {
+            if (cancelled) return;
+            if (data.ai_generating) {
+                setIsAIGenerating(true);
+                setTitle(data.title ?? 'Untitled Note');
+                return;
+            }
+            // data is either a raw server response (has .content JSON string)
+            // or a localStorage draft (already has .pages array directly).
+            const s = Array.isArray(data.pages) ? data : deserializeNote(data);
             setTitle(s.title);
             setPages(s.pages);
             setFontSize(s.fontSize);
             setLineSpacing(s.lineSpacing);
             setDrawingData(s.drawingData);
-            setPaperStyle(s.paperStyle);
-            setPaperColor(s.paperColor);
-            setLineColor(s.lineColor);
-            setTextColor(s.textColor);
-            setFontFamily(s.fontFamily);
+            setPaperStyle(s.paperStyle ?? 'ruled');
+            setPaperColor(s.paperColor ?? '#ffffff');
+            setLineColor(s.lineColor ?? '#cbd5e1');
+            setTextColor(s.textColor ?? '#1e293b');
+            setFontFamily(s.fontFamily ?? 'sans');
             if (s.folderId) setFolderId(s.folderId);
             if (s.folder)   setFolder(s.folder);
         });
+        return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -452,13 +478,14 @@ export const Note = () => {
     const slug = () => title.replace(/\s+/g, '-').toLowerCase() || 'note';
 
     const applyWatermark = (canvas) => {
+        if (isPaid) return;
         const ctx = canvas.getContext('2d');
         const ratio = 2;
 
-        const smallSize = 13 * ratio;
-        const largeSize = 20 * ratio;
-        const lineGap = 8 * ratio;
-        const paddingBottom = 28 * ratio;
+        const smallSize = 11 * ratio;
+        const largeSize = 16 * ratio;
+        const lineGap = 6 * ratio;
+        const paddingBottom = 22 * ratio;
 
         const cx = canvas.width / 2;
         const largeY = canvas.height - paddingBottom;
@@ -468,12 +495,12 @@ export const Note = () => {
         ctx.textBaseline = 'alphabetic';
 
         ctx.font = `300 ${smallSize}px 'DM Sans', sans-serif`;
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
         ctx.fillText('Written with', cx, smallY);
 
-        ctx.font = `500 ${largeSize}px 'DM Sans', sans-serif`;
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.28)';
-        ctx.fillText('Notepaper-ai.com', cx, largeY);
+        ctx.font = `600 ${largeSize}px 'DM Sans', sans-serif`;
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
+        ctx.fillText('NotepaperAI', cx, largeY);
     };
 
     const capturePages = async () => {
@@ -542,8 +569,106 @@ export const Note = () => {
         }
     };
 
+    const expandRetryTimerRef = useRef(null);
+
+    useExpandTopicChannel(isAIGenerating ? noteId : null, () => {
+        clearTimeout(expandRetryTimerRef.current);
+        const applyExpanded = (serverNote) => {
+            const s = Array.isArray(serverNote.pages) ? serverNote : deserializeNote(serverNote);
+            // If content is empty the backend hasn't committed yet — retry up to 5×
+            if (!s.pages.some(p => p?.trim()) && (applyExpanded._attempts = (applyExpanded._attempts ?? 0) + 1) <= 5) {
+                expandRetryTimerRef.current = setTimeout(() => loadNote(noteId, applyExpanded), 2000);
+                return;
+            }
+            setTitle(s.title);
+            setPages(s.pages);
+            setFontSize(s.fontSize);
+            setLineSpacing(s.lineSpacing);
+            setDrawingData(s.drawingData);
+            setPaperStyle(s.paperStyle);
+            setPaperColor(s.paperColor);
+            setLineColor(s.lineColor);
+            setTextColor(s.textColor);
+            setFontFamily(s.fontFamily);
+            if (s.folderId) setFolderId(s.folderId);
+            if (s.folder)   setFolder(s.folder);
+            setIsAIGenerating(false);
+        };
+        loadNote(noteId, applyExpanded);
+    });
+
+    useSimplifyTopicChannel(isAIGenerating ? noteId : null, () => {
+        clearTimeout(expandRetryTimerRef.current);
+        const applySimplified = (serverNote) => {
+            const s = Array.isArray(serverNote.pages) ? serverNote : deserializeNote(serverNote);
+            if (!s.pages.some(p => p?.trim()) && (applySimplified._attempts = (applySimplified._attempts ?? 0) + 1) <= 5) {
+                expandRetryTimerRef.current = setTimeout(() => loadNote(noteId, applySimplified), 2000);
+                return;
+            }
+            setTitle(s.title);
+            setPages(s.pages);
+            setFontSize(s.fontSize);
+            setLineSpacing(s.lineSpacing);
+            setDrawingData(s.drawingData);
+            setPaperStyle(s.paperStyle);
+            setPaperColor(s.paperColor);
+            setLineColor(s.lineColor);
+            setTextColor(s.textColor);
+            setFontFamily(s.fontFamily);
+            if (s.folderId) setFolderId(s.folderId);
+            if (s.folder)   setFolder(s.folder);
+            setIsAIGenerating(false);
+        };
+        loadNote(noteId, applySimplified);
+    });
+
+    // Polling fallback: catches cases where ExpandTopicReady/SimplifyTopicReady fired before
+    // this tab subscribed (tab opened after the event was broadcast) — resolves spinner-forever.
+    useEffect(() => {
+        if (!isAIGenerating || !noteId) return;
+        const timer = setInterval(async () => {
+            try {
+                const res = await noteService.get(noteId);
+                const serverNote = res.data;
+                if (!serverNote.ai_generating && serverNote.content) {
+                    clearInterval(timer);
+                    const s = deserializeNote(serverNote);
+                    setTitle(s.title);
+                    setPages(s.pages);
+                    setFontSize(s.fontSize);
+                    setLineSpacing(s.lineSpacing);
+                    setDrawingData(s.drawingData);
+                    setPaperStyle(s.paperStyle);
+                    setPaperColor(s.paperColor);
+                    setLineColor(s.lineColor);
+                    setTextColor(s.textColor);
+                    setFontFamily(s.fontFamily);
+                    if (s.folderId) setFolderId(s.folderId);
+                    if (s.folder)   setFolder(s.folder);
+                    setIsAIGenerating(false);
+                }
+            } catch { /* ignore poll errors */ }
+        }, 5000);
+        return () => { clearInterval(timer); clearTimeout(expandRetryTimerRef.current); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isAIGenerating]);
+
     return (
         <div className="flex flex-col flex-1 h-screen overflow-hidden bg-white border-l border-slate-200 lg:ml-64 pt-16 lg:pt-0">
+            {isAIGenerating && (
+                <div className="absolute inset-0 z-50 bg-white/95 backdrop-blur flex flex-col items-center justify-center gap-6">
+                    <div className="relative">
+                        <div className="w-20 h-20 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <span className="material-icons-round text-primary text-[26px]">description</span>
+                        </div>
+                    </div>
+                    <div className="text-center max-w-xs">
+                        <h3 className="text-xl font-bold text-slate-800 mb-2">Schola is writing…</h3>
+                        <p className="text-sm text-slate-500">Schola is preparing your note in the background — the page will update automatically when it's ready.</p>
+                    </div>
+                </div>
+            )}
             <NoteHeader
                 title={title}
                 onTitleChange={(v) => { pushNow(); setTitle(v); markDirty('title'); }}
@@ -663,12 +788,12 @@ export const Note = () => {
                 />
 
                 <div className="flex-1 overflow-hidden flex" style={{ position: 'relative' }}>
-                    {/* Loading overlay — blocks interaction while note data is being fetched */}
-                    {saveStatus === 'loading' && (
+                    {/* Loading overlay — only shown if fetch takes longer than 1 s */}
+                    {saveStatus === 'loading' && showLoader && (
                         <div style={{ position: 'absolute', inset: 0, zIndex: 20, pointerEvents: 'all', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(241,245,249,0.7)', backdropFilter: 'blur(2px)' }}>
-                            <div className="flex flex-col items-center gap-3">
-                                <span className="material-icons-round text-primary text-[40px] animate-spin">sync</span>
-                                <p className="text-xs font-semibold text-slate-500 tracking-wide">Loading note…</p>
+                            <div className="flex flex-col items-center justify-center gap-3">
+                                <Loader size="xl" />
+            
                             </div>
                         </div>
                     )}
@@ -740,7 +865,7 @@ export const Note = () => {
                 </div>
 
                 {isAISidebarOpen && (
-                    <NoteAISidebar />
+                    <AISidebar sourceType="note" sourceId={noteId} sourceTitle={title} />
                 )}
 
                 {isYouTubeOpen && (

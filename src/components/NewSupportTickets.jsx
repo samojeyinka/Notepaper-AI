@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Loader from './globals/Loader';
 import { Link, useNavigate } from 'react-router-dom';
 import { ticketService } from '../api/ticketService';
 import { workspaceCache } from '../api/workspaceCache';
@@ -119,7 +120,7 @@ export const SubmitButton = ({ onClick, disabled = false, loading = false }) => 
                     className="bg-primary text-white px-3 md:px-6 py-1 md:py-2 rounded-full font-medium md:font-semibold text-[13px] md:text-[15px] shadow-sm hover:shadow-primary/40 hover:-translate-y-1 active:translate-y-0 transition-all flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {loading ? (
-                        <span className="material-symbols-outlined animate-spin">progress_activity</span>
+                        <Loader size="md" />
                     ) : (
                         <>
                             <span>Submit Ticket</span>
