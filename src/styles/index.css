@@ -660,5 +660,5 @@ body {
 /* Handle */
 ::-webkit-scrollbar-thumb {
   background: var(--note-purple);
-  border-bottom: 10px solid var(--note-purple);
+  border-bottom: 100px solid var(--note-purple);
 }
