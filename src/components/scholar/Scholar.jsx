@@ -1,4 +1,8 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { scholarService } from '../../api/scholarService';
+import echo from '../../lib/echo';
+import { useAuth } from '../../context/AuthContext';
+
 
 // ── Shimmer keyframe injected once ────────────────────────────────────────────
 const SHIMMER_CSS = `
@@ -99,169 +103,364 @@ const IdlePanel = () => (
     </div>
 );
 
-// ── Generating right panel ────────────────────────────────────────────────────
-const GeneratingPanel = ({ email }) => (
-    <div className="flex-1 bg-white rounded-lg shadow-lg border border-slate-100 flex flex-col items-center justify-center p-10 text-center">
-        <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-8 animate-pulse">
-            <span className="material-icons-round text-primary text-3xl">hourglass_empty</span>
-        </div>
 
-        <h3 className="text-xl font-semibold text-slate-800 mb-2">Synthesizing Research</h3>
-        <p className="text-[14px] text-slate-500 mb-8 leading-relaxed">
-            This is deep work —{' '}
-            <span className="text-primary font-semibold">we'll email you when it's ready.</span>
-        </p>
 
-        {/* Shimmer bar */}
-        <div className="w-full h-1.5 bg-slate-100 rounded-full mb-8 overflow-hidden">
-            <div className="h-full w-2/3 scholar-shimmer rounded-full" />
-        </div>
-
-        <div className="flex flex-col items-center gap-3 w-full">
-            <div className="flex items-center gap-2 text-slate-400">
-                <span className="material-icons-round text-[16px]">mail</span>
-                <p className="text-[13px]">
-                    Notification → <span className="font-semibold text-slate-600">{email}</span>
-                </p>
+// ── Outline review panel ──────────────────────────────────────────────────────
+const OutlineReviewPanel = ({ document, onApprove, loading }) => (
+    <div className="flex-1 flex flex-col gap-5">
+        <div className="bg-white rounded-lg shadow-sm border border-slate-100 p-6">
+            <div className="flex items-center gap-3 mb-4">
+                <div className="w-9 h-9 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
+                    <span className="material-icons-round text-primary text-[18px]">list_alt</span>
+                </div>
+                <div>
+                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Document Outline Ready</p>
+                    <p className="text-[14px] font-semibold text-slate-800">{document.title}</p>
+                </div>
             </div>
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-full">
-                <span className="material-icons-round text-emerald-500 text-[14px]">check_circle</span>
-                <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                    You can close this tab safely
-                </p>
-            </div>
-        </div>
 
-        <div className="mt-10 pt-8 border-t border-slate-100 w-full grid grid-cols-2 gap-4 text-left">
-            <div>
-                <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1">Estimated Time</p>
-                <p className="text-[13px] font-semibold text-slate-700">4–6 minutes</p>
+            <div className="flex flex-col gap-2 mb-5">
+                {(document.outline?.chapters || []).map(ch => (
+                    <div key={ch.chapter_number} className="flex items-start gap-3 p-3 rounded-lg bg-slate-50 border border-slate-100">
+                        <span className="w-6 h-6 bg-primary/10 text-primary rounded-full text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                            {ch.chapter_number}
+                        </span>
+                        <div className="min-w-0">
+                            <p className="text-[13px] font-semibold text-slate-700 leading-snug">{ch.title}</p>
+                            <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">{ch.description}</p>
+                        </div>
+                        <span className="shrink-0 text-[10px] text-slate-400 font-medium ml-auto">~{ch.estimated_pages}p</span>
+                    </div>
+                ))}
             </div>
-            <div>
-                <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1">Queue Status</p>
-                <p className="text-[13px] font-semibold text-slate-700">Priority High</p>
+
+            <div className="flex items-center gap-3 pt-4 border-t border-slate-100">
+                <div className="text-[12px] text-slate-500 flex-1">
+                    {document.toc_enabled && <span className="inline-flex items-center gap-1 mr-3"><span className="material-icons-round text-[13px] text-emerald-500">check</span>TOC</span>}
+                    {document.bibliography_enabled && <span className="inline-flex items-center gap-1"><span className="material-icons-round text-[13px] text-emerald-500">check</span>Bibliography</span>}
+                </div>
+                <button
+                    onClick={onApprove}
+                    disabled={loading}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-white text-[13px] font-semibold shadow-sm hover:bg-primary/90 transition-all active:scale-95 disabled:opacity-50"
+                >
+                    {loading ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <span className="material-icons-round text-[16px]">play_arrow</span>}
+                    Start Writing
+                </button>
             </div>
         </div>
     </div>
 );
 
-// ── Done right panel ──────────────────────────────────────────────────────────
-const DonePanel = ({ title }) => (
-    <div className="flex-1 flex flex-col gap-5">
-        {/* Main result card */}
-        <div className="bg-white rounded-lg shadow-lg border border-slate-100 p-6 flex flex-col gap-5 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl pointer-events-none -mr-8 -mt-8" />
+// ── Chapter review panel ──────────────────────────────────────────────────────
+const ChapterReviewPanel = ({ chapter, totalChapters, onUpdate, onApprove, onRetry, loading, isFailed }) => {
+    const [content, setContent] = useState(chapter.content || '');
+    const [isDirty, setIsDirty] = useState(false);
+    const [saving, setSaving] = useState(false);
 
-            {/* Status badge */}
-            <span className="inline-flex self-start items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-[11px] font-semibold">
-                <span className="material-icons-round text-[13px]">check_circle</span>
-                Research Complete
-            </span>
+    useEffect(() => { setContent(chapter.content || ''); setIsDirty(false); }, [chapter.id]);
 
-            {/* Title + meta */}
-            <div>
-                <h3 className="text-lg font-semibold text-slate-800 leading-snug mb-3">{title}</h3>
-                <div className="flex items-center gap-4 text-slate-400">
-                    <div className="flex items-center gap-1.5">
-                        <span className="material-icons-round text-[15px]">format_align_left</span>
-                        <span className="text-[13px] font-medium">3,500 words</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                        <span className="material-icons-round text-[15px]">schedule</span>
-                        <span className="text-[13px] font-medium">12 min read</span>
-                    </div>
-                </div>
-            </div>
+    const handleSave = async () => {
+        setSaving(true);
+        try { await onUpdate(content); setIsDirty(false); } finally { setSaving(false); }
+    };
 
-            {/* Quality score */}
-            <div className="bg-slate-50 rounded-lg p-4 border border-slate-100">
-                <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">
-                        Content Quality Score
+    return (
+        <div className="flex-1 flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <span className="w-7 h-7 bg-primary/10 text-primary rounded-full text-[12px] font-bold flex items-center justify-center">
+                        {chapter.chapter_number}
                     </span>
-                    <span className="text-sm font-semibold text-primary">98%</span>
-                </div>
-                <div className="h-1.5 w-full bg-slate-200 rounded-full overflow-hidden">
-                    <div className="h-full bg-primary rounded-full" style={{ width: '98%' }} />
-                </div>
-                <div className="mt-4 flex items-center gap-4">
                     <div>
-                        <p className="text-[10px] text-slate-400 uppercase font-semibold tracking-widest">Citations</p>
-                        <p className="text-[13px] font-semibold text-slate-700 mt-0.5">24 Sources</p>
-                    </div>
-                    <div className="w-px h-8 bg-slate-200" />
-                    <div>
-                        <p className="text-[10px] text-slate-400 uppercase font-semibold tracking-widest">Originality</p>
-                        <p className="text-[13px] font-semibold text-slate-700 mt-0.5">99.8% Unique</p>
+                        <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">
+                            Chapter {chapter.chapter_number} of {totalChapters}
+                        </p>
+                        <p className="text-[14px] font-semibold text-slate-800">{chapter.title}</p>
                     </div>
                 </div>
+                <span className="text-[11px] text-slate-400">{chapter.word_count?.toLocaleString()} words</span>
             </div>
 
-            {/* Actions */}
-            <div className="flex flex-col gap-2">
-                <div className="grid grid-cols-2 gap-2">
-                    <button className="flex items-center justify-center gap-2 py-3 rounded-lg bg-primary text-white text-[13px] font-semibold shadow-sm hover:bg-primary/90 transition-all active:scale-95">
-                        <span className="material-icons-round text-[16px]">download</span>
-                        Download
-                    </button>
-                    <button className="flex items-center justify-center gap-2 py-3 rounded-lg bg-primary text-white text-[13px] font-semibold shadow-sm hover:bg-primary/90 transition-all active:scale-95">
-                        <span className="material-icons-round text-[16px]">edit_square</span>
-                        Open & Edit
+            {isFailed ? (
+                <div className="flex-1 flex flex-col items-center justify-center gap-4 bg-red-50 rounded-lg border border-red-100 p-8">
+                    <span className="material-icons-round text-red-400 text-4xl">error_outline</span>
+                    <p className="text-[14px] text-red-600 font-semibold">Generation failed for this chapter.</p>
+                    <button onClick={onRetry} className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-red-600 text-white text-[13px] font-semibold hover:bg-red-700 transition-colors">
+                        <span className="material-icons-round text-[16px]">refresh</span>
+                        Retry Chapter
                     </button>
                 </div>
-                <button className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-primary/8 text-primary text-[13px] font-semibold hover:bg-primary/12 transition-colors border border-primary/15">
-                    <span className="material-icons-round text-[16px]">slideshow</span>
-                    Export as Presentation
-                </button>
-            </div>
+            ) : (
+                <>
+                    <div className="flex-1 relative">
+                        <textarea
+                            value={content}
+                            onChange={e => { setContent(e.target.value); setIsDirty(true); }}
+                            className="w-full h-full min-h-[340px] bg-white border border-slate-200 rounded-lg p-4 text-[13px] text-slate-700 font-mono resize-none outline-none focus:ring-2 focus:ring-primary/20 shadow-sm leading-relaxed"
+                            placeholder="Chapter content will appear here…"
+                        />
+                        {isDirty && (
+                            <button
+                                onClick={handleSave}
+                                disabled={saving}
+                                className="absolute top-3 right-3 text-[11px] font-semibold text-primary bg-primary/8 hover:bg-primary/12 px-3 py-1.5 rounded-full border border-primary/15 transition-colors"
+                            >
+                                {saving ? 'Saving…' : 'Save edits'}
+                            </button>
+                        )}
+                    </div>
+
+                    {chapter.citations?.length > 0 && (
+                        <details className="bg-slate-50 rounded-lg border border-slate-100 p-3">
+                            <summary className="text-[11px] font-semibold text-slate-500 uppercase tracking-widest cursor-pointer">
+                                {chapter.citations.length} citations used
+                            </summary>
+                            <ol className="mt-3 flex flex-col gap-1.5 pl-4">
+                                {chapter.citations.map((c, i) => (
+                                    <li key={i} className="text-[11px] text-slate-500 leading-relaxed">
+                                        {c.author} ({c.year}). <em>{c.title}</em>. {c.source}.
+                                    </li>
+                                ))}
+                            </ol>
+                        </details>
+                    )}
+
+                    <button
+                        onClick={onApprove}
+                        disabled={loading || isDirty}
+                        className="w-full py-3 rounded-lg bg-primary text-white text-[13px] font-semibold flex items-center justify-center gap-2 shadow-sm hover:bg-primary/90 transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                        {loading ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <span className="material-icons-round text-[16px]">check</span>}
+                        {isDirty ? 'Save edits before approving' : chapter.chapter_number < totalChapters ? 'Approve & Generate Next Chapter' : 'Approve & Assemble Document'}
+                    </button>
+                </>
+            )}
         </div>
+    );
+};
 
-        {/* AI agent strip */}
-        <div className="bg-white rounded-lg border border-slate-100 px-5 py-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-                <div className="w-9 h-9 bg-amber-50 rounded-lg flex items-center justify-center shrink-0">
-                    <span className="material-icons-round text-amber-500 text-[18px]">auto_awesome</span>
-                </div>
-                <div>
-                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">AI Research Agent</p>
-                    <p className="text-[13px] font-semibold text-slate-700">Synthesis Complete</p>
-                </div>
-            </div>
-            <button className="text-[13px] font-semibold text-primary hover:underline">
-                View Logs
-            </button>
+// ── Progress panel (outline generating / chapter generating / assembling) ─────
+const ProgressPanel = ({ message, progress }) => (
+    <div className="flex-1 bg-white rounded-lg shadow-sm border border-slate-100 flex flex-col items-center justify-center p-10 text-center">
+        <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-8 animate-pulse">
+            <span className="material-icons-round text-primary text-3xl">hourglass_empty</span>
+        </div>
+        <h3 className="text-xl font-semibold text-slate-800 mb-2">Working…</h3>
+        <p className="text-[14px] text-slate-500 mb-8 leading-relaxed max-w-xs">{message || 'Gemini is researching and writing…'}</p>
+        <div className="w-full h-1.5 bg-slate-100 rounded-full mb-3 overflow-hidden">
+            <div
+                className="h-full scholar-shimmer rounded-full transition-all duration-500"
+                style={{ width: progress > 0 ? `${progress}%` : '30%' }}
+            />
+        </div>
+        {progress > 0 && <p className="text-[11px] font-semibold text-slate-400">{progress}%</p>}
+        <div className="mt-8 inline-flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-full">
+            <span className="material-icons-round text-emerald-500 text-[14px]">check_circle</span>
+            <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">You can close this tab safely</p>
         </div>
     </div>
 );
 
 // ── Main Scholar component ────────────────────────────────────────────────────
 export default function Scholar() {
-    const [status, setStatus]           = useState('idle'); // idle | generating | done
-    const [refs, setRefs]               = useState([null, null]);
+    const { user }   = useAuth(); 
+
+    // Core state
+    const [phase, setPhase]           = useState('idle');
+    const [refs, setRefs]             = useState([null, null]);
     const [instructions, setInstructions] = useState('');
-    const [reportTitle, setReportTitle] = useState('');
+    const [exportFormat, setExportFormat] = useState('pdf');
+    const [document, setDocument]     = useState(null);
+    const [activeChapter, setActiveChapter] = useState(null);
+    const [progressMsg, setProgressMsg]   = useState('');
+    const [progress, setProgress]     = useState(0);
+    const [error, setError]           = useState('');
+    const [loading, setLoading]       = useState(false);
 
-    const handleUpload = (index, file) => setRefs(prev => prev.map((r, i) => i === index ? file : r));
-    const handleRemove = (index)       => setRefs(prev => prev.map((r, i) => i === index ? null : r));
+    const echoChannel = useRef(null);
 
-    const handleGenerate = () => {
+    // ── Subscribe to broadcast channel when we have a document ───────────────
+    useEffect(() => {
+        if (!user?.id || !document?.id) return;
+
+        const channel = echo.private(`scholar.${user.id}`);
+        echoChannel.current = channel;
+
+        channel.listen('ScholarProgressEvent', (event) => {
+            if (event.document_ulid !== document.id) return;
+
+            setProgressMsg(event.message);
+            setProgress(event.progress);
+
+            const data = event.data || {};
+
+            if (data.status === 'failed') {
+                setPhase('failed');
+                return;
+            }
+
+            if (event.type === 'outline' && data.status === 'outline_ready') {
+                scholarService.show(document.id).then(res => {
+                    setDocument(res.data);
+                    setPhase('outline_review');
+                });
+            }
+
+            if (event.type === 'chapter' && data.status === 'chapter_ready') {
+                scholarService.show(document.id).then(res => {
+                    const doc = res.data;
+                    setDocument(doc);
+                    const readyChapter = (doc.chapters || []).find(c => c.chapter_number === data.chapter_number);
+                    setActiveChapter(readyChapter || null);
+                    setPhase('chapter_review');
+                });
+            }
+
+            if (event.type === 'assembly' && data.status === 'complete') {
+                scholarService.show(document.id).then(res => {
+                    setDocument(res.data);
+                    setPhase('complete');
+                });
+            }
+        });
+
+        return () => {
+            echo.leave(`scholar.${user.id}`);
+            echoChannel.current = null;
+        };
+    }, [user?.id, document?.id]);
+
+    // ── Handlers ─────────────────────────────────────────────────────────────
+    const handleUpload   = (i, file) => setRefs(prev => prev.map((r, idx) => idx === i ? file : r));
+    const handleRemove   = (i)       => setRefs(prev => prev.map((r, idx) => idx === i ? null : r));
+
+    const handleGenerate = useCallback(async () => {
         if (!instructions.trim()) return;
-        setReportTitle(instructions.trim().slice(0, 60) + (instructions.length > 60 ? '…' : ''));
-        setStatus('generating');
-        // Placeholder — real API call goes here
-        setTimeout(() => setStatus('done'), 5000);
-    };
+        setError('');
+        setLoading(true);
+        try {
+            const res = await scholarService.create({
+                prompt: instructions.trim(),
+                exportFormat,
+                uploads: refs.filter(Boolean),
+            });
+            setDocument(res.data);
+            setPhase('generating_outline');
+            setProgressMsg('Analysing your prompt and researching the topic…');
+            setProgress(10);
+        } catch (err) {
+            setError(err?.message || err?.errors?.prompt?.[0] || err?.errors?.plan?.[0] || 'Something went wrong.');
+        } finally {
+            setLoading(false);
+        }
+    }, [instructions, exportFormat, refs]);
+
+    const handleApproveOutline = useCallback(async () => {
+        setLoading(true);
+        try {
+            await scholarService.approveOutline(document.id);
+            setPhase('generating_chapter');
+            setProgressMsg('Writing Chapter 1…');
+            setProgress(5);
+        } catch (err) {
+            setError(err?.message || 'Failed to start writing.');
+        } finally {
+            setLoading(false);
+        }
+    }, [document]);
+
+    const handleUpdateChapter = useCallback(async (content) => {
+        await scholarService.updateChapter(document.id, activeChapter.id, content);
+        setActiveChapter(prev => ({ ...prev, content }));
+    }, [document, activeChapter]);
+
+    const handleApproveChapter = useCallback(async () => {
+        setLoading(true);
+        setError('');
+        try {
+            const res = await scholarService.approveChapter(document.id, activeChapter.id);
+            const updatedDoc = res.data;
+            setDocument(updatedDoc);
+
+            const allApproved = (updatedDoc.chapters || []).every(c => c.status === 'approved');
+            if (allApproved) {
+                setPhase('assembling');
+                setProgressMsg('Assembling your final document…');
+                setProgress(80);
+            } else {
+                setPhase('generating_chapter');
+                setProgressMsg(`Writing Chapter ${activeChapter.chapter_number + 1}…`);
+                setProgress(Math.round((activeChapter.chapter_number / updatedDoc.total_chapters) * 100));
+            }
+        } catch (err) {
+            setError(err?.message || 'Failed to approve chapter.');
+        } finally {
+            setLoading(false);
+        }
+    }, [document, activeChapter]);
+
+    const handleRetryChapter = useCallback(async () => {
+        setLoading(true);
+        try {
+            await scholarService.retryChapter(document.id, activeChapter.id);
+            setPhase('generating_chapter');
+            setProgressMsg(`Retrying Chapter ${activeChapter.chapter_number}…`);
+        } catch (err) {
+            setError(err?.message || 'Retry failed.');
+        } finally {
+            setLoading(false);
+        }
+    }, [document, activeChapter]);
 
     const handleReset = () => {
-        setStatus('idle');
+        setPhase('idle');
         setRefs([null, null]);
         setInstructions('');
-        setReportTitle('');
+        setDocument(null);
+        setActiveChapter(null);
+        setError('');
+        setProgress(0);
+        setProgressMsg('');
     };
 
-    const isGenerating = status === 'generating';
-    const isDone       = status === 'done';
-    const canGenerate  = instructions.trim().length > 0 && !isGenerating;
+    const handleExport = (format) => {
+        const url = scholarService.exportUrl(document.id) + (format ? `?format=${format}` : '');
+        window.open(url, '_blank');
+    };
+
+    const isLocked  = ['generating_outline', 'generating_chapter', 'assembling'].includes(phase);
+    const isDone    = phase === 'complete';
+    const canSubmit = instructions.trim().length >= 20 && !loading && !isLocked;
+
+    // ── Right panel ───────────────────────────────────────────────────────────
+    const renderRight = () => {
+        if (phase === 'idle')              return <IdlePanel />;
+        if (phase === 'generating_outline' || phase === 'generating_chapter' || phase === 'assembling')
+            return <ProgressPanel message={progressMsg} progress={progress} />;
+        if (phase === 'outline_review')
+            return <OutlineReviewPanel document={document} onApprove={handleApproveOutline} loading={loading} />;
+        if (phase === 'chapter_review' || phase === 'failed')
+            return activeChapter
+                ? <ChapterReviewPanel
+                    chapter={activeChapter}
+                    totalChapters={document?.total_chapters || 1}
+                    onUpdate={handleUpdateChapter}
+                    onApprove={handleApproveChapter}
+                    onRetry={handleRetryChapter}
+                    loading={loading}
+                    isFailed={phase === 'failed'}
+                  />
+                : <ProgressPanel message="Loading chapter…" progress={0} />;
+        if (isDone)
+            return <DonePanel
+                title={document?.title}
+                wordCount={document?.word_count}
+                citationCount={document?.citation_count}
+                onExport={handleExport}
+            />;
+        return <IdlePanel />;
+    };
 
     return (
         <>
@@ -284,7 +483,7 @@ export default function Scholar() {
                         <div className="flex flex-col gap-3">
                             <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
                                 <span className="material-icons-round text-primary text-[15px]">attachment</span>
-                                Reference Examples
+                                Reference Files
                             </p>
                             <div className="grid grid-cols-2 gap-3">
                                 {refs.map((file, i) => (
@@ -292,13 +491,31 @@ export default function Scholar() {
                                         key={i}
                                         index={i}
                                         file={file}
-                                        disabled={isGenerating}
+                                        disabled={isLocked || isDone}
                                         onUpload={f => handleUpload(i, f)}
                                         onRemove={() => handleRemove(i)}
                                     />
                                 ))}
                             </div>
                         </div>
+
+                        {/* Export format */}
+                        {!isLocked && !isDone && (
+                            <div className="flex flex-col gap-2">
+                                <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">Output Format</p>
+                                <div className="flex gap-2">
+                                    {['pdf', 'docx', 'html'].map(f => (
+                                        <button
+                                            key={f}
+                                            onClick={() => setExportFormat(f)}
+                                            className={`px-4 py-2 rounded-lg text-[12px] font-semibold border transition-all ${exportFormat === f ? 'bg-primary text-white border-primary shadow-sm' : 'bg-white text-slate-500 border-slate-200 hover:border-primary/40'}`}
+                                        >
+                                            {f.toUpperCase()}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
                         {/* Instructions textarea */}
                         <div className="flex flex-col gap-3 flex-1">
@@ -310,17 +527,20 @@ export default function Scholar() {
                                 <textarea
                                     value={instructions}
                                     onChange={e => setInstructions(e.target.value)}
-                                    disabled={isGenerating}
+                                    disabled={isLocked || isDone}
                                     placeholder="Describe what you want: topic, depth, format, audience…"
                                     className="w-full h-full min-h-[200px] bg-white border border-slate-100 rounded-lg p-5 text-[14px] text-slate-700 placeholder-slate-300 resize-none outline-none focus:ring-2 focus:ring-primary/20 shadow-sm hover:shadow-md transition-shadow disabled:opacity-50 disabled:cursor-not-allowed"
                                 />
-                                {instructions.trim() && !isGenerating && (
-                                    <button className="absolute bottom-3 right-3 text-[11px] font-semibold text-primary bg-primary/8 hover:bg-primary/12 px-3 py-1.5 rounded-full transition-colors border border-primary/15">
-                                        Improve Prompt
-                                    </button>
-                                )}
                             </div>
                         </div>
+
+                        {/* Error */}
+                        {error && (
+                            <div className="flex items-start gap-2 bg-red-50 border border-red-100 rounded-lg px-4 py-3">
+                                <span className="material-icons-round text-red-400 text-[16px] mt-0.5">error_outline</span>
+                                <p className="text-[13px] text-red-600">{error}</p>
+                            </div>
+                        )}
 
                         {/* CTA */}
                         {isDone ? (
@@ -329,33 +549,103 @@ export default function Scholar() {
                                 className="w-full py-4 rounded-lg bg-slate-100 text-slate-600 text-[14px] font-semibold flex items-center justify-center gap-2 hover:bg-slate-200 transition-colors active:scale-95"
                             >
                                 <span className="material-icons-round text-[18px]">refresh</span>
-                                Start New Report
+                                Start New Document
                             </button>
                         ) : (
                             <button
                                 onClick={handleGenerate}
-                                disabled={!canGenerate}
+                                disabled={!canSubmit}
                                 className="w-full py-4 rounded-lg bg-primary text-white text-[14px] font-semibold flex items-center justify-center gap-2 shadow-lg hover:bg-primary/90 hover:shadow-md transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
                             >
-                                {isGenerating ? (
+                                {loading ? (
                                     <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                                 ) : (
                                     <span className="material-icons-round text-[18px]">auto_awesome</span>
                                 )}
-                                {isGenerating ? 'Generating…' : 'Generate Report'}
+                                {isLocked ? 'Generating…' : 'Generate Document'}
                             </button>
                         )}
                     </section>
 
-                    {/* ── Right column — status panel ── */}
+                    {/* ── Right column — dynamic panel ── */}
                     <section className="col-span-12 lg:col-span-7 flex flex-col min-h-[420px] pb-8">
-                        {status === 'idle'       && <IdlePanel />}
-                        {status === 'generating' && <GeneratingPanel email="user@example.com" />}
-                        {status === 'done'       && <DonePanel title={reportTitle || 'Your Research Report'} />}
+                        {renderRight()}
                     </section>
 
                 </div>
             </main>
         </>
+    );
+}
+
+// ── Done panel (updated to accept real data) ──────────────────────────────────
+function DonePanel({ title, wordCount, citationCount, onExport }) {
+    const readMins = Math.ceil((wordCount || 0) / 200);
+    return (
+        <div className="flex-1 flex flex-col gap-5">
+            <div className="bg-white rounded-lg shadow-lg border border-slate-100 p-6 flex flex-col gap-5 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl pointer-events-none -mr-8 -mt-8" />
+
+                <span className="inline-flex self-start items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-[11px] font-semibold">
+                    <span className="material-icons-round text-[13px]">check_circle</span>
+                    Research Complete
+                </span>
+
+                <div>
+                    <h3 className="text-lg font-semibold text-slate-800 leading-snug mb-3">{title || 'Your Research Document'}</h3>
+                    <div className="flex items-center gap-4 text-slate-400">
+                        <div className="flex items-center gap-1.5">
+                            <span className="material-icons-round text-[15px]">format_align_left</span>
+                            <span className="text-[13px] font-medium">{(wordCount || 0).toLocaleString()} words</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                            <span className="material-icons-round text-[15px]">schedule</span>
+                            <span className="text-[13px] font-medium">{readMins} min read</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="bg-slate-50 rounded-lg p-4 border border-slate-100">
+                    <div className="flex items-center gap-4">
+                        <div>
+                            <p className="text-[10px] text-slate-400 uppercase font-semibold tracking-widest">Citations</p>
+                            <p className="text-[13px] font-semibold text-slate-700 mt-0.5">{citationCount || 0} Sources</p>
+                        </div>
+                        <div className="w-px h-8 bg-slate-200" />
+                        <div>
+                            <p className="text-[10px] text-slate-400 uppercase font-semibold tracking-widest">Format</p>
+                            <p className="text-[13px] font-semibold text-slate-700 mt-0.5">APA</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                    <div className="grid grid-cols-3 gap-2">
+                        {['pdf', 'docx', 'html'].map(fmt => (
+                            <button
+                                key={fmt}
+                                onClick={() => onExport(fmt)}
+                                className="flex items-center justify-center gap-1.5 py-3 rounded-lg bg-primary text-white text-[12px] font-semibold shadow-sm hover:bg-primary/90 transition-all active:scale-95"
+                            >
+                                <span className="material-icons-round text-[15px]">download</span>
+                                {fmt.toUpperCase()}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            <div className="bg-white rounded-lg border border-slate-100 px-5 py-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 bg-amber-50 rounded-lg flex items-center justify-center shrink-0">
+                        <span className="material-icons-round text-amber-500 text-[18px]">auto_awesome</span>
+                    </div>
+                    <div>
+                        <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">AI Research Agent</p>
+                        <p className="text-[13px] font-semibold text-slate-700">Gemini 2.5 Flash — Complete</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 }
