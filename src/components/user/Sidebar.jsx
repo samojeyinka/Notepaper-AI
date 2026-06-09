@@ -10,7 +10,7 @@ export const Sidebar = ({ activePage }) => {
   const navItems = [
     { path: '/lockedin', icon: 'grid_view', label: 'Dashboard' },
     { path: '/lockedin/library', icon: 'folder', label: 'Library' },
-    // { path: '/lockedin/scholar', icon: 'memory', label: 'Scholar' },
+    { path: '/lockedin/scholar', icon: 'memory', label: 'Scholar' },
     { path: '/lockedin/generate', icon: 'psychology', label: 'AI Studio' },
     { path: '/lockedin/quizzes',    icon: 'quiz',       label: 'Quizzes'    },
     { path: '/lockedin/sprints',    icon: 'bolt',       label: 'Sprints'    },

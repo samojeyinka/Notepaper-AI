@@ -6,11 +6,11 @@ const BASE = '/scholar';
 export const scholarService = {
     list: () => apiClient(BASE),
 
-    create: async ({ prompt, exportFormat = 'pdf', citationStyle = 'apa', uploads = [] }) => {
+    create: async ({ prompt, citationStyle = 'apa', pageCount = 20, uploads = [] }) => {
         const formData = new FormData();
         formData.append('prompt', prompt);
-        formData.append('export_format', exportFormat);
         formData.append('citation_style', citationStyle);
+        formData.append('page_count', pageCount);
         uploads.forEach(file => formData.append('uploads[]', file));
 
         const res = await fetch(`${BASE_URL}${BASE}`, {
