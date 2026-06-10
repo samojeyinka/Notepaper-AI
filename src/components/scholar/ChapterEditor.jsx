@@ -11,6 +11,25 @@ import { TableHeader } from '@tiptap/extension-table-header';
 import CharacterCount from '@tiptap/extension-character-count';
 import { useState, useEffect, useRef } from 'react';
 import { scholarService } from '../../api/scholarService';
+import ShakespeareModal from '../note/ShakespeareModal';
+
+function shakespeareToHtml(text) {
+    return text
+        .split(/\n{2,}/)
+        .map(p => p.trim())
+        .filter(Boolean)
+        .map(p => {
+            const escaped = p
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                .replace(/\n/g, '<br>');
+            return `<p>${escaped}</p>`;
+        })
+        .join('');
+}
 
 function Divider() {
     return <span className="w-px h-5 bg-slate-200 mx-0.5 shrink-0 inline-block" />;
@@ -38,8 +57,9 @@ function ToolBtn({ onClick, active, disabled, title, children }) {
 }
 
 export default function ChapterEditor({ chapter, documentId, onSave, onCancel, onDirtyChange }) {
-    const [saving, setSaving] = useState(false);
-    const [saveError, setSaveError] = useState('');
+    const [saving, setSaving]               = useState(false);
+    const [saveError, setSaveError]         = useState('');
+    const [shakespeareOpen, setShakespeareOpen] = useState(false);
 
     const focusedRef = useRef(false);
 
@@ -262,7 +282,7 @@ export default function ChapterEditor({ chapter, documentId, onSave, onCancel, o
             </div>
 
             {/* ── Content row ─────────────────────────────────────────────── */}
-            <div className="flex flex-col bg-white">
+            <div className="relative flex flex-col bg-white">
                 {saveError && (
                     <div className="flex items-center gap-1.5 px-4 py-2 bg-red-50 border-b border-red-100 text-[12px] text-red-600">
                         <span className="material-icons-round text-[14px]">error_outline</span>
@@ -270,7 +290,31 @@ export default function ChapterEditor({ chapter, documentId, onSave, onCancel, o
                     </div>
                 )}
                 <EditorContent editor={editor} />
+
+                {/* Floating Shakespeare FAB */}
+                <button
+                    type="button"
+                    onMouseDown={(e) => { e.preventDefault(); setShakespeareOpen(true); }}
+                    title="Shakespeare Assist — AI writing"
+                    className="absolute bottom-4 right-4 w-11 h-11 rounded-full flex items-center justify-center text-white shakespeare-glow-btn"
+                    style={{
+                        background: 'linear-gradient(135deg, #6541c4 0%, #9b59f5 50%, #6541c4 100%)',
+                        backgroundSize: '200% 200%',
+                    }}
+                >
+                    <span className="material-icons-round text-[20px] shakespeare-sparkle">auto_awesome</span>
+                </button>
             </div>
+
+            {shakespeareOpen && (
+                <ShakespeareModal
+                    onClose={() => { setShakespeareOpen(false); editor?.commands.focus(); }}
+                    onInsert={(text) => {
+                        setShakespeareOpen(false);
+                        editor?.chain().focus().insertContent(shakespeareToHtml(text)).run();
+                    }}
+                />
+            )}
         </div>
     );
 }

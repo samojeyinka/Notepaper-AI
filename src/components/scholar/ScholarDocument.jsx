@@ -34,6 +34,30 @@ const SHIMMER_CSS = `
     0%   { background-position: 200% 0; }
     100% { background-position: -200% 0; }
 }
+@keyframes shakespeareBgShift {
+    0%,100% { background-position: 0% 50%; }
+    50%      { background-position: 100% 50%; }
+}
+@keyframes shakespeareGlow {
+    0%,100% { box-shadow: 0 0 6px 1px rgba(101,65,196,0.55), 0 0 14px 2px rgba(155,89,245,0.35); }
+    50%      { box-shadow: 0 0 10px 3px rgba(101,65,196,0.80), 0 0 22px 5px rgba(155,89,245,0.55); }
+}
+@keyframes shakespeareSparkle {
+    0%,100% { transform: scale(1) rotate(0deg);   opacity: 1; }
+    30%      { transform: scale(1.25) rotate(12deg); opacity: 0.85; }
+    60%      { transform: scale(0.9) rotate(-8deg);  opacity: 1; }
+}
+.shakespeare-glow-btn {
+    animation: shakespeareBgShift 3s ease infinite, shakespeareGlow 2.5s ease-in-out infinite;
+}
+.shakespeare-glow-btn:hover {
+    animation: shakespeareBgShift 1.5s ease infinite, shakespeareGlow 1s ease-in-out infinite;
+    filter: brightness(1.15);
+}
+.shakespeare-sparkle {
+    animation: shakespeareSparkle 2.5s ease-in-out infinite;
+    display: inline-block;
+}
 .scholar-shimmer {
     background: linear-gradient(90deg, #ab8eff 0%, #6541c4 50%, #ab8eff 100%);
     background-size: 200% 100%;
