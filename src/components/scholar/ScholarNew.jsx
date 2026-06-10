@@ -55,6 +55,9 @@ export default function ScholarNew() {
     const [instructions, setInstructions] = useState('');
     const [citationStyle, setCitationStyle] = useState('apa');
     const [pageCount, setPageCount]       = useState(20);
+    const [includeToc, setIncludeToc]           = useState(true);
+    const [pageNumbering, setPageNumbering]     = useState(true);
+    const [includeReferences, setIncludeReferences] = useState(true);
     const [error, setError]               = useState('');
     const [loading, setLoading]           = useState(false);
 
@@ -72,6 +75,9 @@ export default function ScholarNew() {
                 prompt: instructions.trim(),
                 citationStyle,
                 pageCount,
+                includeToc,
+                pageNumbering,
+                includeReferences,
                 uploads: refs.filter(Boolean),
             });
             navigate(`/lockedin/scholar/${res.data.id}`);
@@ -178,6 +184,37 @@ export default function ScholarNew() {
                                     className={`px-3 py-1.5 rounded-lg text-[12px] font-semibold border transition-all disabled:opacity-50 ${citationStyle === s ? 'bg-primary text-white border-primary shadow-sm' : 'bg-white text-slate-500 border-slate-200 hover:border-primary/40'}`}
                                 >
                                     {s.toUpperCase()}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Document options */}
+                    <div className="flex flex-col gap-2">
+                        <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">Document Options</p>
+                        <div className="flex flex-col gap-2">
+                            {[
+                                { label: 'Table of Contents', desc: 'Auto-generated TOC at the start of the document', value: includeToc, set: setIncludeToc, icon: 'toc' },
+                                { label: 'Page Numbering', desc: 'Include page numbers in exported files', value: pageNumbering, set: setPageNumbering, icon: 'tag' },
+                                { label: 'References', desc: 'Include a bibliography / references section', value: includeReferences, set: setIncludeReferences, icon: 'format_quote' },
+                            ].map(({ label, desc, value, set, icon }) => (
+                                <button
+                                    key={label}
+                                    type="button"
+                                    onClick={() => !loading && set(v => !v)}
+                                    disabled={loading}
+                                    className={`flex items-center justify-between px-4 py-3 rounded-lg border transition-all text-left disabled:opacity-50 ${value ? 'border-primary/30 bg-primary/5' : 'border-slate-200 bg-white hover:border-slate-300'}`}
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <span className={`material-icons-round text-[18px] ${value ? 'text-primary' : 'text-slate-400'}`}>{icon}</span>
+                                        <div>
+                                            <p className={`text-[13px] font-semibold ${value ? 'text-slate-800' : 'text-slate-600'}`}>{label}</p>
+                                            <p className="text-[11px] text-slate-400">{desc}</p>
+                                        </div>
+                                    </div>
+                                    <div className={`w-9 h-5 rounded-full relative transition-colors shrink-0 ${value ? 'bg-primary' : 'bg-slate-200'}`}>
+                                        <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-all ${value ? 'left-4' : 'left-0.5'}`} />
+                                    </div>
                                 </button>
                             ))}
                         </div>
