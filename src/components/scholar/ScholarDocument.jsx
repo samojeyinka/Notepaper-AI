@@ -36,7 +36,17 @@ const SHIMMER_CSS = `
 .scholar-doc figure.image-placeholder { width: 100%; min-height: 130px; border: 2px dashed #c4b5fd; border-radius: 0.75rem; background: #faf5ff; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 1.75rem 0; padding: 1.5rem 2rem; gap: 0.5rem; }
 .scholar-doc figure.image-placeholder::before { content: 'SUGGESTED IMAGE'; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.15em; color: #6541c4; font-family: system-ui, -apple-system, sans-serif; }
 .scholar-doc figure.image-placeholder::after { content: attr(data-keywords); font-size: 0.875rem; color: #7c3aed; font-style: italic; font-family: system-ui, -apple-system, sans-serif; text-align: center; line-height: 1.5; }
+.scholar-doc img.scholar-generated-image { display: block; width: 100%; border-radius: 0.75rem; margin: 1.75rem 0; object-fit: cover; }
 `;
+
+// Converts <figure class="scholar-generated-image" data-src="URL" data-alt="..."> into a real <img> tag.
+// Also handles the legacy <img class="scholar-generated-image"> format already in the DB.
+function resolveImages(html) {
+    return html.replace(
+        /<figure\s+class="scholar-generated-image"\s+data-src="([^"]+)"(?:\s+data-alt="([^"]*)")?\s*><\/figure>/gi,
+        (_, src, alt = '') => `<img src="${src}" alt="${alt}" class="scholar-generated-image" onerror="this.style.display='none'" />`
+    );
+}
 
 const ACTIVE_STATUSES = new Set([
     'pending_outline', 'generating_outline', 'outline_ready',
@@ -230,7 +240,7 @@ function DocumentViewer({ doc, onExport }) {
                     >
                         <div
                             className="scholar-doc"
-                            dangerouslySetInnerHTML={{ __html: ch.content || '' }}
+                            dangerouslySetInnerHTML={{ __html: resolveImages(ch.content || '') }}
                         />
                     </section>
                 ))}
