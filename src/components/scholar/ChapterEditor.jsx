@@ -204,7 +204,7 @@ function ToolBtn({ onClick, active, disabled, title, children }) {
 }
 
 // Dropdown container — children can be JSX or a render function `(close) => JSX`
-function DropdownMenu({ trigger, children, minW = 'min-w-[160px]', alignRight = false }) {
+function DropdownMenu({ trigger, children, minW = 'min-w-[160px]', alignRight = false, panelClass = 'max-h-64 overflow-y-auto' }) {
     const [open, setOpen] = useState(false);
     const ref  = useRef(null);
     const close = useCallback(() => setOpen(false), []);
@@ -222,7 +222,7 @@ function DropdownMenu({ trigger, children, minW = 'min-w-[160px]', alignRight = 
                 {trigger}
             </div>
             {open && (
-                <div className={`absolute ${alignRight ? 'right-0' : 'left-0'} top-full mt-0.5 z-50 bg-white rounded-lg shadow-xl border border-slate-200 py-1 ${minW} max-h-64 overflow-y-auto`}>
+                <div className={`absolute ${alignRight ? 'right-0' : 'left-0'} top-full mt-0.5 z-50 bg-white rounded-lg shadow-xl border border-slate-200 py-1 ${minW} ${panelClass}`}>
                     {typeof children === 'function' ? children(close) : children}
                 </div>
             )}
@@ -246,6 +246,65 @@ function MenuItem({ onSelect, active, icon, children, separator }) {
             {icon && <span className="material-icons-round text-[14px] text-slate-400 shrink-0">{icon}</span>}
             {children}
         </button>
+    );
+}
+
+// ── Table grid picker ────────────────────────────────────────────────────────
+function TableGridPicker({ editor, close }) {
+    const [hovCol, setHovCol] = useState(0);
+    const [hovRow, setHovRow] = useState(0);
+    const CELL = 16;
+    const MAX  = 20;
+
+    const visCols = Math.min(MAX, Math.max(10, hovCol + 1));
+    const visRows = Math.min(MAX, Math.max(10, hovRow + 1));
+
+    return (
+        <div
+            className="px-2 py-1.5"
+            onMouseLeave={() => { setHovCol(0); setHovRow(0); }}
+        >
+            <div className="flex items-center gap-2 mb-1 text-[12px] text-slate-500 pointer-events-none select-none">
+                <span className="material-icons-round text-[14px] text-slate-400">table_chart</span>
+                Table
+            </div>
+            <div
+                style={{
+                    display: 'grid',
+                    gridTemplateColumns: `repeat(${visCols}, ${CELL}px)`,
+                    lineHeight: 0,
+                }}
+            >
+                {Array.from({ length: visRows * visCols }, (_, i) => {
+                    const r = Math.floor(i / visCols);
+                    const c = i % visCols;
+                    return (
+                        <div
+                            key={`${r}-${c}`}
+                            style={{
+                                width: CELL,
+                                height: CELL,
+                                border: '1px solid #000',
+                                borderRadius: 2,
+                                backgroundColor: r < hovRow && c < hovCol ? '#1a73e8' : '#fff',
+                                boxSizing: 'border-box',
+                            }}
+                            onMouseEnter={() => { setHovCol(c + 1); setHovRow(r + 1); }}
+                            onMouseDown={(e) => {
+                                e.preventDefault();
+                                if (hovCol > 0 && hovRow > 0) {
+                                    editor?.chain().focus().insertTable({ rows: hovRow, cols: hovCol, withHeaderRow: true }).run();
+                                    close();
+                                }
+                            }}
+                        />
+                    );
+                })}
+            </div>
+            <div className="mt-1 text-center text-[11px] text-slate-500 select-none">
+                {hovCol > 0 && hovRow > 0 ? `${hovCol} × ${hovRow}` : 'Insert table'}
+            </div>
+        </div>
     );
 }
 
@@ -537,7 +596,7 @@ export default function ChapterEditor({ chapter, documentId, onSave, onCancel, o
 
                 {/* Insert */}
                 <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageFile} />
-                <DropdownMenu trigger={triggerBtn(null, 'add', 'Insert')} minW="min-w-[160px]">
+                <DropdownMenu trigger={triggerBtn(null, 'add', 'Insert')} minW="min-w-[160px]" panelClass="overflow-y-auto">
                     {(close) => (
                         <>
                             <MenuItem icon="link" onSelect={() => { insertLink(); close(); }} active={editor?.isActive('link')}>Link</MenuItem>
@@ -546,7 +605,7 @@ export default function ChapterEditor({ chapter, documentId, onSave, onCancel, o
                             <MenuItem icon={isUploading ? 'hourglass_top' : 'image'} onSelect={() => { fileInputRef.current?.click(); close(); }}>
                                 {isUploading ? 'Uploading…' : 'Upload image'}
                             </MenuItem>
-                            <MenuItem icon="table_chart" onSelect={() => { editor?.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run(); close(); }}>Table</MenuItem>
+                            <TableGridPicker editor={editor} close={close} />
                             <MenuItem separator />
                             <MenuItem icon="format_quote"           onSelect={() => { editor?.chain().focus().toggleBlockquote().run(); close(); }}    active={editor?.isActive('blockquote')}>Blockquote</MenuItem>
                             <MenuItem icon="integration_instructions" onSelect={() => { editor?.chain().focus().toggleCodeBlock().run(); close(); }}   active={editor?.isActive('codeBlock')}>Code block</MenuItem>

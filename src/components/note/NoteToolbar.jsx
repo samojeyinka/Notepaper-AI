@@ -182,6 +182,55 @@ const AdvancedColorPicker = ({ anchorRef, color, onChange, onClose, title, recen
   );
 };
 
+const TableGridPopover = ({ anchorRef, onSelect }) => {
+  const [hovCol, setHovCol] = useState(0);
+  const [hovRow, setHovRow] = useState(0);
+  const CELL = 16;
+  const MAX  = 20;
+
+  const visCols = Math.min(MAX, Math.max(10, hovCol + 1));
+  const visRows = Math.min(MAX, Math.max(10, hovRow + 1));
+
+  return (
+    <Popover anchorRef={anchorRef}>
+      <div
+        className="p-3 flex flex-col gap-2"
+        onMouseLeave={() => { setHovCol(0); setHovRow(0); }}
+      >
+        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pointer-events-none select-none">
+          Insert Table
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${visCols}, ${CELL}px)`, lineHeight: 0 }}>
+          {Array.from({ length: visRows * visCols }, (_, i) => {
+            const r = Math.floor(i / visCols);
+            const c = i % visCols;
+            return (
+              <div
+                key={`${r}-${c}`}
+                style={{
+                  width: CELL, height: CELL,
+                  border: '1px solid #000',
+                  borderRadius: 2,
+                  backgroundColor: r < hovRow && c < hovCol ? '#1a73e8' : '#fff',
+                  boxSizing: 'border-box',
+                }}
+                onMouseEnter={() => { setHovCol(c + 1); setHovRow(r + 1); }}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  if (hovCol > 0 && hovRow > 0) onSelect(hovRow, hovCol);
+                }}
+              />
+            );
+          })}
+        </div>
+        <div className="text-center text-[11px] text-slate-500 select-none">
+          {hovCol > 0 && hovRow > 0 ? `${hovCol} × ${hovRow}` : 'Insert table'}
+        </div>
+      </div>
+    </Popover>
+  );
+};
+
 const DrawPopover = ({ anchorRef, drawMode, onAction }) => {
   const [localColor, setLocalColor] = useState(drawMode?.color || '#1e293b');
   const thicknesses = [2, 4, 6, 10, 16];
@@ -283,6 +332,7 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
   const [showFontSize, setShowFontSize] = useState(false);
   const [showUrlInput, setShowUrlInput] = useState(false);
   const [showDraw, setShowDraw] = useState(false);
+  const [showTable, setShowTable] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [url, setUrl] = useState("");
   const fileInputRef = useRef(null);
@@ -297,6 +347,7 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
   const textColorBtnRef = useRef(null);
   const highlightBtnRef = useRef(null);
   const drawBtnRef = useRef(null);
+  const tableBtnRef = useRef(null);
 
   const fontSizeOptions = [
     { label: 'Small', value: '1' },
@@ -311,11 +362,12 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
     setShowFontSize(false);
     setShowUrlInput(false);
     setShowDraw(false);
+    setShowTable(false);
   };
 
   // Close on outside click or toolbar scroll
   useEffect(() => {
-    const isAnyOpen = showTextColor || showHighlight || showFontSize || showUrlInput || showDraw;
+    const isAnyOpen = showTextColor || showHighlight || showFontSize || showUrlInput || showDraw || showTable;
     if (!isAnyOpen) return;
 
     const handleOutside = (e) => {
@@ -333,7 +385,7 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
       document.removeEventListener("mousedown", handleOutside);
       toolbar?.removeEventListener("scroll", handleScroll);
     };
-  }, [showTextColor, showHighlight, showFontSize, showUrlInput]);
+  }, [showTextColor, showHighlight, showFontSize, showUrlInput, showDraw, showTable]);
 
   // Returns the <a> element wrapping the current selection, if any
   const getSelectedAnchor = () => {
@@ -610,6 +662,41 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
           >
             <span className="material-icons-round text-[13px] md:text-[20px]">{isUploading ? 'hourglass_top' : 'image'}</span>
           </button>
+          <div ref={tableBtnRef}>
+            <button
+              onMouseDown={(e) => {
+                e.preventDefault();
+                saveSelection();
+                setShowTable(v => !v);
+                setShowTextColor(false);
+                setShowHighlight(false);
+                setShowFontSize(false);
+                setShowUrlInput(false);
+                setShowDraw(false);
+              }}
+              className={`w-7 h-7 md:w-10 md:h-10 rounded-md md:rounded-xl flex items-center justify-center transition-all
+                ${showTable ? 'bg-slate-900 text-white shadow-lg' : 'bg-slate-100/50 text-slate-600 hover:bg-slate-200'}`}
+              title="Insert Table"
+            >
+              <span className="material-icons-round text-[13px] md:text-[20px]">table_chart</span>
+            </button>
+          </div>
+          {showTable && (
+            <TableGridPopover
+              anchorRef={tableBtnRef}
+              onSelect={(rows, cols) => {
+                if (savedRangeRef.current) {
+                  const sel = window.getSelection();
+                  sel.removeAllRanges();
+                  sel.addRange(savedRangeRef.current);
+                  savedRangeRef.current = null;
+                }
+                onAction('insertTable', { rows, cols });
+                setShowTable(false);
+              }}
+            />
+          )}
+
           <div ref={drawBtnRef}>
             <button
               onMouseDown={(e) => {
@@ -619,6 +706,7 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
                 setShowHighlight(false);
                 setShowFontSize(false);
                 setShowUrlInput(false);
+                setShowTable(false);
               }}
               className={`w-7 h-7 md:w-10 md:h-10 rounded-md md:rounded-xl flex items-center justify-center transition-all
                 ${activeState?.drawMode?.active ? 'bg-primary text-white shadow-lg shadow-primary/30' : 'bg-slate-100/50 text-slate-600 hover:bg-slate-200'}

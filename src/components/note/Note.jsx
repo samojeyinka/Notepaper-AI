@@ -388,6 +388,30 @@ export const Note = () => {
             return;
         }
 
+        // Table insertion
+        if (command === 'insertTable') {
+            const { rows, cols } = value;
+            const headerCells = Array.from({ length: cols }, () =>
+                '<th style="border:1px solid #ccc;padding:4px 8px;background:#f1f5f9;min-width:60px;">&nbsp;</th>'
+            ).join('');
+            const bodyRows = Array.from({ length: rows - 1 }, () => {
+                const cells = Array.from({ length: cols }, () =>
+                    '<td style="border:1px solid #ccc;padding:4px 8px;min-width:60px;">&nbsp;</td>'
+                ).join('');
+                return `<tr>${cells}</tr>`;
+            }).join('');
+            const tableHTML = `<table style="border-collapse:collapse;width:auto;margin:4px 0;"><thead><tr>${headerCells}</tr></thead><tbody>${bodyRows}</tbody></table><p><br></p>`;
+            if (activeEditorRef.current) activeEditorRef.current.focus();
+            document.execCommand('insertHTML', false, tableHTML);
+            if (activeEditorRef.current) {
+                const newPages = [...pages];
+                newPages[activePageIndex] = activeEditorRef.current.innerHTML;
+                setPages(newPages);
+                markDirty('content');
+            }
+            return;
+        }
+
         // Standard formatting — needs editor focus
         if (activeEditorRef.current) {
             activeEditorRef.current.focus();
