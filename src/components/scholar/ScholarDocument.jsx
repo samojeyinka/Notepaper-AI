@@ -804,29 +804,78 @@ function DocumentViewer({ doc, onExport }) {
 }
 
 // ── Failed panel ──────────────────────────────────────────────────────────────
-function FailedPanel({ doc, onRetry }) {
-    const failedChapter = (doc?.chapters || []).find(c => c.status === 'generating' || c.status === 'pending');
+function FailedPanel({ doc, onRetryChapter, onRetryOutline }) {
+    const chapters      = doc?.chapters || [];
+    const outlineFailed = chapters.length === 0;
+    const failedChapter = !outlineFailed
+        ? chapters.find(c => c.status === 'pending' || c.status === 'generating')
+        : null;
+    const approvedCount = chapters.filter(c => c.status === 'approved').length;
+
     return (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mb-6">
-                <span className="material-icons-round text-red-400 text-3xl">error_outline</span>
+        <div className="flex flex-col items-center justify-center py-20 text-center gap-4">
+            <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center">
+                <span className="material-icons-round text-red-400 text-[30px]">error_outline</span>
             </div>
-            <h2 className="text-xl font-semibold text-slate-800 mb-2">Generation failed</h2>
-            <p className="text-[14px] text-slate-500 mb-2 max-w-sm">
-                {doc?.meta?.error || 'An unexpected error occurred during document generation.'}
-            </p>
-            {failedChapter && (
-                <p className="text-[12px] text-slate-400 mb-8">Failed on: Chapter {failedChapter.chapter_number} — {failedChapter.title}</p>
+
+            <div>
+                <h2 className="text-[18px] font-semibold text-slate-800 mb-1">Generation failed</h2>
+                <p className="text-[13px] text-slate-500 max-w-sm">
+                    {doc?.meta?.error || 'An unexpected error occurred during document generation.'}
+                </p>
+            </div>
+
+            {/* Progress context */}
+            {outlineFailed ? (
+                <p className="text-[12px] text-slate-400">Failed while generating the document outline.</p>
+            ) : failedChapter ? (
+                <p className="text-[12px] text-slate-400">
+                    Failed on Chapter {failedChapter.chapter_number} — {failedChapter.title}
+                    {approvedCount > 0 && ` · ${approvedCount} of ${chapters.length} chapters completed`}
+                </p>
+            ) : (
+                <p className="text-[12px] text-slate-400">
+                    {approvedCount} of {chapters.length} chapters completed before failure.
+                </p>
             )}
-            {failedChapter && (
-                <button
-                    onClick={() => onRetry(doc, failedChapter)}
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-white text-[13px] font-semibold shadow-sm hover:bg-primary/90 transition-all active:scale-95"
-                >
-                    <span className="material-icons-round text-[16px]">refresh</span>
-                    Retry Chapter {failedChapter.chapter_number}
-                </button>
-            )}
+
+            {/* Actions */}
+            <div className="flex flex-col sm:flex-row items-center gap-3 mt-2">
+                {outlineFailed ? (
+                    <button
+                        onClick={onRetryOutline}
+                        className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-white text-[13px] font-semibold shadow-sm hover:bg-primary/90 transition-all active:scale-95"
+                    >
+                        <span className="material-icons-round text-[16px]">refresh</span>
+                        Retry outline generation
+                    </button>
+                ) : failedChapter ? (
+                    <>
+                        <button
+                            onClick={() => onRetryChapter(doc, failedChapter)}
+                            className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-white text-[13px] font-semibold shadow-sm hover:bg-primary/90 transition-all active:scale-95"
+                        >
+                            <span className="material-icons-round text-[16px]">play_arrow</span>
+                            Continue from Chapter {failedChapter.chapter_number}
+                        </button>
+                        <button
+                            onClick={onRetryOutline}
+                            className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-slate-200 text-slate-600 text-[13px] font-semibold hover:bg-slate-50 transition-all active:scale-95"
+                        >
+                            <span className="material-icons-round text-[16px]">restart_alt</span>
+                            Restart from scratch
+                        </button>
+                    </>
+                ) : (
+                    <button
+                        onClick={onRetryOutline}
+                        className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-white text-[13px] font-semibold shadow-sm hover:bg-primary/90 transition-all active:scale-95"
+                    >
+                        <span className="material-icons-round text-[16px]">restart_alt</span>
+                        Restart from scratch
+                    </button>
+                )}
+            </div>
         </div>
     );
 }
@@ -875,13 +924,24 @@ export default function ScholarDocument() {
         window.open(scholarService.exportUrl(id) + `?format=${fmt}`, '_blank');
     };
 
-    const handleRetry = async (document, chapter) => {
+    const handleRetryChapter = async (document, chapter) => {
         try {
             await scholarService.retryChapter(document.id, chapter.id);
             setDoc(prev => ({ ...prev, status: 'generating_chapter' }));
             startPolling(id);
         } catch (err) {
             setError(err?.message || 'Retry failed.');
+        }
+    };
+
+    const handleRetryOutline = async () => {
+        try {
+            setError('');
+            await scholarService.retryOutline(id);
+            setDoc(prev => ({ ...prev, status: 'pending_outline', chapters: [] }));
+            startPolling(id);
+        } catch (err) {
+            setError(err?.errors?.plan?.[0] || err?.message || 'Could not restart generation.');
         }
     };
 
@@ -925,7 +985,11 @@ export default function ScholarDocument() {
                                 <DocumentViewer doc={doc} onExport={handleExport} />
                             )}
                             {doc.status === 'failed' && (
-                                <FailedPanel doc={doc} onRetry={handleRetry} />
+                                <FailedPanel
+                                    doc={doc}
+                                    onRetryChapter={handleRetryChapter}
+                                    onRetryOutline={handleRetryOutline}
+                                />
                             )}
                         </>
                     )}

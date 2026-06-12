@@ -15,6 +15,7 @@ import CharacterCount from '@tiptap/extension-character-count';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { scholarService } from '../../api/scholarService';
 import ShakespeareModal from '../note/ShakespeareModal';
+import ImageSearchModal from './ImageSearchModal';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const FONT_SIZES = [8, 9, 10, 11, 12, 14, 16, 18, 20, 24, 28, 32, 36, 48, 72];
@@ -372,6 +373,7 @@ export default function ChapterEditor({ chapter, documentId, onSave, onCancel, o
     const [saving, setSaving]                   = useState(false);
     const [saveError, setSaveError]             = useState('');
     const [shakespeareOpen, setShakespeareOpen] = useState(false);
+    const [imageAiOpen, setImageAiOpen]         = useState(false);
     const [isUploading, setIsUploading]         = useState(false);
 
     const focusedRef   = useRef(false);
@@ -605,6 +607,7 @@ export default function ChapterEditor({ chapter, documentId, onSave, onCancel, o
                             <MenuItem icon={isUploading ? 'hourglass_top' : 'image'} onSelect={() => { fileInputRef.current?.click(); close(); }}>
                                 {isUploading ? 'Uploading…' : 'Upload image'}
                             </MenuItem>
+                            <MenuItem icon="image_search" onSelect={() => { setImageAiOpen(true); close(); }}>Search Images</MenuItem>
                             <TableGridPicker editor={editor} close={close} />
                             <MenuItem separator />
                             <MenuItem icon="format_quote"           onSelect={() => { editor?.chain().focus().toggleBlockquote().run(); close(); }}    active={editor?.isActive('blockquote')}>Blockquote</MenuItem>
@@ -684,6 +687,16 @@ export default function ChapterEditor({ chapter, documentId, onSave, onCancel, o
                     onInsert={(text) => {
                         setShakespeareOpen(false);
                         editor?.chain().focus().insertContent(shakespeareToHtml(text)).run();
+                    }}
+                />
+            )}
+
+            {imageAiOpen && (
+                <ImageSearchModal
+                    onClose={() => { setImageAiOpen(false); editor?.commands.focus(); }}
+                    onInsert={(url) => {
+                        setImageAiOpen(false);
+                        editor?.chain().focus().setImage({ src: url }).run();
                     }}
                 />
             )}

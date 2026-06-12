@@ -45,6 +45,9 @@ export const scholarService = {
     approveChapter: (ulid, chapterId) =>
         apiClient(`${BASE}/${ulid}/chapters/${chapterId}/approve`, { method: 'POST' }),
 
+    retryOutline: (ulid) =>
+        apiClient(`${BASE}/${ulid}/retry-outline`, { method: 'POST' }),
+
     retryChapter: (ulid, chapterId) =>
         apiClient(`${BASE}/${ulid}/chapters/${chapterId}/retry`, { method: 'POST' }),
 
