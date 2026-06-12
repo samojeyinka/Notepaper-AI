@@ -610,6 +610,13 @@ function DocumentViewer({ doc, onExport }) {
     );
     const dirtyRef      = useRef(false);
     const [pendingEditId, setPendingEditId] = useState(null);
+    const [docLineHeight, setDocLineHeight]   = useState('1.5');
+    const [docSpaceBefore, setDocSpaceBefore] = useState(false);
+    const [docSpaceAfter, setDocSpaceAfter]   = useState(false);
+    const [marginTop,    setMarginTop]    = useState(24);
+    const [marginRight,  setMarginRight]  = useState(24);
+    const [marginBottom, setMarginBottom] = useState(24);
+    const [marginLeft,   setMarginLeft]   = useState(24);
     // meta.page_numbering is stored as string '1'/'0' or boolean; use loose != to handle both
     const pageNumbering = doc.meta?.page_numbering != false && doc.meta?.page_numbering !== '0';
 
@@ -698,15 +705,87 @@ function DocumentViewer({ doc, onExport }) {
                 />
             )}
 
+            {/* Global spacing + margin overrides — affects every chapter in both view and edit mode */}
+            <style>{`
+                .scholar-doc p, .scholar-doc li,
+                .scholar-editor-content p, .scholar-editor-content li {
+                    line-height: ${docLineHeight} !important;
+                    ${docSpaceBefore ? 'margin-top: 1em !important;' : ''}
+                    ${docSpaceAfter  ? 'margin-bottom: 1em !important;' : ''}
+                }
+                .scholar-doc,
+                .scholar-editor-content {
+                    padding-top: ${marginTop}px !important;
+                    padding-right: ${marginRight}px !important;
+                    padding-bottom: ${marginBottom}px !important;
+                    padding-left: ${marginLeft}px !important;
+                }
+            `}</style>
+
             {/* Sticky document header */}
-            <div className="sticky top-0 z-10 bg-white/90 backdrop-blur-sm border-b border-slate-100 px-0 py-3 mb-8 flex items-center justify-between">
-                <div>
+            <div className="sticky top-0 z-10 bg-white/90 backdrop-blur-sm border-b border-slate-100 px-0 py-3 mb-8 flex items-center gap-3 justify-between">
+                <div className="shrink-0">
                     <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Scholar Document</p>
                     <p className="text-[14px] font-semibold text-slate-800 leading-snug">{doc.title}</p>
                 </div>
-                <div className="flex items-center gap-2">
+
+                {/* Document-wide spacing controls */}
+                <div className="flex items-center gap-1.5 ml-auto">
+                    <span className="material-icons-round text-slate-400 text-[16px]">format_line_spacing</span>
+                    <select
+                        value={docLineHeight}
+                        onChange={e => setDocLineHeight(e.target.value)}
+                        className="text-[12px] text-slate-600 border border-slate-200 rounded-lg px-2 py-1 bg-white outline-none focus:border-primary/50 cursor-pointer"
+                    >
+                        <option value="1">Single</option>
+                        <option value="1.15">1.15</option>
+                        <option value="1.5">1.5</option>
+                        <option value="2">Double</option>
+                    </select>
+                    <button
+                        onClick={() => setDocSpaceBefore(v => !v)}
+                        title={docSpaceBefore ? 'Remove space before paragraph' : 'Add space before paragraph'}
+                        className={`flex items-center justify-center w-7 h-7 rounded-lg transition-colors ${docSpaceBefore ? 'bg-primary text-white' : 'text-slate-400 hover:bg-slate-100'}`}
+                    >
+                        <span className="material-icons-round text-[16px]">vertical_align_top</span>
+                    </button>
+                    <button
+                        onClick={() => setDocSpaceAfter(v => !v)}
+                        title={docSpaceAfter ? 'Remove space after paragraph' : 'Add space after paragraph'}
+                        className={`flex items-center justify-center w-7 h-7 rounded-lg transition-colors ${docSpaceAfter ? 'bg-primary text-white' : 'text-slate-400 hover:bg-slate-100'}`}
+                    >
+                        <span className="material-icons-round text-[16px]">vertical_align_bottom</span>
+                    </button>
+                </div>
+
+                {/* Document-wide margin controls */}
+                <div className="flex items-center gap-1.5">
+                    <span className="material-icons-round text-slate-400 text-[16px]" title="Page margins">border_outer</span>
+                    <div className="grid grid-cols-2 gap-x-2 gap-y-0.5">
+                        {[
+                            { label: 'T', val: marginTop,    set: setMarginTop    },
+                            { label: 'R', val: marginRight,  set: setMarginRight  },
+                            { label: 'B', val: marginBottom, set: setMarginBottom },
+                            { label: 'L', val: marginLeft,   set: setMarginLeft   },
+                        ].map(({ label, val, set }) => (
+                            <div key={label} className="flex items-center gap-1">
+                                <span className="text-[9px] font-bold text-slate-400 w-3 leading-none">{label}</span>
+                                <input
+                                    type="number"
+                                    value={val}
+                                    onChange={e => set(Math.max(0, Number(e.target.value)))}
+                                    min="0"
+                                    step="4"
+                                    className="w-10 text-center text-[11px] text-slate-600 border border-slate-200 rounded px-1 py-0.5 bg-white outline-none focus:border-primary/50"
+                                />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
                     <span className="text-[12px] text-slate-400 mr-1">Export:</span>
-                    {['pdf', 'docx', 'html'].map(fmt => (
+                    {['pdf', 'docx'].map(fmt => (
                         <button
                             key={fmt}
                             onClick={() => onExport(fmt)}

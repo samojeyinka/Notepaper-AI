@@ -34,6 +34,9 @@ const LINE_SPACINGS = [
     { label: '1.5',    value: '1.5'  },
     { label: 'Double', value: '2'    },
 ];
+// A4 content height at 96 dpi (~297 mm) minus typical top + bottom margins (~25 mm each)
+const PAGE_HEIGHT = 940; // px
+
 const BLOCK_STYLES = [
     { label: 'Normal text', check: ed => ed.isActive('paragraph') && !ed.isActive('heading'), run: ed => ed.chain().focus().setParagraph().run() },
     { label: 'Heading 2',   check: ed => ed.isActive('heading', { level: 2 }), run: ed => ed.chain().focus().toggleHeading({ level: 2 }).run() },
@@ -376,8 +379,12 @@ export default function ChapterEditor({ chapter, documentId, onSave, onCancel, o
     const [imageAiOpen, setImageAiOpen]         = useState(false);
     const [isUploading, setIsUploading]         = useState(false);
 
-    const focusedRef   = useRef(false);
-    const fileInputRef = useRef(null);
+    const focusedRef    = useRef(false);
+    const fileInputRef  = useRef(null);
+    const editorWrapRef = useRef(null);
+
+    const [pageCount,  setPageCount]  = useState(1);
+    const [cursorPage, setCursorPage] = useState(1);
 
     const editor = useEditor({
         extensions: [
@@ -407,6 +414,32 @@ export default function ChapterEditor({ chapter, documentId, onSave, onCancel, o
         const t = setTimeout(() => editor.commands.focus('end'), 0);
         return () => clearTimeout(t);
     }, [editor]);
+
+    // Recalculate page count whenever the editor content grows or shrinks
+    useEffect(() => {
+        const el = editorWrapRef.current;
+        if (!el) return;
+        const ro = new ResizeObserver(([entry]) => {
+            setPageCount(Math.max(1, Math.ceil(entry.contentRect.height / PAGE_HEIGHT)));
+        });
+        ro.observe(el);
+        return () => ro.disconnect();
+    }, []);
+
+    // Track which page the cursor is on via selectionchange
+    useEffect(() => {
+        const update = () => {
+            const wrap = editorWrapRef.current;
+            if (!wrap) return;
+            const sel = window.getSelection();
+            if (!sel || sel.rangeCount === 0) return;
+            const relY = sel.getRangeAt(0).getBoundingClientRect().top - wrap.getBoundingClientRect().top;
+            if (relY < 0) return;
+            setCursorPage(Math.min(pageCount, Math.floor(relY / PAGE_HEIGHT) + 1));
+        };
+        document.addEventListener('selectionchange', update, { passive: true });
+        return () => document.removeEventListener('selectionchange', update);
+    }, [pageCount]);
 
     const handleSave = async () => {
         if (!editor || saving) return;
@@ -451,9 +484,6 @@ export default function ChapterEditor({ chapter, documentId, onSave, onCancel, o
     const currentBlock      = BLOCK_STYLES.find(b => editor && b.check(editor))?.label ?? 'Normal text';
     const currentFontFamily = editor?.getAttributes('textStyle')?.fontFamily ?? null;
     const currentFontLabel  = FONT_FAMILIES.find(f => f.value === currentFontFamily)?.label ?? 'Default';
-    const currentLineHeight = editor?.getAttributes('paragraph')?.lineHeight ?? null;
-    const spaceBefore       = !!editor?.getAttributes('paragraph')?.spaceBefore;
-    const spaceAfter        = !!editor?.getAttributes('paragraph')?.spaceAfter;
     const currentAlign      = ['left','center','right','justify'].find(a => editor?.isActive({ textAlign: a })) ?? 'left';
     const alignIcons        = { left: 'format_align_left', center: 'format_align_center', right: 'format_align_right', justify: 'format_align_justify' };
     const words             = editor?.storage.characterCount?.words() ?? 0;
@@ -552,38 +582,6 @@ export default function ChapterEditor({ chapter, documentId, onSave, onCancel, o
                     ))}
                 </DropdownMenu>
 
-                {/* Line spacing */}
-                <DropdownMenu trigger={triggerBtn(null, 'format_line_spacing', 'Line spacing')} minW="min-w-[200px]">
-                    {(close) => (
-                        <>
-                            {LINE_SPACINGS.map(ls => (
-                                <MenuItem
-                                    key={ls.value}
-                                    active={currentLineHeight === ls.value}
-                                    onSelect={() => { editor?.chain().focus().setLineHeight(ls.value).run(); close(); }}
-                                >
-                                    {ls.label}
-                                </MenuItem>
-                            ))}
-                            <MenuItem separator />
-                            <MenuItem
-                                active={spaceBefore}
-                                icon="vertical_align_top"
-                                onSelect={() => { editor?.chain().focus().toggleSpaceBefore().run(); close(); }}
-                            >
-                                {spaceBefore ? 'Remove' : 'Add'} space before paragraph
-                            </MenuItem>
-                            <MenuItem
-                                active={spaceAfter}
-                                icon="vertical_align_bottom"
-                                onSelect={() => { editor?.chain().focus().toggleSpaceAfter().run(); close(); }}
-                            >
-                                {spaceAfter ? 'Remove' : 'Add'} space after paragraph
-                            </MenuItem>
-                        </>
-                    )}
-                </DropdownMenu>
-
                 <Divider />
 
                 {/* Lists */}
@@ -636,7 +634,9 @@ export default function ChapterEditor({ chapter, documentId, onSave, onCancel, o
 
                 {/* Right side */}
                 <div className="ml-auto flex items-center gap-1.5 pl-2 shrink-0">
-                    <span className="text-[11px] text-slate-400 tabular-nums hidden sm:inline">{words.toLocaleString()}w</span>
+                    <span className="text-[11px] text-slate-400 tabular-nums hidden sm:inline">
+                        {words.toLocaleString()}w · p.{cursorPage}/{pageCount}
+                    </span>
                     <button
                         type="button"
                         onClick={onCancel}
@@ -667,7 +667,26 @@ export default function ChapterEditor({ chapter, documentId, onSave, onCancel, o
                         {saveError}
                     </div>
                 )}
-                <EditorContent editor={editor} />
+                {/* Editor + page-break overlay */}
+                <div ref={editorWrapRef} className="relative">
+                    <EditorContent editor={editor} />
+
+                    {/* Page break rulers — one per boundary, zero-indexed */}
+                    {Array.from({ length: pageCount - 1 }, (_, i) => (
+                        <div
+                            key={i}
+                            className="absolute left-0 right-0 flex items-center pointer-events-none select-none z-10"
+                            style={{ top: (i + 1) * PAGE_HEIGHT }}
+                        >
+                            <div className="flex-1 border-t border-dashed border-slate-300" />
+                            <span className="mx-3 flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-[10px] font-semibold text-slate-400 uppercase tracking-wider whitespace-nowrap">
+                                <span className="material-icons-round text-[11px]">insert_page_break</span>
+                                Page {i + 2}
+                            </span>
+                            <div className="flex-1 border-t border-dashed border-slate-300" />
+                        </div>
+                    ))}
+                </div>
 
                 {/* Floating Shakespeare FAB */}
                 <button
