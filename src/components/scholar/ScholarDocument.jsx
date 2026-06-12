@@ -4,6 +4,7 @@ import { scholarService } from '../../api/scholarService';
 import ChapterEditor from './ChapterEditor';
 import CoverPage from './CoverPage';
 import CoverPageForm from './CoverPageForm';
+import TocStyleForm from './TocStyleForm';
 
 const SCHOLAR_FONTS = [
     { label: 'Default',         value: null },
@@ -613,7 +614,7 @@ function UnsavedChangesModal({ onDiscard, onKeep }) {
 }
 
 // ── Full document viewer ──────────────────────────────────────────────────────
-function DocumentViewer({ doc, onExport, onCoverSaved }) {
+function DocumentViewer({ doc, onExport, onCoverSaved, onTocStyleSaved }) {
     const [chapters, setChapters]               = useState(doc.chapters || []);
     const [editingChapterId, setEditingChapterId] = useState(null);
     const [collapsedIds, setCollapsedIds]        = useState(new Set());
@@ -630,13 +631,19 @@ function DocumentViewer({ doc, onExport, onCoverSaved }) {
     const [marginBottom, setMarginBottom] = useState(24);
     const [marginLeft,   setMarginLeft]   = useState(24);
     const [docFontFamily, setDocFontFamily] = useState(null);
-    const [showCoverForm, setShowCoverForm] = useState(!doc.meta?.cover?.layout);
+    const [showCoverForm, setShowCoverForm]     = useState(!doc.meta?.cover?.layout);
+    const [showTocStyleForm, setShowTocStyleForm] = useState(false);
 
     const fontLabel = SCHOLAR_FONTS.find(f => f.value === docFontFamily)?.label ?? 'Default';
 
     const handleCoverSaved = (updatedCover) => {
         setShowCoverForm(false);
         onCoverSaved(updatedCover);
+    };
+
+    const handleTocStyleSaved = (tocStyle) => {
+        setShowTocStyleForm(false);
+        onTocStyleSaved(tocStyle);
     };
     // meta.page_numbering is stored as string '1'/'0' or boolean; use loose != to handle both
     const pageNumbering = doc.meta?.page_numbering != false && doc.meta?.page_numbering !== '0';
@@ -847,6 +854,15 @@ function DocumentViewer({ doc, onExport, onCoverSaved }) {
                         <span className="material-icons-round text-[14px]">auto_stories</span>
                         Cover
                     </button>
+                    {doc.toc_enabled && (
+                        <button
+                            onClick={() => setShowTocStyleForm(true)}
+                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[12px] font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors"
+                        >
+                            <span className="material-icons-round text-[14px]">toc</span>
+                            TOC Style
+                        </button>
+                    )}
                     {['pdf', 'docx'].map(fmt => (
                         <button
                             key={fmt}
@@ -887,6 +903,15 @@ function DocumentViewer({ doc, onExport, onCoverSaved }) {
                     doc={doc}
                     onSaved={handleCoverSaved}
                     onClose={() => setShowCoverForm(false)}
+                />
+            )}
+
+            {/* TOC style form modal */}
+            {showTocStyleForm && (
+                <TocStyleForm
+                    doc={doc}
+                    onSaved={handleTocStyleSaved}
+                    onClose={() => setShowTocStyleForm(false)}
                 />
             )}
 
@@ -1126,6 +1151,10 @@ export default function ScholarDocument() {
         setDoc(prev => ({ ...prev, meta: { ...(prev.meta ?? {}), cover: updatedCover } }));
     };
 
+    const handleTocStyleSaved = (tocStyle) => {
+        setDoc(prev => ({ ...prev, meta: { ...(prev.meta ?? {}), toc_style: tocStyle } }));
+    };
+
     const handleRetryChapter = async (document, chapter) => {
         try {
             await scholarService.retryChapter(document.id, chapter.id);
@@ -1184,7 +1213,7 @@ export default function ScholarDocument() {
                         <>
                             {isActive(doc) && <ProgressPanel doc={doc} />}
                             {doc.status === 'complete' && (
-                                <DocumentViewer doc={doc} onExport={handleExport} onCoverSaved={handleCoverSaved} />
+                                <DocumentViewer doc={doc} onExport={handleExport} onCoverSaved={handleCoverSaved} onTocStyleSaved={handleTocStyleSaved} />
                             )}
                             {doc.status === 'failed' && (
                                 <FailedPanel
