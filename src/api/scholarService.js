@@ -73,4 +73,10 @@ export const scholarService = {
         }),
 
     exportUrl: (ulid) => `${BASE_URL}${BASE}/${ulid}/export`,
+
+    updateCover: (ulid, coverData) =>
+        apiClient(`${BASE}/${ulid}/cover`, {
+            method: 'PATCH',
+            body: coverData,
+        }),
 };

@@ -2,6 +2,18 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { scholarService } from '../../api/scholarService';
 import ChapterEditor from './ChapterEditor';
+import CoverPage from './CoverPage';
+import CoverPageForm from './CoverPageForm';
+
+const SCHOLAR_FONTS = [
+    { label: 'Default',         value: null },
+    { label: 'Times New Roman', value: '"Times New Roman", Times, serif' },
+    { label: 'Arial',           value: 'Arial, Helvetica, sans-serif' },
+    { label: 'Georgia',         value: 'Georgia, serif' },
+    { label: 'Helvetica',       value: 'Helvetica, Arial, sans-serif' },
+    { label: 'Courier New',     value: '"Courier New", Courier, monospace' },
+    { label: 'Verdana',         value: 'Verdana, Geneva, sans-serif' },
+];
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, useSortable, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -601,7 +613,7 @@ function UnsavedChangesModal({ onDiscard, onKeep }) {
 }
 
 // ── Full document viewer ──────────────────────────────────────────────────────
-function DocumentViewer({ doc, onExport }) {
+function DocumentViewer({ doc, onExport, onCoverSaved }) {
     const [chapters, setChapters]               = useState(doc.chapters || []);
     const [editingChapterId, setEditingChapterId] = useState(null);
     const [collapsedIds, setCollapsedIds]        = useState(new Set());
@@ -617,6 +629,15 @@ function DocumentViewer({ doc, onExport }) {
     const [marginRight,  setMarginRight]  = useState(24);
     const [marginBottom, setMarginBottom] = useState(24);
     const [marginLeft,   setMarginLeft]   = useState(24);
+    const [docFontFamily, setDocFontFamily] = useState(null);
+    const [showCoverForm, setShowCoverForm] = useState(!doc.meta?.cover?.layout);
+
+    const fontLabel = SCHOLAR_FONTS.find(f => f.value === docFontFamily)?.label ?? 'Default';
+
+    const handleCoverSaved = (updatedCover) => {
+        setShowCoverForm(false);
+        onCoverSaved(updatedCover);
+    };
     // meta.page_numbering is stored as string '1'/'0' or boolean; use loose != to handle both
     const pageNumbering = doc.meta?.page_numbering != false && doc.meta?.page_numbering !== '0';
 
@@ -705,7 +726,7 @@ function DocumentViewer({ doc, onExport }) {
                 />
             )}
 
-            {/* Global spacing + margin overrides — affects every chapter in both view and edit mode */}
+            {/* Global formatting overrides — affects every chapter in both view and edit mode */}
             <style>{`
                 .scholar-doc p, .scholar-doc li,
                 .scholar-editor-content p, .scholar-editor-content li {
@@ -720,75 +741,125 @@ function DocumentViewer({ doc, onExport }) {
                     padding-bottom: ${marginBottom}px !important;
                     padding-left: ${marginLeft}px !important;
                 }
+                ${docFontFamily ? `.scholar-doc, .scholar-doc *,
+                .scholar-editor-content, .scholar-editor-content * {
+                    font-family: ${docFontFamily} !important;
+                }` : ''}
             `}</style>
 
-            {/* Sticky document header */}
-            <div className="sticky top-0 z-10 bg-white/90 backdrop-blur-sm border-b border-slate-100 px-0 py-3 mb-8 flex items-center gap-3 justify-between">
-                <div className="shrink-0">
-                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Scholar Document</p>
-                    <p className="text-[14px] font-semibold text-slate-800 leading-snug">{doc.title}</p>
+            {/* Sticky document toolbar */}
+            <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b border-slate-100 px-0 py-2 mb-8 flex items-center gap-2 justify-between">
+
+                {/* Left — document identity */}
+                <div className="shrink-0 min-w-0">
+                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-0.5">Scholar</p>
+                    <p className="text-[13px] font-semibold text-slate-800 leading-snug truncate max-w-[200px]">{doc.title}</p>
                 </div>
 
-                {/* Document-wide spacing controls */}
-                <div className="flex items-center gap-1.5 ml-auto">
-                    <span className="material-icons-round text-slate-400 text-[16px]">format_line_spacing</span>
-                    <select
-                        value={docLineHeight}
-                        onChange={e => setDocLineHeight(e.target.value)}
-                        className="text-[12px] text-slate-600 border border-slate-200 rounded-lg px-2 py-1 bg-white outline-none focus:border-primary/50 cursor-pointer"
-                    >
-                        <option value="1">Single</option>
-                        <option value="1.15">1.15</option>
-                        <option value="1.5">1.5</option>
-                        <option value="2">Double</option>
-                    </select>
-                    <button
-                        onClick={() => setDocSpaceBefore(v => !v)}
-                        title={docSpaceBefore ? 'Remove space before paragraph' : 'Add space before paragraph'}
-                        className={`flex items-center justify-center w-7 h-7 rounded-lg transition-colors ${docSpaceBefore ? 'bg-primary text-white' : 'text-slate-400 hover:bg-slate-100'}`}
-                    >
-                        <span className="material-icons-round text-[16px]">vertical_align_top</span>
-                    </button>
-                    <button
-                        onClick={() => setDocSpaceAfter(v => !v)}
-                        title={docSpaceAfter ? 'Remove space after paragraph' : 'Add space after paragraph'}
-                        className={`flex items-center justify-center w-7 h-7 rounded-lg transition-colors ${docSpaceAfter ? 'bg-primary text-white' : 'text-slate-400 hover:bg-slate-100'}`}
-                    >
-                        <span className="material-icons-round text-[16px]">vertical_align_bottom</span>
-                    </button>
-                </div>
+                <div className="w-px h-6 bg-slate-200 shrink-0" />
 
-                {/* Document-wide margin controls */}
-                <div className="flex items-center gap-1.5">
-                    <span className="material-icons-round text-slate-400 text-[16px]" title="Page margins">border_outer</span>
-                    <div className="grid grid-cols-2 gap-x-2 gap-y-0.5">
-                        {[
-                            { label: 'T', val: marginTop,    set: setMarginTop    },
-                            { label: 'R', val: marginRight,  set: setMarginRight  },
-                            { label: 'B', val: marginBottom, set: setMarginBottom },
-                            { label: 'L', val: marginLeft,   set: setMarginLeft   },
-                        ].map(({ label, val, set }) => (
-                            <div key={label} className="flex items-center gap-1">
-                                <span className="text-[9px] font-bold text-slate-400 w-3 leading-none">{label}</span>
-                                <input
-                                    type="number"
-                                    value={val}
-                                    onChange={e => set(Math.max(0, Number(e.target.value)))}
-                                    min="0"
-                                    step="4"
-                                    className="w-10 text-center text-[11px] text-slate-600 border border-slate-200 rounded px-1 py-0.5 bg-white outline-none focus:border-primary/50"
-                                />
-                            </div>
+                {/* Centre — formatting menus */}
+                <div className="flex items-center gap-0.5 flex-1">
+
+                    {/* Font */}
+                    <GlobalDropdown label={fontLabel} icon="text_fields" panelClass="min-w-[180px]">
+                        {SCHOLAR_FONTS.map(f => (
+                            <GDItem
+                                key={f.label}
+                                active={docFontFamily === f.value}
+                                onClick={() => setDocFontFamily(f.value)}
+                            >
+                                <span style={{ fontFamily: f.value ?? 'inherit' }}>{f.label}</span>
+                            </GDItem>
                         ))}
-                    </div>
+                    </GlobalDropdown>
+
+                    {/* Spacing */}
+                    <GlobalDropdown label="Spacing" icon="format_line_spacing" panelClass="min-w-[210px]">
+                        <div className="py-1.5">
+                            <p className="px-3 pt-1 pb-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Line height</p>
+                            {[
+                                { label: 'Single', value: '1'    },
+                                { label: '1.15',   value: '1.15' },
+                                { label: '1.5',    value: '1.5'  },
+                                { label: 'Double', value: '2'    },
+                            ].map(s => (
+                                <GDItem key={s.value} active={docLineHeight === s.value} onClick={() => setDocLineHeight(s.value)}>
+                                    {s.label}
+                                </GDItem>
+                            ))}
+                            <div className="border-t border-slate-100 my-1.5" />
+                            <p className="px-3 pb-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Paragraph spacing</p>
+                            {[
+                                { label: 'Space before paragraph', val: docSpaceBefore, toggle: () => setDocSpaceBefore(v => !v) },
+                                { label: 'Space after paragraph',  val: docSpaceAfter,  toggle: () => setDocSpaceAfter(v => !v)  },
+                            ].map(({ label, val, toggle }) => (
+                                <button
+                                    key={label}
+                                    onClick={toggle}
+                                    className="w-full flex items-center gap-2 px-3 py-1.5 text-[12px] text-slate-700 hover:bg-slate-50 transition-colors text-left"
+                                >
+                                    <span className={`material-icons-round text-[15px] ${val ? 'text-primary' : 'text-slate-300'}`}>
+                                        {val ? 'check_box' : 'check_box_outline_blank'}
+                                    </span>
+                                    {label}
+                                </button>
+                            ))}
+                        </div>
+                    </GlobalDropdown>
+
+                    {/* Margins */}
+                    <GlobalDropdown label="Margins" icon="border_outer" panelClass="min-w-[200px]">
+                        <div className="p-3">
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3">Page margins (px)</p>
+                            <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                                {[
+                                    { label: 'Top',    val: marginTop,    fn: setMarginTop    },
+                                    { label: 'Right',  val: marginRight,  fn: setMarginRight  },
+                                    { label: 'Bottom', val: marginBottom, fn: setMarginBottom },
+                                    { label: 'Left',   val: marginLeft,   fn: setMarginLeft   },
+                                ].map(({ label, val, fn }) => (
+                                    <div key={label} className="flex flex-col gap-1">
+                                        <span className="text-[10px] font-semibold text-slate-500">{label}</span>
+                                        <input
+                                            type="number"
+                                            value={val}
+                                            onChange={e => fn(Math.max(0, Number(e.target.value)))}
+                                            min="0"
+                                            step="4"
+                                            className="w-full text-center text-[12px] text-slate-700 border border-slate-200 rounded-lg px-2 py-1.5 outline-none focus:border-primary/50"
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </GlobalDropdown>
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-[12px] text-slate-400 mr-1">Export:</span>
+                <div className="w-px h-6 bg-slate-200 shrink-0" />
+
+                {/* Right — actions */}
+                <div className="flex items-center gap-1.5 shrink-0">
+                    <button
+                        onClick={() => setShowCoverForm(true)}
+                        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[12px] font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors"
+                    >
+                        <span className="material-icons-round text-[14px]">auto_stories</span>
+                        Cover
+                    </button>
                     {['pdf', 'docx'].map(fmt => (
                         <button
                             key={fmt}
-                            onClick={() => onExport(fmt)}
+                            onClick={() => onExport(fmt, {
+                                line_height:   docLineHeight,
+                                space_before:  docSpaceBefore ? '1' : '0',
+                                space_after:   docSpaceAfter  ? '1' : '0',
+                                margin_top:    marginTop,
+                                margin_right:  marginRight,
+                                margin_bottom: marginBottom,
+                                margin_left:   marginLeft,
+                                font_family:   docFontFamily || '',
+                            })}
                             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-white text-[12px] font-semibold hover:bg-primary/90 transition-all active:scale-95"
                         >
                             <span className="material-icons-round text-[14px]">download</span>
@@ -798,30 +869,26 @@ function DocumentViewer({ doc, onExport }) {
                 </div>
             </div>
 
-            {/* Document title page */}
-            <div className="text-center py-12 border-b border-slate-100 mb-8">
-                <h1 className="text-3xl font-bold text-slate-900 leading-tight mb-4">{doc.title}</h1>
-                <div className="flex items-center justify-center gap-6 text-[13px] text-slate-400">
-                    <span className="flex items-center gap-1.5">
-                        <span className="material-icons-round text-[15px]">format_align_left</span>
-                        {(doc.word_count || 0).toLocaleString()} words
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                        <span className="material-icons-round text-[15px]">menu_book</span>
-                        {chapters.length} chapters
-                    </span>
-                    {allCitations.length > 0 && (
-                        <span className="flex items-center gap-1.5">
-                            <span className="material-icons-round text-[15px]">format_quote</span>
-                            {allCitations.length} sources
-                        </span>
-                    )}
-                    <span className="flex items-center gap-1.5">
-                        <span className="material-icons-round text-[15px]">calendar_today</span>
-                        {new Date(doc.completed_at || doc.created_at).toLocaleDateString()}
-                    </span>
-                </div>
+            {/* Cover page */}
+            <div className="relative group">
+                <CoverPage cover={doc.meta?.cover} doc={doc} />
+                <button
+                    onClick={() => setShowCoverForm(true)}
+                    className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white shadow-sm border border-slate-200 text-[11px] font-semibold text-slate-500 hover:text-primary hover:border-primary/40 transition-all"
+                >
+                    <span className="material-icons-round text-[13px]">edit</span>
+                    {doc.meta?.cover?.layout ? 'Edit Cover' : 'Customize Cover'}
+                </button>
             </div>
+
+            {/* Cover form modal */}
+            {showCoverForm && (
+                <CoverPageForm
+                    doc={doc}
+                    onSaved={handleCoverSaved}
+                    onClose={() => setShowCoverForm(false)}
+                />
+            )}
 
             {/* Table of contents */}
             {doc.toc_enabled && chapters.length > 0 && (
@@ -879,6 +946,57 @@ function DocumentViewer({ doc, onExport }) {
                 />
             )}
         </div>
+    );
+}
+
+// ── Global toolbar primitives ─────────────────────────────────────────────────
+
+function GlobalDropdown({ label, icon, children, panelClass = '' }) {
+    const [open, setOpen] = useState(false);
+    const ref = useRef(null);
+
+    useEffect(() => {
+        if (!open) return;
+        const handler = (e) => { if (!ref.current?.contains(e.target)) setOpen(false); };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, [open]);
+
+    return (
+        <div className="relative" ref={ref}>
+            <button
+                onClick={() => setOpen(o => !o)}
+                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[12px] font-medium transition-colors whitespace-nowrap ${
+                    open ? 'bg-slate-100 text-slate-800' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'
+                }`}
+            >
+                <span className="material-icons-round text-[14px]">{icon}</span>
+                {label}
+                <span className="material-icons-round text-[12px] text-slate-400">expand_more</span>
+            </button>
+            {open && (
+                <div
+                    className={`absolute top-full left-0 mt-1.5 bg-white border border-slate-200 rounded-xl shadow-lg z-50 ${panelClass}`}
+                    onMouseDown={e => e.stopPropagation()}
+                >
+                    {children}
+                </div>
+            )}
+        </div>
+    );
+}
+
+function GDItem({ active, onClick, children }) {
+    return (
+        <button
+            onClick={onClick}
+            className={`w-full flex items-center gap-2 px-3 py-1.5 text-[12px] text-left transition-colors ${
+                active ? 'bg-primary/8 text-primary font-semibold' : 'text-slate-700 hover:bg-slate-50'
+            }`}
+        >
+            <span className={`material-icons-round text-[13px] ${active ? 'opacity-100' : 'opacity-0'}`}>check</span>
+            {children}
+        </button>
     );
 }
 
@@ -999,8 +1117,13 @@ export default function ScholarDocument() {
         return () => stopPolling();
     }, [id]);
 
-    const handleExport = (fmt) => {
-        window.open(scholarService.exportUrl(id) + `?format=${fmt}`, '_blank');
+    const handleExport = (fmt, formatting = {}) => {
+        const params = new URLSearchParams({ format: fmt, ...formatting });
+        window.open(`${scholarService.exportUrl(id)}?${params}`, '_blank');
+    };
+
+    const handleCoverSaved = (updatedCover) => {
+        setDoc(prev => ({ ...prev, meta: { ...(prev.meta ?? {}), cover: updatedCover } }));
     };
 
     const handleRetryChapter = async (document, chapter) => {
@@ -1061,7 +1184,7 @@ export default function ScholarDocument() {
                         <>
                             {isActive(doc) && <ProgressPanel doc={doc} />}
                             {doc.status === 'complete' && (
-                                <DocumentViewer doc={doc} onExport={handleExport} />
+                                <DocumentViewer doc={doc} onExport={handleExport} onCoverSaved={handleCoverSaved} />
                             )}
                             {doc.status === 'failed' && (
                                 <FailedPanel
