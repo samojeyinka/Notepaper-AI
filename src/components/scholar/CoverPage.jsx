@@ -10,7 +10,7 @@ export default function CoverPage({ cover, doc }) {
                     </span>
                     <span className="flex items-center gap-1.5">
                         <span className="material-icons-round text-[15px]">menu_book</span>
-                        {(doc.chapters || []).length} chapters
+                        {(doc.pages || []).length} pages
                     </span>
                     <span className="flex items-center gap-1.5">
                         <span className="material-icons-round text-[15px]">calendar_today</span>

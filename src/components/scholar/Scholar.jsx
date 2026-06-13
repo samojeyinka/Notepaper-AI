@@ -59,10 +59,10 @@ const DocumentCard = ({ doc, onOpen }) => {
                         {doc.word_count.toLocaleString()} words
                     </span>
                 )}
-                {doc.total_chapters > 0 && (
+                {doc.total_pages > 0 && (
                     <span className="flex items-center gap-1">
                         <span className="material-icons-round text-[13px]">menu_book</span>
-                        {doc.total_chapters} ch.
+                        {doc.total_pages} pg.
                     </span>
                 )}
             </div>

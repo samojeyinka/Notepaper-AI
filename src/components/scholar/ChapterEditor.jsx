@@ -34,8 +34,7 @@ const LINE_SPACINGS = [
     { label: '1.5',    value: '1.5'  },
     { label: 'Double', value: '2'    },
 ];
-// A4 content height at 96 dpi (~297 mm) minus typical top + bottom margins (~25 mm each)
-const PAGE_HEIGHT = 940; // px
+const MAX_WORDS = 350; // one physical A4 page
 
 const BLOCK_STYLES = [
     { label: 'Normal text', check: ed => ed.isActive('paragraph') && !ed.isActive('heading'), run: ed => ed.chain().focus().setParagraph().run() },
@@ -371,20 +370,17 @@ function FontSizeControl({ editor }) {
     );
 }
 
-// ── Chapter editor ────────────────────────────────────────────────────────────
-export default function ChapterEditor({ chapter, documentId, onSave, onCancel, onDirtyChange }) {
+// ── Page editor ───────────────────────────────────────────────────────────────
+export default function PageEditor({ page, documentId, onSave, onCancel, onDirtyChange }) {
+    const chapter = page; // alias so existing internals below continue to work
     const [saving, setSaving]                   = useState(false);
     const [saveError, setSaveError]             = useState('');
     const [shakespeareOpen, setShakespeareOpen] = useState(false);
     const [imageAiOpen, setImageAiOpen]         = useState(false);
     const [isUploading, setIsUploading]         = useState(false);
 
-    const focusedRef    = useRef(false);
-    const fileInputRef  = useRef(null);
-    const editorWrapRef = useRef(null);
-
-    const [pageCount,  setPageCount]  = useState(1);
-    const [cursorPage, setCursorPage] = useState(1);
+    const focusedRef   = useRef(false);
+    const fileInputRef = useRef(null);
 
     const editor = useEditor({
         extensions: [
@@ -415,37 +411,11 @@ export default function ChapterEditor({ chapter, documentId, onSave, onCancel, o
         return () => clearTimeout(t);
     }, [editor]);
 
-    // Recalculate page count whenever the editor content grows or shrinks
-    useEffect(() => {
-        const el = editorWrapRef.current;
-        if (!el) return;
-        const ro = new ResizeObserver(([entry]) => {
-            setPageCount(Math.max(1, Math.ceil(entry.contentRect.height / PAGE_HEIGHT)));
-        });
-        ro.observe(el);
-        return () => ro.disconnect();
-    }, []);
-
-    // Track which page the cursor is on via selectionchange
-    useEffect(() => {
-        const update = () => {
-            const wrap = editorWrapRef.current;
-            if (!wrap) return;
-            const sel = window.getSelection();
-            if (!sel || sel.rangeCount === 0) return;
-            const relY = sel.getRangeAt(0).getBoundingClientRect().top - wrap.getBoundingClientRect().top;
-            if (relY < 0) return;
-            setCursorPage(Math.min(pageCount, Math.floor(relY / PAGE_HEIGHT) + 1));
-        };
-        document.addEventListener('selectionchange', update, { passive: true });
-        return () => document.removeEventListener('selectionchange', update);
-    }, [pageCount]);
-
     const handleSave = async () => {
         if (!editor || saving) return;
         setSaving(true); setSaveError('');
         try {
-            const res = await scholarService.updateChapter(documentId, chapter.id, editor.getHTML());
+            const res = await scholarService.updatePage(documentId, chapter.id, editor.getHTML());
             onDirtyChange?.(false);
             onSave(chapter.id, res.data);
         } catch { setSaveError('Could not save changes. Please try again.'); }
@@ -634,8 +604,13 @@ export default function ChapterEditor({ chapter, documentId, onSave, onCancel, o
 
                 {/* Right side */}
                 <div className="ml-auto flex items-center gap-1.5 pl-2 shrink-0">
-                    <span className="text-[11px] text-slate-400 tabular-nums hidden sm:inline">
-                        {words.toLocaleString()}w · p.{cursorPage}/{pageCount}
+                    <span className={`text-[11px] tabular-nums hidden sm:inline font-medium ${
+                        words > MAX_WORDS       ? 'text-red-500'
+                        : words > MAX_WORDS * 0.9 ? 'text-orange-500'
+                        : words > MAX_WORDS * 0.75 ? 'text-amber-500'
+                        : 'text-slate-400'
+                    }`}>
+                        {words} / {MAX_WORDS}w
                     </span>
                     <button
                         type="button"
@@ -667,25 +642,34 @@ export default function ChapterEditor({ chapter, documentId, onSave, onCancel, o
                         {saveError}
                     </div>
                 )}
-                {/* Editor + page-break overlay */}
-                <div ref={editorWrapRef} className="relative">
-                    <EditorContent editor={editor} />
 
-                    {/* Page break rulers — one per boundary, zero-indexed */}
-                    {Array.from({ length: pageCount - 1 }, (_, i) => (
+                {/* Scrollable editor — capped at one page height */}
+                <div className="overflow-y-auto max-h-[780px]">
+                    <EditorContent editor={editor} />
+                </div>
+
+                {/* Word budget bar */}
+                <div className="flex items-center gap-3 px-4 py-2 border-t border-slate-100 bg-slate-50">
+                    <div className="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden">
                         <div
-                            key={i}
-                            className="absolute left-0 right-0 flex items-center pointer-events-none select-none z-10"
-                            style={{ top: (i + 1) * PAGE_HEIGHT }}
-                        >
-                            <div className="flex-1 border-t border-dashed border-slate-300" />
-                            <span className="mx-3 flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-[10px] font-semibold text-slate-400 uppercase tracking-wider whitespace-nowrap">
-                                <span className="material-icons-round text-[11px]">insert_page_break</span>
-                                Page {i + 2}
-                            </span>
-                            <div className="flex-1 border-t border-dashed border-slate-300" />
-                        </div>
-                    ))}
+                            className={`h-full rounded-full transition-all duration-300 ${
+                                words > MAX_WORDS         ? 'bg-red-500'
+                                : words > MAX_WORDS * 0.9  ? 'bg-orange-400'
+                                : words > MAX_WORDS * 0.75 ? 'bg-amber-400'
+                                : 'bg-emerald-400'
+                            }`}
+                            style={{ width: `${Math.min(100, (words / MAX_WORDS) * 100)}%` }}
+                        />
+                    </div>
+                    <span className={`text-[11px] tabular-nums font-medium shrink-0 ${
+                        words > MAX_WORDS         ? 'text-red-500'
+                        : words > MAX_WORDS * 0.9  ? 'text-orange-500'
+                        : words > MAX_WORDS * 0.75 ? 'text-amber-500'
+                        : 'text-slate-400'
+                    }`}>
+                        {words} / {MAX_WORDS} words
+                        {words > MAX_WORDS && <span className="ml-1 text-red-400">(over limit)</span>}
+                    </span>
                 </div>
 
                 {/* Floating Shakespeare FAB */}
@@ -693,7 +677,7 @@ export default function ChapterEditor({ chapter, documentId, onSave, onCancel, o
                     type="button"
                     onMouseDown={(e) => { e.preventDefault(); setShakespeareOpen(true); }}
                     title="Shakespeare Assist — AI writing"
-                    className="absolute bottom-4 right-4 w-11 h-11 rounded-full flex items-center justify-center text-white shakespeare-glow-btn"
+                    className="absolute bottom-12 right-4 w-11 h-11 rounded-full flex items-center justify-center text-white shakespeare-glow-btn"
                     style={{ background: 'linear-gradient(135deg, #6541c4 0%, #9b59f5 50%, #6541c4 100%)', backgroundSize: '200% 200%' }}
                 >
                     <span className="material-icons-round text-[20px] shakespeare-sparkle">auto_awesome</span>

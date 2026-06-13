@@ -33,35 +33,35 @@ export const scholarService = {
 
     approveOutline: (ulid) => apiClient(`${BASE}/${ulid}/approve-outline`, { method: 'POST' }),
 
-    showChapter: (ulid, chapterNumber) =>
-        apiClient(`${BASE}/${ulid}/chapters/${chapterNumber}`),
+    showPage: (ulid, pageNumber) =>
+        apiClient(`${BASE}/${ulid}/pages/${pageNumber}`),
 
-    updateChapter: (ulid, chapterId, content) =>
-        apiClient(`${BASE}/${ulid}/chapters/${chapterId}`, {
+    updatePage: (ulid, pageId, content) =>
+        apiClient(`${BASE}/${ulid}/pages/${pageId}`, {
             method: 'PATCH',
             body: { content },
         }),
 
-    approveChapter: (ulid, chapterId) =>
-        apiClient(`${BASE}/${ulid}/chapters/${chapterId}/approve`, { method: 'POST' }),
+    approvePage: (ulid, pageId) =>
+        apiClient(`${BASE}/${ulid}/pages/${pageId}/approve`, { method: 'POST' }),
 
     retryOutline: (ulid) =>
         apiClient(`${BASE}/${ulid}/retry-outline`, { method: 'POST' }),
 
-    retryChapter: (ulid, chapterId) =>
-        apiClient(`${BASE}/${ulid}/chapters/${chapterId}/retry`, { method: 'POST' }),
+    retryPage: (ulid, pageId) =>
+        apiClient(`${BASE}/${ulid}/pages/${pageId}/retry`, { method: 'POST' }),
 
-    deleteChapter: (ulid, chapterId) =>
-        apiClient(`${BASE}/${ulid}/chapters/${chapterId}`, { method: 'DELETE' }),
+    deletePage: (ulid, pageId) =>
+        apiClient(`${BASE}/${ulid}/pages/${pageId}`, { method: 'DELETE' }),
 
-    addChapter: (ulid, title) =>
-        apiClient(`${BASE}/${ulid}/chapters`, {
+    addPage: (ulid, title) =>
+        apiClient(`${BASE}/${ulid}/pages`, {
             method: 'POST',
             body: { title },
         }),
 
-    reorderChapters: (ulid, orderedIds) =>
-        apiClient(`${BASE}/${ulid}/chapters/reorder`, {
+    reorderPages: (ulid, orderedIds) =>
+        apiClient(`${BASE}/${ulid}/pages/reorder`, {
             method: 'PATCH',
             body: { order: orderedIds },
         }),
