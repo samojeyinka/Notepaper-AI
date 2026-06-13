@@ -1,5 +1,7 @@
 import { useEditor, EditorContent, NodeViewWrapper, ReactNodeViewRenderer } from '@tiptap/react';
 import { Extension } from '@tiptap/core';
+import { Plugin, PluginKey } from '@tiptap/pm/state';
+import { DecorationSet, Decoration } from '@tiptap/pm/view';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
@@ -35,6 +37,52 @@ const LINE_SPACINGS = [
     { label: 'Double', value: '2'    },
 ];
 const MAX_WORDS = 350; // one physical A4 page
+
+// ── Overflow highlight extension ──────────────────────────────────────────────
+const OVERFLOW_KEY = new PluginKey('overflowHighlight');
+
+function findOverflowStart(doc, maxWords) {
+    let wordCount = 0;
+    let cutPos = null;
+    doc.descendants((node, pos) => {
+        if (cutPos !== null) return false;
+        if (node.isText) {
+            const text = node.text;
+            let i = 0;
+            while (i < text.length) {
+                while (i < text.length && /\s/.test(text[i])) i++;
+                if (i >= text.length) break;
+                const wordStart = i;
+                while (i < text.length && !/\s/.test(text[i])) i++;
+                wordCount++;
+                if (wordCount > maxWords) { cutPos = pos + wordStart; return false; }
+            }
+        }
+        return cutPos === null;
+    });
+    return cutPos;
+}
+
+const OverflowHighlight = Extension.create({
+    name: 'overflowHighlight',
+    addOptions() { return { maxWords: MAX_WORDS }; },
+    addProseMirrorPlugins() {
+        const { maxWords } = this.options;
+        return [
+            new Plugin({
+                key: OVERFLOW_KEY,
+                props: {
+                    decorations(state) {
+                        const cutPos = findOverflowStart(state.doc, maxWords);
+                        if (cutPos === null) return DecorationSet.empty;
+                        const deco = Decoration.inline(cutPos, state.doc.content.size, { class: 'word-overflow' });
+                        return DecorationSet.create(state.doc, [deco]);
+                    },
+                },
+            }),
+        ];
+    },
+});
 
 const BLOCK_STYLES = [
     { label: 'Normal text', check: ed => ed.isActive('paragraph') && !ed.isActive('heading'), run: ed => ed.chain().focus().setParagraph().run() },
@@ -381,6 +429,8 @@ export default function PageEditor({ page, documentId, onSave, onCancel, onDirty
 
     const focusedRef   = useRef(false);
     const fileInputRef = useRef(null);
+    const wordsRef     = useRef(0);
+    const [words, setWords] = useState(0);
 
     const editor = useEditor({
         extensions: [
@@ -396,10 +446,28 @@ export default function PageEditor({ page, documentId, onSave, onCancel, onDirty
             Table.configure({ resizable: false }),
             TableRow, TableCell, TableHeader,
             CharacterCount,
+            OverflowHighlight,
         ],
         content: chapter.content || '',
-        onUpdate: () => onDirtyChange?.(true),
+        onCreate: ({ editor }) => {
+            const wc = editor.storage.characterCount?.words() ?? 0;
+            wordsRef.current = wc;
+            setWords(wc);
+        },
+        onUpdate: ({ editor }) => {
+            const wc = editor.storage.characterCount?.words() ?? 0;
+            wordsRef.current = wc;
+            setWords(wc);
+            onDirtyChange?.(true);
+        },
         editorProps: {
+            handleKeyDown: (_view, event) => {
+                if (wordsRef.current >= MAX_WORDS && event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
+                    return true;
+                }
+                return false;
+            },
+            handlePaste: () => wordsRef.current >= MAX_WORDS,
             attributes: { class: 'scholar-doc scholar-editor-content p-6 min-h-[320px] focus:outline-none' },
         },
     });
@@ -413,6 +481,11 @@ export default function PageEditor({ page, documentId, onSave, onCancel, onDirty
 
     const handleSave = async () => {
         if (!editor || saving) return;
+        if (words > MAX_WORDS) {
+            const over = words - MAX_WORDS;
+            setSaveError(`Over the ${MAX_WORDS}-word limit by ${over} word${over !== 1 ? 's' : ''}. Cut the highlighted text before saving.`);
+            return;
+        }
         setSaving(true); setSaveError('');
         try {
             const res = await scholarService.updatePage(documentId, chapter.id, editor.getHTML());
@@ -456,8 +529,6 @@ export default function PageEditor({ page, documentId, onSave, onCancel, onDirty
     const currentFontLabel  = FONT_FAMILIES.find(f => f.value === currentFontFamily)?.label ?? 'Default';
     const currentAlign      = ['left','center','right','justify'].find(a => editor?.isActive({ textAlign: a })) ?? 'left';
     const alignIcons        = { left: 'format_align_left', center: 'format_align_center', right: 'format_align_right', justify: 'format_align_justify' };
-    const words             = editor?.storage.characterCount?.words() ?? 0;
-
     const triggerBtn = (label, icon, title, active = false) => (
         <button
             type="button"
@@ -622,14 +693,16 @@ export default function PageEditor({ page, documentId, onSave, onCancel, onDirty
                     <button
                         type="button"
                         onClick={handleSave}
-                        disabled={saving}
-                        className="flex items-center gap-1 px-3 py-1 rounded-lg bg-primary text-white text-[12px] font-semibold hover:bg-primary/90 transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
+                        disabled={saving || words > MAX_WORDS}
+                        className={`flex items-center gap-1 px-3 py-1 rounded-lg text-white text-[12px] font-semibold transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed ${
+                            words > MAX_WORDS ? 'bg-red-500' : 'bg-primary hover:bg-primary/90'
+                        }`}
                     >
                         {saving
                             ? <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                            : <span className="material-icons-round text-[13px]">save</span>
+                            : <span className="material-icons-round text-[13px]">{words > MAX_WORDS ? 'lock' : 'save'}</span>
                         }
-                        {saving ? 'Saving…' : 'Save'}
+                        {saving ? 'Saving…' : words > MAX_WORDS ? 'Over limit' : 'Save'}
                     </button>
                 </div>
             </div>
