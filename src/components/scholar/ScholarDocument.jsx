@@ -186,36 +186,254 @@ function ProgressPanel({ doc }) {
     );
 }
 
+// ── TOC helpers ───────────────────────────────────────────────────────────────
+function extractHeadings(html, pageNum) {
+    if (!html) return [];
+    const parsed = new DOMParser().parseFromString(html, 'text/html');
+    return [...parsed.querySelectorAll('h2, h3, h4')].map((node, idx) => ({
+        id: `${pageNum}-h${node.tagName[1]}-${idx}`,
+        level: parseInt(node.tagName[1]),
+        originalText: node.textContent.trim(),
+    }));
+}
+
+function buildFreshEntries(pages) {
+    return (pages || []).map(pg => ({
+        pageId: pg.id,
+        page_number: pg.page_number,
+        label: pg.title || '',
+        hidden: false,
+        subs: extractHeadings(pg.content, pg.page_number).map(h => ({
+            ...h, label: h.originalText, hidden: false,
+        })),
+    }));
+}
+
+function mergeTocEntries(fresh, saved) {
+    if (!saved?.length) return fresh;
+    return fresh.map(entry => {
+        const sv = saved.find(s => s.pageId === entry.pageId);
+        if (!sv) return entry;
+        const mergedSubs = entry.subs.map(sub => {
+            const svSub = sv.subs?.find(s => s.id === sub.id);
+            return svSub ? { ...sub, label: svSub.label ?? sub.label, hidden: Boolean(svSub.hidden) } : sub;
+        });
+        return { ...entry, label: sv.label ?? entry.label, hidden: Boolean(sv.hidden), subs: mergedSubs };
+    });
+}
+
 // ── Table of contents ─────────────────────────────────────────────────────────
-function TableOfContents({ pages, outline }) {
-    const outlinePages = outline?.pages || [];
+function TableOfContents({ pages, savedEntries, documentId }) {
+    const [entries, setEntries]   = useState(() => mergeTocEntries(buildFreshEntries(pages), savedEntries));
+    const [collapsed, setCollapsed] = useState(false);
+    const [editing, setEditing]   = useState(false);
+    const [draft, setDraft]       = useState([]);
+    const [saving, setSaving]     = useState(false);
+    const [saveErr, setSaveErr]   = useState('');
+    const prevPagesRef = useRef(pages);
+
+    // Re-merge when pages change (content edits, new pages, reorder, delete).
+    useEffect(() => {
+        if (prevPagesRef.current === pages) return;
+        prevPagesRef.current = pages;
+        setEntries(prev => mergeTocEntries(buildFreshEntries(pages), prev));
+    }, [pages]);
+
+    const openEdit = () => {
+        setDraft(JSON.parse(JSON.stringify(entries)));
+        setSaveErr('');
+        setEditing(true);
+    };
+
+    const updateEntry = (ei, field, value) =>
+        setDraft(prev => prev.map((e, i) => i === ei ? { ...e, [field]: value } : e));
+
+    const updateSub = (ei, si, field, value) =>
+        setDraft(prev => prev.map((e, i) => i !== ei ? e : {
+            ...e,
+            subs: e.subs.map((s, j) => j === si ? { ...s, [field]: value } : s),
+        }));
+
+    const handleReset = () => setDraft(buildFreshEntries(pages));
+
+    const handleSave = async () => {
+        setSaving(true);
+        setSaveErr('');
+        try {
+            await scholarService.updateMeta(documentId, { toc_entries: draft });
+            setEntries(draft);
+            setEditing(false);
+        } catch {
+            setSaveErr('Could not save. Please try again.');
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const visible = entries.filter(e => !e.hidden);
+
     return (
-        <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 mb-8 print:break-inside-avoid">
-            <h2 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
-                <span className="material-icons-round text-primary text-[20px]">toc</span>
-                Table of Contents
-            </h2>
-            <ol className="flex flex-col gap-2">
-                {pages.map(pg => {
-                    const outlinePg = outlinePages.find(o => o.page_number === pg.page_number);
-                    return (
-                        <li key={pg.id}>
+        <div className="bg-slate-50 border border-slate-200 rounded-xl mb-8 overflow-hidden print:break-inside-avoid">
+            {/* Header — clicking the title area collapses/expands */}
+            <div
+                className={`flex items-center justify-between px-6 py-4 cursor-pointer select-none hover:bg-slate-100/60 transition-colors ${!collapsed ? 'border-b border-slate-200' : ''}`}
+                onClick={() => { if (!editing) setCollapsed(c => !c); }}
+            >
+                <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                    <span className="material-icons-round text-primary text-[20px]">toc</span>
+                    Table of Contents
+                    <span className={`material-icons-round text-[18px] text-slate-400 transition-transform duration-200 ${collapsed ? '-rotate-90' : ''}`}>
+                        expand_more
+                    </span>
+                </h2>
+                {!collapsed && !editing && (
+                    <button
+                        onClick={e => { e.stopPropagation(); openEdit(); }}
+                        className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold text-slate-400 hover:text-primary hover:bg-primary/8 transition-colors border border-transparent hover:border-primary/15"
+                    >
+                        <span className="material-icons-round text-[14px]">edit</span>
+                        Edit
+                    </button>
+                )}
+                {!collapsed && editing && (
+                    <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
+                        <button
+                            onClick={handleReset}
+                            className="text-[11px] font-semibold text-slate-400 hover:text-slate-600 px-2 py-1 rounded-lg hover:bg-slate-100 transition-colors"
+                        >
+                            Reset
+                        </button>
+                        <button
+                            onClick={() => setEditing(false)}
+                            className="px-3 py-1.5 rounded-lg text-[12px] font-semibold text-slate-500 hover:bg-slate-100 transition-colors"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={handleSave}
+                            disabled={saving}
+                            className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-primary text-white text-[12px] font-semibold hover:bg-primary/90 transition-all active:scale-95 disabled:opacity-60"
+                        >
+                            {saving
+                                ? <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                : <span className="material-icons-round text-[14px]">save</span>}
+                            {saving ? 'Saving…' : 'Save'}
+                        </button>
+                    </div>
+                )}
+            </div>
+
+            {/* Collapsible body */}
+            {!collapsed && <div className="px-6 py-5">
+
+            {saveErr && (
+                <div className="flex items-center gap-1.5 mb-3 px-3 py-2 bg-red-50 border border-red-100 rounded-lg text-[12px] text-red-600">
+                    <span className="material-icons-round text-[14px]">error_outline</span>
+                    {saveErr}
+                </div>
+            )}
+
+            {/* ── View mode ── */}
+            {!editing && (
+                <nav>
+                    {visible.length === 0 ? (
+                        <p className="text-[13px] text-slate-400 italic">All entries are hidden. Click "Edit" to restore them.</p>
+                    ) : visible.map(entry => (
+                        <div key={entry.pageId ?? entry.page_number}>
                             <a
-                                href={`#page-${pg.page_number}`}
-                                className="flex items-center gap-3 text-[14px] text-slate-600 hover:text-primary transition-colors group"
+                                href={`#page-${entry.page_number}`}
+                                className="flex items-center gap-3 text-[14px] text-slate-600 hover:text-primary transition-colors group py-1.5"
                             >
                                 <span className="w-7 h-7 bg-white border border-slate-200 rounded-full text-[11px] font-bold text-slate-500 flex items-center justify-center shrink-0 group-hover:border-primary/40 group-hover:text-primary transition-colors">
-                                    {pg.page_number}
+                                    {entry.page_number}
                                 </span>
-                                <span className="group-hover:underline">{pg.title || <em className="text-slate-400">Untitled</em>}</span>
-                                {outlinePg?.estimated_pages && (
-                                    <span className="ml-auto text-[11px] text-slate-400 shrink-0">~{outlinePg.estimated_pages}p</span>
-                                )}
+                                <span className="font-medium group-hover:underline">
+                                    {entry.label || <em className="text-slate-400 font-normal">Untitled</em>}
+                                </span>
                             </a>
-                        </li>
-                    );
-                })}
-            </ol>
+                            {entry.subs?.filter(s => !s.hidden).map(sub => (
+                                <a
+                                    key={sub.id}
+                                    href={`#page-${entry.page_number}`}
+                                    style={{ paddingLeft: `${(sub.level - 2) * 18 + 46}px` }}
+                                    className="flex items-center gap-2 text-[12px] text-slate-400 hover:text-primary transition-colors group py-0.5"
+                                >
+                                    <span className="w-1 h-1 rounded-full bg-slate-300 group-hover:bg-primary/50 shrink-0 transition-colors" />
+                                    <span className="group-hover:underline">{sub.label}</span>
+                                </a>
+                            ))}
+                        </div>
+                    ))}
+                </nav>
+            )}
+
+            {/* ── Edit mode ── */}
+            {editing && (
+                <div className="flex flex-col gap-2">
+                    {draft.map((entry, ei) => (
+                        <div
+                            key={entry.pageId ?? entry.page_number}
+                            className={`rounded-xl border overflow-hidden transition-opacity ${entry.hidden ? 'opacity-40 border-dashed border-slate-200' : 'border-slate-200 bg-white'}`}
+                        >
+                            {/* Page-level row */}
+                            <div className="flex items-center gap-2 px-3 py-2">
+                                <span className="w-6 h-6 rounded-full bg-primary/10 text-primary text-[11px] font-bold flex items-center justify-center shrink-0 select-none">
+                                    {entry.page_number}
+                                </span>
+                                <input
+                                    value={entry.label}
+                                    placeholder="Untitled"
+                                    disabled={entry.hidden}
+                                    onChange={e => updateEntry(ei, 'label', e.target.value)}
+                                    className="flex-1 min-w-0 bg-transparent text-[13px] font-semibold text-slate-700 outline-none border border-transparent hover:border-slate-200 focus:border-primary/40 focus:bg-white px-2 py-1 rounded-lg transition-all placeholder-slate-300 disabled:opacity-50"
+                                />
+                                <button
+                                    onClick={() => updateEntry(ei, 'hidden', !entry.hidden)}
+                                    title={entry.hidden ? 'Show in TOC' : 'Hide from TOC'}
+                                    className={`p-1 rounded-lg transition-colors shrink-0 ${entry.hidden ? 'text-slate-300 hover:text-primary hover:bg-primary/8' : 'text-slate-400 hover:text-red-400 hover:bg-red-50'}`}
+                                >
+                                    <span className="material-icons-round text-[16px]">
+                                        {entry.hidden ? 'visibility_off' : 'visibility'}
+                                    </span>
+                                </button>
+                            </div>
+
+                            {/* Sub-heading rows */}
+                            {!entry.hidden && entry.subs?.map((sub, si) => (
+                                <div
+                                    key={sub.id}
+                                    style={{ paddingLeft: `${(sub.level - 2) * 16 + 12}px` }}
+                                    className={`flex items-center gap-2 pr-3 py-1.5 border-t border-slate-100 transition-opacity ${sub.hidden ? 'opacity-40' : ''}`}
+                                >
+                                    <span className={`text-[9px] font-bold rounded px-1 py-0.5 shrink-0 ${sub.level === 2 ? 'bg-primary/10 text-primary' : sub.level === 3 ? 'bg-slate-100 text-slate-400' : 'bg-slate-50 text-slate-300'}`}>
+                                        H{sub.level}
+                                    </span>
+                                    <input
+                                        value={sub.label}
+                                        placeholder={sub.originalText}
+                                        disabled={sub.hidden}
+                                        onChange={e => updateSub(ei, si, 'label', e.target.value)}
+                                        className="flex-1 min-w-0 bg-transparent text-[12px] text-slate-600 outline-none border border-transparent hover:border-slate-200 focus:border-primary/40 focus:bg-white px-2 py-0.5 rounded-lg transition-all placeholder-slate-300 disabled:opacity-50"
+                                    />
+                                    <button
+                                        onClick={() => updateSub(ei, si, 'hidden', !sub.hidden)}
+                                        title={sub.hidden ? 'Show in TOC' : 'Hide from TOC'}
+                                        className={`p-1 rounded-lg transition-colors shrink-0 ${sub.hidden ? 'text-slate-200 hover:text-primary hover:bg-primary/8' : 'text-slate-300 hover:text-red-400 hover:bg-red-50'}`}
+                                    >
+                                        <span className="material-icons-round text-[14px]">
+                                            {sub.hidden ? 'visibility_off' : 'visibility'}
+                                        </span>
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    ))}
+                    <p className="text-[11px] text-slate-400 mt-1">
+                        Hiding an entry removes it from the TOC only — page content is not affected.
+                    </p>
+                </div>
+            )}
+            </div>}
         </div>
     );
 }
@@ -944,7 +1162,11 @@ function DocumentViewer({ doc, onExport, onCoverSaved, onTocStyleSaved }) {
 
             {/* Table of contents */}
             {doc.toc_enabled && pages.length > 0 && (
-                <TableOfContents pages={pages} outline={doc.outline} />
+                <TableOfContents
+                    pages={pages}
+                    savedEntries={doc.meta?.toc_entries}
+                    documentId={doc.id}
+                />
             )}
 
             {/* Collapse / expand all */}
