@@ -23,7 +23,7 @@ function stripHtml(html) {
     return div.textContent || div.innerText || '';
 }
 
-export const GeneratePresentationModal = ({ onClose, paperId, paperTitle, pages, onGenerated }) => {
+export const GeneratePresentationModal = ({ onClose, paperId, scholarDocumentId, paperTitle, pages, onGenerated }) => {
     const { canUseAI, increment, loaded, planLimit } = usePlan();
     const maxSlides = planLimit('max_slide_count') ?? 20;
     const [slideCount, setSlideCount] = useState(Math.min(10, maxSlides));
@@ -88,11 +88,12 @@ STRICT RULES:
             setProgress('Saving presentation…');
 
             const res = await presentationService.create({
-                paper_id:    paperId,
-                title:       `${paperTitle || 'Untitled'} — Presentation`,
-                slides:      JSON.stringify(slides),
+                paper_id:             paperId ?? null,
+                scholar_document_id:  scholarDocumentId ?? null,
+                title:                `${paperTitle || 'Untitled'} — Presentation`,
+                slides:               JSON.stringify(slides),
                 theme,
-                slide_count: slides.length,
+                slide_count:          slides.length,
             });
 
             const saved = res.data;

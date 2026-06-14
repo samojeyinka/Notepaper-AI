@@ -5,6 +5,8 @@ import PageEditor from './ChapterEditor';
 import CoverPage from './CoverPage';
 import CoverPageForm from './CoverPageForm';
 import TocStyleForm from './TocStyleForm';
+import { GeneratePresentationModal } from '../paper/GeneratePresentationModal';
+import { ScholarPresentationsSidebar } from './ScholarPresentationsSidebar';
 
 const SCHOLAR_FONTS = [
     { label: 'Default',         value: null },
@@ -923,6 +925,7 @@ function ExportOptionsModal({ format, formatting, onConfirm, onClose }) {
 
 // ── Full document viewer ──────────────────────────────────────────────────────
 function DocumentViewer({ doc, onExport, onCoverSaved, onTocStyleSaved }) {
+    const navigate = useNavigate();
     const [pages, setPages]                   = useState(doc.pages || []);
     const [editingPageId, setEditingPageId]   = useState(null);
     const [collapsedIds, setCollapsedIds]     = useState(new Set());
@@ -939,9 +942,11 @@ function DocumentViewer({ doc, onExport, onCoverSaved, onTocStyleSaved }) {
     const [marginBottom, setMarginBottom] = useState(24);
     const [marginLeft,   setMarginLeft]   = useState(24);
     const [docFontFamily, setDocFontFamily] = useState(null);
-    const [showCoverForm, setShowCoverForm]       = useState(!doc.meta?.cover?.layout);
-    const [showTocStyleForm, setShowTocStyleForm] = useState(false);
-    const [exportModal, setExportModal]           = useState(null);
+    const [showCoverForm, setShowCoverForm]             = useState(!doc.meta?.cover?.layout);
+    const [showTocStyleForm, setShowTocStyleForm]       = useState(false);
+    const [showPresentationModal, setShowPresentationModal] = useState(false);
+    const [showPresentationsSidebar, setShowPresentationsSidebar] = useState(false);
+    const [exportModal, setExportModal]                 = useState(null);
 
     const fontLabel = SCHOLAR_FONTS.find(f => f.value === docFontFamily)?.label ?? 'Default';
 
@@ -1035,7 +1040,8 @@ function DocumentViewer({ doc, onExport, onCoverSaved, onTocStyleSaved }) {
     const allCollapsed = pages.length > 0 && collapsedIds.size === pages.length;
 
     return (
-        <div>
+        <div className="flex items-start gap-0">
+            {/* modals — all fixed/portal, don't affect layout */}
             {pendingEditId !== null && (
                 <UnsavedChangesModal
                     onDiscard={() => { switchToEdit(pendingEditId); setPendingEditId(null); }}
@@ -1061,6 +1067,8 @@ function DocumentViewer({ doc, onExport, onCoverSaved, onTocStyleSaved }) {
                 />
             )}
 
+            {/* Main document content */}
+            <div className="flex-1 min-w-0">
             {/* Global formatting overrides — applies to every page in both view and edit mode */}
             <style>{`
                 .scholar-doc p, .scholar-doc li,
@@ -1191,6 +1199,14 @@ function DocumentViewer({ doc, onExport, onCoverSaved, onTocStyleSaved }) {
                             TOC Style
                         </button>
                     )}
+                    <button
+                        onClick={() => setShowPresentationsSidebar(v => !v)}
+                        className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[12px] font-medium transition-all ${showPresentationsSidebar ? 'bg-primary text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                        title="View presentations from this document"
+                    >
+                        <span className="material-icons-round text-[14px]">slideshow</span>
+                        Slides
+                    </button>
                     {['pdf', 'docx'].map(fmt => (
                         <button
                             key={fmt}
@@ -1231,6 +1247,21 @@ function DocumentViewer({ doc, onExport, onCoverSaved, onTocStyleSaved }) {
                     doc={doc}
                     onSaved={handleTocStyleSaved}
                     onClose={() => setShowTocStyleForm(false)}
+                />
+            )}
+
+            {/* Generate Presentation modal */}
+            {showPresentationModal && (
+                <GeneratePresentationModal
+                    onClose={() => setShowPresentationModal(false)}
+                    paperId={null}
+                    scholarDocumentId={doc.id}
+                    paperTitle={doc.title}
+                    pages={pages.map(pg => pg.content || '')}
+                    onGenerated={(saved) => {
+                        setShowPresentationModal(false);
+                        if (saved?.id) navigate(`/lockedin/presentations/${saved.id}`);
+                    }}
                 />
             )}
 
@@ -1291,6 +1322,16 @@ function DocumentViewer({ doc, onExport, onCoverSaved, onTocStyleSaved }) {
                     citations={allCitations}
                     documentId={doc.id}
                     onSaved={setAllCitations}
+                />
+            )}
+            </div>{/* end flex-1 content */}
+
+            {/* Presentations sidebar */}
+            {showPresentationsSidebar && (
+                <ScholarPresentationsSidebar
+                    docId={doc.id}
+                    onClose={() => setShowPresentationsSidebar(false)}
+                    onNewPresentation={() => { setShowPresentationsSidebar(false); setShowPresentationModal(true); }}
                 />
             )}
         </div>
