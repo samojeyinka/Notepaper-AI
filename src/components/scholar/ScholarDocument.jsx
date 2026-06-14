@@ -857,6 +857,70 @@ function UnsavedChangesModal({ onDiscard, onKeep }) {
     );
 }
 
+// ── Export options modal ──────────────────────────────────────────────────────
+function ExportOptionsModal({ format, formatting, onConfirm, onClose }) {
+    const [bodyPt, setBodyPt] = useState(12);
+    const [tocPt,  setTocPt]  = useState(12);
+    const [refPt,  setRefPt]  = useState(12);
+
+    const step = (setter, delta) => setter(v => Math.max(8, Math.min(20, v + delta)));
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+            <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm mx-4 flex flex-col gap-5">
+                <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
+                        <span className="material-icons-round text-primary text-[20px]">download</span>
+                    </div>
+                    <div>
+                        <p className="text-[14px] font-semibold text-slate-800">Export as {format.toUpperCase()}</p>
+                        <p className="text-[13px] text-slate-500 mt-0.5">Set font sizes for each section</p>
+                    </div>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                    {[
+                        { label: 'Body text',         val: bodyPt, setter: setBodyPt },
+                        { label: 'Table of contents', val: tocPt,  setter: setTocPt  },
+                        { label: 'References',        val: refPt,  setter: setRefPt  },
+                    ].map(({ label, val, setter }) => (
+                        <div key={label} className="flex items-center justify-between">
+                            <span className="text-[12px] font-medium text-slate-600">{label}</span>
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={() => step(setter, -1)}
+                                    className="w-7 h-7 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 flex items-center justify-center text-[16px] font-medium leading-none transition-colors"
+                                >−</button>
+                                <span className="text-[13px] font-semibold text-slate-800 w-8 text-center">{val}pt</span>
+                                <button
+                                    onClick={() => step(setter, 1)}
+                                    className="w-7 h-7 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 flex items-center justify-center text-[16px] font-medium leading-none transition-colors"
+                                >+</button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="flex gap-2 justify-end">
+                    <button
+                        onClick={onClose}
+                        className="px-4 py-2 rounded-lg text-[12px] font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={() => { onConfirm(format, { ...formatting, body_font_size: bodyPt, toc_font_size: tocPt, ref_font_size: refPt }); onClose(); }}
+                        className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-white text-[12px] font-semibold hover:bg-primary/90 transition-all active:scale-95"
+                    >
+                        <span className="material-icons-round text-[14px]">download</span>
+                        Download
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 // ── Full document viewer ──────────────────────────────────────────────────────
 function DocumentViewer({ doc, onExport, onCoverSaved, onTocStyleSaved }) {
     const [pages, setPages]                   = useState(doc.pages || []);
@@ -877,6 +941,7 @@ function DocumentViewer({ doc, onExport, onCoverSaved, onTocStyleSaved }) {
     const [docFontFamily, setDocFontFamily] = useState(null);
     const [showCoverForm, setShowCoverForm]       = useState(!doc.meta?.cover?.layout);
     const [showTocStyleForm, setShowTocStyleForm] = useState(false);
+    const [exportModal, setExportModal]           = useState(null);
 
     const fontLabel = SCHOLAR_FONTS.find(f => f.value === docFontFamily)?.label ?? 'Default';
 
@@ -975,6 +1040,24 @@ function DocumentViewer({ doc, onExport, onCoverSaved, onTocStyleSaved }) {
                 <UnsavedChangesModal
                     onDiscard={() => { switchToEdit(pendingEditId); setPendingEditId(null); }}
                     onKeep={() => setPendingEditId(null)}
+                />
+            )}
+
+            {exportModal && (
+                <ExportOptionsModal
+                    format={exportModal}
+                    formatting={{
+                        line_height:   docLineHeight,
+                        space_before:  docSpaceBefore ? '1' : '0',
+                        space_after:   docSpaceAfter  ? '1' : '0',
+                        margin_top:    marginTop,
+                        margin_right:  marginRight,
+                        margin_bottom: marginBottom,
+                        margin_left:   marginLeft,
+                        font_family:   docFontFamily || '',
+                    }}
+                    onConfirm={onExport}
+                    onClose={() => setExportModal(null)}
                 />
             )}
 
@@ -1111,16 +1194,7 @@ function DocumentViewer({ doc, onExport, onCoverSaved, onTocStyleSaved }) {
                     {['pdf', 'docx'].map(fmt => (
                         <button
                             key={fmt}
-                            onClick={() => onExport(fmt, {
-                                line_height:   docLineHeight,
-                                space_before:  docSpaceBefore ? '1' : '0',
-                                space_after:   docSpaceAfter  ? '1' : '0',
-                                margin_top:    marginTop,
-                                margin_right:  marginRight,
-                                margin_bottom: marginBottom,
-                                margin_left:   marginLeft,
-                                font_family:   docFontFamily || '',
-                            })}
+                            onClick={() => setExportModal(fmt)}
                             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-white text-[12px] font-semibold hover:bg-primary/90 transition-all active:scale-95"
                         >
                             <span className="material-icons-round text-[14px]">download</span>
