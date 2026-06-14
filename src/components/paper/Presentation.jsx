@@ -3,6 +3,7 @@ import Loader from '../globals/Loader';
 import { useParams, useNavigate } from "react-router-dom";
 import { usePlan } from "../../hooks/usePlan";
 import { presentationService } from "../../api/presentationService";
+import ShakespeareModal from '../note/ShakespeareModal';
 
 // ── Theme definitions ─────────────────────────────────────────────────────────
 const THEME_MAP = {
@@ -1047,8 +1048,9 @@ export const Presentation = () => {
     const [slides, setSlides]             = useState([]);
     const [idx, setIdx]                   = useState(0);
     const [themeId, setThemeId]           = useState('modern');
-    const [showNotes, setShowNotes]       = useState(false);
-    const [isFullscreen, setIsFullscreen] = useState(false);
+    const [showNotes, setShowNotes]             = useState(false);
+    const [isShakespeareOpen, setIsShakespeareOpen] = useState(false);
+    const [isFullscreen, setIsFullscreen]       = useState(false);
     const [loading, setLoading]           = useState(true);
     const [saving, setSaving]             = useState(false);
     const [saveMsg, setSaveMsg]           = useState('');
@@ -1161,6 +1163,20 @@ export const Presentation = () => {
         if (!id) return;
         try { await presentationService.update(id, { theme:t }); } catch {}
     }, [id]);
+
+    const handleShakespeareInsert = useCallback((text) => {
+        setIsShakespeareOpen(false);
+        const s = slidesRef.current[idx];
+        if (!s) return;
+        if (s.layout === 'section') {
+            updateSlide(idx, { ...s, title: text.trim().split('\n')[0] ?? s.title });
+            return;
+        }
+        const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+        const existing = (s.bullets ?? []).filter(b => b.trim());
+        const combined = [...existing, ...lines].slice(0, 7);
+        updateSlide(idx, { ...s, bullets: combined.length ? combined : [''] });
+    }, [idx, updateSlide]);
 
     // Close export menu on outside click
     useEffect(() => {
@@ -1275,6 +1291,12 @@ export const Presentation = () => {
                 <div className="flex items-center gap-2 shrink-0">
                     {saving && <span className="flex items-center gap-1 text-[11px] text-amber-500"><Loader size="xs" /></span>}
                     {!saving && saveMsg==='saved' && <span className="flex items-center gap-1 text-[11px] text-green-500"><span className="material-icons-round text-[13px]">check</span>Saved</span>}
+                    <button onClick={() => setIsShakespeareOpen(true)}
+                        className="flex items-center gap-1 md:gap-1.5 px-1.5 py-1 md:px-3 md:py-1.5 rounded-xl text-[11px] md:text-xs font-medium md:font-semibold transition-all text-slate-500 hover:bg-slate-100"
+                        title="Shakespeare Assist — AI writing">
+                        <span className="material-icons-round text-[11px] md:text-[15px]">auto_fix_high</span>
+                        <span className="hidden sm:inline">Shakespeare</span>
+                    </button>
                     <button onClick={() => setShowNotes(v=>!v)}
                         className={`flex items-center gap-1 md:gap-1.5 px-1.5 py-1 md:px-3 md:py-1.5 rounded-xl text-[11px] md:text-xs font-medium md:font-semibold transition-all ${showNotes?'bg-amber-50 text-amber-600 border border-amber-200':'text-slate-500 hover:bg-slate-100'}`}>
                         <span className="material-icons-round text-[11px] md:text-[15px]">speaker_notes</span>Notes
@@ -1391,12 +1413,19 @@ export const Presentation = () => {
                     {/* Speaker notes */}
                     {showNotes && current && (
                         <div className="border-t border-amber-100 bg-amber-50 px-5 py-3 shrink-0">
-                            <p className="text-[9px] font-bold text-amber-500 uppercase tracking-widest mb-1.5">Speaker Notes</p>
+                            <p className="text-[9px] font-bold text-amber-500 uppercase tracking-widest mb-1.5">Speaker Notes haibo</p>
                             <p className="text-[12px] text-amber-900 leading-relaxed">{current.speaker_notes || <span className="opacity-40 italic">No notes for this slide.</span>}</p>
                         </div>
                     )}
                 </div>
             </div>
+
+            {isShakespeareOpen && (
+                <ShakespeareModal
+                    onClose={() => setIsShakespeareOpen(false)}
+                    onInsert={handleShakespeareInsert}
+                />
+            )}
         </div>
     );
 };
