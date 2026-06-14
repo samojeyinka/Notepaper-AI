@@ -1,5 +1,7 @@
 import { useEditor, EditorContent, NodeViewWrapper, ReactNodeViewRenderer } from '@tiptap/react';
 import { Extension } from '@tiptap/core';
+import { Plugin, PluginKey } from '@tiptap/pm/state';
+import { DecorationSet, Decoration } from '@tiptap/pm/view';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
@@ -34,8 +36,53 @@ const LINE_SPACINGS = [
     { label: '1.5',    value: '1.5'  },
     { label: 'Double', value: '2'    },
 ];
-// A4 content height at 96 dpi (~297 mm) minus typical top + bottom margins (~25 mm each)
-const PAGE_HEIGHT = 940; // px
+const MAX_WORDS = 350; // one physical A4 page
+
+// ── Overflow highlight extension ──────────────────────────────────────────────
+const OVERFLOW_KEY = new PluginKey('overflowHighlight');
+
+function findOverflowStart(doc, maxWords) {
+    let wordCount = 0;
+    let cutPos = null;
+    doc.descendants((node, pos) => {
+        if (cutPos !== null) return false;
+        if (node.isText) {
+            const text = node.text;
+            let i = 0;
+            while (i < text.length) {
+                while (i < text.length && /\s/.test(text[i])) i++;
+                if (i >= text.length) break;
+                const wordStart = i;
+                while (i < text.length && !/\s/.test(text[i])) i++;
+                wordCount++;
+                if (wordCount > maxWords) { cutPos = pos + wordStart; return false; }
+            }
+        }
+        return cutPos === null;
+    });
+    return cutPos;
+}
+
+const OverflowHighlight = Extension.create({
+    name: 'overflowHighlight',
+    addOptions() { return { maxWords: MAX_WORDS }; },
+    addProseMirrorPlugins() {
+        const { maxWords } = this.options;
+        return [
+            new Plugin({
+                key: OVERFLOW_KEY,
+                props: {
+                    decorations(state) {
+                        const cutPos = findOverflowStart(state.doc, maxWords);
+                        if (cutPos === null) return DecorationSet.empty;
+                        const deco = Decoration.inline(cutPos, state.doc.content.size, { class: 'word-overflow' });
+                        return DecorationSet.create(state.doc, [deco]);
+                    },
+                },
+            }),
+        ];
+    },
+});
 
 const BLOCK_STYLES = [
     { label: 'Normal text', check: ed => ed.isActive('paragraph') && !ed.isActive('heading'), run: ed => ed.chain().focus().setParagraph().run() },
@@ -371,20 +418,19 @@ function FontSizeControl({ editor }) {
     );
 }
 
-// ── Chapter editor ────────────────────────────────────────────────────────────
-export default function ChapterEditor({ chapter, documentId, onSave, onCancel, onDirtyChange }) {
+// ── Page editor ───────────────────────────────────────────────────────────────
+export default function PageEditor({ page, documentId, onSave, onCancel, onDirtyChange }) {
+    const chapter = page; // alias so existing internals below continue to work
     const [saving, setSaving]                   = useState(false);
     const [saveError, setSaveError]             = useState('');
     const [shakespeareOpen, setShakespeareOpen] = useState(false);
     const [imageAiOpen, setImageAiOpen]         = useState(false);
     const [isUploading, setIsUploading]         = useState(false);
 
-    const focusedRef    = useRef(false);
-    const fileInputRef  = useRef(null);
-    const editorWrapRef = useRef(null);
-
-    const [pageCount,  setPageCount]  = useState(1);
-    const [cursorPage, setCursorPage] = useState(1);
+    const focusedRef   = useRef(false);
+    const fileInputRef = useRef(null);
+    const wordsRef     = useRef(0);
+    const [words, setWords] = useState(0);
 
     const editor = useEditor({
         extensions: [
@@ -400,10 +446,28 @@ export default function ChapterEditor({ chapter, documentId, onSave, onCancel, o
             Table.configure({ resizable: false }),
             TableRow, TableCell, TableHeader,
             CharacterCount,
+            OverflowHighlight,
         ],
         content: chapter.content || '',
-        onUpdate: () => onDirtyChange?.(true),
+        onCreate: ({ editor }) => {
+            const wc = editor.storage.characterCount?.words() ?? 0;
+            wordsRef.current = wc;
+            setWords(wc);
+        },
+        onUpdate: ({ editor }) => {
+            const wc = editor.storage.characterCount?.words() ?? 0;
+            wordsRef.current = wc;
+            setWords(wc);
+            onDirtyChange?.(true);
+        },
         editorProps: {
+            handleKeyDown: (_view, event) => {
+                if (wordsRef.current >= MAX_WORDS && event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
+                    return true;
+                }
+                return false;
+            },
+            handlePaste: () => wordsRef.current >= MAX_WORDS,
             attributes: { class: 'scholar-doc scholar-editor-content p-6 min-h-[320px] focus:outline-none' },
         },
     });
@@ -415,37 +479,16 @@ export default function ChapterEditor({ chapter, documentId, onSave, onCancel, o
         return () => clearTimeout(t);
     }, [editor]);
 
-    // Recalculate page count whenever the editor content grows or shrinks
-    useEffect(() => {
-        const el = editorWrapRef.current;
-        if (!el) return;
-        const ro = new ResizeObserver(([entry]) => {
-            setPageCount(Math.max(1, Math.ceil(entry.contentRect.height / PAGE_HEIGHT)));
-        });
-        ro.observe(el);
-        return () => ro.disconnect();
-    }, []);
-
-    // Track which page the cursor is on via selectionchange
-    useEffect(() => {
-        const update = () => {
-            const wrap = editorWrapRef.current;
-            if (!wrap) return;
-            const sel = window.getSelection();
-            if (!sel || sel.rangeCount === 0) return;
-            const relY = sel.getRangeAt(0).getBoundingClientRect().top - wrap.getBoundingClientRect().top;
-            if (relY < 0) return;
-            setCursorPage(Math.min(pageCount, Math.floor(relY / PAGE_HEIGHT) + 1));
-        };
-        document.addEventListener('selectionchange', update, { passive: true });
-        return () => document.removeEventListener('selectionchange', update);
-    }, [pageCount]);
-
     const handleSave = async () => {
         if (!editor || saving) return;
+        if (words > MAX_WORDS) {
+            const over = words - MAX_WORDS;
+            setSaveError(`Over the ${MAX_WORDS}-word limit by ${over} word${over !== 1 ? 's' : ''}. Cut the highlighted text before saving.`);
+            return;
+        }
         setSaving(true); setSaveError('');
         try {
-            const res = await scholarService.updateChapter(documentId, chapter.id, editor.getHTML());
+            const res = await scholarService.updatePage(documentId, chapter.id, editor.getHTML());
             onDirtyChange?.(false);
             onSave(chapter.id, res.data);
         } catch { setSaveError('Could not save changes. Please try again.'); }
@@ -486,8 +529,6 @@ export default function ChapterEditor({ chapter, documentId, onSave, onCancel, o
     const currentFontLabel  = FONT_FAMILIES.find(f => f.value === currentFontFamily)?.label ?? 'Default';
     const currentAlign      = ['left','center','right','justify'].find(a => editor?.isActive({ textAlign: a })) ?? 'left';
     const alignIcons        = { left: 'format_align_left', center: 'format_align_center', right: 'format_align_right', justify: 'format_align_justify' };
-    const words             = editor?.storage.characterCount?.words() ?? 0;
-
     const triggerBtn = (label, icon, title, active = false) => (
         <button
             type="button"
@@ -634,8 +675,13 @@ export default function ChapterEditor({ chapter, documentId, onSave, onCancel, o
 
                 {/* Right side */}
                 <div className="ml-auto flex items-center gap-1.5 pl-2 shrink-0">
-                    <span className="text-[11px] text-slate-400 tabular-nums hidden sm:inline">
-                        {words.toLocaleString()}w · p.{cursorPage}/{pageCount}
+                    <span className={`text-[11px] tabular-nums hidden sm:inline font-medium ${
+                        words > MAX_WORDS       ? 'text-red-500'
+                        : words > MAX_WORDS * 0.9 ? 'text-orange-500'
+                        : words > MAX_WORDS * 0.75 ? 'text-amber-500'
+                        : 'text-slate-400'
+                    }`}>
+                        {words} / {MAX_WORDS}w
                     </span>
                     <button
                         type="button"
@@ -647,14 +693,16 @@ export default function ChapterEditor({ chapter, documentId, onSave, onCancel, o
                     <button
                         type="button"
                         onClick={handleSave}
-                        disabled={saving}
-                        className="flex items-center gap-1 px-3 py-1 rounded-lg bg-primary text-white text-[12px] font-semibold hover:bg-primary/90 transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
+                        disabled={saving || words > MAX_WORDS}
+                        className={`flex items-center gap-1 px-3 py-1 rounded-lg text-white text-[12px] font-semibold transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed ${
+                            words > MAX_WORDS ? 'bg-red-500' : 'bg-primary hover:bg-primary/90'
+                        }`}
                     >
                         {saving
                             ? <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                            : <span className="material-icons-round text-[13px]">save</span>
+                            : <span className="material-icons-round text-[13px]">{words > MAX_WORDS ? 'lock' : 'save'}</span>
                         }
-                        {saving ? 'Saving…' : 'Save'}
+                        {saving ? 'Saving…' : words > MAX_WORDS ? 'Over limit' : 'Save'}
                     </button>
                 </div>
             </div>
@@ -667,25 +715,34 @@ export default function ChapterEditor({ chapter, documentId, onSave, onCancel, o
                         {saveError}
                     </div>
                 )}
-                {/* Editor + page-break overlay */}
-                <div ref={editorWrapRef} className="relative">
-                    <EditorContent editor={editor} />
 
-                    {/* Page break rulers — one per boundary, zero-indexed */}
-                    {Array.from({ length: pageCount - 1 }, (_, i) => (
+                {/* Scrollable editor — capped at one page height */}
+                <div className="overflow-y-auto max-h-[780px]">
+                    <EditorContent editor={editor} />
+                </div>
+
+                {/* Word budget bar */}
+                <div className="flex items-center gap-3 px-4 py-2 border-t border-slate-100 bg-slate-50">
+                    <div className="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden">
                         <div
-                            key={i}
-                            className="absolute left-0 right-0 flex items-center pointer-events-none select-none z-10"
-                            style={{ top: (i + 1) * PAGE_HEIGHT }}
-                        >
-                            <div className="flex-1 border-t border-dashed border-slate-300" />
-                            <span className="mx-3 flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-[10px] font-semibold text-slate-400 uppercase tracking-wider whitespace-nowrap">
-                                <span className="material-icons-round text-[11px]">insert_page_break</span>
-                                Page {i + 2}
-                            </span>
-                            <div className="flex-1 border-t border-dashed border-slate-300" />
-                        </div>
-                    ))}
+                            className={`h-full rounded-full transition-all duration-300 ${
+                                words > MAX_WORDS         ? 'bg-red-500'
+                                : words > MAX_WORDS * 0.9  ? 'bg-orange-400'
+                                : words > MAX_WORDS * 0.75 ? 'bg-amber-400'
+                                : 'bg-emerald-400'
+                            }`}
+                            style={{ width: `${Math.min(100, (words / MAX_WORDS) * 100)}%` }}
+                        />
+                    </div>
+                    <span className={`text-[11px] tabular-nums font-medium shrink-0 ${
+                        words > MAX_WORDS         ? 'text-red-500'
+                        : words > MAX_WORDS * 0.9  ? 'text-orange-500'
+                        : words > MAX_WORDS * 0.75 ? 'text-amber-500'
+                        : 'text-slate-400'
+                    }`}>
+                        {words} / {MAX_WORDS} words
+                        {words > MAX_WORDS && <span className="ml-1 text-red-400">(over limit)</span>}
+                    </span>
                 </div>
 
                 {/* Floating Shakespeare FAB */}
@@ -693,7 +750,7 @@ export default function ChapterEditor({ chapter, documentId, onSave, onCancel, o
                     type="button"
                     onMouseDown={(e) => { e.preventDefault(); setShakespeareOpen(true); }}
                     title="Shakespeare Assist — AI writing"
-                    className="absolute bottom-4 right-4 w-11 h-11 rounded-full flex items-center justify-center text-white shakespeare-glow-btn"
+                    className="absolute bottom-12 right-4 w-11 h-11 rounded-full flex items-center justify-center text-white shakespeare-glow-btn"
                     style={{ background: 'linear-gradient(135deg, #6541c4 0%, #9b59f5 50%, #6541c4 100%)', backgroundSize: '200% 200%' }}
                 >
                     <span className="material-icons-round text-[20px] shakespeare-sparkle">auto_awesome</span>

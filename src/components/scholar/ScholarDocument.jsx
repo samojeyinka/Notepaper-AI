@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { scholarService } from '../../api/scholarService';
-import ChapterEditor from './ChapterEditor';
+import PageEditor from './ChapterEditor';
 import CoverPage from './CoverPage';
 import CoverPageForm from './CoverPageForm';
 import TocStyleForm from './TocStyleForm';
@@ -136,22 +136,22 @@ function ProgressPanel({ doc }) {
             setMessage('Queued — waiting for a worker…');
         } else if (s === 'generating_outline' || s === 'outline_ready') {
             setProgress(prev => Math.max(prev, 15));
-            setMessage('Researching topic and building document outline…');
+            setMessage('Researching topic and building document page plan…');
         } else if (s === 'generating_chapter' || s === 'chapter_ready') {
-            const n     = doc.current_chapter || 1;
-            const total = doc.total_chapters  || 1;
+            const n     = doc.current_page || 1;
+            const total = doc.total_pages  || 1;
             const pct   = Math.round(15 + ((n - 1) / total) * 70);
             setProgress(pct);
-            const title = (doc.chapters || []).find(c => c.chapter_number === n)?.title || '';
-            setMessage(`Writing Chapter ${n}${title ? ': ' + title : ''}…`);
+            const title = (doc.pages || []).find(c => c.page_number === n)?.title || '';
+            setMessage(`Writing Page ${n}${title ? ': ' + title : ''}…`);
         } else if (s === 'assembling') {
             setProgress(90);
             setMessage('Assembling your final document…');
         }
-    }, [doc?.status, doc?.current_chapter]);
+    }, [doc?.status, doc?.current_page]);
 
-    const totalChapters = doc?.total_chapters || 0;
-    const doneChapters  = (doc?.chapters || []).filter(c => c.status === 'approved').length;
+    const totalPages = doc?.total_pages || 0;
+    const donePages  = (doc?.pages || []).filter(c => c.status === 'approved').length;
 
     return (
         <div className="flex-1 flex flex-col items-center justify-center p-10 text-center">
@@ -171,8 +171,8 @@ function ProgressPanel({ doc }) {
                 </div>
             </div>
 
-            {totalChapters > 0 && (
-                <p className="text-[12px] text-slate-400 mb-8">{doneChapters} of {totalChapters} chapters written</p>
+            {totalPages > 0 && (
+                <p className="text-[12px] text-slate-400 mb-8">{donePages} of {totalPages} pages written</p>
             )}
 
             <div className="flex flex-col items-center gap-2 mt-2">
@@ -186,36 +186,254 @@ function ProgressPanel({ doc }) {
     );
 }
 
+// ── TOC helpers ───────────────────────────────────────────────────────────────
+function extractHeadings(html, pageNum) {
+    if (!html) return [];
+    const parsed = new DOMParser().parseFromString(html, 'text/html');
+    return [...parsed.querySelectorAll('h2, h3, h4')].map((node, idx) => ({
+        id: `${pageNum}-h${node.tagName[1]}-${idx}`,
+        level: parseInt(node.tagName[1]),
+        originalText: node.textContent.trim(),
+    }));
+}
+
+function buildFreshEntries(pages) {
+    return (pages || []).map(pg => ({
+        pageId: pg.id,
+        page_number: pg.page_number,
+        label: pg.title || '',
+        hidden: false,
+        subs: extractHeadings(pg.content, pg.page_number).map(h => ({
+            ...h, label: h.originalText, hidden: false,
+        })),
+    }));
+}
+
+function mergeTocEntries(fresh, saved) {
+    if (!saved?.length) return fresh;
+    return fresh.map(entry => {
+        const sv = saved.find(s => s.pageId === entry.pageId);
+        if (!sv) return entry;
+        const mergedSubs = entry.subs.map(sub => {
+            const svSub = sv.subs?.find(s => s.id === sub.id);
+            return svSub ? { ...sub, label: svSub.label ?? sub.label, hidden: Boolean(svSub.hidden) } : sub;
+        });
+        return { ...entry, label: sv.label ?? entry.label, hidden: Boolean(sv.hidden), subs: mergedSubs };
+    });
+}
+
 // ── Table of contents ─────────────────────────────────────────────────────────
-function TableOfContents({ chapters, outline }) {
-    const outlineChapters = outline?.chapters || [];
+function TableOfContents({ pages, savedEntries, documentId }) {
+    const [entries, setEntries]   = useState(() => mergeTocEntries(buildFreshEntries(pages), savedEntries));
+    const [collapsed, setCollapsed] = useState(false);
+    const [editing, setEditing]   = useState(false);
+    const [draft, setDraft]       = useState([]);
+    const [saving, setSaving]     = useState(false);
+    const [saveErr, setSaveErr]   = useState('');
+    const prevPagesRef = useRef(pages);
+
+    // Re-merge when pages change (content edits, new pages, reorder, delete).
+    useEffect(() => {
+        if (prevPagesRef.current === pages) return;
+        prevPagesRef.current = pages;
+        setEntries(prev => mergeTocEntries(buildFreshEntries(pages), prev));
+    }, [pages]);
+
+    const openEdit = () => {
+        setDraft(JSON.parse(JSON.stringify(entries)));
+        setSaveErr('');
+        setEditing(true);
+    };
+
+    const updateEntry = (ei, field, value) =>
+        setDraft(prev => prev.map((e, i) => i === ei ? { ...e, [field]: value } : e));
+
+    const updateSub = (ei, si, field, value) =>
+        setDraft(prev => prev.map((e, i) => i !== ei ? e : {
+            ...e,
+            subs: e.subs.map((s, j) => j === si ? { ...s, [field]: value } : s),
+        }));
+
+    const handleReset = () => setDraft(buildFreshEntries(pages));
+
+    const handleSave = async () => {
+        setSaving(true);
+        setSaveErr('');
+        try {
+            await scholarService.updateMeta(documentId, { toc_entries: draft });
+            setEntries(draft);
+            setEditing(false);
+        } catch {
+            setSaveErr('Could not save. Please try again.');
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const visible = entries.filter(e => !e.hidden);
+
     return (
-        <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 mb-8 print:break-inside-avoid">
-            <h2 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
-                <span className="material-icons-round text-primary text-[20px]">toc</span>
-                Table of Contents
-            </h2>
-            <ol className="flex flex-col gap-2">
-                {chapters.map(ch => {
-                    const outlineCh = outlineChapters.find(o => o.chapter_number === ch.chapter_number);
-                    return (
-                        <li key={ch.id}>
+        <div className="bg-slate-50 border border-slate-200 rounded-xl mb-8 overflow-hidden print:break-inside-avoid">
+            {/* Header — clicking the title area collapses/expands */}
+            <div
+                className={`flex items-center justify-between px-6 py-4 cursor-pointer select-none hover:bg-slate-100/60 transition-colors ${!collapsed ? 'border-b border-slate-200' : ''}`}
+                onClick={() => { if (!editing) setCollapsed(c => !c); }}
+            >
+                <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                    <span className="material-icons-round text-primary text-[20px]">toc</span>
+                    Table of Contents
+                    <span className={`material-icons-round text-[18px] text-slate-400 transition-transform duration-200 ${collapsed ? '-rotate-90' : ''}`}>
+                        expand_more
+                    </span>
+                </h2>
+                {!collapsed && !editing && (
+                    <button
+                        onClick={e => { e.stopPropagation(); openEdit(); }}
+                        className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold text-slate-400 hover:text-primary hover:bg-primary/8 transition-colors border border-transparent hover:border-primary/15"
+                    >
+                        <span className="material-icons-round text-[14px]">edit</span>
+                        Edit
+                    </button>
+                )}
+                {!collapsed && editing && (
+                    <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
+                        <button
+                            onClick={handleReset}
+                            className="text-[11px] font-semibold text-slate-400 hover:text-slate-600 px-2 py-1 rounded-lg hover:bg-slate-100 transition-colors"
+                        >
+                            Reset
+                        </button>
+                        <button
+                            onClick={() => setEditing(false)}
+                            className="px-3 py-1.5 rounded-lg text-[12px] font-semibold text-slate-500 hover:bg-slate-100 transition-colors"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={handleSave}
+                            disabled={saving}
+                            className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-primary text-white text-[12px] font-semibold hover:bg-primary/90 transition-all active:scale-95 disabled:opacity-60"
+                        >
+                            {saving
+                                ? <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                : <span className="material-icons-round text-[14px]">save</span>}
+                            {saving ? 'Saving…' : 'Save'}
+                        </button>
+                    </div>
+                )}
+            </div>
+
+            {/* Collapsible body */}
+            {!collapsed && <div className="px-6 py-5">
+
+            {saveErr && (
+                <div className="flex items-center gap-1.5 mb-3 px-3 py-2 bg-red-50 border border-red-100 rounded-lg text-[12px] text-red-600">
+                    <span className="material-icons-round text-[14px]">error_outline</span>
+                    {saveErr}
+                </div>
+            )}
+
+            {/* ── View mode ── */}
+            {!editing && (
+                <nav>
+                    {visible.length === 0 ? (
+                        <p className="text-[13px] text-slate-400 italic">All entries are hidden. Click "Edit" to restore them.</p>
+                    ) : visible.map(entry => (
+                        <div key={entry.pageId ?? entry.page_number}>
                             <a
-                                href={`#chapter-${ch.chapter_number}`}
-                                className="flex items-center gap-3 text-[14px] text-slate-600 hover:text-primary transition-colors group"
+                                href={`#page-${entry.page_number}`}
+                                className="flex items-center gap-3 text-[14px] text-slate-600 hover:text-primary transition-colors group py-1.5"
                             >
                                 <span className="w-7 h-7 bg-white border border-slate-200 rounded-full text-[11px] font-bold text-slate-500 flex items-center justify-center shrink-0 group-hover:border-primary/40 group-hover:text-primary transition-colors">
-                                    {ch.chapter_number}
+                                    {entry.page_number}
                                 </span>
-                                <span className="group-hover:underline">{ch.title}</span>
-                                {outlineCh?.estimated_pages && (
-                                    <span className="ml-auto text-[11px] text-slate-400 shrink-0">~{outlineCh.estimated_pages}p</span>
-                                )}
+                                <span className="font-medium group-hover:underline">
+                                    {entry.label || <em className="text-slate-400 font-normal">Untitled</em>}
+                                </span>
                             </a>
-                        </li>
-                    );
-                })}
-            </ol>
+                            {entry.subs?.filter(s => !s.hidden).map(sub => (
+                                <a
+                                    key={sub.id}
+                                    href={`#page-${entry.page_number}`}
+                                    style={{ paddingLeft: `${(sub.level - 2) * 18 + 46}px` }}
+                                    className="flex items-center gap-2 text-[12px] text-slate-400 hover:text-primary transition-colors group py-0.5"
+                                >
+                                    <span className="w-1 h-1 rounded-full bg-slate-300 group-hover:bg-primary/50 shrink-0 transition-colors" />
+                                    <span className="group-hover:underline">{sub.label}</span>
+                                </a>
+                            ))}
+                        </div>
+                    ))}
+                </nav>
+            )}
+
+            {/* ── Edit mode ── */}
+            {editing && (
+                <div className="flex flex-col gap-2">
+                    {draft.map((entry, ei) => (
+                        <div
+                            key={entry.pageId ?? entry.page_number}
+                            className={`rounded-xl border overflow-hidden transition-opacity ${entry.hidden ? 'opacity-40 border-dashed border-slate-200' : 'border-slate-200 bg-white'}`}
+                        >
+                            {/* Page-level row */}
+                            <div className="flex items-center gap-2 px-3 py-2">
+                                <span className="w-6 h-6 rounded-full bg-primary/10 text-primary text-[11px] font-bold flex items-center justify-center shrink-0 select-none">
+                                    {entry.page_number}
+                                </span>
+                                <input
+                                    value={entry.label}
+                                    placeholder="Untitled"
+                                    disabled={entry.hidden}
+                                    onChange={e => updateEntry(ei, 'label', e.target.value)}
+                                    className="flex-1 min-w-0 bg-transparent text-[13px] font-semibold text-slate-700 outline-none border border-transparent hover:border-slate-200 focus:border-primary/40 focus:bg-white px-2 py-1 rounded-lg transition-all placeholder-slate-300 disabled:opacity-50"
+                                />
+                                <button
+                                    onClick={() => updateEntry(ei, 'hidden', !entry.hidden)}
+                                    title={entry.hidden ? 'Show in TOC' : 'Hide from TOC'}
+                                    className={`p-1 rounded-lg transition-colors shrink-0 ${entry.hidden ? 'text-slate-300 hover:text-primary hover:bg-primary/8' : 'text-slate-400 hover:text-red-400 hover:bg-red-50'}`}
+                                >
+                                    <span className="material-icons-round text-[16px]">
+                                        {entry.hidden ? 'visibility_off' : 'visibility'}
+                                    </span>
+                                </button>
+                            </div>
+
+                            {/* Sub-heading rows */}
+                            {!entry.hidden && entry.subs?.map((sub, si) => (
+                                <div
+                                    key={sub.id}
+                                    style={{ paddingLeft: `${(sub.level - 2) * 16 + 12}px` }}
+                                    className={`flex items-center gap-2 pr-3 py-1.5 border-t border-slate-100 transition-opacity ${sub.hidden ? 'opacity-40' : ''}`}
+                                >
+                                    <span className={`text-[9px] font-bold rounded px-1 py-0.5 shrink-0 ${sub.level === 2 ? 'bg-primary/10 text-primary' : sub.level === 3 ? 'bg-slate-100 text-slate-400' : 'bg-slate-50 text-slate-300'}`}>
+                                        H{sub.level}
+                                    </span>
+                                    <input
+                                        value={sub.label}
+                                        placeholder={sub.originalText}
+                                        disabled={sub.hidden}
+                                        onChange={e => updateSub(ei, si, 'label', e.target.value)}
+                                        className="flex-1 min-w-0 bg-transparent text-[12px] text-slate-600 outline-none border border-transparent hover:border-slate-200 focus:border-primary/40 focus:bg-white px-2 py-0.5 rounded-lg transition-all placeholder-slate-300 disabled:opacity-50"
+                                    />
+                                    <button
+                                        onClick={() => updateSub(ei, si, 'hidden', !sub.hidden)}
+                                        title={sub.hidden ? 'Show in TOC' : 'Hide from TOC'}
+                                        className={`p-1 rounded-lg transition-colors shrink-0 ${sub.hidden ? 'text-slate-200 hover:text-primary hover:bg-primary/8' : 'text-slate-300 hover:text-red-400 hover:bg-red-50'}`}
+                                    >
+                                        <span className="material-icons-round text-[14px]">
+                                            {sub.hidden ? 'visibility_off' : 'visibility'}
+                                        </span>
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    ))}
+                    <p className="text-[11px] text-slate-400 mt-1">
+                        Hiding an entry removes it from the TOC only — page content is not affected.
+                    </p>
+                </div>
+            )}
+            </div>}
         </div>
     );
 }
@@ -224,9 +442,9 @@ function TableOfContents({ chapters, outline }) {
 const EMPTY_CITATION = { author: '', title: '', year: '', source: '', url: '' };
 
 function Bibliography({ citations: initialCitations, documentId, onSaved }) {
-    const [editing, setEditing]   = useState(false);
-    const [draft, setDraft]       = useState([]);
-    const [saving, setSaving]     = useState(false);
+    const [editing, setEditing]     = useState(false);
+    const [draft, setDraft]         = useState([]);
+    const [saving, setSaving]       = useState(false);
     const [saveError, setSaveError] = useState('');
 
     const citations = initialCitations || [];
@@ -365,16 +583,16 @@ function Bibliography({ citations: initialCitations, documentId, onSaved }) {
     );
 }
 
-// ── Sortable chapter item ─────────────────────────────────────────────────────
-function SortableChapterItem({ ch, isEditing, isCollapsed, onToggleCollapse, onEdit, onSave, onCancel, onDelete, onDirtyChange, documentId, pageNumbering }) {
-    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: ch.id });
+// ── Sortable page item ────────────────────────────────────────────────────────
+function SortablePageItem({ pg, isEditing, isCollapsed, onToggleCollapse, onEdit, onSave, onCancel, onDelete, onDirtyChange, documentId, pageNumbering }) {
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: pg.id });
     const [confirmingDelete, setConfirmingDelete] = useState(false);
     const [isDeleting, setIsDeleting]             = useState(false);
 
     const handleDeleteConfirm = async () => {
         setIsDeleting(true);
         try {
-            await onDelete(ch.id);
+            await onDelete(pg.id);
         } finally {
             setIsDeleting(false);
             setConfirmingDelete(false);
@@ -385,10 +603,10 @@ function SortableChapterItem({ ch, isEditing, isCollapsed, onToggleCollapse, onE
         <section
             ref={setNodeRef}
             style={{ transform: CSS.Transform.toString(transform), transition }}
-            id={`chapter-${ch.chapter_number}`}
+            id={`page-${pg.page_number}`}
             className={`scroll-mt-20 ${isDragging ? 'opacity-50' : ''}`}
         >
-            {/* Chapter header */}
+            {/* Page header */}
             <div className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border mb-3 transition-colors ${isEditing ? 'bg-primary/5 border-primary/20' : 'bg-slate-50 border-slate-200 hover:border-slate-300'}`}>
                 {/* Drag handle */}
                 <button
@@ -403,23 +621,25 @@ function SortableChapterItem({ ch, isEditing, isCollapsed, onToggleCollapse, onE
 
                 {/* Number badge */}
                 <span className="w-6 h-6 rounded-full bg-primary/10 text-primary text-[11px] font-bold flex items-center justify-center shrink-0 select-none">
-                    {ch.chapter_number}
+                    {pg.page_number}
                 </span>
 
                 {/* Title */}
-                <span className="text-[13px] font-semibold text-slate-700 flex-1 truncate select-none">{ch.title}</span>
+                <span className="text-[13px] font-semibold flex-1 truncate select-none text-slate-700">
+                    {pg.title || <span className="text-slate-400 italic font-normal">Untitled page</span>}
+                </span>
 
                 {/* Word count */}
-                {(ch.word_count > 0) && !isEditing && (
+                {(pg.word_count > 0) && !isEditing && (
                     <span className="text-[10px] text-slate-400 shrink-0 tabular-nums hidden sm:inline">
-                        {ch.word_count.toLocaleString()}w
+                        {pg.word_count.toLocaleString()}w
                     </span>
                 )}
 
                 {/* Inline delete confirm — replaces edit/delete/collapse when active */}
                 {!isEditing && confirmingDelete ? (
                     <div className="flex items-center gap-1.5 ml-auto shrink-0">
-                        <span className="text-[11px] text-slate-500 font-medium hidden sm:inline">Delete chapter?</span>
+                        <span className="text-[11px] text-slate-500 font-medium hidden sm:inline">Delete page?</span>
                         <button
                             onClick={() => setConfirmingDelete(false)}
                             disabled={isDeleting}
@@ -440,7 +660,7 @@ function SortableChapterItem({ ch, isEditing, isCollapsed, onToggleCollapse, onE
                     <>
                         {/* Edit button */}
                         <button
-                            onClick={() => onEdit(ch.id)}
+                            onClick={() => onEdit(pg.id)}
                             className="flex items-center gap-0.5 px-2 py-1 rounded-lg text-[11px] font-semibold text-slate-400 hover:text-primary hover:bg-primary/8 transition-colors shrink-0"
                         >
                             <span className="material-icons-round text-[14px]">edit</span>
@@ -451,17 +671,17 @@ function SortableChapterItem({ ch, isEditing, isCollapsed, onToggleCollapse, onE
                         <button
                             onClick={() => setConfirmingDelete(true)}
                             className="flex items-center gap-0.5 px-2 py-1 rounded-lg text-[11px] font-semibold text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors shrink-0"
-                            title="Delete chapter"
+                            title="Delete page"
                         >
                             <span className="material-icons-round text-[14px]">delete_outline</span>
                         </button>
                     </>
                 )}
 
-                {/* Collapse toggle — hidden during delete confirm so it doesn't crowd */}
+                {/* Collapse toggle */}
                 {!confirmingDelete && (
                     <button
-                        onClick={() => onToggleCollapse(ch.id)}
+                        onClick={() => onToggleCollapse(pg.id)}
                         className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors shrink-0"
                         title={isCollapsed ? 'Expand' : 'Collapse'}
                     >
@@ -475,8 +695,8 @@ function SortableChapterItem({ ch, isEditing, isCollapsed, onToggleCollapse, onE
             {/* Collapsible body */}
             {!isCollapsed && (
                 isEditing ? (
-                    <ChapterEditor
-                        chapter={ch}
+                    <PageEditor
+                        page={pg}
                         documentId={documentId}
                         onSave={onSave}
                         onCancel={onCancel}
@@ -484,10 +704,10 @@ function SortableChapterItem({ ch, isEditing, isCollapsed, onToggleCollapse, onE
                     />
                 ) : (
                     <>
-                        <div className="scholar-doc" dangerouslySetInnerHTML={{ __html: resolveImages(ch.content || '') }} />
+                        <div className="scholar-doc" dangerouslySetInnerHTML={{ __html: resolveImages(pg.content || '') }} />
                         {pageNumbering && (
                             <div className="flex justify-end mt-4 pt-3 border-t border-slate-100">
-                                <span className="text-[11px] text-slate-300 font-medium tabular-nums">— {ch.chapter_number} —</span>
+                                <span className="text-[11px] text-slate-300 font-medium tabular-nums">— {pg.page_number} —</span>
                             </div>
                         )}
                     </>
@@ -497,31 +717,35 @@ function SortableChapterItem({ ch, isEditing, isCollapsed, onToggleCollapse, onE
     );
 }
 
-// ── Add chapter form ──────────────────────────────────────────────────────────
-function AddChapterForm({ documentId, onAdded }) {
-    const [open, setOpen]       = useState(false);
-    const [title, setTitle]     = useState('');
-    const [loading, setLoading] = useState(false);
-    const [error, setError]     = useState('');
+// ── Add page form ─────────────────────────────────────────────────────────────
+function AddPageForm({ documentId, onAdded }) {
+    const [open, setOpen]         = useState(false);
+    const [title, setTitle]       = useState('');
+    const [noTitle, setNoTitle]   = useState(false);
+    const [loading, setLoading]   = useState(false);
+    const [error, setError]       = useState('');
     const inputRef = useRef(null);
 
     const openForm = () => {
         setTitle('');
+        setNoTitle(false);
         setError('');
         setOpen(true);
         setTimeout(() => inputRef.current?.focus(), 0);
     };
 
+    const canSubmit = noTitle || title.trim().length > 0;
+
     const handleAdd = async () => {
-        if (!title.trim() || loading) return;
+        if (!canSubmit || loading) return;
         setLoading(true);
         setError('');
         try {
-            const res = await scholarService.addChapter(documentId, title.trim());
+            const res = await scholarService.addPage(documentId, noTitle ? '' : title.trim());
             onAdded(res.data);
             setOpen(false);
         } catch {
-            setError('Could not add chapter. Please try again.');
+            setError('Could not add page. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -534,22 +758,42 @@ function AddChapterForm({ documentId, onAdded }) {
                 className="w-full flex items-center justify-center gap-2 py-3 mt-4 rounded-xl border-2 border-dashed border-slate-200 hover:border-primary/40 text-slate-400 hover:text-primary text-[13px] font-semibold transition-all"
             >
                 <span className="material-icons-round text-[18px]">add</span>
-                Add Chapter
+                Add Page
             </button>
         );
     }
 
     return (
         <div className="mt-4 bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col gap-3">
-            <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">New Chapter</p>
-            <input
-                ref={inputRef}
-                value={title}
-                onChange={e => setTitle(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter') handleAdd(); if (e.key === 'Escape') setOpen(false); }}
-                placeholder="Chapter title…"
-                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-[14px] text-slate-700 placeholder-slate-300 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all"
-            />
+            <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">New Page</p>
+
+            {/* Title input — hidden when noTitle is checked */}
+            {!noTitle && (
+                <input
+                    ref={inputRef}
+                    value={title}
+                    onChange={e => setTitle(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') handleAdd(); if (e.key === 'Escape') setOpen(false); }}
+                    placeholder="Page title…"
+                    className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-[14px] text-slate-700 placeholder-slate-300 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all"
+                />
+            )}
+
+            {/* No title toggle */}
+            <button
+                type="button"
+                onClick={() => {
+                    setNoTitle(v => !v);
+                    if (noTitle) setTimeout(() => inputRef.current?.focus(), 0);
+                }}
+                className="flex items-center gap-2 text-[12px] text-slate-500 hover:text-slate-700 transition-colors w-fit"
+            >
+                <span className={`material-icons-round text-[16px] ${noTitle ? 'text-primary' : 'text-slate-300'}`}>
+                    {noTitle ? 'check_box' : 'check_box_outline_blank'}
+                </span>
+                No title (continuation page)
+            </button>
+
             {error && (
                 <p className="text-[12px] text-red-500 flex items-center gap-1">
                     <span className="material-icons-round text-[14px]">error_outline</span>
@@ -565,13 +809,13 @@ function AddChapterForm({ documentId, onAdded }) {
                 </button>
                 <button
                     onClick={handleAdd}
-                    disabled={!title.trim() || loading}
+                    disabled={!canSubmit || loading}
                     className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-white text-[12px] font-semibold hover:bg-primary/90 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {loading
                         ? <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                         : <span className="material-icons-round text-[14px]">add</span>}
-                    {loading ? 'Adding…' : 'Add Chapter'}
+                    {loading ? 'Adding…' : 'Add Page'}
                 </button>
             </div>
         </div>
@@ -590,7 +834,7 @@ function UnsavedChangesModal({ onDiscard, onKeep }) {
                     <div>
                         <p className="text-[14px] font-semibold text-slate-800">Unsaved changes</p>
                         <p className="text-[13px] text-slate-500 mt-1 leading-relaxed">
-                            This chapter has unsaved edits. Discard them and switch chapters?
+                            This page has unsaved edits. Discard them and switch pages?
                         </p>
                     </div>
                 </div>
@@ -613,16 +857,80 @@ function UnsavedChangesModal({ onDiscard, onKeep }) {
     );
 }
 
+// ── Export options modal ──────────────────────────────────────────────────────
+function ExportOptionsModal({ format, formatting, onConfirm, onClose }) {
+    const [bodyPt, setBodyPt] = useState(12);
+    const [tocPt,  setTocPt]  = useState(12);
+    const [refPt,  setRefPt]  = useState(12);
+
+    const step = (setter, delta) => setter(v => Math.max(8, Math.min(20, v + delta)));
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+            <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm mx-4 flex flex-col gap-5">
+                <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
+                        <span className="material-icons-round text-primary text-[20px]">download</span>
+                    </div>
+                    <div>
+                        <p className="text-[14px] font-semibold text-slate-800">Export as {format.toUpperCase()}</p>
+                        <p className="text-[13px] text-slate-500 mt-0.5">Set font sizes for each section</p>
+                    </div>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                    {[
+                        { label: 'Body text',         val: bodyPt, setter: setBodyPt },
+                        { label: 'Table of contents', val: tocPt,  setter: setTocPt  },
+                        { label: 'References',        val: refPt,  setter: setRefPt  },
+                    ].map(({ label, val, setter }) => (
+                        <div key={label} className="flex items-center justify-between">
+                            <span className="text-[12px] font-medium text-slate-600">{label}</span>
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={() => step(setter, -1)}
+                                    className="w-7 h-7 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 flex items-center justify-center text-[16px] font-medium leading-none transition-colors"
+                                >−</button>
+                                <span className="text-[13px] font-semibold text-slate-800 w-8 text-center">{val}pt</span>
+                                <button
+                                    onClick={() => step(setter, 1)}
+                                    className="w-7 h-7 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 flex items-center justify-center text-[16px] font-medium leading-none transition-colors"
+                                >+</button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="flex gap-2 justify-end">
+                    <button
+                        onClick={onClose}
+                        className="px-4 py-2 rounded-lg text-[12px] font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={() => { onConfirm(format, { ...formatting, body_font_size: bodyPt, toc_font_size: tocPt, ref_font_size: refPt }); onClose(); }}
+                        className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-white text-[12px] font-semibold hover:bg-primary/90 transition-all active:scale-95"
+                    >
+                        <span className="material-icons-round text-[14px]">download</span>
+                        Download
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 // ── Full document viewer ──────────────────────────────────────────────────────
 function DocumentViewer({ doc, onExport, onCoverSaved, onTocStyleSaved }) {
-    const [chapters, setChapters]               = useState(doc.chapters || []);
-    const [editingChapterId, setEditingChapterId] = useState(null);
-    const [collapsedIds, setCollapsedIds]        = useState(new Set());
-    const [allCitations, setAllCitations]        = useState(
-        doc.meta?.all_citations || (doc.chapters || []).flatMap(c => c.citations || [])
+    const [pages, setPages]                   = useState(doc.pages || []);
+    const [editingPageId, setEditingPageId]   = useState(null);
+    const [collapsedIds, setCollapsedIds]     = useState(new Set());
+    const [allCitations, setAllCitations]     = useState(
+        doc.meta?.all_citations || (doc.pages || []).flatMap(c => c.citations || [])
     );
     const dirtyRef      = useRef(false);
-    const [pendingEditId, setPendingEditId] = useState(null);
+    const [pendingEditId, setPendingEditId]   = useState(null);
     const [docLineHeight, setDocLineHeight]   = useState('1.5');
     const [docSpaceBefore, setDocSpaceBefore] = useState(false);
     const [docSpaceAfter, setDocSpaceAfter]   = useState(false);
@@ -631,8 +939,9 @@ function DocumentViewer({ doc, onExport, onCoverSaved, onTocStyleSaved }) {
     const [marginBottom, setMarginBottom] = useState(24);
     const [marginLeft,   setMarginLeft]   = useState(24);
     const [docFontFamily, setDocFontFamily] = useState(null);
-    const [showCoverForm, setShowCoverForm]     = useState(!doc.meta?.cover?.layout);
+    const [showCoverForm, setShowCoverForm]       = useState(!doc.meta?.cover?.layout);
     const [showTocStyleForm, setShowTocStyleForm] = useState(false);
+    const [exportModal, setExportModal]           = useState(null);
 
     const fontLabel = SCHOLAR_FONTS.find(f => f.value === docFontFamily)?.label ?? 'Default';
 
@@ -645,6 +954,7 @@ function DocumentViewer({ doc, onExport, onCoverSaved, onTocStyleSaved }) {
         setShowTocStyleForm(false);
         onTocStyleSaved(tocStyle);
     };
+
     // meta.page_numbering is stored as string '1'/'0' or boolean; use loose != to handle both
     const pageNumbering = doc.meta?.page_numbering != false && doc.meta?.page_numbering !== '0';
 
@@ -652,77 +962,77 @@ function DocumentViewer({ doc, onExport, onCoverSaved, onTocStyleSaved }) {
         useSensor(SmartPointerSensor, { activationConstraint: { distance: 8 } })
     );
 
-    const switchToEdit = (chapterId) => {
+    const switchToEdit = (pageId) => {
         dirtyRef.current = false;
-        setCollapsedIds(prev => { const s = new Set(prev); s.delete(chapterId); return s; });
-        setEditingChapterId(chapterId);
+        setCollapsedIds(prev => { const s = new Set(prev); s.delete(pageId); return s; });
+        setEditingPageId(pageId);
     };
 
-    const requestEdit = (chapterId) => {
-        if (editingChapterId === chapterId) return;
-        if (editingChapterId !== null && dirtyRef.current) {
-            setPendingEditId(chapterId);
+    const requestEdit = (pageId) => {
+        if (editingPageId === pageId) return;
+        if (editingPageId !== null && dirtyRef.current) {
+            setPendingEditId(pageId);
             return;
         }
-        switchToEdit(chapterId);
+        switchToEdit(pageId);
     };
 
-    const handleSave = (chapterId, updatedChapter) => {
-        setChapters(prev => prev.map(ch =>
-            ch.id === chapterId ? { ...ch, content: updatedChapter.content ?? ch.content } : ch
+    const handleSave = (pageId, updatedPage) => {
+        setPages(prev => prev.map(pg =>
+            pg.id === pageId ? { ...pg, content: updatedPage.content ?? pg.content } : pg
         ));
-        setEditingChapterId(null);
+        setEditingPageId(null);
         dirtyRef.current = false;
     };
 
     const handleCancel = () => {
-        setEditingChapterId(null);
+        setEditingPageId(null);
         dirtyRef.current = false;
     };
 
-    const toggleCollapse = (chapterId) => {
+    const toggleCollapse = (pageId) => {
         setCollapsedIds(prev => {
             const s = new Set(prev);
-            s.has(chapterId) ? s.delete(chapterId) : s.add(chapterId);
+            s.has(pageId) ? s.delete(pageId) : s.add(pageId);
             return s;
         });
     };
 
-    const collapseAll = () => setCollapsedIds(new Set(chapters.map(c => c.id)));
+    const collapseAll = () => setCollapsedIds(new Set(pages.map(c => c.id)));
     const expandAll   = () => setCollapsedIds(new Set());
 
     const handleDragEnd = async ({ active, over }) => {
         if (!over || active.id === over.id) return;
-        const oldIdx = chapters.findIndex(c => c.id === active.id);
-        const newIdx = chapters.findIndex(c => c.id === over.id);
-        const reordered = arrayMove(chapters, oldIdx, newIdx).map((ch, i) => ({ ...ch, chapter_number: i + 1 }));
-        setChapters(reordered);
+        const oldIdx = pages.findIndex(c => c.id === active.id);
+        const newIdx = pages.findIndex(c => c.id === over.id);
+        const reordered = arrayMove(pages, oldIdx, newIdx).map((pg, i) => ({ ...pg, page_number: i + 1 }));
+        setPages(reordered);
         try {
-            await scholarService.reorderChapters(doc.id, reordered.map(c => c.id));
+            await scholarService.reorderPages(doc.id, reordered.map(c => c.id));
         } catch {
-            setChapters(chapters);
+            setPages(pages);
         }
     };
 
-    const handleChapterAdded = (newChapter) => {
-        setChapters(prev => [...prev, newChapter]);
-        setCollapsedIds(prev => { const s = new Set(prev); s.delete(newChapter.id); return s; });
-        setEditingChapterId(newChapter.id);
+    const handlePageAdded = (newPage) => {
+        setPages(prev => [...prev, newPage]);
+        setCollapsedIds(prev => { const s = new Set(prev); s.delete(newPage.id); return s; });
+        setEditingPageId(newPage.id);
     };
 
-    const handleChapterDeleted = async (chapterId) => {
-        const snapshot = chapters;
-        setChapters(chapters.filter(c => c.id !== chapterId).map((c, i) => ({ ...c, chapter_number: i + 1 })));
-        setCollapsedIds(prev => { const s = new Set(prev); s.delete(chapterId); return s; });
-        if (editingChapterId === chapterId) setEditingChapterId(null);
+    const handlePageDeleted = async (pageId) => {
+        const snapshot = pages;
+        setPages(pages.filter(c => c.id !== pageId).map((c, i) => ({ ...c, page_number: i + 1 })));
+        setCollapsedIds(prev => { const s = new Set(prev); s.delete(pageId); return s; });
+        if (editingPageId === pageId) setEditingPageId(null);
         try {
-            await scholarService.deleteChapter(doc.id, chapterId);
+            await scholarService.deletePage(doc.id, pageId);
         } catch {
-            setChapters(snapshot);
+            setPages(snapshot);
         }
     };
 
-    const allCollapsed = chapters.length > 0 && collapsedIds.size === chapters.length;
+    const allCollapsed = pages.length > 0 && collapsedIds.size === pages.length;
 
     return (
         <div>
@@ -733,7 +1043,25 @@ function DocumentViewer({ doc, onExport, onCoverSaved, onTocStyleSaved }) {
                 />
             )}
 
-            {/* Global formatting overrides — affects every chapter in both view and edit mode */}
+            {exportModal && (
+                <ExportOptionsModal
+                    format={exportModal}
+                    formatting={{
+                        line_height:   docLineHeight,
+                        space_before:  docSpaceBefore ? '1' : '0',
+                        space_after:   docSpaceAfter  ? '1' : '0',
+                        margin_top:    marginTop,
+                        margin_right:  marginRight,
+                        margin_bottom: marginBottom,
+                        margin_left:   marginLeft,
+                        font_family:   docFontFamily || '',
+                    }}
+                    onConfirm={onExport}
+                    onClose={() => setExportModal(null)}
+                />
+            )}
+
+            {/* Global formatting overrides — applies to every page in both view and edit mode */}
             <style>{`
                 .scholar-doc p, .scholar-doc li,
                 .scholar-editor-content p, .scholar-editor-content li {
@@ -866,16 +1194,7 @@ function DocumentViewer({ doc, onExport, onCoverSaved, onTocStyleSaved }) {
                     {['pdf', 'docx'].map(fmt => (
                         <button
                             key={fmt}
-                            onClick={() => onExport(fmt, {
-                                line_height:   docLineHeight,
-                                space_before:  docSpaceBefore ? '1' : '0',
-                                space_after:   docSpaceAfter  ? '1' : '0',
-                                margin_top:    marginTop,
-                                margin_right:  marginRight,
-                                margin_bottom: marginBottom,
-                                margin_left:   marginLeft,
-                                font_family:   docFontFamily || '',
-                            })}
+                            onClick={() => setExportModal(fmt)}
                             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-white text-[12px] font-semibold hover:bg-primary/90 transition-all active:scale-95"
                         >
                             <span className="material-icons-round text-[14px]">download</span>
@@ -916,12 +1235,16 @@ function DocumentViewer({ doc, onExport, onCoverSaved, onTocStyleSaved }) {
             )}
 
             {/* Table of contents */}
-            {doc.toc_enabled && chapters.length > 0 && (
-                <TableOfContents chapters={chapters} outline={doc.outline} />
+            {doc.toc_enabled && pages.length > 0 && (
+                <TableOfContents
+                    pages={pages}
+                    savedEntries={doc.meta?.toc_entries}
+                    documentId={doc.id}
+                />
             )}
 
             {/* Collapse / expand all */}
-            {chapters.length > 1 && (
+            {pages.length > 1 && (
                 <div className="flex justify-end mb-4">
                     <button
                         onClick={allCollapsed ? expandAll : collapseAll}
@@ -935,21 +1258,21 @@ function DocumentViewer({ doc, onExport, onCoverSaved, onTocStyleSaved }) {
                 </div>
             )}
 
-            {/* Chapters (drag + collapse) */}
+            {/* Pages (drag + collapse) */}
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                <SortableContext items={chapters.map(ch => ch.id)} strategy={verticalListSortingStrategy}>
+                <SortableContext items={pages.map(pg => pg.id)} strategy={verticalListSortingStrategy}>
                     <div className="flex flex-col gap-6">
-                        {chapters.map(ch => (
-                            <SortableChapterItem
-                                key={ch.id}
-                                ch={ch}
-                                isEditing={editingChapterId === ch.id}
-                                isCollapsed={collapsedIds.has(ch.id)}
+                        {pages.map(pg => (
+                            <SortablePageItem
+                                key={pg.id}
+                                pg={pg}
+                                isEditing={editingPageId === pg.id}
+                                isCollapsed={collapsedIds.has(pg.id)}
                                 onToggleCollapse={toggleCollapse}
                                 onEdit={requestEdit}
                                 onSave={handleSave}
                                 onCancel={handleCancel}
-                                onDelete={handleChapterDeleted}
+                                onDelete={handlePageDeleted}
                                 onDirtyChange={(dirty) => { dirtyRef.current = dirty; }}
                                 documentId={doc.id}
                                 pageNumbering={pageNumbering}
@@ -959,8 +1282,8 @@ function DocumentViewer({ doc, onExport, onCoverSaved, onTocStyleSaved }) {
                 </SortableContext>
             </DndContext>
 
-            {/* Add chapter */}
-            <AddChapterForm documentId={doc.id} onAdded={handleChapterAdded} />
+            {/* Add page */}
+            <AddPageForm documentId={doc.id} onAdded={handlePageAdded} />
 
             {/* Bibliography */}
             {doc.bibliography_enabled && (
@@ -1026,13 +1349,13 @@ function GDItem({ active, onClick, children }) {
 }
 
 // ── Failed panel ──────────────────────────────────────────────────────────────
-function FailedPanel({ doc, onRetryChapter, onRetryOutline }) {
-    const chapters      = doc?.chapters || [];
-    const outlineFailed = chapters.length === 0;
-    const failedChapter = !outlineFailed
-        ? chapters.find(c => c.status === 'pending' || c.status === 'generating')
+function FailedPanel({ doc, onRetryPage, onRetryOutline }) {
+    const pages       = doc?.pages || [];
+    const outlineFailed = pages.length === 0;
+    const failedPage  = !outlineFailed
+        ? pages.find(c => c.status === 'pending' || c.status === 'generating')
         : null;
-    const approvedCount = chapters.filter(c => c.status === 'approved').length;
+    const approvedCount = pages.filter(c => c.status === 'approved').length;
 
     return (
         <div className="flex flex-col items-center justify-center py-20 text-center gap-4">
@@ -1050,14 +1373,14 @@ function FailedPanel({ doc, onRetryChapter, onRetryOutline }) {
             {/* Progress context */}
             {outlineFailed ? (
                 <p className="text-[12px] text-slate-400">Failed while generating the document outline.</p>
-            ) : failedChapter ? (
+            ) : failedPage ? (
                 <p className="text-[12px] text-slate-400">
-                    Failed on Chapter {failedChapter.chapter_number} — {failedChapter.title}
-                    {approvedCount > 0 && ` · ${approvedCount} of ${chapters.length} chapters completed`}
+                    Failed on Page {failedPage.page_number} — {failedPage.title}
+                    {approvedCount > 0 && ` · ${approvedCount} of ${pages.length} pages completed`}
                 </p>
             ) : (
                 <p className="text-[12px] text-slate-400">
-                    {approvedCount} of {chapters.length} chapters completed before failure.
+                    {approvedCount} of {pages.length} pages completed before failure.
                 </p>
             )}
 
@@ -1071,14 +1394,14 @@ function FailedPanel({ doc, onRetryChapter, onRetryOutline }) {
                         <span className="material-icons-round text-[16px]">refresh</span>
                         Retry outline generation
                     </button>
-                ) : failedChapter ? (
+                ) : failedPage ? (
                     <>
                         <button
-                            onClick={() => onRetryChapter(doc, failedChapter)}
+                            onClick={() => onRetryPage(doc, failedPage)}
                             className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-white text-[13px] font-semibold shadow-sm hover:bg-primary/90 transition-all active:scale-95"
                         >
                             <span className="material-icons-round text-[16px]">play_arrow</span>
-                            Continue from Chapter {failedChapter.chapter_number}
+                            Continue from Page {failedPage.page_number}
                         </button>
                         <button
                             onClick={onRetryOutline}
@@ -1106,9 +1429,9 @@ function FailedPanel({ doc, onRetryChapter, onRetryOutline }) {
 export default function ScholarDocument() {
     const { id }     = useParams();
     const navigate   = useNavigate();
-    const [doc, setDoc]     = useState(null);
+    const [doc, setDoc]         = useState(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError]   = useState('');
+    const [error, setError]     = useState('');
     const pollingRef = useRef(null);
 
     const isActive = (d) => d && ACTIVE_STATUSES.has(d.status);
@@ -1155,9 +1478,9 @@ export default function ScholarDocument() {
         setDoc(prev => ({ ...prev, meta: { ...(prev.meta ?? {}), toc_style: tocStyle } }));
     };
 
-    const handleRetryChapter = async (document, chapter) => {
+    const handleRetryPage = async (document, page) => {
         try {
-            await scholarService.retryChapter(document.id, chapter.id);
+            await scholarService.retryPage(document.id, page.id);
             setDoc(prev => ({ ...prev, status: 'generating_chapter' }));
             startPolling(id);
         } catch (err) {
@@ -1169,7 +1492,7 @@ export default function ScholarDocument() {
         try {
             setError('');
             await scholarService.retryOutline(id);
-            setDoc(prev => ({ ...prev, status: 'pending_outline', chapters: [] }));
+            setDoc(prev => ({ ...prev, status: 'pending_outline', pages: [] }));
             startPolling(id);
         } catch (err) {
             setError(err?.errors?.plan?.[0] || err?.message || 'Could not restart generation.');
@@ -1218,7 +1541,7 @@ export default function ScholarDocument() {
                             {doc.status === 'failed' && (
                                 <FailedPanel
                                     doc={doc}
-                                    onRetryChapter={handleRetryChapter}
+                                    onRetryPage={handleRetryPage}
                                     onRetryOutline={handleRetryOutline}
                                 />
                             )}
