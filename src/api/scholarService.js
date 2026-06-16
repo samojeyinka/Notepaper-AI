@@ -86,5 +86,11 @@ export const scholarService = {
             body: metaData,
         }),
 
+    updateBody: (ulid, body) =>
+        apiClient(`${BASE}/${ulid}/body`, {
+            method: 'PATCH',
+            body: { body },
+        }),
+
     presentations: (ulid) => apiClient(`${BASE}/${ulid}/presentations`),
 };
