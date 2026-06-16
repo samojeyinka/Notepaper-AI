@@ -66,6 +66,8 @@ const SCHOLAR_CSS = `
 /* ── Editor overrides ── */
 .scholar-editor-content { outline: none; }
 .scholar-editor-content > *:first-child { margin-top: 0; }
+.scholar-editor-content .ProseMirror { scroll-margin-top: 96px; }
+.scholar-editor-content .ProseMirror > * { scroll-margin-top: 96px; }
 .scholar-editor-content table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; font-size: 0.875rem; }
 .scholar-editor-content th { background: #f8fafc; color: #334155; font-weight: 600; padding: 0.65rem 1rem; border: 1px solid #e2e8f0; text-align: left; }
 .scholar-editor-content td { padding: 0.6rem 1rem; border: 1px solid #e2e8f0; color: #475569; }
@@ -274,7 +276,7 @@ export default function ScholarDocument() {
     return (
         <>
             <style>{SCHOLAR_CSS}</style>
-            <main className="flex-1 h-full overflow-y-auto bg-white lg:ml-64 p-4 lg:p-10 pt-20 lg:pt-8">
+            <main className="flex-1 h-full overflow-y-auto bg-white lg:ml-64 p-4 lg:p-10 pt-20 lg:pt-8" style={{ scrollPaddingTop: '96px' }}>
                 <div className="max-w-4xl mx-auto">
 
                     {/* Back nav */}
