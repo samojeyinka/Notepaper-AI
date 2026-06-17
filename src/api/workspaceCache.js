@@ -10,6 +10,7 @@ const cache = {
     tickets:       null,
     activeSprint:  null,
     sprintsList:   null,
+    scholars:      {},
 };
 
 export const workspaceCache = {
@@ -37,7 +38,11 @@ export const workspaceCache = {
     setSprintsList: (data) => { cache.sprintsList = { data, fetchedAt: Date.now() }; },
     invalidateSprintsList: () => { cache.sprintsList = null; },
 
-    invalidateAll: () => { cache.folders = null; cache.notes = null; cache.papers = null; cache.presentations = null; cache.activeSprint = null; cache.sprintsList = null; },
+    getScholars: (page = 1) => cache.scholars[page] ? { data: cache.scholars[page].data, meta: cache.scholars[page].meta } : null,
+    setScholars: (page, data, meta) => { cache.scholars[page] = { data, meta, fetchedAt: Date.now() }; },
+    invalidateScholars: () => { cache.scholars = {}; },
+
+    invalidateAll: () => { cache.folders = null; cache.notes = null; cache.papers = null; cache.presentations = null; cache.activeSprint = null; cache.sprintsList = null; cache.scholars = {}; },
 
     getTickets: () => cache.tickets?.data ?? null,
     setTickets: (data) => { cache.tickets = { data, fetchedAt: Date.now() }; },

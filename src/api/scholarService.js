@@ -4,13 +4,14 @@ const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 const BASE = '/scholar';
 
 export const scholarService = {
-    list: () => apiClient(BASE),
+    list: (page = 1) => apiClient(`${BASE}?page=${page}`),
 
-    create: async ({ prompt, citationStyle = 'apa', pageCount = 20, uploads = [] }) => {
+    create: async ({ prompt, citationStyle = 'apa', pageCount = 20, yearsBack = null, uploads = [] }) => {
         const formData = new FormData();
         formData.append('prompt', prompt);
         formData.append('citation_style', citationStyle);
         formData.append('page_count', pageCount);
+        if (yearsBack) formData.append('years_back', yearsBack);
         uploads.forEach(file => formData.append('uploads[]', file));
 
         const res = await fetch(`${BASE_URL}${BASE}`, {
