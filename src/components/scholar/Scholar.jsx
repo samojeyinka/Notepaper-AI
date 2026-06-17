@@ -3,6 +3,44 @@ import { useNavigate } from 'react-router-dom';
 import { scholarService } from '../../api/scholarService';
 import { workspaceCache } from '../../api/workspaceCache';
 
+// ── Delete confirmation modal ─────────────────────────────────────────────────
+function DeleteModal({ doc, onConfirm, onCancel }) {
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onCancel}>
+            <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px]" />
+            <div
+                className="relative bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 flex flex-col gap-4"
+                onClick={e => e.stopPropagation()}
+            >
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center shrink-0">
+                        <span className="material-icons-round text-red-500 text-[20px]">delete_outline</span>
+                    </div>
+                    <div>
+                        <p className="text-[14px] font-bold text-slate-800">Delete document?</p>
+                        <p className="text-[12px] text-slate-400 mt-0.5 line-clamp-2">{doc.title || doc.prompt}</p>
+                    </div>
+                </div>
+                <p className="text-[12px] text-slate-500">This action cannot be undone. The document and all its content will be permanently removed.</p>
+                <div className="flex gap-2 pt-1">
+                    <button
+                        onClick={onCancel}
+                        className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-[13px] font-semibold text-slate-600 hover:bg-slate-50 transition-colors"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={onConfirm}
+                        className="flex-1 px-4 py-2.5 rounded-xl bg-red-500 text-white text-[13px] font-semibold hover:bg-red-600 transition-colors active:scale-95"
+                    >
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 // ── Status config ─────────────────────────────────────────────────────────────
 const STATUS = {
     pending_outline:    { label: 'Queued',      badge: 'text-slate-500 bg-slate-100',    icon: 'hourglass_empty', active: true  },
@@ -172,6 +210,7 @@ export default function Scholar() {
     const [loading,   setLoading]   = useState(true);
     const [search,    setSearch]    = useState('');
     const [filter,    setFilter]    = useState('all');
+    const [deleteDoc, setDeleteDoc] = useState(null);
 
     useEffect(() => {
         const cached = workspaceCache.getScholars(page);
@@ -195,17 +234,15 @@ export default function Scholar() {
             .finally(() => setLoading(false));
     }, [page]);
 
-    const handleDelete = async (doc) => {
-        if (!window.confirm(`Delete "${doc.title || doc.prompt}"?`)) return;
+    const handleDelete = async () => {
+        const doc = deleteDoc;
+        setDeleteDoc(null);
         try {
             await scholarService.destroy(doc.id);
             workspaceCache.invalidateScholars();
             setDocuments(prev => {
                 const next = prev.filter(d => d.id !== doc.id);
-                // If page is now empty and there's a previous page, go back
-                if (next.length === 0 && page > 1) {
-                    setPage(p => p - 1);
-                }
+                if (next.length === 0 && page > 1) setPage(p => p - 1);
                 return next;
             });
             if (meta) {
@@ -240,6 +277,14 @@ export default function Scholar() {
     const currentPage = meta?.current_page ?? page;
 
     return (
+        <>
+        {deleteDoc && (
+            <DeleteModal
+                doc={deleteDoc}
+                onConfirm={handleDelete}
+                onCancel={() => setDeleteDoc(null)}
+            />
+        )}
         <main className="flex-1 h-full overflow-y-auto bg-slate-50 lg:ml-64 px-4 lg:px-8 pt-20 lg:pt-8 pb-12">
             <div className="max-w-6xl mx-auto">
 
@@ -302,7 +347,7 @@ export default function Scholar() {
                                     key={doc.id}
                                     doc={doc}
                                     onOpen={() => navigate(`/lockedin/scholar/${doc.id}`)}
-                                    onDelete={() => handleDelete(doc)}
+                                    onDelete={() => setDeleteDoc(doc)}
                                 />
                             ))}
                             {/* "Start New Entry" card — only on last page with no filter */}
@@ -369,5 +414,6 @@ export default function Scholar() {
                 )}
             </div>
         </main>
+        </>
     );
 }
