@@ -380,14 +380,21 @@ function shakespeareToHtml(text) {
 function resolveImagesForEditor(html) {
     if (!html) return '';
     return html
-        // Fetched images → <img>
+        // Numbered, captioned images → <img> + figure-caption paragraph
         .replace(
-            /<figure\s+class="scholar-generated-image"\s+data-src="([^"]+)"(?:\s+data-alt="([^"]*)")?\s*(?:data-keywords="[^"]*")?\s*><\/figure>/gi,
+            /<figure\b[^>]*class="scholar-generated-image"[^>]*data-src="([^"]+)"[^>]*data-figure-num="(\d+)"[^>]*data-caption="([^"]*)"[^>]*>.*?<\/figure>/gi,
+            (_, src, num, caption) =>
+                `<img src="${src}" alt="${caption}" />` +
+                `<p style="text-align:center;font-size:0.8rem;color:#64748b;font-style:italic;margin-top:0.25rem;margin-bottom:0.75rem;">Figure ${num}${caption ? ': ' + caption : ''}</p>`
+        )
+        // Fetched images without a figure number yet (fallback — still loading or older doc)
+        .replace(
+            /<figure\b[^>]*class="scholar-generated-image"[^>]*data-src="([^"]+)"(?:[^>]*data-alt="([^"]*)")?[^>]*>.*?<\/figure>/gi,
             (_, src, alt = '') => `<img src="${src}" alt="${alt}" />`
         )
-        // Unfetched placeholders → visible styled paragraph with keywords
+        // Unfetched placeholders → visible styled block with keywords
         .replace(
-            /<figure\s+class="image-placeholder"\s+data-keywords="([^"]+)"\s*(?:>\s*<\/figure>|\/?>)/gi,
+            /<figure\b[^>]*class="image-placeholder"[^>]*data-keywords="([^"]+)"[^>]*(?:>\s*<\/figure>|\/?>)/gi,
             (_, keywords) => `<p style="border:2px dashed #c4b5fd;border-radius:0.5rem;padding:0.75rem 1.25rem;background:#faf5ff;color:#7c3aed;font-size:0.875rem;font-style:italic;text-align:center;">[ Suggested image: ${keywords} ]</p>`
         );
 }
