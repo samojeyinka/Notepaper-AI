@@ -256,6 +256,24 @@ async function prepareExportSvg(svgString) {
     });
 
     svgEl.querySelectorAll('style').forEach(s => s.remove());
+
+    // Trim the SVG viewBox to the actual content bounding box so whitespace
+    // padding added by Mermaid is removed. Without this, diagrams render
+    // shifted inside an oversized white canvas in the exported PNG.
+    try {
+        const bbox = svgEl.getBBox();
+        if (bbox.width > 0 && bbox.height > 0) {
+            const pad = 8;
+            const vx = bbox.x - pad;
+            const vy = bbox.y - pad;
+            const vw = bbox.width  + pad * 2;
+            const vh = bbox.height + pad * 2;
+            svgEl.setAttribute('viewBox', `${vx} ${vy} ${vw} ${vh}`);
+            svgEl.setAttribute('width',  String(vw));
+            svgEl.setAttribute('height', String(vh));
+        }
+    } catch { /* getBBox unavailable (e.g. offscreen or cross-origin) */ }
+
     // outerHTML keeps the xmlns attribute that SVG needs when loaded as an <img>
     const result = svgEl.outerHTML;
     document.body.removeChild(wrap);
