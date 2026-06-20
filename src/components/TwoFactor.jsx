@@ -8,8 +8,13 @@ export default function TwoFactor() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // temp_token is passed via navigation state — never touches the URL
-  const tempToken = location.state?.tempToken;
+  // temp_token arrives via navigation state on first load.
+  // We persist it to sessionStorage so a page refresh doesn't break the flow.
+  const stateToken = location.state?.tempToken;
+  useEffect(() => {
+    if (stateToken) sessionStorage.setItem('np_2fa_token', stateToken);
+  }, [stateToken]);
+  const tempToken = stateToken ?? sessionStorage.getItem('np_2fa_token');
 
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [loading, setLoading] = useState(false);
@@ -58,6 +63,7 @@ export default function TwoFactor() {
 
     try {
       await verify2fa(tempToken, code);
+      sessionStorage.removeItem('np_2fa_token');
       navigate('/lockedin', { replace: true });
     } catch (err) {
       setError({ message: err?.message || 'Invalid OTP. Please try again.' });

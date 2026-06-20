@@ -128,6 +128,14 @@ export const PaperHeader = ({
 }) => {
     const status  = STATUS_CONFIG[saveStatus] ?? STATUS_CONFIG.idle;
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [linkCopied, setLinkCopied] = useState(false);
+
+    const handleCopyLink = () => {
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            setLinkCopied(true);
+            setTimeout(() => setLinkCopied(false), 2000);
+        });
+    };
     const { voiceState, toggle: toggleVoice } = useVoiceToText((transcript) => { onVoiceResult?.(transcript); });
 
     const prevVoiceStateRef = useRef(null);
@@ -249,6 +257,15 @@ export const PaperHeader = ({
                                 <>
                                     <div className="fixed inset-0 z-20 pointer-events-auto" onClick={() => setIsMenuOpen(false)} />
                                     <div className="absolute right-0 mt-2 w-36 md:w-56 bg-white rounded-md md:rounded-2xl shadow-xl border border-slate-100 py-2 z-30 animate-in fade-in zoom-in-95 duration-150">
+                                        <button
+                                            onClick={() => { handleCopyLink(); setIsMenuOpen(false); }}
+                                            className="w-full flex items-center gap-1.5 md:gap-3 px-2 py-1 md:px-4 md:py-2 hover:bg-slate-50 text-slate-700 text-[11px] md:text-sm font-normal md:font-medium transition-all"
+                                        >
+                                            <span className={`material-icons-round text-[11px] md:text-[18px] ${linkCopied ? 'text-emerald-500' : 'text-slate-400'}`}>
+                                                {linkCopied ? 'check_circle' : 'link'}
+                                            </span>
+                                            {linkCopied ? 'Link copied!' : 'Copy Link'}
+                                        </button>
                                         <MenuButton icon="content_copy" label="Make a Copy" onClick={onCopy} />
                                         <div className="h-px bg-slate-100 my-2" />
                                         <MenuButton icon="picture_as_pdf" label="Export as PDF" onClick={onExportPDF} />

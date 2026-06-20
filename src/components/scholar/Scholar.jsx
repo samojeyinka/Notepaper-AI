@@ -212,27 +212,41 @@ export default function Scholar() {
     const [filter,    setFilter]    = useState('all');
     const [deleteDoc, setDeleteDoc] = useState(null);
 
+    const fetchPage = (p, silent = false) => {
+        if (!silent) setLoading(true);
+        return scholarService.list(p)
+            .then(res => {
+                const data = res.data || [];
+                const m    = res.meta || null;
+                workspaceCache.setScholars(p, data, m);
+                setDocuments(data);
+                setMeta(m);
+            })
+            .catch(() => {})
+            .finally(() => { if (!silent) setLoading(false); });
+    };
+
     useEffect(() => {
         const cached = workspaceCache.getScholars(page);
         if (cached) {
             setDocuments(cached.data);
             setMeta(cached.meta);
             setLoading(false);
-            return;
+        } else {
+            fetchPage(page);
         }
-
-        setLoading(true);
-        scholarService.list(page)
-            .then(res => {
-                const data = res.data || [];
-                const m    = res.meta || null;
-                workspaceCache.setScholars(page, data, m);
-                setDocuments(data);
-                setMeta(m);
-            })
-            .catch(() => {})
-            .finally(() => setLoading(false));
     }, [page]);
+
+    // Poll every 10s while any document on the current page is still generating
+    useEffect(() => {
+        const hasActive = documents.some(d => ACTIVE.has(d.status));
+        if (!hasActive) return;
+        const id = setInterval(() => {
+            workspaceCache.invalidateScholars();
+            fetchPage(page, true);
+        }, 10000);
+        return () => clearInterval(id);
+    }, [documents, page]);
 
     const handleDelete = async () => {
         const doc = deleteDoc;

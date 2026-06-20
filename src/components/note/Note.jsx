@@ -74,6 +74,7 @@ export const Note = () => {
     // Note Data
     const [noteId, setNoteId] = useState(routeId ?? null);
     const [isAIGenerating, setIsAIGenerating] = useState(false);
+    const [aiGeneratingTimedOut, setAIGeneratingTimedOut] = useState(false);
     // folderId — set from ?folder= query param on new notes, or from loaded note
     const [folderId, setFolderId] = useState(() => searchParams.get('folder') ?? null);
     const [folder, setFolder]     = useState(null);
@@ -648,14 +649,21 @@ export const Note = () => {
 
     // Polling fallback: catches cases where ExpandTopicReady/SimplifyTopicReady fired before
     // this tab subscribed (tab opened after the event was broadcast) — resolves spinner-forever.
+    // Times out after 90 seconds and shows a retry message instead of spinning indefinitely.
     useEffect(() => {
         if (!isAIGenerating || !noteId) return;
-        const timer = setInterval(async () => {
+        setAIGeneratingTimedOut(false);
+        const timeoutId = setTimeout(() => {
+            clearInterval(pollId);
+            setAIGeneratingTimedOut(true);
+        }, 90000);
+        const pollId = setInterval(async () => {
             try {
                 const res = await noteService.get(noteId);
                 const serverNote = res.data;
                 if (!serverNote.ai_generating && serverNote.content) {
-                    clearInterval(timer);
+                    clearInterval(pollId);
+                    clearTimeout(timeoutId);
                     const s = deserializeNote(serverNote);
                     setTitle(s.title);
                     setPages(s.pages);
@@ -673,7 +681,7 @@ export const Note = () => {
                 }
             } catch { /* ignore poll errors */ }
         }, 5000);
-        return () => { clearInterval(timer); clearTimeout(expandRetryTimerRef.current); };
+        return () => { clearInterval(pollId); clearTimeout(timeoutId); clearTimeout(expandRetryTimerRef.current); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAIGenerating]);
 
@@ -681,16 +689,42 @@ export const Note = () => {
         <div className="flex flex-col flex-1 h-screen overflow-hidden bg-white border-l border-slate-200 lg:ml-64 pt-16 lg:pt-0">
             {isAIGenerating && (
                 <div className="absolute inset-0 z-50 bg-white/95 backdrop-blur flex flex-col items-center justify-center gap-6">
-                    <div className="relative">
-                        <div className="w-20 h-20 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <span className="material-icons-round text-primary text-[26px]">description</span>
-                        </div>
-                    </div>
-                    <div className="text-center max-w-xs">
-                        <h3 className="text-xl font-bold text-slate-800 mb-2">Schola is writing…</h3>
-                        <p className="text-sm text-slate-500">Schola is preparing your note in the background — the page will update automatically when it's ready.</p>
-                    </div>
+                    {aiGeneratingTimedOut ? (
+                        <>
+                            <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center">
+                                <span className="material-icons-round text-amber-500 text-[28px]">hourglass_disabled</span>
+                            </div>
+                            <div className="text-center max-w-xs">
+                                <h3 className="text-xl font-bold text-slate-800 mb-2">Taking longer than expected</h3>
+                                <p className="text-sm text-slate-500 mb-4">Schola is still working on your note. It will appear once ready — you can reload to check.</p>
+                                <button
+                                    onClick={() => window.location.reload()}
+                                    className="px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-primary/90 transition-colors"
+                                >
+                                    Reload page
+                                </button>
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <div className="relative">
+                                <div className="w-20 h-20 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <span className="material-icons-round text-primary text-[26px]">description</span>
+                                </div>
+                            </div>
+                            <div className="text-center max-w-xs">
+                                <h3 className="text-xl font-bold text-slate-800 mb-2">Schola is writing…</h3>
+                                <p className="text-sm text-slate-500">Schola is preparing your note in the background — the page will update automatically when it's ready.</p>
+                            </div>
+                        </>
+                    )}
+                </div>
+            )}
+            {!isPaid && (
+                <div className="flex items-center gap-2 px-4 py-1.5 bg-amber-50 border-b border-amber-100 text-amber-700 text-[11px]">
+                    <span className="material-icons-round text-[13px]">workspace_premium</span>
+                    <span>Free plan — exports will include a <strong>NotepaperAI</strong> watermark. <a href="/upgrade" className="underline font-semibold hover:text-amber-900">Upgrade</a> to remove it.</span>
                 </div>
             )}
             <NoteHeader
@@ -714,7 +748,6 @@ export const Note = () => {
                         // silent
                     }
                 }}
-                onShare={() => alert('Shared!')}
                 onToggleAI={() => {
                     if (!isAISidebarOpen) {
                         // Save cursor before focus leaves the editor

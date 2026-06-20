@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Loader from '../globals/Loader';
 
 export const FlashcardHeader = ({
     title,
@@ -45,9 +46,22 @@ export const FlashcardHeader = ({
 
             {/* Right actions */}
             <div className="flex items-center gap-1 md:gap-2">
-                {statusLabel && (
-                    <span className={`text-[10px] md:text-[11px] hidden sm:block ${saveStatus === 'error' ? 'text-red-400' : 'text-slate-400'}`}>
-                        {statusLabel}
+                {saveStatus === 'saving' && (
+                    <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-lg bg-amber-50 text-amber-500 text-[9px] md:text-[10px] font-medium uppercase tracking-wider">
+                        <Loader size="xs" />
+                        Saving…
+                    </span>
+                )}
+                {saveStatus === 'saved' && (
+                    <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-lg bg-green-50 text-green-600 text-[9px] md:text-[10px] font-medium uppercase tracking-wider">
+                        <span className="material-icons-round text-[11px]">cloud_done</span>
+                        Saved
+                    </span>
+                )}
+                {saveStatus === 'error' && (
+                    <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-lg bg-red-50 text-red-500 text-[9px] md:text-[10px] font-medium uppercase tracking-wider">
+                        <span className="material-icons-round text-[11px]">cloud_off</span>
+                        Unsaved
                     </span>
                 )}
 

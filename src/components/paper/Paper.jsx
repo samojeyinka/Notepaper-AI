@@ -65,6 +65,8 @@ export const Paper = () => {
     // Core state
     const [paperId, setPaperId]       = useState(routeId ?? null);
     const [isAIGenerating, setIsAIGenerating] = useState(false);
+    const [aiGeneratingTimedOut, setAIGeneratingTimedOut] = useState(false);
+    const [exportWarning, setExportWarning] = useState(null); // 'docx' | 'pptx' | null
     const [folderId, setFolderId] = useState(() => searchParams.get('folder') ?? null);
     const [folder, setFolder]     = useState(null);
     const [title, setTitle]       = useState("Untitled Paper");
@@ -485,12 +487,18 @@ export const Paper = () => {
 
     useEffect(() => {
         if (!isAIGenerating || !paperId) return;
-        const timer = setInterval(async () => {
+        setAIGeneratingTimedOut(false);
+        const timeoutId = setTimeout(() => {
+            clearInterval(pollId);
+            setAIGeneratingTimedOut(true);
+        }, 90000);
+        const pollId = setInterval(async () => {
             try {
                 const res = await paperService.get(paperId);
                 const serverPaper = res.data;
                 if (!serverPaper.ai_generating && serverPaper.content) {
-                    clearInterval(timer);
+                    clearInterval(pollId);
+                    clearTimeout(timeoutId);
                     const s = deserializePaper(serverPaper);
                     setTitle(s.title); setPages(s.pages); setFontSize(s.fontSize); setLineSpacing(s.lineSpacing);
                     setDrawingData(s.drawingData); setTextColor(s.textColor); setFontFamily(s.fontFamily);
@@ -501,7 +509,7 @@ export const Paper = () => {
                 }
             } catch { /* ignore poll errors */ }
         }, 5000);
-        return () => { clearInterval(timer); clearTimeout(expandRetryTimerRef.current); };
+        return () => { clearInterval(pollId); clearTimeout(timeoutId); clearTimeout(expandRetryTimerRef.current); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAIGenerating]);
 
@@ -509,16 +517,77 @@ export const Paper = () => {
         <div className="flex flex-col flex-1 h-screen overflow-hidden bg-white border-l border-slate-200 lg:ml-64 pt-16 lg:pt-0">
             {isAIGenerating && (
                 <div className="absolute inset-0 z-50 bg-white/95 backdrop-blur flex flex-col items-center justify-center gap-6">
-                    <div className="relative">
-                        <div className="w-20 h-20 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <span className="material-icons-round text-primary text-[26px]">article</span>
+                    {aiGeneratingTimedOut ? (
+                        <>
+                            <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center">
+                                <span className="material-icons-round text-amber-500 text-[28px]">hourglass_disabled</span>
+                            </div>
+                            <div className="text-center max-w-xs">
+                                <h3 className="text-xl font-bold text-slate-800 mb-2">Taking longer than expected</h3>
+                                <p className="text-sm text-slate-500 mb-4">Schola is still working on your paper. It will appear once ready — you can reload to check.</p>
+                                <button
+                                    onClick={() => window.location.reload()}
+                                    className="px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-primary/90 transition-colors"
+                                >
+                                    Reload page
+                                </button>
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <div className="relative">
+                                <div className="w-20 h-20 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <span className="material-icons-round text-primary text-[26px]">article</span>
+                                </div>
+                            </div>
+                            <div className="text-center max-w-xs">
+                                <h3 className="text-xl font-bold text-slate-800 mb-2">Schola is writing…</h3>
+                                <p className="text-sm text-slate-500">Schola is preparing your paper in the background — the page will update automatically when it's ready.</p>
+                            </div>
+                        </>
+                    )}
+                </div>
+            )}
+            {exportWarning && (
+                <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+                    <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4">
+                        <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center mb-4">
+                            <span className="material-icons-round text-amber-500 text-[22px]">warning</span>
+                        </div>
+                        <h3 className="text-lg font-bold text-slate-800 mb-1">
+                            Formatting will be lost
+                        </h3>
+                        <p className="text-sm text-slate-500 mb-5">
+                            Exporting as <strong>.{exportWarning.toUpperCase()}</strong> converts your pages to plain text.
+                            Bold, italic, images, and tables will not be preserved in the file.
+                        </p>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setExportWarning(null)}
+                                className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 text-sm font-semibold hover:bg-slate-50 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => {
+                                    const fmt = exportWarning;
+                                    setExportWarning(null);
+                                    if (fmt === 'docx') handleExportDOCX();
+                                    else handleExportPPTX();
+                                }}
+                                className="flex-1 px-4 py-2.5 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-primary/90 transition-colors"
+                            >
+                                Export anyway
+                            </button>
                         </div>
                     </div>
-                    <div className="text-center max-w-xs">
-                        <h3 className="text-xl font-bold text-slate-800 mb-2">Schola is writing…</h3>
-                        <p className="text-sm text-slate-500">Schola is preparing your paper in the background — the page will update automatically when it's ready.</p>
-                    </div>
+                </div>
+            )}
+            {!isPaid && (
+                <div className="flex items-center gap-2 px-4 py-1.5 bg-amber-50 border-b border-amber-100 text-amber-700 text-[11px]">
+                    <span className="material-icons-round text-[13px]">workspace_premium</span>
+                    <span>Free plan — PDF exports will include a <strong>NotepaperAI</strong> watermark. <a href="/upgrade" className="underline font-semibold hover:text-amber-900">Upgrade</a> to remove it.</span>
                 </div>
             )}
             <PaperHeader
@@ -528,8 +597,8 @@ export const Paper = () => {
                 onSave={forceFlush}
                 folderId={folderId}
                 onExportPDF={handleExportPDF}
-                onExportDOCX={handleExportDOCX}
-                onExportPPTX={handleExportPPTX}
+                onExportDOCX={() => setExportWarning('docx')}
+                onExportPPTX={() => setExportWarning('pptx')}
                 onCopy={async () => {
                     if (!paperId) return;
                     try {
