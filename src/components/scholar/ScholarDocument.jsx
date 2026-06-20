@@ -239,9 +239,29 @@ export default function ScholarDocument() {
         return () => stopPolling();
     }, [id]);
 
-    const handleExport = (fmt, formatting = {}) => {
-        const params = new URLSearchParams({ format: fmt, ...formatting });
-        window.open(`${scholarService.exportUrl(id)}?${params}`, '_blank');
+    const handleExport = async (fmt, formatting = {}, diagrams = []) => {
+        try {
+            const body = { format: fmt, ...formatting };
+            if (diagrams.length > 0) body.rendered_diagrams = diagrams;
+            const res = await fetch(scholarService.exportUrl(id), {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json', Accept: 'application/octet-stream' },
+                body: JSON.stringify(body),
+            });
+            if (!res.ok) throw new Error('Export failed');
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = (doc?.title ?? 'document').replace(/[^a-z0-9]/gi, '-').toLowerCase() + '.' + fmt;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        } catch (err) {
+            console.error('[Export]', err);
+        }
     };
 
     const handleCoverSaved = (updatedCover) => {

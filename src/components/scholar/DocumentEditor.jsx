@@ -1,5 +1,5 @@
 import { useEditor, EditorContent, NodeViewWrapper, ReactNodeViewRenderer } from '@tiptap/react';
-import { Extension } from '@tiptap/core';
+import { Extension, Node, mergeAttributes } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
@@ -150,6 +150,299 @@ const ResizableImage = Image.extend({
         };
     },
     addNodeView() { return ReactNodeViewRenderer(ResizableImageView); },
+});
+
+// ── Mermaid diagram extension ─────────────────────────────────────────────────
+let _mermaidSeq = 0;
+let _mermaidInstance = null;
+// Registry: raw mermaid code → rendered SVG string (populated by MermaidNodeView)
+const _mermaidSvgRegistry = new Map();
+
+function sanitizeMermaid(code) {
+    if (!code) return code;
+
+    // When newlines collapse to spaces (AI JSON encoding), restore them.
+    // 3+ consecutive spaces in a single-line diagram = a missing newline.
+    // Single spaces inside labels are safe — they're never 3+ in a row.
+    if (!code.includes('\n') && /\s{3,}/.test(code)) {
+        code = code.replace(/\s{3,}/g, '\n    ');
+    }
+
+    // Auto-quote node labels that contain bare parentheses
+    // e.g.  [Label (detail)]  →  ["Label (detail)"]
+    code = code.replace(
+        /\[([^[\]"\n][^[\]\n]*\([^)\n]*\)[^[\]\n]*)\]/g,
+        '["$1"]'
+    );
+
+    return code;
+}
+
+async function getMermaid() {
+    if (_mermaidInstance) return _mermaidInstance;
+    const m = await import('mermaid');
+    _mermaidInstance = m.default;
+    _mermaidInstance.initialize({
+        startOnLoad: false,
+        theme: 'neutral',
+        securityLevel: 'loose',
+        fontFamily: 'Arial, sans-serif',
+        // Use SVG <text> elements for labels instead of <foreignObject>.
+        // <foreignObject> is invisible in DomPDF and unrenderable on canvas.
+        flowchart: { htmlLabels: false },
+    });
+    return _mermaidInstance;
+}
+
+// Insert the SVG into the live DOM so the browser resolves CSS class rules and
+// var(--…) custom properties, then inline every computed style and drop <style> blocks.
+// Also converts <foreignObject> labels to SVG <text> elements — canvas and DomPDF
+// cannot render foreignObject, but we can extract the text and position it correctly.
+async function prepareExportSvg(svgString) {
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'position:fixed;left:-9999px;top:-9999px;width:1000px;visibility:hidden;pointer-events:none;';
+    wrap.innerHTML = svgString;
+    document.body.appendChild(wrap);
+    await new Promise(r => requestAnimationFrame(r)); // one frame so styles compute
+
+    const svgEl = wrap.querySelector('svg');
+    if (!svgEl) { document.body.removeChild(wrap); return svgString; }
+
+    // Convert <foreignObject> to SVG <text> so canvas can render node labels.
+    // Mermaid's foreignObject contains the node text; we extract it and place a
+    // <text> at the centre of the foreignObject's bounding box.
+    svgEl.querySelectorAll('foreignObject').forEach(fo => {
+        const label = (fo.textContent || '').replace(/\s+/g, ' ').trim();
+        if (!label) { fo.remove(); return; }
+
+        const fw = parseFloat(fo.getAttribute('width')  || '0');
+        const fh = parseFloat(fo.getAttribute('height') || '0');
+        const fx = parseFloat(fo.getAttribute('x') || '0');
+        const fy = parseFloat(fo.getAttribute('y') || '0');
+
+        const inner = fo.firstElementChild;
+        const cs = inner ? window.getComputedStyle(inner) : null;
+        const fontSize   = cs?.fontSize   || '14px';
+        const fontFamily = (cs?.fontFamily || 'Arial, sans-serif').replace(/\binherit\b/gi, 'Arial, sans-serif');
+        const fillColor  = cs?.color      || '#333333';
+
+        const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        t.setAttribute('x', String(fx + fw / 2));
+        t.setAttribute('y', String(fy + fh / 2));
+        t.setAttribute('text-anchor', 'middle');
+        t.setAttribute('dominant-baseline', 'central');
+        t.setAttribute('style', `font-size:${fontSize};font-family:${fontFamily};fill:${fillColor};`);
+        t.textContent = label;
+        fo.parentNode?.replaceChild(t, fo);
+    });
+
+    // Inline computed styles — canvas and DomPDF both need concrete values, not
+    // CSS class lookups or var(--…) custom properties.
+    const PROPS = [
+        'fill', 'stroke', 'stroke-width', 'stroke-dasharray', 'stroke-linecap', 'stroke-linejoin',
+        'font-family', 'font-size', 'font-weight', 'font-style', 'opacity',
+    ];
+    [svgEl, ...svgEl.querySelectorAll('*')].forEach(el => {
+        if (el.tagName.toLowerCase() === 'style') return;
+        try {
+            const cs = window.getComputedStyle(el);
+            const parts = [];
+            for (const prop of PROPS) {
+                const val = cs.getPropertyValue(prop);
+                if (val && val !== '' && val !== 'initial' && val !== 'unset') parts.push(`${prop}:${val}`);
+            }
+            if (parts.length) el.setAttribute('style', parts.join(';'));
+        } catch { /* non-styleable nodes (defs, marker, etc.) */ }
+    });
+
+    svgEl.querySelectorAll('style').forEach(s => s.remove());
+    // outerHTML keeps the xmlns attribute that SVG needs when loaded as an <img>
+    const result = svgEl.outerHTML;
+    document.body.removeChild(wrap);
+    return result;
+}
+
+// Render a prepared SVG string to a PNG data URL via canvas.
+// Uses a blob URL (no size limits, no encoding overhead).
+// Scales wide diagrams (e.g. sequence diagrams) down to maxWidth so they fit the PDF page.
+async function svgStringToPng(svgString, maxWidth = 1400) {
+    return new Promise(resolve => {
+        try {
+            const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+            const url  = URL.createObjectURL(blob);
+            const img  = new Image();
+            img.onload = () => {
+                let w = img.naturalWidth  || 900;
+                let h = img.naturalHeight || 450;
+                if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth; }
+                const scale = 2; // 2× for crisp text in PDF
+                const canvas = document.createElement('canvas');
+                canvas.width  = w * scale;
+                canvas.height = h * scale;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.scale(scale, scale);
+                ctx.drawImage(img, 0, 0, w, h);
+                URL.revokeObjectURL(url);
+                try { resolve(canvas.toDataURL('image/png')); } catch { resolve(null); }
+            };
+            img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+            img.src = url;
+        } catch { resolve(null); }
+    });
+}
+
+async function collectMermaidDiagrams() {
+    const entries = Array.from(_mermaidSvgRegistry.entries()).filter(([, s]) => s);
+    return Promise.all(
+        entries.map(async ([code, svg]) => {
+            const prepared = await prepareExportSvg(svg);
+            const png = await svgStringToPng(prepared);
+            // Always include svg so the backend has a fallback if canvas failed
+            return { code, svg: prepared, png };
+        })
+    );
+}
+
+function MermaidNodeView({ node, updateAttributes, selected }) {
+    const [svg,     setSvg]     = useState('');
+    const [errMsg,  setErrMsg]  = useState('');
+    const [editing, setEditing] = useState(!node.attrs.code?.trim());
+    const [hovered, setHovered] = useState(false);
+    const svgId       = useRef(`mmd-${++_mermaidSeq}`);
+    const containerRef = useRef(null);
+    const startX      = useRef(0);
+    const startW      = useRef(0);
+
+    const showControls = selected || hovered;
+
+    useEffect(() => {
+        const code = node.attrs.code?.trim();
+        if (!code) { setSvg(''); return; }
+        let cancelled = false;
+        document.getElementById(svgId.current)?.remove();
+        getMermaid()
+            .then(m => m.render(svgId.current, sanitizeMermaid(code)))
+            .then(({ svg: s }) => { if (!cancelled) { setSvg(s); setErrMsg(''); _mermaidSvgRegistry.set(code, s); } })
+            .catch(err => {
+                console.error('[Mermaid]', err, '\nCode:\n', code);
+                if (!cancelled) { setSvg(''); setErrMsg('Diagram syntax error — click Edit to fix'); }
+            });
+        return () => {
+            cancelled = true;
+            document.getElementById(svgId.current)?.remove();
+        };
+    }, [node.attrs.code]);
+
+    const onHandleMouseDown = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        startX.current = e.clientX;
+        startW.current = containerRef.current?.offsetWidth ?? 600;
+        const onMove = ev => updateAttributes({ width: `${Math.max(240, startW.current + ev.clientX - startX.current)}px` });
+        const onUp   = () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
+        window.addEventListener('mousemove', onMove);
+        window.addEventListener('mouseup', onUp);
+    };
+
+    return (
+        <NodeViewWrapper contentEditable={false}>
+            <div
+                ref={containerRef}
+                style={{ width: node.attrs.width ?? '100%', maxWidth: '100%' }}
+                className={`relative my-4 rounded-xl border-2 bg-white transition-colors overflow-hidden ${showControls ? 'border-primary/50' : 'border-slate-100'}`}
+                onMouseEnter={() => setHovered(true)}
+                onMouseLeave={() => setHovered(false)}
+            >
+                {/* Header */}
+                <div className="flex items-center justify-between px-3 py-1.5 bg-slate-50 border-b border-slate-100">
+                    <span className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                        <span className="material-icons-round text-[13px]">account_tree</span>
+                        Diagram
+                    </span>
+                    <button
+                        onMouseDown={e => { e.preventDefault(); setEditing(v => !v); }}
+                        className="text-[11px] font-semibold text-slate-400 hover:text-primary transition-colors"
+                    >
+                        {editing ? 'Preview' : 'Edit code'}
+                    </button>
+                </div>
+
+                {/* Editor pane */}
+                {editing && (
+                    <textarea
+                        value={node.attrs.code}
+                        onChange={e => updateAttributes({ code: e.target.value })}
+                        spellCheck={false}
+                        rows={8}
+                        placeholder={'flowchart TD\n    A[Start] --> B{Decision}\n    B -->|Yes| C[Result A]\n    B -->|No| D[Result B]'}
+                        className="w-full font-mono text-[12px] text-slate-700 leading-relaxed p-3 outline-none resize-y bg-white border-b border-slate-100"
+                    />
+                )}
+
+                {/* Preview pane — [&_svg]:w-full scales the SVG to fill the container */}
+                {!editing && (
+                    <div
+                        className="p-4 flex justify-center overflow-x-auto cursor-pointer min-h-[80px] [&_svg]:max-w-full [&_svg]:h-auto"
+                        onClick={() => setEditing(true)}
+                        title="Click to edit"
+                        dangerouslySetInnerHTML={{
+                            __html: svg
+                                || (errMsg ? `<p style="color:#f87171;font-size:0.8rem;text-align:center;padding:1rem">${errMsg}</p>`
+                                           : '<p style="color:#cbd5e1;font-size:0.8rem;text-align:center;padding:1rem">Rendering…</p>'),
+                        }}
+                    />
+                )}
+
+                {/* Resize handle — same style as images */}
+                {showControls && !editing && (
+                    <div
+                        onMouseDown={onHandleMouseDown}
+                        className="absolute bottom-0 right-0 w-5 h-5 rounded-tl-md bg-primary cursor-se-resize flex items-center justify-center shadow"
+                        title="Drag to resize"
+                    >
+                        <span className="material-icons-round text-white text-[11px]">open_in_full</span>
+                    </div>
+                )}
+            </div>
+        </NodeViewWrapper>
+    );
+}
+
+const MermaidBlock = Node.create({
+    name: 'mermaidBlock',
+    group: 'block',
+    atom: true,
+    draggable: true,
+    selectable: true,
+
+    addAttributes() {
+        return {
+            code: {
+                default: '',
+                parseHTML: el => el.getAttribute('data-code') ?? el.textContent?.trim() ?? '',
+                renderHTML: attrs => ({ 'data-code': attrs.code }),
+            },
+            width: {
+                default: null,
+                parseHTML: el => el.getAttribute('data-width') || null,
+                renderHTML: attrs => attrs.width ? { 'data-width': attrs.width } : {},
+            },
+        };
+    },
+
+    parseHTML() {
+        return [{ tag: 'div.mermaid' }];
+    },
+
+    renderHTML({ HTMLAttributes }) {
+        return ['div', mergeAttributes({ class: 'mermaid' }, HTMLAttributes)];
+    },
+
+    addNodeView() {
+        return ReactNodeViewRenderer(MermaidNodeView);
+    },
 });
 
 // ── Toolbar primitives ────────────────────────────────────────────────────────
@@ -477,6 +770,7 @@ export default function DocumentEditor({ doc, onExport, onCoverSaved, onTocStyle
             Table.configure({ resizable: false }),
             TableRow, TableCell, TableHeader,
             CharacterCount,
+            MermaidBlock,
         ],
         content: initialContent,
         onUpdate: ({ editor: ed }) => scheduleAutoSave(ed.getHTML()),
@@ -689,7 +983,7 @@ export default function DocumentEditor({ doc, onExport, onCoverSaved, onTocStyle
                                 <span className="hidden md:inline">Slides</span>
                             </button>
                             {['pdf', 'docx'].map(fmt => (
-                                <button key={fmt} onClick={() => onExport(fmt, exportFormatting)}
+                                <button key={fmt} onClick={() => collectMermaidDiagrams().then(diagrams => onExport(fmt, exportFormatting, diagrams))}
                                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-white text-[12px] font-semibold hover:bg-primary/90 transition-all active:scale-95">
                                     <span className="material-icons-round text-[14px]">download</span>
                                     {fmt.toUpperCase()}
@@ -787,7 +1081,15 @@ export default function DocumentEditor({ doc, onExport, onCoverSaved, onTocStyle
                                         <MenuItem icon="format_quote"             active={editor?.isActive('blockquote')} onSelect={() => { editor?.chain().focus().toggleBlockquote().run(); close(); }}>Blockquote</MenuItem>
                                         <MenuItem icon="integration_instructions" active={editor?.isActive('codeBlock')}  onSelect={() => { editor?.chain().focus().toggleCodeBlock().run(); close(); }}>Code block</MenuItem>
                                         <MenuItem icon="code"                     active={editor?.isActive('code')}       onSelect={() => { editor?.chain().focus().toggleCode().run(); close(); }}>Inline code</MenuItem>
-                                        <MenuItem icon="horizontal_rule"                                                   onSelect={() => { editor?.chain().focus().setHorizontalRule().run(); close(); }}>Divider</MenuItem>
+                                        <MenuItem icon="horizontal_rule" onSelect={() => { editor?.chain().focus().setHorizontalRule().run(); close(); }}>Divider</MenuItem>
+                                        <MenuItem separator />
+                                        <MenuItem icon="account_tree" onSelect={() => {
+                                            editor?.chain().focus().insertContent({
+                                                type: 'mermaidBlock',
+                                                attrs: { code: 'flowchart TD\n    A[Start] --> B{Decision}\n    B -->|Yes| C[Result A]\n    B -->|No| D[Result B]' },
+                                            }).run();
+                                            close();
+                                        }}>Diagram (Mermaid)</MenuItem>
                                     </>
                                 )}
                             </DropdownMenu>
