@@ -203,7 +203,8 @@ async function prepareExportSvg(svgString) {
     wrap.style.cssText = 'position:fixed;left:-9999px;top:-9999px;width:1000px;visibility:hidden;pointer-events:none;';
     wrap.innerHTML = svgString;
     document.body.appendChild(wrap);
-    await new Promise(r => requestAnimationFrame(r)); // one frame so styles compute
+    // Two frames: first for DOM layout, second for paint/computed-style resolution.
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 
     const svgEl = wrap.querySelector('svg');
     if (!svgEl) { document.body.removeChild(wrap); return svgString; }
@@ -246,10 +247,15 @@ async function prepareExportSvg(svgString) {
         if (el.tagName.toLowerCase() === 'style') return;
         try {
             const cs = window.getComputedStyle(el);
+            const isTextNode = /^(text|tspan)$/i.test(el.tagName);
             const parts = [];
             for (const prop of PROPS) {
                 const val = cs.getPropertyValue(prop);
-                if (val && val !== '' && val !== 'initial' && val !== 'unset') parts.push(`${prop}:${val}`);
+                if (!val || val === '' || val === 'initial' || val === 'unset') continue;
+                // Never make text/tspan invisible — if CSS says fill:none, skip it so
+                // the SVG default (black) is used and text stays readable.
+                if (prop === 'fill' && val === 'none' && isTextNode) continue;
+                parts.push(`${prop}:${val}`);
             }
             if (parts.length) el.setAttribute('style', parts.join(';'));
         } catch { /* non-styleable nodes (defs, marker, etc.) */ }
@@ -262,20 +268,19 @@ async function prepareExportSvg(svgString) {
     // shifted inside an oversized white canvas in the exported PNG.
     try {
         const bbox = svgEl.getBBox();
-        if (bbox.width > 0 && bbox.height > 0) {
-            const pad = 8;
-            const vx = bbox.x - pad;
-            const vy = bbox.y - pad;
-            const vw = bbox.width  + pad * 2;
-            const vh = bbox.height + pad * 2;
-            svgEl.setAttribute('viewBox', `${vx} ${vy} ${vw} ${vh}`);
-            svgEl.setAttribute('width',  String(vw));
-            svgEl.setAttribute('height', String(vh));
+        const { x, y, width, height } = bbox;
+        if (width > 0 && height > 0 && isFinite(x) && isFinite(y) && isFinite(width) && isFinite(height)) {
+            const pad = 16;
+            svgEl.setAttribute('viewBox', `${x - pad} ${y - pad} ${width + pad * 2} ${height + pad * 2}`);
+            svgEl.setAttribute('width',   String(Math.ceil(width  + pad * 2)));
+            svgEl.setAttribute('height',  String(Math.ceil(height + pad * 2)));
         }
     } catch { /* getBBox unavailable (e.g. offscreen or cross-origin) */ }
 
-    // outerHTML keeps the xmlns attribute that SVG needs when loaded as an <img>
-    const result = svgEl.outerHTML;
+    // XMLSerializer always emits proper xmlns declarations so the SVG is valid
+    // as a standalone document when loaded via a blob URL for canvas rendering.
+    // outerHTML in an HTML context may omit xmlns, causing img.onerror to fire.
+    const result = new XMLSerializer().serializeToString(svgEl);
     document.body.removeChild(wrap);
     return result;
 }
