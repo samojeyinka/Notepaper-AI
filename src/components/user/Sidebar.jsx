@@ -12,9 +12,10 @@ export const Sidebar = ({ activePage }) => {
     { path: '/lockedin/library', icon: 'folder', label: 'Library' },
     { path: '/lockedin/scholar', icon: 'memory', label: 'Scholar' },
     { path: '/lockedin/generate', icon: 'psychology', label: 'AI Studio' },
+     { path: '/lockedin/sprints', icon: 'bolt', label: 'Sprints' },
     { path: '/lockedin/quizzes',    icon: 'quiz',       label: 'Quizzes'    },
     // Sprints — feature uses mock data and is not ready for users yet
-    // { path: '/lockedin/sprints', icon: 'bolt', label: 'Sprints' },
+   
     // { path: '/lockedin/study-plan', icon: 'event_note', label: 'Study Plan' },
     { path: '/lockedin/support-tickets', icon: 'chat', label: 'Support Tickets' },
     // { path: '/lockedin/application-settings', icon: 'settings', label: 'Settings' }

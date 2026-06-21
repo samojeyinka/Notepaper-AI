@@ -80,11 +80,12 @@ export const usePaperSync = (getState, paperId, setPaperId) => {
 
   const markDirty = useCallback((fields) => {
     saveDraft();
+    if (paperId) workspaceCache.invalidatePaperContent(paperId);
     const arr = Array.isArray(fields) ? fields : [fields];
     arr.forEach(f => dirtyRef.current.add(f));
     clearTimeout(debounceTimer.current);
     debounceTimer.current = setTimeout(() => { saveToBackend(); }, DEBOUNCE_MS);
-  }, [saveDraft, saveToBackend]);
+  }, [saveDraft, saveToBackend, paperId]);
 
   const forceFlush = useCallback(async () => {
     clearTimeout(debounceTimer.current);
@@ -92,29 +93,49 @@ export const usePaperSync = (getState, paperId, setPaperId) => {
     await saveToBackend(dirty);
   }, [saveToBackend]);
 
-  const loadPaper = useCallback(async (id, applyState) => {
-    setSaveStatus('loading');
+  // `force: true` bypasses cache/draft — used by AI channel handlers where freshness is required.
+  const loadPaper = useCallback(async (id, applyState, { force = false } = {}) => {
+    const memCached  = force ? null : workspaceCache.getPaperContent(id);
+    const draft      = force ? null : loadDraft(id);
+    const servedFast = !!(memCached || draft);
+
+    if (memCached) {
+      applyState(memCached);
+      setSaveStatus('saved');
+    } else if (draft) {
+      const { _savedAt, ...draftState } = draft;
+      applyState(draftState);
+      setSaveStatus('saved');
+    } else {
+      setSaveStatus('loading');
+    }
+
     try {
       const res        = await paperService.get(id);
       const serverPaper = res.data;
-      const draft      = loadDraft(id);
-      if (draft && draft._savedAt) {
+      if (!isMountedRef.current) return;
+      workspaceCache.setPaperContent(id, serverPaper);
+
+      const latestDraft = loadDraft(id);
+      if (latestDraft?._savedAt) {
         const serverTime = new Date(serverPaper.updated_at).getTime();
-        if (draft._savedAt > serverTime) {
-          const { _savedAt, ...draftState } = draft;
+        if (latestDraft._savedAt > serverTime) {
+          const { _savedAt, ...draftState } = latestDraft;
           applyState({ ...draftState, folder: serverPaper.folder ?? null, folder_id: serverPaper.folder_id ?? null });
           ['title','content','textColor','fontFamily','fontSize','lineSpacing','drawingData','paddingX','paddingY']
             .forEach(f => dirtyRef.current.add(f));
-          setSaveStatus('saved');
+          if (isMountedRef.current) setSaveStatus('saved');
           return;
         }
       }
+
       applyState(serverPaper);
       clearDraft(id);
-      setSaveStatus('saved');
+      if (isMountedRef.current) setSaveStatus('saved');
     } catch (err) {
       console.error('[usePaperSync] load failed', err);
-      setSaveStatus('error');
+      if (!isMountedRef.current) return;
+      if (!servedFast) setSaveStatus('error');
     }
   }, [loadDraft, clearDraft]);
 

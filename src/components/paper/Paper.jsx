@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import Loader from '../globals/Loader';
 import { useParams, useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { PaperHeader } from "./PaperHeader";
 import { PaperToolbar } from "./PaperToolbar";
@@ -163,14 +162,27 @@ export const Paper = () => {
     );
     forceFlushRef.current = forceFlush;
 
-    const [showLoader, setShowLoader] = useState(false);
+    // White-screen loading overlay — shown whenever opening an existing paper.
+    // Closes in 250ms when data is ready (instant for cache/draft, longer for cold loads).
+    const [showLoadingOverlay, setShowLoadingOverlay] = useState(() => !!routeId);
+    const [barWidth, setBarWidth] = useState(0);
+
     useEffect(() => {
-        if (saveStatus === 'loading') {
-            const t = setTimeout(() => setShowLoader(true), 1000);
-            return () => clearTimeout(t);
-        }
-        setShowLoader(false);
-    }, [saveStatus]);
+        if (!showLoadingOverlay) return;
+        const raf = requestAnimationFrame(() => {
+            requestAnimationFrame(() => setBarWidth(85));
+        });
+        return () => cancelAnimationFrame(raf);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+        if (!showLoadingOverlay) return;
+        if (saveStatus === 'loading' || saveStatus === 'idle') return;
+        setBarWidth(100);
+        const t = setTimeout(() => setShowLoadingOverlay(false), 250);
+        return () => clearTimeout(t);
+    }, [saveStatus, showLoadingOverlay]);
 
     // Undo/redo
     const applySnapshot = useCallback((snapshot) => {
@@ -453,7 +465,7 @@ export const Paper = () => {
             const s = Array.isArray(serverPaper.pages) ? serverPaper : deserializePaper(serverPaper);
             // If content is empty the backend hasn't committed yet — retry up to 5×
             if (!s.pages.some(p => p?.trim()) && (applyExpanded._attempts = (applyExpanded._attempts ?? 0) + 1) <= 5) {
-                expandRetryTimerRef.current = setTimeout(() => loadPaper(paperId, applyExpanded), 2000);
+                expandRetryTimerRef.current = setTimeout(() => loadPaper(paperId, applyExpanded, { force: true }), 2000);
                 return;
             }
             setTitle(s.title); setPages(s.pages); setFontSize(s.fontSize); setLineSpacing(s.lineSpacing);
@@ -463,7 +475,7 @@ export const Paper = () => {
             if (s.folder)   setFolder(s.folder);
             setIsAIGenerating(false);
         };
-        loadPaper(paperId, applyExpanded);
+        loadPaper(paperId, applyExpanded, { force: true });
     });
 
     useSimplifyTopicChannel(isAIGenerating ? paperId : null, () => {
@@ -471,7 +483,7 @@ export const Paper = () => {
         const applySimplified = (serverPaper) => {
             const s = Array.isArray(serverPaper.pages) ? serverPaper : deserializePaper(serverPaper);
             if (!s.pages.some(p => p?.trim()) && (applySimplified._attempts = (applySimplified._attempts ?? 0) + 1) <= 5) {
-                expandRetryTimerRef.current = setTimeout(() => loadPaper(paperId, applySimplified), 2000);
+                expandRetryTimerRef.current = setTimeout(() => loadPaper(paperId, applySimplified, { force: true }), 2000);
                 return;
             }
             setTitle(s.title); setPages(s.pages); setFontSize(s.fontSize); setLineSpacing(s.lineSpacing);
@@ -481,7 +493,7 @@ export const Paper = () => {
             if (s.folder)   setFolder(s.folder);
             setIsAIGenerating(false);
         };
-        loadPaper(paperId, applySimplified);
+        loadPaper(paperId, applySimplified, { force: true });
     });
 
 
@@ -496,6 +508,7 @@ export const Paper = () => {
             try {
                 const res = await paperService.get(paperId);
                 const serverPaper = res.data;
+                workspaceCache.setPaperContent(paperId, serverPaper);
                 if (!serverPaper.ai_generating && serverPaper.content) {
                     clearInterval(pollId);
                     clearTimeout(timeoutId);
@@ -514,7 +527,23 @@ export const Paper = () => {
     }, [isAIGenerating]);
 
     return (
-        <div className="flex flex-col flex-1 h-screen overflow-hidden bg-white border-l border-slate-200 lg:ml-64 pt-16 lg:pt-0">
+        <div className="relative flex flex-col flex-1 h-screen overflow-hidden bg-white border-l border-slate-200 lg:ml-64 pt-16 lg:pt-0">
+            {/* White-screen progress bar — cold open only (no cache, no draft) */}
+            {showLoadingOverlay && (
+                <div className="absolute inset-0 z-40 bg-white">
+                    <div className="h-[3px] bg-slate-100 overflow-hidden">
+                        <div
+                            className="h-full bg-primary rounded-r-full"
+                            style={{
+                                width: `${barWidth}%`,
+                                transition: barWidth >= 100
+                                    ? 'width 0.2s ease-in'
+                                    : 'width 1.6s cubic-bezier(0.05, 0.5, 0.25, 1)',
+                            }}
+                        />
+                    </div>
+                </div>
+            )}
             {isAIGenerating && (
                 <div className="absolute inset-0 z-50 bg-white/95 backdrop-blur flex flex-col items-center justify-center gap-6">
                     {aiGeneratingTimedOut ? (
@@ -669,14 +698,6 @@ export const Paper = () => {
                 />
 
                 <div className="flex-1 overflow-hidden flex" style={{ position:'relative' }}>
-                    {saveStatus === 'loading' && showLoader && (
-                        <div style={{ position:'absolute',inset:0,zIndex:20,pointerEvents:'all',display:'flex',alignItems:'center',justifyContent:'center',background:'rgba(241,245,249,0.7)',backdropFilter:'blur(2px)' }}>
-                            <div className="flex flex-col items-center gap-3">
-                                <Loader size="xl" />
-
-                            </div>
-                        </div>
-                    )}
                     <div className="paper-pages-container flex-1 overflow-hidden flex relative">
                         {isRecording && <div style={{ position:'absolute',inset:0,zIndex:50,cursor:'not-allowed' }} />}
                         <PaperEditor
