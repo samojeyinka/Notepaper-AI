@@ -111,7 +111,7 @@ export default function ScholarNew() {
                             <span className="material-icons-round text-[15px]">arrow_back</span>
                             Back
                         </button>
-                        <h1 className="text-[26px] font-bold text-slate-800 tracking-tight">New Document</h1>
+                        <h1 className="text-[20px] md:text-[26px] font-medium md:font-bold text-slate-800 tracking-tight">New Document</h1>
                     </div>
                     <span className="mt-8 text-[11px] font-semibold text-primary/70 bg-primary/8 px-2.5 py-1 rounded-full">
                         4–6 min generation

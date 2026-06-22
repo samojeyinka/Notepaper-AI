@@ -927,17 +927,17 @@ export default function DocumentEditor({ doc, onExport, onCoverSaved, onTocStyle
                 <div className="flex-1 min-w-0">
 
                     {/* ── Sticky top bar ─────────────────────────────────────── */}
-                    <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b border-slate-100 px-0 py-2 mb-6 flex items-center gap-2 justify-between">
+                    <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b border-slate-100 px-0 py-2 mb-6 flex flex-wrap items-center gap-x-2 gap-y-1.5">
 
                         <div className="shrink-0 min-w-0">
                             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-0.5">Scholar</p>
-                            <p className="text-[13px] font-semibold text-slate-800 leading-snug truncate max-w-[200px]">{doc.title}</p>
+                            <p className="text-[13px] font-semibold text-slate-800 leading-snug truncate max-w-[120px] sm:max-w-[200px]">{doc.title}</p>
                         </div>
 
-                        <div className="w-px h-6 bg-slate-200 shrink-0" />
+                        <div className="w-px h-6 bg-slate-200 shrink-0 hidden md:block" />
 
-                        {/* Formatting menus */}
-                        <div className="flex items-center gap-0.5 flex-1">
+                        {/* Formatting menus — full-width scrollable row on mobile, inline on md+ */}
+                        <div className="flex items-center gap-0.5 md:flex-1 w-full md:w-auto order-last md:order-none overflow-x-auto pb-0.5">
                             <GlobalDropdown label={fontLabel} icon="text_fields" panelClass="min-w-[180px]">
                                 {FONT_FAMILIES.map(f => (
                                     <GDItem key={f.label} active={docFontFamily === f.value} onClick={() => setDocFontFamily(f.value)}>
@@ -989,10 +989,10 @@ export default function DocumentEditor({ doc, onExport, onCoverSaved, onTocStyle
                             </GlobalDropdown>
                         </div>
 
-                        <div className="w-px h-6 bg-slate-200 shrink-0" />
+                        <div className="w-px h-6 bg-slate-200 shrink-0 hidden md:block" />
 
                         {/* Actions */}
-                        <div className="flex items-center gap-1.5 shrink-0">
+                        <div className="flex items-center gap-1.5 shrink-0 ml-auto md:ml-0">
                             <SaveBadge />
                             <button onClick={() => setShowCoverForm(true)} className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[12px] font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors">
                                 <span className="material-icons-round text-[14px]">auto_stories</span>

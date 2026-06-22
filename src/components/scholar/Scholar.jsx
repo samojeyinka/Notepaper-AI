@@ -305,14 +305,14 @@ export default function Scholar() {
                 {/* ── Header ─────────────────────────────────────────── */}
                 <div className="flex items-end justify-between mb-6">
                     <div>
-                        <h1 className="text-[28px] font-bold text-slate-800 tracking-tight leading-tight">Documents</h1>
+                        <h1 className="text-[20px] md:text-[28px] font-medium md:font-bold text-slate-800 tracking-tight leading-tight">Documents</h1>
                         <p className="text-[13px] text-slate-400 mt-0.5">
                             {totalDocs > 0 ? `${totalDocs} document${totalDocs === 1 ? '' : 's'} total` : 'Deep work, done right.'}
                         </p>
                     </div>
                     <button
                         onClick={() => navigate('/lockedin/scholar/new')}
-                        className="flex items-center gap-1.5 px-5 py-2.5 rounded-md bg-primary text-white text-[13px] font-semibold hover:bg-primary/90 transition-all active:scale-95"
+                        className="flex items-center gap-1.5 px-3 md:px-5 py-1.5 md:py-2.5 rounded-md bg-primary text-white text-[13px] font-semibold hover:bg-primary/90 transition-all active:scale-95"
                     >
                         <span className="material-icons-round text-[16px]">add</span>
                         New Document

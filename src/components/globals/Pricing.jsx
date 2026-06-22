@@ -1,14 +1,16 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { billingService } from '../../api/billingService'
 
-// ── Plan data ─────────────────────────────────────────────────────────────────
+// ── Plan data (features hardcoded, prices fetched from API) ───────────────────
 const PLANS = [
     {
         key: 'free',
         name: 'Free',
         icon: 'eco',
-        monthly: 0,
-        yearly: 0,
-        yearlyBilled: null,
+        fallbackMonthly: 0,
+        fallbackYearly: 0,
+        fallbackYearlyBilled: null,
         tag: null,
         cardBg: 'bg-white',
         cardBorder: 'border-slate-100',
@@ -36,9 +38,9 @@ const PLANS = [
         key: 'starter',
         name: 'Starter',
         icon: 'auto_awesome',
-        monthly: 4.99,
-        yearly: 3.49,
-        yearlyBilled: 41.88,
+        fallbackMonthly: 4.99,
+        fallbackYearly: 3.49,
+        fallbackYearlyBilled: 41.88,
         tag: { text: 'Most Popular!', cls: 'bg-green-300 text-green-900 border-green-400' },
         cardBg: 'bg-[#F3F1FB]',
         cardBorder: 'border-purple-200/50',
@@ -67,9 +69,9 @@ const PLANS = [
         key: 'pro',
         name: 'Pro',
         icon: 'diamond',
-        monthly: 11.99,
-        yearly: 8.33,
-        yearlyBilled: 99.99,
+        fallbackMonthly: 11.99,
+        fallbackYearly: 8.33,
+        fallbackYearlyBilled: 99.99,
         tag: null,
         cardBg: 'bg-[#F8F9FA]',
         cardBorder: 'border-slate-100',
@@ -98,9 +100,9 @@ const PLANS = [
         key: 'premium',
         name: 'Premium',
         icon: 'workspace_premium',
-        monthly: 17,
-        yearly: 11.67,
-        yearlyBilled: 139.99,
+        fallbackMonthly: 17,
+        fallbackYearly: 11.67,
+        fallbackYearlyBilled: 139.99,
         tag: { text: 'Best Value!', cls: 'bg-yellow-300 text-yellow-900 border-yellow-400' },
         cardBg: 'bg-[#F1F3F5]',
         cardBorder: 'border-purple-200/50',
@@ -135,11 +137,46 @@ const TEAM_FEATURES = [
     { text: 'All future AI features for the whole team' },
 ]
 
-const fmt = (n) => n === 0 ? '$0' : `$${n % 1 === 0 ? n : n.toFixed(2)}`
+const fmtFallback = (n) => n === 0 ? '$0' : `$${n % 1 === 0 ? n : n.toFixed(2)}`
 
 // ── Pricing component ─────────────────────────────────────────────────────────
 const Pricing = () => {
     const [annual, setAnnual] = useState(false)
+    const [priceMap, setPriceMap] = useState({})
+    const [pricesLoaded, setPricesLoaded] = useState(false)
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        billingService.getPlans()
+            .then(res => {
+                const list = res?.data ?? res ?? []
+                const map = {}
+                list.forEach(p => { map[p.key] = p })
+                setPriceMap(map)
+                setPricesLoaded(true)
+            })
+            .catch(() => setPricesLoaded(true))
+    }, [])
+
+    const getPrice = (plan) => {
+        const p = priceMap[plan.key]?.prices
+        if (!p) return { display: null, billed: null }
+        if (!annual) return { display: p.monthly, billed: null }
+        const perMonth = p.yearly != null ? p.yearly / 12 : null
+        return { display: perMonth, billed: p.yearly }
+    }
+
+    const symbol = priceMap['starter']?.symbol ?? '$'
+    const fmtPrice = (n) => {
+        if (n === 0) return `${symbol}0`
+        return `${symbol}${Number.isInteger(n) ? n.toLocaleString() : n.toFixed(2)}`
+    }
+
+    const teamPrices = priceMap['team']?.prices ?? null
+
+    const handleCta = (planKey) => {
+        navigate('/signup', { state: { plan: planKey } })
+    }
 
     return (
         <div className="pt-16 md:pt-32 pb-24 relative z-10">
@@ -191,8 +228,13 @@ const Pricing = () => {
                 {/* 2 × 2 plan grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto relative px-4">
                     {PLANS.map((plan) => {
-                        const price   = annual && plan.yearly > 0 ? plan.yearly : plan.monthly
-                        const isAnnualPaid = annual && plan.yearlyBilled
+                        const { display: apiPrice, billed: apiBilled } = getPrice(plan)
+                        const price = apiPrice !== null
+                            ? apiPrice
+                            : (annual && plan.fallbackYearly > 0 ? plan.fallbackYearly : plan.fallbackMonthly)
+                        const billedYearly = apiBilled !== null
+                            ? apiBilled
+                            : (annual ? plan.fallbackYearlyBilled : null)
 
                         return (
                             <div
@@ -216,21 +258,27 @@ const Pricing = () => {
                                     </div>
                                     <h3 className={`text-xl md:text-3xl font-semibold md:font-bold font-serif mb-2 ${plan.priceColor}`}>{plan.name}</h3>
                                     <div className="flex items-baseline gap-1">
-                                        <span className={`text-4xl md:text-5xl font-bold font-serif transition-all ${plan.priceColor}`}>
-                                            {fmt(price)}
-                                        </span>
-                                        <span className={`font-medium md:font-bold uppercase tracking-tighter text-[12px] md:text-sm ${plan.subColor}`}>
-                                            {price === 0 ? 'forever free' : '/ month'}
-                                        </span>
+                                        {!pricesLoaded && plan.key !== 'free' ? (
+                                            <div className="h-10 w-28 bg-slate-200/60 rounded-lg animate-pulse" />
+                                        ) : (
+                                            <>
+                                                <span className={`text-4xl md:text-5xl font-bold font-serif transition-all ${plan.priceColor}`}>
+                                                    {plan.key === 'free' ? (symbol === '$' ? '$0' : `${symbol}0`) : fmtPrice(Math.round(price))}
+                                                </span>
+                                                <span className={`font-medium md:font-bold uppercase tracking-tighter text-[12px] md:text-sm ${plan.subColor}`}>
+                                                    {price === 0 ? 'forever free' : '/ month'}
+                                                </span>
+                                            </>
+                                        )}
                                     </div>
-                                    {isAnnualPaid && (
+                                    {annual && billedYearly > 0 && pricesLoaded && (
                                         <p className={`text-xs mt-1 font-medium ${plan.subColor}`}>
-                                            Billed ${plan.yearlyBilled} / year
+                                            Billed {fmtPrice(billedYearly)} / year
                                         </p>
                                     )}
                                 </div>
 
-                                {/* Features */}
+                                {/* Features — always visible, no loading wait */}
                                 <div className={`space-y-4 mb-6 md:mb-12 flex-grow ${plan.textColor}`}>
                                     {plan.features.map((f, i) => (
                                         <div key={i} className="flex items-start gap-4 text-[12px] md:text-base">
@@ -246,7 +294,10 @@ const Pricing = () => {
 
                                 {/* CTA */}
                                 <div className="relative group">
-                                    <button className={`w-full py-2.5 px-3 md:py-5 md:px-6 font-medium  md:font-black uppercase tracking-widest text-[12px] md:text-sm transition-all active:scale-95 rounded-sm ${plan.ctaStyle}`}>
+                                    <button
+                                        onClick={() => handleCta(plan.key)}
+                                        className={`w-full py-2.5 px-3 md:py-5 md:px-6 font-medium md:font-black uppercase tracking-widest text-[12px] md:text-sm transition-all active:scale-95 rounded-sm ${plan.ctaStyle}`}
+                                    >
                                         {plan.cta}
                                     </button>
                                     {plan.key !== 'free' && (
@@ -287,23 +338,36 @@ const Pricing = () => {
                                     One plan, five people. The owner invites teammates by email — everyone gets full Premium access billed as one.
                                 </p>
                                 <div className="flex items-baseline gap-1 mb-1">
-                                    <span className="text-4xl md:text-5xl font-bold font-serif text-white">
-                                        {annual ? '$33.25' : '$49'}
-                                    </span>
-                                    <span className="text-slate-400 font-bold uppercase tracking-tighter text-sm">/ month</span>
+                                    {!pricesLoaded ? (
+                                        <div className="h-10 w-28 bg-white/10 rounded-lg animate-pulse" />
+                                    ) : (
+                                        <>
+                                            <span className="text-4xl md:text-5xl font-bold font-serif text-white">
+                                                {teamPrices
+                                                    ? fmtPrice(Math.round(annual ? teamPrices.yearly / 12 : teamPrices.monthly))
+                                                    : (annual ? '$33.25' : '$49')
+                                                }
+                                            </span>
+                                            <span className="text-slate-400 font-bold uppercase tracking-tighter text-sm">/ month</span>
+                                        </>
+                                    )}
                                 </div>
-                                {annual && (
-                                    <p className="text-slate-500 text-xs font-medium mb-2">Billed $399 / year</p>
+                                {annual && teamPrices?.yearly > 0 && pricesLoaded && (
+                                    <p className="text-slate-500 text-xs font-medium mb-2">
+                                        Billed {fmtPrice(teamPrices.yearly)} / year
+                                    </p>
                                 )}
-                                <p className="text-slate-500 text-xs">That's ${annual ? '6.65' : '9.80'} per person / month — vs $17 individual</p>
 
-                                <button className="mt-8 py-4 px-10 bg-white text-slate-900 font-black uppercase tracking-widest text-sm hover:bg-slate-100 active:scale-95 transition-all rounded-sm shadow-lg">
+                                <button
+                                    onClick={() => handleCta('team')}
+                                    className="mt-8 py-4 px-10 bg-white text-slate-900 font-black uppercase tracking-widest text-sm hover:bg-slate-100 active:scale-95 transition-all rounded-sm shadow-lg"
+                                >
                                     Launch Team
                                 </button>
                                 <p className="mt-2 scribble-note text-slate-500 text-sm">Cancel anytime with one click</p>
                             </div>
 
-                            {/* Right — features */}
+                            {/* Right — features (always visible) */}
                             <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 {TEAM_FEATURES.map((f, i) => (
                                     <div key={i} className="flex items-start gap-3 text-[11px] md:text-[13px]">
