@@ -13,7 +13,9 @@ import { TableCell } from '@tiptap/extension-table-cell';
 import { TableHeader } from '@tiptap/extension-table-header';
 import CharacterCount from '@tiptap/extension-character-count';
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
+import { callDeepSeek } from '../../utils/deepseek';
 import { scholarService } from '../../api/scholarService';
 import ShakespeareModal from '../note/ShakespeareModal';
 import ImageSearchModal from './ImageSearchModal';
@@ -161,19 +163,42 @@ const _mermaidSvgRegistry = new Map();
 function sanitizeMermaid(code) {
     if (!code) return code;
 
-    // When newlines collapse to spaces (AI JSON encoding), restore them.
-    // 3+ consecutive spaces in a single-line diagram = a missing newline.
-    // Single spaces inside labels are safe — they're never 3+ in a row.
+    // ── 1. Restore newlines collapsed to spaces ───────────────────────────────
+    // Full collapse (no newlines at all): 3+ spaces = a missing newline.
     if (!code.includes('\n') && /\s{3,}/.test(code)) {
         code = code.replace(/\s{3,}/g, '\n    ');
     }
 
-    // Auto-quote node labels that contain bare parentheses
+    // Partial collapse: multiple statements merged onto one line.
+    // e.g. "class Foo { }    class Bar" — "}  class" or "-->  A["  run-ons.
+    // Split on "} <keyword>" patterns that should be on separate lines.
+    code = code.replace(/(\})\s{2,}(?=(class|participant|actor|state|note|section|task|milestone|link|click|style|classDef|subgraph|end)\s)/g, '$1\n    ');
+    // Also split on bare class keyword mid-line after whitespace (no preceding })
+    code = code.replace(/(;|,)\s{2,}(?=class\s)/g, '$1\n    ');
+
+    // ── 2. Auto-quote flowchart node labels with bare parentheses ────────────
     // e.g.  [Label (detail)]  →  ["Label (detail)"]
     code = code.replace(
         /\[([^[\]"\n][^[\]\n]*\([^)\n]*\)[^[\]\n]*)\]/g,
         '["$1"]'
     );
+
+    // ── 3. Fix AI classDiagram alias syntax Mermaid rejects ──────────────────
+    //   class "Large Language Model" as LLM { }
+    //   → class LLM["Large Language Model"]
+    code = code.replace(
+        /\bclass\s+"([^"]+)"\s+as\s+(\w+)\s*(\{[^}]*\})?/g,
+        (_, label, alias, body) => {
+            const trimmed = (body ?? '').replace(/\s/g, '');
+            return trimmed && trimmed !== '{}'
+                ? `class ${alias}["${label}"] ${body.trim()}`
+                : `class ${alias}["${label}"]`;
+        }
+    );
+
+    // ── 4. Strip empty class bodies  "class Foo { }" → "class Foo" ───────────
+    // Some Mermaid versions reject "{ }" on a class with no members.
+    code = code.replace(/\bclass\s+(\w+(?:\[(?:[^\]]*)\])?)\s*\{\s*\}/g, 'class $1');
 
     return code;
 }
@@ -316,15 +341,280 @@ async function svgStringToPng(svgString, maxWidth = 1400) {
     });
 }
 
-async function collectMermaidDiagrams() {
-    const entries = Array.from(_mermaidSvgRegistry.entries()).filter(([, s]) => s);
+// includePng = true, includeFresh = true  → full pipeline (PDF): prepareExportSvg + PNG + fresh render
+// includePng = true, includeFresh = false → PNG without fresh render (DOCX): registry-only, no risky re-render
+// includePng = false → SVG only (legacy): skip canvas step
+async function collectMermaidDiagrams(extraCodes = [], { includePng = true, includeFresh = includePng } = {}) {
+    const regEntries = Array.from(_mermaidSvgRegistry.entries()).filter(([, s]) => s);
+    const registered = new Set(regEntries.map(([c]) => c));
+
+    // Re-attempt rendering for codes not yet in the registry (PDF only).
+    // Skipped for DOCX — fresh SVG data was the root cause of prior DOCX 500 errors.
+    const freshEntries = [];
+    if (includeFresh) {
+        for (const code of extraCodes) {
+            if (!code?.trim() || registered.has(code)) continue;
+            try {
+                const m  = await getMermaid();
+                const id = `mmd-export-${Date.now()}`;
+                document.getElementById(id)?.remove();
+                const { svg } = await m.render(id, sanitizeMermaid(code));
+                if (svg) { freshEntries.push([code, svg]); registered.add(code); }
+            } catch { /* skip diagrams that still can't render */ }
+        }
+    }
+
     return Promise.all(
-        entries.map(async ([code, svg]) => {
+        [...regEntries, ...freshEntries].map(async ([code, svg]) => {
+            if (!includePng) return { code, svg };
             const prepared = await prepareExportSvg(svg);
             const png = await svgStringToPng(prepared);
-            // Always include svg so the backend has a fallback if canvas failed
             return { code, svg: prepared, png };
         })
+    );
+}
+
+// ── Diagram generate modal ────────────────────────────────────────────────────
+const DIAGRAM_TYPES = [
+    { value: 'flowchart TD',       label: 'Flowchart'    },
+    { value: 'sequenceDiagram',    label: 'Sequence'     },
+    { value: 'erDiagram',          label: 'ER Diagram'   },
+    { value: 'classDiagram',       label: 'Class'        },
+    { value: 'stateDiagram-v2',    label: 'State'        },
+    { value: 'mindmap',            label: 'Mind Map'     },
+    { value: 'gantt',              label: 'Gantt'        },
+];
+
+let _genPreviewSeq = 0;
+
+function DiagramGenerateModal({ onClose, onInsert }) {
+    const [prompt,      setPrompt]      = useState('');
+    const [diagramType, setDiagramType] = useState('flowchart TD');
+    const [code,        setCode]        = useState('');
+    const [svg,         setSvg]         = useState('');
+    const [status,      setStatus]      = useState('idle'); // idle | generating | done | error
+    const [errorMsg,    setErrorMsg]    = useState('');
+    const [downloading, setDownloading] = useState(null); // null | 'png' | 'jpg'
+    const previewId = useRef(`mmd-gen-${++_genPreviewSeq}`);
+    const inputRef  = useRef(null);
+
+    useEffect(() => { inputRef.current?.focus(); }, []);
+    useEffect(() => {
+        const h = (e) => { if (e.key === 'Escape') onClose(); };
+        document.addEventListener('keydown', h);
+        return () => document.removeEventListener('keydown', h);
+    }, [onClose]);
+
+    const generate = async () => {
+        if (!prompt.trim() || status === 'generating') return;
+        setStatus('generating');
+        setCode('');
+        setSvg('');
+        setErrorMsg('');
+        try {
+            const raw = await callDeepSeek(
+                `Generate a ${diagramType} Mermaid diagram for: ${prompt.trim()}`,
+`You are an expert Mermaid diagram generator.
+Output ONLY valid Mermaid diagram syntax. No markdown fences, no prose, no comments.
+The very first line must be the diagram type keyword (e.g. flowchart TD, sequenceDiagram, classDiagram, etc).
+Rules:
+- classDiagram: class names must be single identifiers (no spaces, no quotes). Use ClassName["Display Label"] for a readable label. NEVER use: class "Name" as Alias syntax.
+- flowchart: quote labels that contain special characters: A["Label with (parens)"]
+- Keep it concise and accurate.`
+            );
+            // Strip any markdown fences the model may have added
+            const cleaned = raw.replace(/^```[\w]*\n?/m, '').replace(/\n?```\s*$/m, '').trim();
+            setCode(cleaned);
+            // Render live preview using the same pipeline as the editor
+            document.getElementById(previewId.current)?.remove();
+            const m = await getMermaid();
+            const { svg: s } = await m.render(previewId.current, sanitizeMermaid(cleaned));
+            setSvg(s);
+            setStatus('done');
+        } catch (err) {
+            console.error('[DiagramGen]', err);
+            setErrorMsg(err.message || 'Generation failed — try rephrasing your description.');
+            setStatus('error');
+        }
+    };
+
+    const handleDownload = async (fmt) => {
+        if (!svg || downloading) return;
+        setDownloading(fmt);
+        try {
+            // Use a data: URL (not a blob URL) — data URLs are treated as same-origin
+            // so the canvas never gets tainted, even when the SVG has inline <style> blocks.
+            const encoded = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+
+            const img = new window.Image();
+            await new Promise((res, rej) => {
+                img.onload = res;
+                img.onerror = rej;
+                img.src = encoded;
+            });
+
+            const scale = 2; // 2× for crisp text
+            const w = img.naturalWidth  || 900;
+            const h = img.naturalHeight || 450;
+            const canvas = document.createElement('canvas');
+            canvas.width  = w * scale;
+            canvas.height = h * scale;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.scale(scale, scale);
+            ctx.drawImage(img, 0, 0, w, h);
+
+            const mime   = fmt === 'jpg' ? 'image/jpeg' : 'image/png';
+            const dataUrl = canvas.toDataURL(mime, fmt === 'jpg' ? 0.92 : undefined);
+
+            const slug = prompt.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40) || 'diagram';
+            const a = document.createElement('a');
+            a.href = dataUrl;
+            a.download = `${slug}.${fmt}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        } catch (err) {
+            console.error('[DiagramDownload]', err);
+        } finally {
+            setDownloading(null);
+        }
+    };
+
+    return createPortal(
+        <>
+            <div className="fixed inset-0 z-[99] bg-black/20 backdrop-blur-sm" onClick={onClose} />
+            <div
+                className="fixed z-[100] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[92%] md:w-[580px] bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden"
+                style={{ maxHeight: '88vh' }}
+                onClick={e => e.stopPropagation()}
+            >
+                {/* Header */}
+                <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 shrink-0">
+                    <div className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 rounded-xl bg-gradient-to-br from-primary to-indigo-500 flex items-center justify-center shadow-sm shrink-0">
+                            <span className="material-icons-round text-white text-[15px]">account_tree</span>
+                        </div>
+                        <div>
+                            <p className="font-semibold text-[13px] text-slate-800 leading-tight">Generate Diagram</p>
+                            <p className="text-[10px] text-slate-400">AI-powered Mermaid diagram</p>
+                        </div>
+                    </div>
+                    <button onClick={onClose} className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 transition-colors">
+                        <span className="material-icons-round text-[16px]">close</span>
+                    </button>
+                </div>
+
+                {/* Body */}
+                <div className="p-4 flex flex-col gap-3 overflow-y-auto flex-1 min-h-0">
+                    {/* Diagram type chips */}
+                    <div className="flex flex-wrap gap-1.5">
+                        {DIAGRAM_TYPES.map(t => (
+                            <button
+                                key={t.value}
+                                onClick={() => setDiagramType(t.value)}
+                                className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-colors ${
+                                    diagramType === t.value
+                                        ? 'bg-primary text-white shadow-sm'
+                                        : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                                }`}
+                            >
+                                {t.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Prompt + Generate */}
+                    <div className="flex gap-2">
+                        <input
+                            ref={inputRef}
+                            value={prompt}
+                            onChange={e => setPrompt(e.target.value)}
+                            onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); generate(); } }}
+                            placeholder="Describe your diagram — e.g. &ldquo;user login and signup flow&rdquo;"
+                            className="flex-1 px-3 py-2 text-[13px] text-slate-700 border border-slate-200 rounded-xl outline-none focus:border-primary/60 placeholder-slate-300 min-w-0"
+                        />
+                        <button
+                            onClick={generate}
+                            disabled={!prompt.trim() || status === 'generating'}
+                            className="shrink-0 px-4 py-2 rounded-xl bg-primary text-white text-[12px] font-semibold hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95 flex items-center gap-1.5"
+                        >
+                            {status === 'generating' ? (
+                                <>
+                                    <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin shrink-0" />
+                                    Generating
+                                </>
+                            ) : (
+                                <>
+                                    <span className="material-icons-round text-[14px]">auto_awesome</span>
+                                    {status === 'done' ? 'Regenerate' : 'Generate'}
+                                </>
+                            )}
+                        </button>
+                    </div>
+
+                    {/* Live preview */}
+                    {status === 'done' && svg && (
+                        <div className="rounded-xl border border-slate-200 overflow-hidden">
+                            <div className="px-3 py-1.5 bg-slate-50 border-b border-slate-100">
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Preview</span>
+                            </div>
+                            <div
+                                className="p-4 flex justify-center overflow-x-auto [&_svg]:max-w-full [&_svg]:h-auto"
+                                dangerouslySetInnerHTML={{ __html: svg }}
+                            />
+                        </div>
+                    )}
+
+                    {/* Error */}
+                    {status === 'error' && (
+                        <div className="flex items-start gap-2 bg-red-50 border border-red-100 rounded-xl px-3 py-2.5">
+                            <span className="material-icons-round text-red-400 text-[15px] mt-0.5 shrink-0">error_outline</span>
+                            <p className="text-[12px] text-red-600">{errorMsg}</p>
+                        </div>
+                    )}
+                </div>
+
+                {/* Footer */}
+                <div className="px-4 py-3 border-t border-slate-100 flex items-center justify-between gap-2 shrink-0">
+                    {/* Download buttons */}
+                    <div className="flex items-center gap-1.5">
+                        {['png', 'jpg'].map(fmt => (
+                            <button
+                                key={fmt}
+                                onClick={() => handleDownload(fmt)}
+                                disabled={status !== 'done' || !!downloading}
+                                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold text-slate-500 border border-slate-200 hover:border-slate-300 hover:text-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                title={`Download as ${fmt.toUpperCase()}`}
+                            >
+                                {downloading === fmt ? (
+                                    <span className="w-3 h-3 border-2 border-slate-300 border-t-slate-500 rounded-full animate-spin shrink-0" />
+                                ) : (
+                                    <span className="material-icons-round text-[13px]">download</span>
+                                )}
+                                {fmt.toUpperCase()}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Cancel + Insert */}
+                    <div className="flex items-center gap-2">
+                        <button onClick={onClose} className="px-3.5 py-1.5 rounded-lg text-[12px] font-medium text-slate-500 hover:bg-slate-100 transition-colors">
+                            Cancel
+                        </button>
+                        <button
+                            onClick={() => { onInsert(code); onClose(); }}
+                            disabled={status !== 'done' || !code}
+                            className="px-4 py-1.5 rounded-lg bg-primary text-white text-[12px] font-semibold hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95"
+                        >
+                            Insert diagram
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </>,
+        document.body
     );
 }
 
@@ -343,20 +633,22 @@ function MermaidNodeView({ node, updateAttributes, selected }) {
     useEffect(() => {
         const code = node.attrs.code?.trim();
         if (!code) { setSvg(''); return; }
+        const sanitized = sanitizeMermaid(code);
         let cancelled = false;
         document.getElementById(svgId.current)?.remove();
         getMermaid()
-            .then(m => m.render(svgId.current, sanitizeMermaid(code)))
+            .then(m => m.render(svgId.current, sanitized))
             .then(({ svg: s }) => { if (!cancelled) { setSvg(s); setErrMsg(''); _mermaidSvgRegistry.set(code, s); } })
             .catch(err => {
-                console.error('[Mermaid]', err, '\nCode:\n', code);
+                console.error('[Mermaid]', err, '\nCode:\n', sanitized);
                 if (!cancelled) { setSvg(''); setErrMsg('Diagram syntax error — click Edit to fix'); }
             });
         return () => {
             cancelled = true;
             document.getElementById(svgId.current)?.remove();
         };
-    }, [node.attrs.code]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [sanitizeMermaid(node.attrs.code)]);
 
     const onHandleMouseDown = (e) => {
         e.preventDefault();
@@ -747,6 +1039,7 @@ export default function DocumentEditor({ doc, onExport, onCoverSaved, onTocStyle
     const [imageAiOpen,              setImageAiOpen]              = useState(false);
     const [isUploading,              setIsUploading]              = useState(false);
     const [actionsMenuOpen,          setActionsMenuOpen]          = useState(false);
+    const [diagramGenOpen,           setDiagramGenOpen]           = useState(false);
 
     // ── Save state ────────────────────────────────────────────────────────────
     const [saveStatus,  setSaveStatus]  = useState('idle');
@@ -931,6 +1224,15 @@ export default function DocumentEditor({ doc, onExport, onCoverSaved, onTocStyle
                     onInsert={(url) => { setImageAiOpen(false); editor?.chain().focus().setImage({ src: url }).run(); }}
                 />
             )}
+            {diagramGenOpen && (
+                <DiagramGenerateModal
+                    onClose={() => { setDiagramGenOpen(false); editor?.commands.focus(); }}
+                    onInsert={(code) => {
+                        setDiagramGenOpen(false);
+                        editor?.chain().focus().insertContent({ type: 'mermaidBlock', attrs: { code } }).run();
+                    }}
+                />
+            )}
 
             <div className="flex items-start gap-0">
                 <div className="flex-1 min-w-0">
@@ -1028,14 +1330,14 @@ export default function DocumentEditor({ doc, onExport, onCoverSaved, onTocStyle
                                         </button>
                                         <div className="my-1 border-t border-slate-100" />
                                         <button
-                                            onClick={() => { setActionsMenuOpen(false); collectMermaidDiagrams().then(d => onExport('pdf', exportFormatting, d)); }}
+                                            onClick={() => { setActionsMenuOpen(false); const codes = []; editor?.state.doc.descendants(n => { if (n.type.name === 'mermaidBlock' && n.attrs.code) codes.push(n.attrs.code); }); collectMermaidDiagrams(codes, { includePng: true }).then(d => onExport('pdf', exportFormatting, d)); }}
                                             className="w-full flex items-center gap-2.5 px-3.5 py-2 text-[12px] text-slate-700 hover:bg-slate-50 transition-colors text-left"
                                         >
                                             <span className="material-icons-round text-[15px] text-slate-400">picture_as_pdf</span>
                                             Export as PDF
                                         </button>
                                         <button
-                                            onClick={() => { setActionsMenuOpen(false); collectMermaidDiagrams().then(d => onExport('docx', exportFormatting, d)); }}
+                                            onClick={() => { setActionsMenuOpen(false); const codes = []; editor?.state.doc.descendants(n => { if (n.type.name === 'mermaidBlock' && n.attrs.code) codes.push(n.attrs.code); }); collectMermaidDiagrams(codes, { includePng: true, includeFresh: false }).then(d => onExport('docx', exportFormatting, d)); }}
                                             className="w-full flex items-center gap-2.5 px-3.5 py-2 text-[12px] text-slate-700 hover:bg-slate-50 transition-colors text-left"
                                         >
                                             <span className="material-icons-round text-[15px] text-slate-400">description</span>
@@ -1138,13 +1440,7 @@ export default function DocumentEditor({ doc, onExport, onCoverSaved, onTocStyle
                                         <MenuItem icon="code"                     active={editor?.isActive('code')}       onSelect={() => { editor?.chain().focus().toggleCode().run(); close(); }}>Inline code</MenuItem>
                                         <MenuItem icon="horizontal_rule" onSelect={() => { editor?.chain().focus().setHorizontalRule().run(); close(); }}>Divider</MenuItem>
                                         <MenuItem separator />
-                                        <MenuItem icon="account_tree" onSelect={() => {
-                                            editor?.chain().focus().insertContent({
-                                                type: 'mermaidBlock',
-                                                attrs: { code: 'flowchart TD\n    A[Start] --> B{Decision}\n    B -->|Yes| C[Result A]\n    B -->|No| D[Result B]' },
-                                            }).run();
-                                            close();
-                                        }}>Diagram (Mermaid)</MenuItem>
+                                        <MenuItem icon="account_tree" onSelect={() => { setDiagramGenOpen(true); close(); }}>Generate diagram</MenuItem>
                                     </>
                                 )}
                             </DropdownMenu>

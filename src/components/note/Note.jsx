@@ -548,7 +548,7 @@ export const Note = () => {
         const canvases = [];
         for (const el of refs) {
             // Temporarily make the page's inner contentEditable visible at full scroll height
-            const canvas = await htmlToImage.toCanvas(el, { pixelRatio: 2, useCORS: true });
+            const canvas = await htmlToImage.toCanvas(el, { pixelRatio: 2, useCORS: true, skipFonts: true });
             applyWatermark(canvas);
             canvases.push(canvas);
         }

@@ -346,7 +346,7 @@ export const Paper = () => {
     const applyWatermark = (canvas) => {
         if (isPaid) return;
         const ctx = canvas.getContext('2d');
-        const ratio = 2;
+        const ratio = canvas.width / 816; // derive from actual canvas size
         const smallSize = 11 * ratio;
         const largeSize = 16 * ratio;
         const lineGap = 6 * ratio;
@@ -368,9 +368,72 @@ export const Paper = () => {
     };
 
     const capturePages = async () => {
-        const refs = pageRefsRef.current.filter(Boolean); const canvases = [];
+        const refs = pageRefsRef.current.filter(Boolean);
+        const canvases = [];
+        const TRANSPARENT = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+        const PAGE_W = 816, PAGE_H = 1056;
+
         for (const el of refs) {
-            const c = await htmlToImage.toCanvas(el, { pixelRatio:2,useCORS:true });
+            // el is the scaled wrapper (may be smaller than 816×1056 on narrow screens).
+            // Its first child is the full-size (816×1056) transform container with CSS
+            // scale applied. Clone it off-screen without the transform so we always
+            // capture at native resolution regardless of the user's screen width.
+            const inner = el.firstElementChild;
+            const clone = (inner || el).cloneNode(true);
+            if (inner) {
+                clone.style.transform = 'none';
+                clone.style.transformOrigin = 'top left';
+            }
+
+            // cloneNode() doesn't copy canvas pixel data — copy drawing strokes manually.
+            const origCanvases = (inner || el).querySelectorAll('canvas');
+            clone.querySelectorAll('canvas').forEach((cc, i) => {
+                if (origCanvases[i]) {
+                    try { cc.getContext('2d').drawImage(origCanvases[i], 0, 0); } catch { /* ignore */ }
+                }
+            });
+
+            // Remove the editor ring/shadow so the export has a clean white page edge.
+            clone.querySelectorAll('[class*="ring-"]').forEach(d => { d.style.boxShadow = 'none'; });
+
+            const offscreen = document.createElement('div');
+            offscreen.style.cssText =
+                `position:fixed;left:-9999px;top:-9999px;pointer-events:none;` +
+                `width:${PAGE_W}px;height:${PAGE_H}px;overflow:hidden;`;
+            offscreen.appendChild(clone);
+            document.body.appendChild(offscreen);
+
+            // Pre-inline external images as data URIs — avoids CORS crashes for
+            // expired or restricted URLs (e.g. Pixabay CDN links returning 400).
+            await Promise.all(
+                Array.from(clone.querySelectorAll('img[src]')).map(async (img) => {
+                    const src = img.getAttribute('src');
+                    if (!src || src.startsWith('data:') || src.startsWith('blob:')) return;
+                    try {
+                        const res = await fetch(src, { cache: 'force-cache' });
+                        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                        const blob = await res.blob();
+                        const dataUrl = await new Promise((ok, fail) => {
+                            const r = new FileReader();
+                            r.onload = () => ok(r.result);
+                            r.onerror = fail;
+                            r.readAsDataURL(blob);
+                        });
+                        img.src = dataUrl;
+                    } catch {
+                        img.src = TRANSPARENT;
+                    }
+                })
+            );
+
+            const c = await htmlToImage.toCanvas(clone, {
+                pixelRatio: 3,
+                skipFonts: true,
+                width: PAGE_W,
+                height: PAGE_H,
+            });
+
+            document.body.removeChild(offscreen);
             applyWatermark(c);
             canvases.push(c);
         }
@@ -381,11 +444,13 @@ export const Paper = () => {
         try {
             await forceFlush();
             const canvases = await capturePages();
-            const W = 816, H = 1056, M = 40;
+            const W = 816, H = 1056;
             const pdf = new jsPDF({ orientation:'portrait',unit:'px',format:[W,H] });
             for (let i=0;i<canvases.length;i++) {
                 if (i>0) pdf.addPage();
-                pdf.addImage(canvases[i].toDataURL('image/png'),'PNG',M,0,W-M*2,H);
+                // Embed the full 816×1056 canvas filling the page — the PaperPage
+                // already has internal padding so no extra margin is needed here.
+                pdf.addImage(canvases[i].toDataURL('image/png'),'PNG',0,0,W,H);
             }
             pdf.save(`${slug()}.pdf`);
         } catch (err) { console.error('PDF export failed',err); }

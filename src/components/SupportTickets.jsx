@@ -157,11 +157,52 @@ export const TicketList = ({ tickets, loading }) => {
     );
 };
 
+const TICKETS_PER_PAGE = 8;
+
+const Pagination = ({ currentPage, totalPages, onPageChange }) => {
+    if (totalPages <= 1) return null;
+
+    const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+
+    return (
+        <div className="flex items-center justify-center space-x-1 mt-6">
+            <button
+                onClick={() => onPageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="p-1 rounded text-slate-400 hover:text-primary hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            >
+                <span className="material-symbols-outlined text-[18px]">chevron_left</span>
+            </button>
+            {pages.map(page => (
+                <button
+                    key={page}
+                    onClick={() => onPageChange(page)}
+                    className={`w-7 h-7 text-xs rounded transition-colors ${
+                        page === currentPage
+                            ? 'bg-primary text-white font-medium'
+                            : 'text-slate-500 hover:text-primary hover:bg-slate-50'
+                    }`}
+                >
+                    {page}
+                </button>
+            ))}
+            <button
+                onClick={() => onPageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="p-1 rounded text-slate-400 hover:text-primary hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            >
+                <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+            </button>
+        </div>
+    );
+};
+
 export const SupportArchiveContent = ({ activeTab, onTabChange }) => {
     const { isAdmin } = useAuth();
     const [tickets, setTickets] = useState([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
 
     const fetchTickets = useCallback(async (showSpinner = false) => {
         if (showSpinner) setRefreshing(true);
@@ -188,6 +229,11 @@ export const SupportArchiveContent = ({ activeTab, onTabChange }) => {
         }
     }, [fetchTickets]);
 
+    // Reset to page 1 when tab changes
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [activeTab]);
+
     // Admins: prepend new tickets arriving in real time
     useAdminTicketsChannel(isAdmin ? (ticket) => {
         setTickets(prev => {
@@ -201,6 +247,12 @@ export const SupportArchiveContent = ({ activeTab, onTabChange }) => {
     const activeTickets = tickets.filter(t => t.status !== 'closed');
     const resolvedTickets = tickets.filter(t => t.status === 'closed');
     const displayTickets = activeTab === 'active' ? activeTickets : resolvedTickets;
+
+    const totalPages = Math.ceil(displayTickets.length / TICKETS_PER_PAGE);
+    const paginatedTickets = displayTickets.slice(
+        (currentPage - 1) * TICKETS_PER_PAGE,
+        currentPage * TICKETS_PER_PAGE
+    );
 
     return (
         <div className="relative w-full max-w-5xl">
@@ -233,7 +285,8 @@ export const SupportArchiveContent = ({ activeTab, onTabChange }) => {
                     </button>
                 </div>
 
-                <TicketList tickets={displayTickets} loading={loading} />
+                <TicketList tickets={paginatedTickets} loading={loading} />
+                <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
             </div>
 
             <div className="absolute -bottom-8 right-0 rotate-1">

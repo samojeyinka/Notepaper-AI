@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { scholarService } from '../../api/scholarService';
 import DocumentEditor from './DocumentEditor';
+import Toast from '../globals/Toast';
 
 // ── CSS injected once for all scholar components ──────────────────────────────
 const SCHOLAR_CSS = `
@@ -206,8 +207,9 @@ export default function ScholarDocument() {
     const [doc,       setDoc]       = useState(null);
     const [loading,   setLoading]   = useState(true);
     const [error,     setError]     = useState('');
-    const [exportBar, setExportBar] = useState(null); // null = hidden, 0-100 = progress
-    const pollingRef    = useRef(null);
+    const [exportBar,   setExportBar]   = useState(null); // null = hidden, 0-100 = progress
+    const [exportError, setExportError] = useState('');
+    const pollingRef     = useRef(null);
     const exportBarTimer = useRef(null);
 
     const isActive = (d) => d && ACTIVE_STATUSES.has(d.status);
@@ -249,6 +251,8 @@ export default function ScholarDocument() {
 
         try {
             const body = { format: fmt, ...formatting };
+            // Always send rendered_diagrams so the backend can substitute diagram images.
+            // PDF gets full SVG+PNG; DOCX gets SVG-only (PNG omitted to avoid 500 on large payloads).
             if (diagrams.length > 0) body.rendered_diagrams = diagrams;
             const res = await fetch(scholarService.exportUrl(id), {
                 method: 'POST',
@@ -256,7 +260,10 @@ export default function ScholarDocument() {
                 headers: { 'Content-Type': 'application/json', Accept: 'application/octet-stream' },
                 body: JSON.stringify(body),
             });
-            if (!res.ok) throw new Error('Export failed');
+            if (!res.ok) {
+                const msg = await res.text().catch(() => '');
+                throw new Error(msg || `Export failed (${res.status})`);
+            }
             const blob = await res.blob();
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -269,7 +276,8 @@ export default function ScholarDocument() {
             setExportBar(100);
         } catch (err) {
             console.error('[Export]', err);
-            setExportBar(100);
+            setExportError(`Export failed — ${err.message || 'please try again.'}`);
+            setExportBar(null);
         } finally {
             exportBarTimer.current = setTimeout(() => setExportBar(null), 400);
         }
@@ -307,6 +315,12 @@ export default function ScholarDocument() {
     return (
         <>
             <style>{SCHOLAR_CSS}</style>
+
+            <Toast
+                message={exportError}
+                type="error"
+                onClose={() => setExportError('')}
+            />
 
             {/* Export progress bar — fixed top of browser */}
             {exportBar !== null && (
