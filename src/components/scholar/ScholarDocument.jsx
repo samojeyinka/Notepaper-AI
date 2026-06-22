@@ -203,10 +203,12 @@ function FailedPanel({ doc, onRetryPage, onRetryOutline }) {
 export default function ScholarDocument() {
     const { id }     = useParams();
     const navigate   = useNavigate();
-    const [doc,     setDoc]     = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error,   setError]   = useState('');
-    const pollingRef = useRef(null);
+    const [doc,       setDoc]       = useState(null);
+    const [loading,   setLoading]   = useState(true);
+    const [error,     setError]     = useState('');
+    const [exportBar, setExportBar] = useState(null); // null = hidden, 0-100 = progress
+    const pollingRef    = useRef(null);
+    const exportBarTimer = useRef(null);
 
     const isActive = (d) => d && ACTIVE_STATUSES.has(d.status);
 
@@ -240,6 +242,11 @@ export default function ScholarDocument() {
     }, [id]);
 
     const handleExport = async (fmt, formatting = {}, diagrams = []) => {
+        clearTimeout(exportBarTimer.current);
+        setExportBar(0);
+        // Fake-progress: animate to 85% while waiting for the server
+        requestAnimationFrame(() => requestAnimationFrame(() => setExportBar(85)));
+
         try {
             const body = { format: fmt, ...formatting };
             if (diagrams.length > 0) body.rendered_diagrams = diagrams;
@@ -259,8 +266,12 @@ export default function ScholarDocument() {
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
+            setExportBar(100);
         } catch (err) {
             console.error('[Export]', err);
+            setExportBar(100);
+        } finally {
+            exportBarTimer.current = setTimeout(() => setExportBar(null), 400);
         }
     };
 
@@ -296,6 +307,22 @@ export default function ScholarDocument() {
     return (
         <>
             <style>{SCHOLAR_CSS}</style>
+
+            {/* Export progress bar — fixed top of browser */}
+            {exportBar !== null && (
+                <div className="fixed top-0 left-0 right-0 h-[3px] bg-slate-100 z-[200] overflow-hidden">
+                    <div
+                        className="h-full bg-primary rounded-r-full"
+                        style={{
+                            width: `${exportBar}%`,
+                            transition: exportBar >= 100
+                                ? 'width 0.15s ease-in'
+                                : 'width 1.8s cubic-bezier(0.05, 0.5, 0.25, 1)',
+                        }}
+                    />
+                </div>
+            )}
+
             <main className="flex-1 h-full overflow-y-auto bg-white lg:ml-64 p-4 lg:p-10 pt-20 lg:pt-8" style={{ scrollPaddingTop: '96px' }}>
                 <div className="max-w-4xl mx-auto">
 

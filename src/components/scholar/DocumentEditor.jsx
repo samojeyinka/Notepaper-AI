@@ -746,11 +746,13 @@ export default function DocumentEditor({ doc, onExport, onCoverSaved, onTocStyle
     const [shakespeareOpen,          setShakespeareOpen]          = useState(false);
     const [imageAiOpen,              setImageAiOpen]              = useState(false);
     const [isUploading,              setIsUploading]              = useState(false);
+    const [actionsMenuOpen,          setActionsMenuOpen]          = useState(false);
 
     // ── Save state ────────────────────────────────────────────────────────────
     const [saveStatus,  setSaveStatus]  = useState('idle');
     const autoSaveTimer = useRef(null);
     const fileInputRef  = useRef(null);
+    const actionsMenuRef = useRef(null);
 
     // ── Initial content ───────────────────────────────────────────────────────
     const initialContent = resolveImagesForEditor(
@@ -781,6 +783,13 @@ export default function DocumentEditor({ doc, onExport, onCoverSaved, onTocStyle
     }, [doSave]);
 
     useEffect(() => () => clearTimeout(autoSaveTimer.current), []);
+
+    useEffect(() => {
+        if (!actionsMenuOpen) return;
+        const h = (e) => { if (!actionsMenuRef.current?.contains(e.target)) setActionsMenuOpen(false); };
+        document.addEventListener('mousedown', h);
+        return () => document.removeEventListener('mousedown', h);
+    }, [actionsMenuOpen]);
 
     // ── Editor ────────────────────────────────────────────────────────────────
     const editor = useEditor({
@@ -998,20 +1007,43 @@ export default function DocumentEditor({ doc, onExport, onCoverSaved, onTocStyle
                                 <span className="material-icons-round text-[14px]">auto_stories</span>
                                 <span className="hidden md:inline">Cover</span>
                             </button>
-                            <button
-                                onClick={() => setShowPresentationsSidebar(v => !v)}
-                                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[12px] font-medium transition-all ${showPresentationsSidebar ? 'bg-primary text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
-                            >
-                                <span className="material-icons-round text-[14px]">slideshow</span>
-                                <span className="hidden md:inline">Slides</span>
-                            </button>
-                            {['pdf', 'docx'].map(fmt => (
-                                <button key={fmt} onClick={() => collectMermaidDiagrams().then(diagrams => onExport(fmt, exportFormatting, diagrams))}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-white text-[12px] font-semibold hover:bg-primary/90 transition-all active:scale-95">
-                                    <span className="material-icons-round text-[14px]">download</span>
-                                    {fmt.toUpperCase()}
+
+                            {/* Kebab menu — slides + exports */}
+                            <div className="relative" ref={actionsMenuRef}>
+                                <button
+                                    onClick={() => setActionsMenuOpen(o => !o)}
+                                    className={`flex items-center justify-center w-8 h-8 rounded-lg transition-colors ${actionsMenuOpen ? 'bg-slate-100 text-slate-800' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'}`}
+                                    title="More options"
+                                >
+                                    <span className="material-icons-round text-[18px]">more_vert</span>
                                 </button>
-                            ))}
+                                {actionsMenuOpen && (
+                                    <div className="absolute right-0 top-full mt-1.5 bg-white border border-slate-200 rounded-xl shadow-lg z-50 min-w-[188px] py-1.5 overflow-hidden">
+                                        <button
+                                            onClick={() => { setActionsMenuOpen(false); setShowPresentationsSidebar(v => !v); }}
+                                            className="w-full flex items-center gap-2.5 px-3.5 py-2 text-[12px] text-slate-700 hover:bg-slate-50 transition-colors text-left"
+                                        >
+                                            <span className="material-icons-round text-[15px] text-slate-400">slideshow</span>
+                                            Generate slides
+                                        </button>
+                                        <div className="my-1 border-t border-slate-100" />
+                                        <button
+                                            onClick={() => { setActionsMenuOpen(false); collectMermaidDiagrams().then(d => onExport('pdf', exportFormatting, d)); }}
+                                            className="w-full flex items-center gap-2.5 px-3.5 py-2 text-[12px] text-slate-700 hover:bg-slate-50 transition-colors text-left"
+                                        >
+                                            <span className="material-icons-round text-[15px] text-slate-400">picture_as_pdf</span>
+                                            Export as PDF
+                                        </button>
+                                        <button
+                                            onClick={() => { setActionsMenuOpen(false); collectMermaidDiagrams().then(d => onExport('docx', exportFormatting, d)); }}
+                                            className="w-full flex items-center gap-2.5 px-3.5 py-2 text-[12px] text-slate-700 hover:bg-slate-50 transition-colors text-left"
+                                        >
+                                            <span className="material-icons-round text-[15px] text-slate-400">description</span>
+                                            Export as DOCX
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
 
@@ -1028,10 +1060,10 @@ export default function DocumentEditor({ doc, onExport, onCoverSaved, onTocStyle
                     </div>
 
                     {/* ── Editor ───────────────────────────────────────────── */}
-                    <div className="mt-8 rounded-xl shadow-sm border border-primary/20 bg-white overflow-hidden">
+                    <div className="mt-8 rounded-xl shadow-sm border border-primary/20 bg-white overflow-clip">
 
                         {/* Toolbar */}
-                        <div className="flex flex-wrap items-center gap-0.5 px-2 py-1.5 bg-slate-50 border-b border-slate-200 sticky top-[4px] z-[9]">
+                        <div className="flex flex-wrap items-center gap-0.5 px-2 py-1.5 bg-slate-50 border-b border-slate-200 sticky top-[82px] md:top-[50px] z-[9]">
 
                             <ToolBtn onClick={() => editor?.chain().focus().undo().run()} disabled={!editor?.can().undo()} title="Undo">
                                 <span className="material-icons-round text-[15px]">undo</span>
