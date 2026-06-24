@@ -28,7 +28,7 @@ export default function ContactHero() {
         <span className="text-xs uppercase tracking-widest font-bold text-slate-400 block mb-2">
           Hello at
         </span>
-        <p className="font-handwritten text-xl text-primary">hello@notepaper.ai</p>
+        <p className="font-handwritten text-xl text-primary">hello@Notepaper-ai</p>
       </div>
 
       {/* Social Card - Right Top */}

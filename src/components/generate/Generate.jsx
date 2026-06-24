@@ -60,7 +60,7 @@ function markdownToHtml(md) {
 }
 
 
-const SYSTEM_INSTRUCTION = `You are Schola — an expert study-note generator inside a note-taking app called Notepaper.ai.
+const SYSTEM_INSTRUCTION = `You are Schola — an expert study-note generator inside a note-taking app called Notepaper-ai.
 Your job is to produce thorough, well-structured, deeply informative content on any topic the student gives you.
 
 Rules:
@@ -252,7 +252,7 @@ export default function Generate() {
     const isIdle      = status === "idle";
 
     return (
-        <div className="flex-1 flex min-h-screen bg-slate-50">
+        <div className="flex-1 flex min-h-screen bg-surface-light">
             <main className="flex-1 flex flex-col lg:ml-64 min-h-screen">
 
                 {/* ── Top bar ──────────────────────────────────────────────── */}

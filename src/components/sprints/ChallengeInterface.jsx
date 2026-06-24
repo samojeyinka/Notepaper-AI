@@ -388,13 +388,13 @@ const ConceptView = ({ content }) => {
                     <span className="material-icons-round text-[14px]">lightbulb</span>
                     Key Points
                 </p>
-                <ul className="space-y-3">
+                <ul className="divide-y divide-slate-50">
                     {(content?.key_points ?? []).map((pt, i) => (
-                        <li key={i} className="flex items-start gap-3">
-                            <div className="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center shrink-0 mt-0.5">
-                                <span className="material-icons-round text-amber-600 text-[14px]">lightbulb</span>
-                            </div>
-                            <p className="text-[13px] text-slate-700 leading-snug">{pt}</p>
+                        <li key={i} className="flex items-start gap-4 py-3 first:pt-0 last:pb-0">
+                            <span className="text-[11px] font-bold text-slate-300 tabular-nums shrink-0 mt-0.5 w-5 text-right">
+                                {String(i + 1).padStart(2, '0')}
+                            </span>
+                            <p className="text-[13px] text-slate-700 leading-relaxed">{pt}</p>
                         </li>
                     ))}
                 </ul>
@@ -404,21 +404,16 @@ const ConceptView = ({ content }) => {
 };
 
 // ── Quick Points ──────────────────────────────────────────────────────────────
-const POINT_ICONS   = ['bolt', 'gps_fixed', 'key', 'diamond', 'rocket_launch', 'auto_awesome', 'star', 'local_fire_department'];
-const POINT_COLORS  = ['text-yellow-500', 'text-primary', 'text-slate-500', 'text-cyan-500', 'text-indigo-500', 'text-violet-500', 'text-amber-500', 'text-orange-500'];
-
 const QuickpointsView = ({ content }) => {
     useEffect(() => { playSound('chime'); }, []);
     return (
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 space-y-3">
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 divide-y divide-slate-50">
             {(content?.points ?? []).map((pt, i) => (
-                <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-blue-50 hover:bg-blue-100/60 transition-colors">
-                    <div className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center shrink-0 mt-0.5">
-                        <span className={`material-icons-round text-[15px] ${POINT_COLORS[i % POINT_COLORS.length]}`}>
-                            {POINT_ICONS[i % POINT_ICONS.length]}
-                        </span>
-                    </div>
-                    <p className="text-[13px] text-slate-700 leading-snug">{pt}</p>
+                <div key={i} className="flex items-start gap-4 py-3.5 first:pt-0 last:pb-0">
+                    <span className="text-[11px] font-bold text-slate-300 tabular-nums shrink-0 mt-0.5 w-5 text-right">
+                        {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <p className="text-[13px] text-slate-700 leading-relaxed">{pt}</p>
                 </div>
             ))}
         </div>
@@ -537,15 +532,26 @@ const ChallengeInterface = () => {
                     </div>
                     <h1 className="text-[14px] md:text-[15px] font-medium md:font-semibold text-slate-900 truncate">{challenge.title}</h1>
                 </div>
-                {alreadyDone && (
-                    <span className="text-emerald-600 flex items-center gap-1 text-[11px] font-semibold shrink-0">
-                        <span className="material-icons-round text-[16px]">check_circle</span>
+                {alreadyDone ? (
+                    <span className="text-emerald-600 flex items-center gap-1.5 text-[11px] font-semibold shrink-0">
+                        <span className="material-icons-round text-[15px]">check_circle</span>
                         Done
                     </span>
+                ) : challenge.content && (
+                    <button
+                        onClick={handleComplete}
+                        disabled={completing}
+                        className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 text-white text-[11px] md:text-[12px] font-semibold rounded-lg hover:bg-slate-700 disabled:opacity-50 transition-all active:scale-95"
+                    >
+                        {completing
+                            ? <Loader size="xs" />
+                            : <><span className="material-icons-round text-[13px]">check</span> Mark Complete</>
+                        }
+                    </button>
                 )}
             </div>
 
-            <div className="max-w-2xl mx-auto px-4 md:px-6 py-8 pb-36">
+            <div className="max-w-2xl mx-auto px-4 md:px-6 py-8 pb-12">
                 <div className="mb-6">
                     <p className="text-[13px] text-slate-500 leading-relaxed">{challenge.description}</p>
                 </div>
@@ -564,30 +570,21 @@ const ChallengeInterface = () => {
                 }
             </div>
 
-            {!alreadyDone && challenge.content && (
-                <div className="fixed bottom-0 left-0 lg:left-64 right-0 z-50 px-6 py-4 bg-white/95 backdrop-blur border-t border-slate-100">
-                    <button onClick={handleComplete} disabled={completing}
-                        className="w-full py-2 bg-primary text-white rounded-lg font-medium text-[14px] md:text-[15px] hover:bg-primary/90 disabled:opacity-50 transition-all active:scale-[0.98] shadow-md shadow-primary/20 flex items-center justify-center gap-2">
-                        {completing
-                            ? <><Loader size="sm" /></>
-                            : <><span className="material-icons-round text-[14px] md:text-[16px]">check_circle</span> Mark as Complete</>
-                        }
-                    </button>
-                </div>
-            )}
-
             {completed && (
-                <div className="fixed bottom-0 left-0 lg:left-64 right-0 z-50 px-4 py-2.5 bg-emerald-600 border-t border-emerald-500">
-                    <p className="text-white font-semibold text-[15px] text-center flex items-center justify-center gap-2 mb-3">
-                        <span className="material-icons-round text-[20px]">celebration</span>
-                        Challenge Complete!
-                        <span className="material-icons-round text-[20px]">emoji_events</span>
-                    </p>
-                    <button onClick={() => navigate(`/lockedin/sprints/${sprintId}`)}
-                        className="w-full py-2 bg-white text-emerald-700 rounded-lg font-semibold text-[15px] hover:bg-emerald-50 transition-all active:scale-[0.98] shadow-md flex items-center justify-center gap-2">
-                        <span className="material-icons-round text-[18px]">arrow_back</span>
-                        Back to Sprint Roadmap
-                    </button>
+                <div className="max-w-2xl mx-auto px-4 md:px-6 pb-12">
+                    <div className="flex flex-col items-center gap-3 py-8 border-t border-slate-100 text-center">
+                        <div className="flex items-center gap-2 text-emerald-600">
+                            <span className="material-icons-round text-[18px]">check_circle</span>
+                            <p className="text-[13px] font-semibold">Challenge marked as complete</p>
+                        </div>
+                        <button
+                            onClick={() => navigate(`/lockedin/sprints/${sprintId}`)}
+                            className="text-[12px] text-slate-400 hover:text-slate-700 font-medium flex items-center gap-1.5 transition-colors"
+                        >
+                            <span className="material-icons-round text-[15px]">arrow_back</span>
+                            Back to Sprint
+                        </button>
+                    </div>
                 </div>
             )}
 

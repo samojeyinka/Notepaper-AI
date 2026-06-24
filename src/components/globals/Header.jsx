@@ -22,7 +22,7 @@ export default function Header() {
           <Link to="/" className="flex items-center gap-2">
           <img src={logo} alt="Notepaper AI" className="w-10"/>
             <span className="text-xl font-bold tracking-tight font-serif-elegant hidden sm:block text-ink-black">
-              Notepaper<span className="text-primary">.ai</span>
+              Notepaper<span className="text-primary">-ai</span>
             </span>
           
           </Link>

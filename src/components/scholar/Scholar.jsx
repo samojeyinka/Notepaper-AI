@@ -115,7 +115,7 @@ function DocCard({ doc, onOpen, onDelete }) {
 
     return (
         <div
-            className="bg-white rounded-xl border border-slate-100 p-4 flex flex-col gap-3 cursor-pointer hover:border-slate-200 transition-colors"
+            className="bg-surface-light rounded-xl border border-slate-100 p-4 flex flex-col gap-3 cursor-pointer hover:border-slate-200 transition-colors"
             onClick={onOpen}
         >
             {/* Top row: badge + menu */}
@@ -299,7 +299,7 @@ export default function Scholar() {
                 onCancel={() => setDeleteDoc(null)}
             />
         )}
-        <main className="flex-1 h-full overflow-y-auto bg-slate-50 lg:ml-64 px-4 lg:px-8 pt-20 lg:pt-8 pb-12">
+        <main className="flex-1 h-full overflow-y-auto bg-surface-light lg:ml-64 px-4 lg:px-8 pt-20 lg:pt-8 pb-12">
             <div className="max-w-6xl mx-auto">
 
                 {/* ── Header ─────────────────────────────────────────── */}

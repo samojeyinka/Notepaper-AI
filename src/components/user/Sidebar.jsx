@@ -27,7 +27,7 @@ export const Sidebar = ({ activePage }) => {
         <Link to="/" className="flex items-center gap-2">
           <img src={logo} alt="Notepaper AI" className="w-8" />
           <span className="text-lg font-bold tracking-tight font-serif-elegant text-ink-black">
-            Notepaper<span className="text-primary">.ai</span>
+            Notepaper<span className="text-primary">-ai</span>
           </span>
         </Link>
 
@@ -60,7 +60,7 @@ export const Sidebar = ({ activePage }) => {
           <Link to="/" className="flex items-center gap-2">
             <img src={logo} alt="Notepaper AI" className="w-10" />
             <span className="text-xl font-bold tracking-tight font-serif-elegant text-ink-black">
-              Notepaper<span className="text-primary">.ai</span>
+              Notepaper<span className="text-primary">-ai</span>
             </span>
           </Link>
         </div>

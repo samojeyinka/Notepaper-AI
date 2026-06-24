@@ -24,9 +24,9 @@ export default function Footer() {
   ]
 
  const socialLinks = [
-    { icon: <FiGithub/>, href: 'https://github.com/samojeyinka'},
-    { icon: <FiTwitter/>, href: 'https://x.com/notepaperai'},
-    { icon: <FiFacebook/>, href: 'https://facebook.com/notepaperai'},
+    { icon: <FiGithub/>, href: 'https://github.com/samojeyinka/notepaper-ai'},
+    { icon: <FiTwitter/>, href: 'https://x.com/notepaper-ai'},
+    { icon: <FiFacebook/>, href: 'https://facebook.com/notepaper-ai'},
  ]
 
   return (
@@ -38,7 +38,7 @@ export default function Footer() {
              <img src={logo} alt="Notepaper AI" className="w-6 md:w-10"/>
               
               <span className="text-xl md:text-2xl font-semibold md:font-bold font-serif-elegant">
-                Notepaper<span className="text-primary">.ai</span>
+                Notepaper<span className="text-primary">-ai</span>
               </span>
             </Link>
             <p className="text-slate-400 max-w-sm mb-10 leading-relaxed text-[12px] md:text-[15px]">
@@ -47,7 +47,7 @@ export default function Footer() {
             <div className="flex gap-6">
 
               {socialLinks.map((link, index) => (
-              <Link to={`/${link.href}`} key={index} target='_blank' className="text-slate-400 hover:text-white transition-colors" href="#">
+              <Link to={`${link.href}`} key={index} target='_blank' className="text-slate-400 hover:text-white transition-colors" href="#">
                 <span className="material-symbols-outlined">
                   {link.icon}
                 </span>

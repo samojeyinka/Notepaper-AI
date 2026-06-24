@@ -75,7 +75,7 @@ const LETTERS = ['A', 'B', 'C', 'D'];
 const Header = ({ title }) => (
     <header className="w-full flex items-center justify-between px-5 py-3 bg-white border-b border-slate-100 shrink-0">
         <Link to="/" className="flex items-center gap-2">
-            <img src={logo} alt="Notepaper.ai" className="w-7" />
+            <img src={logo} alt="Notepaper-ai" className="w-7" />
             <span className="text-base font-semibold text-slate-800 tracking-tight">
                 Notepaper<span className="text-primary">.ai</span>
             </span>
@@ -153,7 +153,7 @@ const ScoreScreen = ({ score, total, quiz, onRestart }) => {
 
                     <p className="text-[11px] text-slate-400">
                         Powered by{' '}
-                        <Link to="/" className="text-primary hover:underline font-medium">Notepaper.ai</Link>
+                        <Link to="/" className="text-primary hover:underline font-medium">Notepaper-ai</Link>
                     </p>
                 </div>
             </div>
@@ -264,7 +264,7 @@ export default function PublicQuizPlay() {
                 <div className="flex-1 flex flex-col items-center justify-center gap-4" style={{ background: '#F8F9FA' }}>
                     <span className="material-icons-round text-slate-300 text-5xl">quiz</span>
                     <p className="text-slate-500 font-medium">Quiz not found or no longer available.</p>
-                    <Link to="/" className="text-primary text-sm font-semibold hover:underline">Go to Notepaper.ai</Link>
+                    <Link to="/" className="text-primary text-sm font-semibold hover:underline">Go to Notepaper-ai</Link>
                 </div>
             </div>
         );
@@ -372,7 +372,7 @@ export default function PublicQuizPlay() {
                                     to="/signup"
                                     className="block w-full text-center py-2 rounded-xl bg-primary text-white text-[12px] font-semibold hover:bg-primary/90 transition-colors"
                                 >
-                                    Sign up free on Notepaper.ai
+                                    Sign up free on Notepaper-ai
                                 </Link>
                             </div>
                         </div>
