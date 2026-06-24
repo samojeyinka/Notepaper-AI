@@ -311,6 +311,10 @@ export const TopQuestionsSection = () => {
       answer: 'Notepaper AI is a productivity app for students and professionals. You can create and organise Notes, Papers, Folders, Flashcard decks, and Presentations — with AI tools to help you generate, summarise, and study content more effectively.',
     },
     {
+      question: 'What is Scholar, and what can it do?',
+      answer: 'Scholar is Notepaper AI\'s all-in-one research and writing engine. Give it a topic and it independently researches it, writes a full structured report complete with citations and references, fetches relevant images, and generates supporting diagrams — all in minutes. You get a polished, publication-ready document without having to open a single browser tab or piece together sources yourself.',
+    },
+    {
       question: 'How do I create my first note?',
       answer: 'After signing in, go to your Dashboard and click the create button, or head to the Library and select "New Note". The editor opens immediately — start typing, apply formatting, and your work is saved automatically as you go.',
     },

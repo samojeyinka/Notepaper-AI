@@ -7,6 +7,7 @@ import { generateService } from "../../api/generateService";
 import AutoFlashcardTab from "./AutoFlashcardTab";
 import AutoPresentationTab from "./AutoPresentationTab";
 import AutoQuizTab from "./AutoQuizTab";
+import AutoDiagramTab from "./AutoDiagramTab";
 import GenerateFromContent, { TAB_CONFIG } from "./GenerateFromContent";
 import LimitBanner from "./LimitBanner";
 
@@ -102,7 +103,8 @@ const TABS = [
     { id: 'generate',      label: 'AI Generate',   icon: 'auto_awesome' },
     { id: 'flashcards',    label: 'Flashcards',     icon: 'style'        },
     { id: 'quizzes',       label: 'Quizzes',        icon: 'quiz'         },
-    { id: 'presentations', label: 'Presentations',  icon: 'slideshow' },
+    { id: 'presentations', label: 'Presentations',  icon: 'slideshow'    },
+    { id: 'diagrams',      label: 'Diagrams',       icon: 'account_tree' },
 ];
 
 export default function Generate() {
@@ -307,6 +309,9 @@ export default function Generate() {
 
                 {/* Quizzes tab */}
                 {activeTab === 'quizzes' && <AutoQuizTab />}
+
+                {/* Diagrams tab */}
+                {activeTab === 'diagrams' && <AutoDiagramTab />}
 
                 {/* Generate tab (default) */}
                 {activeTab === 'generate' && (

@@ -163,7 +163,7 @@ const SprintsList = () => {
     const currentSortLabel = SORT_OPTIONS.find(o => o.id === sortBy)?.label ?? 'Newest';
 
     return (
-        <div className="flex-1 lg:ml-64 p-4 lg:p-8 pt-20 lg:pt-8 min-w-0 overflow-x-hidden pb-28" style={{ background: '#F8F9FA' }}>
+        <div className="flex-1 lg:ml-64 p-4 lg:p-8 pt-20 lg:pt-8 min-w-0 overflow-x-hidden pb-28 bg-surface-light">
 
             {/* Stats */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 md:gap-4 mb-5 md:mb-8">

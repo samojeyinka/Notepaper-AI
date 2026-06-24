@@ -13,7 +13,7 @@ export const TheSpark = () => {
           </p>
           <div className="flex items-center gap-4">
             <div className="w-12 h-1 bg-slate-200"></div>
-            <p className="font-handwritten text-slate-400 italic text-[12px] md:text-lg">Founding idea, 2021</p>
+            <p className="font-handwritten text-slate-400 italic text-[12px] md:text-lg">Founding idea, 2023</p>
           </div>
         </div>
 

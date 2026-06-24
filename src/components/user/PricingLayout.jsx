@@ -125,7 +125,7 @@ export const PricingLayout = () => {
     const teamPlan = priceMap['team'] ?? null;
 
     return (
-        <div className="flex-1 lg:ml-64 min-h-screen bg-slate-50">
+        <div className="flex-1 lg:ml-64 min-h-screen bg-surface-light">
             <div className="max-w-5xl mx-auto px-4 py-8 md:py-10">
 
                 {/* Header */}

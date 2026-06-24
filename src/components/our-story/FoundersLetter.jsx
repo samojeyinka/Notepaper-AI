@@ -40,12 +40,10 @@ export const FoundersLetter = () => {
           {/* Header */}
           <div className="mb-6 md:mb-12 flex justify-between items-start border-b border-slate-100 pb-4 md:pb-8">
             <div className="space-y-1">
-              <p className="font-serif-elegant text-slate-400 text-sm">October 24, 2025</p>
+              <p className="font-serif-elegant text-slate-400 text-sm">July 1, 2026</p>
               <p className="font-serif-elegant text-slate-400 text-sm">Internet</p>
             </div>
-            <div className="w-6 h-6 md:w-12 md:h-12 bg-purple-100 rounded flex items-center justify-center text-purple-600">
-              <span className="material-symbols-outlined">auto_awesome</span>
-            </div>
+          
           </div>
 
           {/* Letter Content */}
