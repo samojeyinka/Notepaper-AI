@@ -177,7 +177,7 @@ const ShakespeareModal = ({ onClose, onInsert }) => {
                 <div className="flex items-center justify-between px-2 md:px-4 py-1.5 md:py-3 border-b border-slate-100 shrink-0">
                     <div className="flex items-center gap-2.5">
                         <div className="w-5 h-5 md:w-7 md:h-7 rounded-xl bg-gradient-to-br from-gray-400 to-black flex items-center justify-center shadow-sm overflow-hidden shrink-0">
-                            <img src={shakespeare} className="w-full h-full object-cover" alt="" />
+                            <img src={shakespeare} className="w-full h-full object-cover" alt="Shakespeare Assist" />
                         </div>
                         <div>
                             <p className="font-medium md:font-semibold text-[12px] text-slate-800 leading-tight">Shakespeare Assist</p>

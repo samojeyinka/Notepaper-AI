@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+# Block private app routes
+Disallow: /lockedin/
+Disallow: /signin
+Disallow: /signup
+Disallow: /forgot-password
+Disallow: /restore-account
+Disallow: /auth/
+Disallow: /verify/
+
+Sitemap: https://notepaper.ai/sitemap.xml

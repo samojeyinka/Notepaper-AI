@@ -783,7 +783,7 @@ const SlideEditor = ({ slide, themeId, onChange, onDelete, canDelete }) => {
                     onMouseEnter={() => setImgHovered(true)}
                     onMouseLeave={() => setImgHovered(false)}
                     style={{ flex:'0 0 42%', position:'relative', display:'flex', alignItems:'center', justifyContent:'center', padding:'5% 4%', borderLeft:'1px solid rgba(255,255,255,0.08)' }}>
-                    <img src={slide.image.url} style={{ maxWidth:'100%', maxHeight:'70%', width:'100%', height:'70%', objectFit:'contain', borderRadius:6 }} alt="" />
+                    <img src={slide.image.url} style={{ maxWidth:'100%', maxHeight:'70%', width:'100%', height:'70%', objectFit:'contain', borderRadius:6 }} alt={slide.title || 'Slide image'} />
                     <button onClick={() => set({image:null})} data-pdf-hide
                         style={{ position:'absolute', top:8, right:8, zIndex:10, opacity: imgHovered ? 1 : 0, transition:'opacity 0.15s' }}
                         className="w-7 h-7 rounded-full bg-black/60 hover:bg-red-500 text-white flex items-center justify-center shadow-lg"
@@ -815,7 +815,7 @@ const Thumbnail = ({ slide, themeId }) => {
             </div>
             {slide.image?.url && !slide.image?.position?.includes('background') && (
                 <div style={{ position:'absolute', right:0, top:0, bottom:0, width:'38%', display:'flex', alignItems:'center', justifyContent:'center', padding:'6% 4%', zIndex:1 }}>
-                    <img src={slide.image.url} style={{ maxWidth:'100%', maxHeight:'70%', objectFit:'contain' }} alt="" />
+                    <img src={slide.image.url} style={{ maxWidth:'100%', maxHeight:'70%', objectFit:'contain' }} alt={slide.title || 'Slide image'} />
                 </div>
             )}
         </div>

@@ -245,7 +245,7 @@ export const AISidebar = ({ sourceType, sourceId, sourceTitle }) => {
                     >
                         <div className="flex items-center gap-2.5">
                             <div className="w-4 h-4 md:w-6 md:h-6 rounded md:rounded-lg bg-gradient-to-br from-primary to-indigo-500 flex items-center justify-center shadow-sm shadow-primary/30 shrink-0 overflow-hidden">
-                                <img src={naomi} className="w-full h-full object-cover" alt="" />
+                                <img src={naomi} className="w-full h-full object-cover" alt="Schola AI assistant" />
                             </div>
                             <div className="text-left">
                                 <p className="font-display font-medium md:font-semibold text-[11px] md:text-[13px] text-slate-900 leading-tight">Schola</p>
