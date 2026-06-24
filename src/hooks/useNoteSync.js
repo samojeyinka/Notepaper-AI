@@ -127,6 +127,9 @@ export const useNoteSync = (getState, noteId, setNoteId) => {
     // Layer 1: immediate localStorage draft
     saveDraft();
 
+    // Invalidate in-memory cache so a background refresh won't overwrite user edits
+    if (noteId) workspaceCache.invalidateNoteContent(noteId);
+
     // Add to dirty set
     const arr = Array.isArray(fields) ? fields : [fields];
     arr.forEach(f => dirtyRef.current.add(f));
@@ -136,7 +139,7 @@ export const useNoteSync = (getState, noteId, setNoteId) => {
     debounceTimer.current = setTimeout(() => {
       saveToBackend();
     }, DEBOUNCE_MS);
-  }, [saveDraft, saveToBackend]);
+  }, [saveDraft, saveToBackend, noteId]);
 
   // ── forceFlush — call before export to ensure server is up to date ────────
 
@@ -148,35 +151,54 @@ export const useNoteSync = (getState, noteId, setNoteId) => {
   }, [saveToBackend]);
 
   // ── loadNote — called on mount when noteId is known ──────────────────────
+  // `force: true` bypasses cache/draft and always fetches from server (used by
+  // AI channel handlers where freshness is required).
 
-  const loadNote = useCallback(async (id, applyState) => {
-    setSaveStatus('loading');
+  const loadNote = useCallback(async (id, applyState, { force = false } = {}) => {
+    // Fast path: serve from in-memory cache or localStorage draft immediately
+    const memCached = force ? null : workspaceCache.getNoteContent(id);
+    const draft     = force ? null : loadDraft(id);
+    const servedFast = !!(memCached || draft);
+
+    if (memCached) {
+      applyState(memCached);
+      setSaveStatus('saved');
+    } else if (draft) {
+      const { _savedAt, ...draftState } = draft;
+      applyState(draftState);
+      setSaveStatus('saved');
+    } else {
+      setSaveStatus('loading');
+    }
+
     try {
       const res = await noteService.get(id);
       const serverNote = res.data;
+      if (!isMountedRef.current) return;
+      workspaceCache.setNoteContent(id, serverNote);
 
-      // Check if we have a newer draft in localStorage
-      const draft = loadDraft(id);
-      if (draft && draft._savedAt) {
+      // Re-read draft — it may have been written while the fetch was in flight
+      const latestDraft = loadDraft(id);
+      if (latestDraft?._savedAt) {
         const serverTime = new Date(serverNote.updated_at).getTime();
-        if (draft._savedAt > serverTime) {
-          // Draft is newer — restore it, mark everything dirty for re-sync
-          // Merge server-only fields (folder relation) that drafts don't carry
-          const { _savedAt, ...draftState } = draft;
+        if (latestDraft._savedAt > serverTime) {
+          const { _savedAt, ...draftState } = latestDraft;
           applyState({ ...draftState, folder: serverNote.folder ?? null, folder_id: serverNote.folder_id ?? null });
           ['title','content','paperStyle','paperColor','lineColor','textColor','fontFamily',
            'fontSize','lineSpacing','drawingData'].forEach(f => dirtyRef.current.add(f));
-          setSaveStatus('saved'); // will re-save on next markDirty
+          if (isMountedRef.current) setSaveStatus('saved');
           return;
         }
       }
 
       applyState(serverNote);
       clearDraft(id);
-      setSaveStatus('saved');
+      if (isMountedRef.current) setSaveStatus('saved');
     } catch (err) {
       console.error('[useNoteSync] load failed', err);
-      setSaveStatus('error');
+      if (!isMountedRef.current) return;
+      if (!servedFast) setSaveStatus('error');
+      // If we already showed cached/draft content, keep it showing rather than erroring
     }
   }, [loadDraft, clearDraft]);
 

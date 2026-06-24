@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import Loader from '../globals/Loader';
 import { useParams, useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { PaperHeader } from "./PaperHeader";
 import { PaperToolbar } from "./PaperToolbar";
@@ -65,6 +64,8 @@ export const Paper = () => {
     // Core state
     const [paperId, setPaperId]       = useState(routeId ?? null);
     const [isAIGenerating, setIsAIGenerating] = useState(false);
+    const [aiGeneratingTimedOut, setAIGeneratingTimedOut] = useState(false);
+    const [exportWarning, setExportWarning] = useState(null); // 'docx' | 'pptx' | null
     const [folderId, setFolderId] = useState(() => searchParams.get('folder') ?? null);
     const [folder, setFolder]     = useState(null);
     const [title, setTitle]       = useState("Untitled Paper");
@@ -161,14 +162,27 @@ export const Paper = () => {
     );
     forceFlushRef.current = forceFlush;
 
-    const [showLoader, setShowLoader] = useState(false);
+    // White-screen loading overlay — shown whenever opening an existing paper.
+    // Closes in 250ms when data is ready (instant for cache/draft, longer for cold loads).
+    const [showLoadingOverlay, setShowLoadingOverlay] = useState(() => !!routeId);
+    const [barWidth, setBarWidth] = useState(0);
+
     useEffect(() => {
-        if (saveStatus === 'loading') {
-            const t = setTimeout(() => setShowLoader(true), 1000);
-            return () => clearTimeout(t);
-        }
-        setShowLoader(false);
-    }, [saveStatus]);
+        if (!showLoadingOverlay) return;
+        const raf = requestAnimationFrame(() => {
+            requestAnimationFrame(() => setBarWidth(85));
+        });
+        return () => cancelAnimationFrame(raf);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+        if (!showLoadingOverlay) return;
+        if (saveStatus === 'loading' || saveStatus === 'idle') return;
+        setBarWidth(100);
+        const t = setTimeout(() => setShowLoadingOverlay(false), 250);
+        return () => clearTimeout(t);
+    }, [saveStatus, showLoadingOverlay]);
 
     // Undo/redo
     const applySnapshot = useCallback((snapshot) => {
@@ -332,7 +346,7 @@ export const Paper = () => {
     const applyWatermark = (canvas) => {
         if (isPaid) return;
         const ctx = canvas.getContext('2d');
-        const ratio = 2;
+        const ratio = canvas.width / 816; // derive from actual canvas size
         const smallSize = 11 * ratio;
         const largeSize = 16 * ratio;
         const lineGap = 6 * ratio;
@@ -354,9 +368,72 @@ export const Paper = () => {
     };
 
     const capturePages = async () => {
-        const refs = pageRefsRef.current.filter(Boolean); const canvases = [];
+        const refs = pageRefsRef.current.filter(Boolean);
+        const canvases = [];
+        const TRANSPARENT = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+        const PAGE_W = 816, PAGE_H = 1056;
+
         for (const el of refs) {
-            const c = await htmlToImage.toCanvas(el, { pixelRatio:2,useCORS:true });
+            // el is the scaled wrapper (may be smaller than 816×1056 on narrow screens).
+            // Its first child is the full-size (816×1056) transform container with CSS
+            // scale applied. Clone it off-screen without the transform so we always
+            // capture at native resolution regardless of the user's screen width.
+            const inner = el.firstElementChild;
+            const clone = (inner || el).cloneNode(true);
+            if (inner) {
+                clone.style.transform = 'none';
+                clone.style.transformOrigin = 'top left';
+            }
+
+            // cloneNode() doesn't copy canvas pixel data — copy drawing strokes manually.
+            const origCanvases = (inner || el).querySelectorAll('canvas');
+            clone.querySelectorAll('canvas').forEach((cc, i) => {
+                if (origCanvases[i]) {
+                    try { cc.getContext('2d').drawImage(origCanvases[i], 0, 0); } catch { /* ignore */ }
+                }
+            });
+
+            // Remove the editor ring/shadow so the export has a clean white page edge.
+            clone.querySelectorAll('[class*="ring-"]').forEach(d => { d.style.boxShadow = 'none'; });
+
+            const offscreen = document.createElement('div');
+            offscreen.style.cssText =
+                `position:fixed;left:-9999px;top:-9999px;pointer-events:none;` +
+                `width:${PAGE_W}px;height:${PAGE_H}px;overflow:hidden;`;
+            offscreen.appendChild(clone);
+            document.body.appendChild(offscreen);
+
+            // Pre-inline external images as data URIs — avoids CORS crashes for
+            // expired or restricted URLs (e.g. Pixabay CDN links returning 400).
+            await Promise.all(
+                Array.from(clone.querySelectorAll('img[src]')).map(async (img) => {
+                    const src = img.getAttribute('src');
+                    if (!src || src.startsWith('data:') || src.startsWith('blob:')) return;
+                    try {
+                        const res = await fetch(src, { cache: 'force-cache' });
+                        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                        const blob = await res.blob();
+                        const dataUrl = await new Promise((ok, fail) => {
+                            const r = new FileReader();
+                            r.onload = () => ok(r.result);
+                            r.onerror = fail;
+                            r.readAsDataURL(blob);
+                        });
+                        img.src = dataUrl;
+                    } catch {
+                        img.src = TRANSPARENT;
+                    }
+                })
+            );
+
+            const c = await htmlToImage.toCanvas(clone, {
+                pixelRatio: 3,
+                skipFonts: true,
+                width: PAGE_W,
+                height: PAGE_H,
+            });
+
+            document.body.removeChild(offscreen);
             applyWatermark(c);
             canvases.push(c);
         }
@@ -367,11 +444,13 @@ export const Paper = () => {
         try {
             await forceFlush();
             const canvases = await capturePages();
-            const W = 816, H = 1056, M = 40;
+            const W = 816, H = 1056;
             const pdf = new jsPDF({ orientation:'portrait',unit:'px',format:[W,H] });
             for (let i=0;i<canvases.length;i++) {
                 if (i>0) pdf.addPage();
-                pdf.addImage(canvases[i].toDataURL('image/png'),'PNG',M,0,W-M*2,H);
+                // Embed the full 816×1056 canvas filling the page — the PaperPage
+                // already has internal padding so no extra margin is needed here.
+                pdf.addImage(canvases[i].toDataURL('image/png'),'PNG',0,0,W,H);
             }
             pdf.save(`${slug()}.pdf`);
         } catch (err) { console.error('PDF export failed',err); }
@@ -451,7 +530,7 @@ export const Paper = () => {
             const s = Array.isArray(serverPaper.pages) ? serverPaper : deserializePaper(serverPaper);
             // If content is empty the backend hasn't committed yet — retry up to 5×
             if (!s.pages.some(p => p?.trim()) && (applyExpanded._attempts = (applyExpanded._attempts ?? 0) + 1) <= 5) {
-                expandRetryTimerRef.current = setTimeout(() => loadPaper(paperId, applyExpanded), 2000);
+                expandRetryTimerRef.current = setTimeout(() => loadPaper(paperId, applyExpanded, { force: true }), 2000);
                 return;
             }
             setTitle(s.title); setPages(s.pages); setFontSize(s.fontSize); setLineSpacing(s.lineSpacing);
@@ -461,7 +540,7 @@ export const Paper = () => {
             if (s.folder)   setFolder(s.folder);
             setIsAIGenerating(false);
         };
-        loadPaper(paperId, applyExpanded);
+        loadPaper(paperId, applyExpanded, { force: true });
     });
 
     useSimplifyTopicChannel(isAIGenerating ? paperId : null, () => {
@@ -469,7 +548,7 @@ export const Paper = () => {
         const applySimplified = (serverPaper) => {
             const s = Array.isArray(serverPaper.pages) ? serverPaper : deserializePaper(serverPaper);
             if (!s.pages.some(p => p?.trim()) && (applySimplified._attempts = (applySimplified._attempts ?? 0) + 1) <= 5) {
-                expandRetryTimerRef.current = setTimeout(() => loadPaper(paperId, applySimplified), 2000);
+                expandRetryTimerRef.current = setTimeout(() => loadPaper(paperId, applySimplified, { force: true }), 2000);
                 return;
             }
             setTitle(s.title); setPages(s.pages); setFontSize(s.fontSize); setLineSpacing(s.lineSpacing);
@@ -479,18 +558,25 @@ export const Paper = () => {
             if (s.folder)   setFolder(s.folder);
             setIsAIGenerating(false);
         };
-        loadPaper(paperId, applySimplified);
+        loadPaper(paperId, applySimplified, { force: true });
     });
 
 
     useEffect(() => {
         if (!isAIGenerating || !paperId) return;
-        const timer = setInterval(async () => {
+        setAIGeneratingTimedOut(false);
+        const timeoutId = setTimeout(() => {
+            clearInterval(pollId);
+            setAIGeneratingTimedOut(true);
+        }, 90000);
+        const pollId = setInterval(async () => {
             try {
                 const res = await paperService.get(paperId);
                 const serverPaper = res.data;
+                workspaceCache.setPaperContent(paperId, serverPaper);
                 if (!serverPaper.ai_generating && serverPaper.content) {
-                    clearInterval(timer);
+                    clearInterval(pollId);
+                    clearTimeout(timeoutId);
                     const s = deserializePaper(serverPaper);
                     setTitle(s.title); setPages(s.pages); setFontSize(s.fontSize); setLineSpacing(s.lineSpacing);
                     setDrawingData(s.drawingData); setTextColor(s.textColor); setFontFamily(s.fontFamily);
@@ -501,24 +587,101 @@ export const Paper = () => {
                 }
             } catch { /* ignore poll errors */ }
         }, 5000);
-        return () => { clearInterval(timer); clearTimeout(expandRetryTimerRef.current); };
+        return () => { clearInterval(pollId); clearTimeout(timeoutId); clearTimeout(expandRetryTimerRef.current); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAIGenerating]);
 
     return (
-        <div className="flex flex-col flex-1 h-screen overflow-hidden bg-white border-l border-slate-200 lg:ml-64 pt-16 lg:pt-0">
+        <div className="relative flex flex-col flex-1 h-screen overflow-hidden bg-white border-l border-slate-200 lg:ml-64 pt-16 lg:pt-0">
+            {/* White-screen progress bar — cold open only (no cache, no draft) */}
+            {showLoadingOverlay && (
+                <div className="absolute inset-0 z-40 bg-white">
+                    <div className="h-[3px] bg-slate-100 overflow-hidden">
+                        <div
+                            className="h-full bg-primary rounded-r-full"
+                            style={{
+                                width: `${barWidth}%`,
+                                transition: barWidth >= 100
+                                    ? 'width 0.2s ease-in'
+                                    : 'width 1.6s cubic-bezier(0.05, 0.5, 0.25, 1)',
+                            }}
+                        />
+                    </div>
+                </div>
+            )}
             {isAIGenerating && (
                 <div className="absolute inset-0 z-50 bg-white/95 backdrop-blur flex flex-col items-center justify-center gap-6">
-                    <div className="relative">
-                        <div className="w-20 h-20 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <span className="material-icons-round text-primary text-[26px]">article</span>
+                    {aiGeneratingTimedOut ? (
+                        <>
+                            <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center">
+                                <span className="material-icons-round text-amber-500 text-[28px]">hourglass_disabled</span>
+                            </div>
+                            <div className="text-center max-w-xs">
+                                <h3 className="text-xl font-bold text-slate-800 mb-2">Taking longer than expected</h3>
+                                <p className="text-sm text-slate-500 mb-4">Schola is still working on your paper. It will appear once ready — you can reload to check.</p>
+                                <button
+                                    onClick={() => window.location.reload()}
+                                    className="px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-primary/90 transition-colors"
+                                >
+                                    Reload page
+                                </button>
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <div className="relative">
+                                <div className="w-20 h-20 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <span className="material-icons-round text-primary text-[26px]">article</span>
+                                </div>
+                            </div>
+                            <div className="text-center max-w-xs">
+                                <h3 className="text-xl font-bold text-slate-800 mb-2">Schola is writing…</h3>
+                                <p className="text-sm text-slate-500">Schola is preparing your paper in the background — the page will update automatically when it's ready.</p>
+                            </div>
+                        </>
+                    )}
+                </div>
+            )}
+            {exportWarning && (
+                <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+                    <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4">
+                        <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center mb-4">
+                            <span className="material-icons-round text-amber-500 text-[22px]">warning</span>
+                        </div>
+                        <h3 className="text-lg font-bold text-slate-800 mb-1">
+                            Formatting will be lost
+                        </h3>
+                        <p className="text-sm text-slate-500 mb-5">
+                            Exporting as <strong>.{exportWarning.toUpperCase()}</strong> converts your pages to plain text.
+                            Bold, italic, images, and tables will not be preserved in the file.
+                        </p>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setExportWarning(null)}
+                                className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 text-sm font-semibold hover:bg-slate-50 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => {
+                                    const fmt = exportWarning;
+                                    setExportWarning(null);
+                                    if (fmt === 'docx') handleExportDOCX();
+                                    else handleExportPPTX();
+                                }}
+                                className="flex-1 px-4 py-2.5 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-primary/90 transition-colors"
+                            >
+                                Export anyway
+                            </button>
                         </div>
                     </div>
-                    <div className="text-center max-w-xs">
-                        <h3 className="text-xl font-bold text-slate-800 mb-2">Schola is writing…</h3>
-                        <p className="text-sm text-slate-500">Schola is preparing your paper in the background — the page will update automatically when it's ready.</p>
-                    </div>
+                </div>
+            )}
+            {!isPaid && (
+                <div className="flex items-center gap-2 px-4 py-1.5 bg-amber-50 border-b border-amber-100 text-amber-700 text-[11px]">
+                    <span className="material-icons-round text-[13px]">workspace_premium</span>
+                    <span>Free plan — PDF exports will include a <strong>NotepaperAI</strong> watermark. <a href="/upgrade" className="underline font-semibold hover:text-amber-900">Upgrade</a> to remove it.</span>
                 </div>
             )}
             <PaperHeader
@@ -528,8 +691,8 @@ export const Paper = () => {
                 onSave={forceFlush}
                 folderId={folderId}
                 onExportPDF={handleExportPDF}
-                onExportDOCX={handleExportDOCX}
-                onExportPPTX={handleExportPPTX}
+                onExportDOCX={() => setExportWarning('docx')}
+                onExportPPTX={() => setExportWarning('pptx')}
                 onCopy={async () => {
                     if (!paperId) return;
                     try {
@@ -600,14 +763,6 @@ export const Paper = () => {
                 />
 
                 <div className="flex-1 overflow-hidden flex" style={{ position:'relative' }}>
-                    {saveStatus === 'loading' && showLoader && (
-                        <div style={{ position:'absolute',inset:0,zIndex:20,pointerEvents:'all',display:'flex',alignItems:'center',justifyContent:'center',background:'rgba(241,245,249,0.7)',backdropFilter:'blur(2px)' }}>
-                            <div className="flex flex-col items-center gap-3">
-                                <Loader size="xl" />
-
-                            </div>
-                        </div>
-                    )}
                     <div className="paper-pages-container flex-1 overflow-hidden flex relative">
                         {isRecording && <div style={{ position:'absolute',inset:0,zIndex:50,cursor:'not-allowed' }} />}
                         <PaperEditor

@@ -10,13 +10,14 @@ export const Sidebar = ({ activePage }) => {
   const navItems = [
     { path: '/lockedin', icon: 'grid_view', label: 'Dashboard' },
     { path: '/lockedin/library', icon: 'folder', label: 'Library' },
-    // { path: '/lockedin/scholar', icon: 'memory', label: 'Scholar' },
+    { path: '/lockedin/scholar', icon: 'memory', label: 'Scholar' },
     { path: '/lockedin/generate', icon: 'psychology', label: 'AI Studio' },
+     { path: '/lockedin/sprints', icon: 'bolt', label: 'Sprints' },
     { path: '/lockedin/quizzes',    icon: 'quiz',       label: 'Quizzes'    },
-    { path: '/lockedin/sprints',    icon: 'bolt',       label: 'Sprints'    },
     // { path: '/lockedin/study-plan', icon: 'event_note', label: 'Study Plan' },
     { path: '/lockedin/support-tickets', icon: 'chat', label: 'Support Tickets' },
     // { path: '/lockedin/application-settings', icon: 'settings', label: 'Settings' }
+    { path: '/lockedin/upgrade', icon: 'workspace_premium', label: 'upgrade' }
   ];
 
   return (
@@ -26,7 +27,7 @@ export const Sidebar = ({ activePage }) => {
         <Link to="/" className="flex items-center gap-2">
           <img src={logo} alt="Notepaper AI" className="w-8" />
           <span className="text-lg font-bold tracking-tight font-serif-elegant text-ink-black">
-            Notepaper<span className="text-primary">.ai</span>
+            Notepaper<span className="text-primary">-ai</span>
           </span>
         </Link>
 
@@ -59,7 +60,7 @@ export const Sidebar = ({ activePage }) => {
           <Link to="/" className="flex items-center gap-2">
             <img src={logo} alt="Notepaper AI" className="w-10" />
             <span className="text-xl font-bold tracking-tight font-serif-elegant text-ink-black">
-              Notepaper<span className="text-primary">.ai</span>
+              Notepaper<span className="text-primary">-ai</span>
             </span>
           </Link>
         </div>

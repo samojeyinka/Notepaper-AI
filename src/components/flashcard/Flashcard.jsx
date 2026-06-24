@@ -33,13 +33,14 @@ export const Flashcard = ({ id }) => {
     const [folder,      setFolder]      = useState(null);
 
     // ── UI state ──────────────────────────────────────────────────────────────
-    const [activeIndex, setActiveIndex] = useState(0);
-    const [editMode,    setEditMode]    = useState(true);
-    const [editSide,    setEditSide]    = useState('front');
-    const [saveStatus,  setSaveStatus]  = useState('idle');
-    const [loading,     setLoading]     = useState(!isNew);
-    const saveTimerRef                  = useRef(null);
-    const dirtyRef                      = useRef(false);
+    const [activeIndex,    setActiveIndex]    = useState(0);
+    const [editMode,       setEditMode]       = useState(true);
+    const [editSide,       setEditSide]       = useState('front');
+    const [saveStatus,     setSaveStatus]     = useState('idle');
+    const [loading,        setLoading]        = useState(!isNew);
+    const [confirmDelete,  setConfirmDelete]  = useState(false);
+    const saveTimerRef                        = useRef(null);
+    const dirtyRef                            = useRef(false);
 
     // ── Load existing flashcard ───────────────────────────────────────────────
     useEffect(() => {
@@ -146,12 +147,14 @@ export const Flashcard = ({ id }) => {
     const goPrev = () => { setActiveIndex(i => Math.max(i - 1, 0)); setEditSide('front'); };
 
     // ── Delete ────────────────────────────────────────────────────────────────
-    const handleDelete = async () => {
-        if (!window.confirm('Delete this flashcard deck?')) return;
+    const handleDelete = () => setConfirmDelete(true);
+
+    const confirmDeleteDeck = async () => {
+        setConfirmDelete(false);
         if (flashcardId) await flashcardService.delete(flashcardId);
         invalidateFlashcardCache(folder?.id ?? null);
         if (folder?.id) invalidateFolderCache(folder.id);
-        navigate(folder?.id ? `/lockedin/folders/${folder.id}` : '/lockedin/flashcards');
+        navigate(folder?.id ? `/lockedin/folders/${folder.id}` : '/lockedin/library?tab=flashcards');
     };
 
     // ── Duplicate ─────────────────────────────────────────────────────────────
@@ -173,6 +176,31 @@ export const Flashcard = ({ id }) => {
 
     return (
         <div className="flex flex-col flex-1 h-screen overflow-hidden bg-slate-50 lg:ml-64 pt-16 lg:pt-0">
+            {confirmDelete && (
+                <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+                    <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4">
+                        <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4">
+                            <span className="material-icons-round text-red-500 text-[22px]">delete_outline</span>
+                        </div>
+                        <h3 className="text-lg font-bold text-slate-800 mb-1">Delete flashcard deck?</h3>
+                        <p className="text-sm text-slate-500 mb-6">This will permanently delete <span className="font-semibold text-slate-700">"{title}"</span> and all its cards. This cannot be undone.</p>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setConfirmDelete(false)}
+                                className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 text-sm font-semibold hover:bg-slate-50 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={confirmDeleteDeck}
+                                className="flex-1 px-4 py-2.5 rounded-xl bg-red-500 text-white text-sm font-semibold hover:bg-red-600 transition-colors"
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
             <FlashcardHeader
                 title={title}
                 onTitleChange={setTitle}

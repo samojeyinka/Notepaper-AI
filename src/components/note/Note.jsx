@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import Loader from '../globals/Loader';
 import { useParams, useNavigate, useSearchParams, useLocation } from "react-router-dom";
 // useSearchParams is used below to read ?folder= on new-note creation
 import { NoteHeader } from "./NoteHeader";
@@ -74,6 +73,7 @@ export const Note = () => {
     // Note Data
     const [noteId, setNoteId] = useState(routeId ?? null);
     const [isAIGenerating, setIsAIGenerating] = useState(false);
+    const [aiGeneratingTimedOut, setAIGeneratingTimedOut] = useState(false);
     // folderId — set from ?folder= query param on new notes, or from loaded note
     const [folderId, setFolderId] = useState(() => searchParams.get('folder') ?? null);
     const [folder, setFolder]     = useState(null);
@@ -276,14 +276,30 @@ export const Note = () => {
         }
     );
 
-    const [showLoader, setShowLoader] = useState(false);
+    // White-screen loading overlay — shown whenever opening an existing note.
+    // Closes in 250ms when data is ready (instant for cache/draft, longer for cold loads).
+    const [showLoadingOverlay, setShowLoadingOverlay] = useState(() => !!routeId);
+    const [barWidth, setBarWidth] = useState(0);
+
+    // Kick off the progress bar animation once on mount (if overlay is shown)
     useEffect(() => {
-        if (saveStatus === 'loading') {
-            const t = setTimeout(() => setShowLoader(true), 1000);
-            return () => clearTimeout(t);
-        }
-        setShowLoader(false);
-    }, [saveStatus]);
+        if (!showLoadingOverlay) return;
+        // Double-RAF: let browser paint at width=0 first, then animate to 85%
+        const raf = requestAnimationFrame(() => {
+            requestAnimationFrame(() => setBarWidth(85));
+        });
+        return () => cancelAnimationFrame(raf);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // When the fetch completes, finish the bar then remove overlay
+    useEffect(() => {
+        if (!showLoadingOverlay) return;
+        if (saveStatus === 'loading' || saveStatus === 'idle') return;
+        setBarWidth(100);
+        const t = setTimeout(() => setShowLoadingOverlay(false), 250);
+        return () => clearTimeout(t);
+    }, [saveStatus, showLoadingOverlay]);
 
     // Keep the Ctrl+S handler in sync with the latest forceFlush
     forceFlushRef.current = forceFlush;
@@ -385,6 +401,30 @@ export const Note = () => {
         }
         if (command === 'drawEraser') {
             setDrawMode(prev => ({ ...prev, eraser: value }));
+            return;
+        }
+
+        // Table insertion
+        if (command === 'insertTable') {
+            const { rows, cols } = value;
+            const headerCells = Array.from({ length: cols }, () =>
+                '<th style="border:1px solid #ccc;padding:4px 8px;background:#f1f5f9;min-width:60px;">&nbsp;</th>'
+            ).join('');
+            const bodyRows = Array.from({ length: rows - 1 }, () => {
+                const cells = Array.from({ length: cols }, () =>
+                    '<td style="border:1px solid #ccc;padding:4px 8px;min-width:60px;">&nbsp;</td>'
+                ).join('');
+                return `<tr>${cells}</tr>`;
+            }).join('');
+            const tableHTML = `<table style="border-collapse:collapse;width:auto;margin:4px 0;"><thead><tr>${headerCells}</tr></thead><tbody>${bodyRows}</tbody></table><p><br></p>`;
+            if (activeEditorRef.current) activeEditorRef.current.focus();
+            document.execCommand('insertHTML', false, tableHTML);
+            if (activeEditorRef.current) {
+                const newPages = [...pages];
+                newPages[activePageIndex] = activeEditorRef.current.innerHTML;
+                setPages(newPages);
+                markDirty('content');
+            }
             return;
         }
 
@@ -508,7 +548,7 @@ export const Note = () => {
         const canvases = [];
         for (const el of refs) {
             // Temporarily make the page's inner contentEditable visible at full scroll height
-            const canvas = await htmlToImage.toCanvas(el, { pixelRatio: 2, useCORS: true });
+            const canvas = await htmlToImage.toCanvas(el, { pixelRatio: 2, useCORS: true, skipFonts: true });
             applyWatermark(canvas);
             canvases.push(canvas);
         }
@@ -577,7 +617,7 @@ export const Note = () => {
             const s = Array.isArray(serverNote.pages) ? serverNote : deserializeNote(serverNote);
             // If content is empty the backend hasn't committed yet — retry up to 5×
             if (!s.pages.some(p => p?.trim()) && (applyExpanded._attempts = (applyExpanded._attempts ?? 0) + 1) <= 5) {
-                expandRetryTimerRef.current = setTimeout(() => loadNote(noteId, applyExpanded), 2000);
+                expandRetryTimerRef.current = setTimeout(() => loadNote(noteId, applyExpanded, { force: true }), 2000);
                 return;
             }
             setTitle(s.title);
@@ -594,7 +634,7 @@ export const Note = () => {
             if (s.folder)   setFolder(s.folder);
             setIsAIGenerating(false);
         };
-        loadNote(noteId, applyExpanded);
+        loadNote(noteId, applyExpanded, { force: true });
     });
 
     useSimplifyTopicChannel(isAIGenerating ? noteId : null, () => {
@@ -602,7 +642,7 @@ export const Note = () => {
         const applySimplified = (serverNote) => {
             const s = Array.isArray(serverNote.pages) ? serverNote : deserializeNote(serverNote);
             if (!s.pages.some(p => p?.trim()) && (applySimplified._attempts = (applySimplified._attempts ?? 0) + 1) <= 5) {
-                expandRetryTimerRef.current = setTimeout(() => loadNote(noteId, applySimplified), 2000);
+                expandRetryTimerRef.current = setTimeout(() => loadNote(noteId, applySimplified, { force: true }), 2000);
                 return;
             }
             setTitle(s.title);
@@ -619,19 +659,27 @@ export const Note = () => {
             if (s.folder)   setFolder(s.folder);
             setIsAIGenerating(false);
         };
-        loadNote(noteId, applySimplified);
+        loadNote(noteId, applySimplified, { force: true });
     });
 
     // Polling fallback: catches cases where ExpandTopicReady/SimplifyTopicReady fired before
     // this tab subscribed (tab opened after the event was broadcast) — resolves spinner-forever.
+    // Times out after 90 seconds and shows a retry message instead of spinning indefinitely.
     useEffect(() => {
         if (!isAIGenerating || !noteId) return;
-        const timer = setInterval(async () => {
+        setAIGeneratingTimedOut(false);
+        const timeoutId = setTimeout(() => {
+            clearInterval(pollId);
+            setAIGeneratingTimedOut(true);
+        }, 90000);
+        const pollId = setInterval(async () => {
             try {
                 const res = await noteService.get(noteId);
                 const serverNote = res.data;
+                workspaceCache.setNoteContent(noteId, serverNote);
                 if (!serverNote.ai_generating && serverNote.content) {
-                    clearInterval(timer);
+                    clearInterval(pollId);
+                    clearTimeout(timeoutId);
                     const s = deserializeNote(serverNote);
                     setTitle(s.title);
                     setPages(s.pages);
@@ -649,24 +697,66 @@ export const Note = () => {
                 }
             } catch { /* ignore poll errors */ }
         }, 5000);
-        return () => { clearInterval(timer); clearTimeout(expandRetryTimerRef.current); };
+        return () => { clearInterval(pollId); clearTimeout(timeoutId); clearTimeout(expandRetryTimerRef.current); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAIGenerating]);
 
     return (
-        <div className="flex flex-col flex-1 h-screen overflow-hidden bg-white border-l border-slate-200 lg:ml-64 pt-16 lg:pt-0">
+        <div className="relative flex flex-col flex-1 h-screen overflow-hidden bg-white border-l border-slate-200 lg:ml-64 pt-16 lg:pt-0">
+            {/* White-screen progress bar — cold open only (no cache, no draft) */}
+            {showLoadingOverlay && (
+                <div className="absolute inset-0 z-40 bg-white">
+                    <div className="h-[3px] bg-slate-100 overflow-hidden">
+                        <div
+                            className="h-full bg-primary rounded-r-full"
+                            style={{
+                                width: `${barWidth}%`,
+                                transition: barWidth >= 100
+                                    ? 'width 0.2s ease-in'
+                                    : 'width 1.6s cubic-bezier(0.05, 0.5, 0.25, 1)',
+                            }}
+                        />
+                    </div>
+                </div>
+            )}
             {isAIGenerating && (
                 <div className="absolute inset-0 z-50 bg-white/95 backdrop-blur flex flex-col items-center justify-center gap-6">
-                    <div className="relative">
-                        <div className="w-20 h-20 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <span className="material-icons-round text-primary text-[26px]">description</span>
-                        </div>
-                    </div>
-                    <div className="text-center max-w-xs">
-                        <h3 className="text-xl font-bold text-slate-800 mb-2">Schola is writing…</h3>
-                        <p className="text-sm text-slate-500">Schola is preparing your note in the background — the page will update automatically when it's ready.</p>
-                    </div>
+                    {aiGeneratingTimedOut ? (
+                        <>
+                            <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center">
+                                <span className="material-icons-round text-amber-500 text-[28px]">hourglass_disabled</span>
+                            </div>
+                            <div className="text-center max-w-xs">
+                                <h3 className="text-xl font-bold text-slate-800 mb-2">Taking longer than expected</h3>
+                                <p className="text-sm text-slate-500 mb-4">Schola is still working on your note. It will appear once ready — you can reload to check.</p>
+                                <button
+                                    onClick={() => window.location.reload()}
+                                    className="px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-primary/90 transition-colors"
+                                >
+                                    Reload page
+                                </button>
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <div className="relative">
+                                <div className="w-20 h-20 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <span className="material-icons-round text-primary text-[26px]">description</span>
+                                </div>
+                            </div>
+                            <div className="text-center max-w-xs">
+                                <h3 className="text-xl font-bold text-slate-800 mb-2">Schola is writing…</h3>
+                                <p className="text-sm text-slate-500">Schola is preparing your note in the background — the page will update automatically when it's ready.</p>
+                            </div>
+                        </>
+                    )}
+                </div>
+            )}
+            {!isPaid && (
+                <div className="flex items-center gap-2 px-4 py-1.5 bg-amber-50 border-b border-amber-100 text-amber-700 text-[11px]">
+                    <span className="material-icons-round text-[13px]">workspace_premium</span>
+                    <span>Free plan — exports will include a <strong>NotepaperAI</strong> watermark. <a href="/upgrade" className="underline font-semibold hover:text-amber-900">Upgrade</a> to remove it.</span>
                 </div>
             )}
             <NoteHeader
@@ -690,7 +780,6 @@ export const Note = () => {
                         // silent
                     }
                 }}
-                onShare={() => alert('Shared!')}
                 onToggleAI={() => {
                     if (!isAISidebarOpen) {
                         // Save cursor before focus leaves the editor
@@ -788,15 +877,6 @@ export const Note = () => {
                 />
 
                 <div className="flex-1 overflow-hidden flex" style={{ position: 'relative' }}>
-                    {/* Loading overlay — only shown if fetch takes longer than 1 s */}
-                    {saveStatus === 'loading' && showLoader && (
-                        <div style={{ position: 'absolute', inset: 0, zIndex: 20, pointerEvents: 'all', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(241,245,249,0.7)', backdropFilter: 'blur(2px)' }}>
-                            <div className="flex flex-col items-center justify-center gap-3">
-                                <Loader size="xl" />
-            
-                            </div>
-                        </div>
-                    )}
                     <div className="note-pages-container flex-1 overflow-hidden flex relative">
                         {/* Block all pointer interaction on the pages while voice recording */}
                         {isRecording && (

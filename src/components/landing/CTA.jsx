@@ -13,11 +13,11 @@ export default function CTA() {
             Ready to transform your note-taking?
           </h2>
           <p className="text-[14px] md:text-xl opacity-90 mb-12 max-w-2xl mx-auto relative z-10 leading-relaxed">
-            Join 50,000+ students and professionals who are leveling up their creative thinking with digital ink that matters.
+            Join students and professionals who are leveling up their creative thinking with digital ink that matters.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 relative z-10 mb-4 md:mb-8">
-            <a href='/signin' className="bg-white text-primary px-10 py-2 md:py-4 rounded-full text-[15px] md:text-lg font-medium md:font-bold hover:scale-105 transition-transform shadow-xl">
+            <a href='/signup' className="bg-white text-primary px-10 py-2 md:py-4 rounded-full text-[15px] md:text-lg font-medium md:font-bold hover:scale-105 transition-transform shadow-xl">
               Get Started Free
             </a>
             <a href='/pricing' className="border-2 border-white/40 px-10 py-2 md:py-4 rounded-full ttext-[15px] md:text-lg font-medium md:font-bold hover:bg-white/10 transition-all">

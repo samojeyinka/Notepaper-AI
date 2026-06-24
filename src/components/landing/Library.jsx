@@ -17,9 +17,7 @@ export default function Library() {
             </h2>
             <p className="text-slate-500 text-[14px] md:text-[16px]">Pick up where you left your pen.</p>
           </div>
-          <a className="text-ink-black text-[15px] md:text-[16px] font-medium md:font-bold decoration-wavy underline underline-offset-4 hover:text-primary transition-colors">
-            See Library
-          </a>
+       
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-10">

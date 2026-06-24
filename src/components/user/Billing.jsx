@@ -208,7 +208,7 @@ export const SubscriptionTab = () => {
       <div className="text-center pb-12">
         <div className="inline-block relative">
           <p className="font-sketch text-slate-400 text-sm max-w-xs mx-auto">
-            Need help? Contact our support team at support@notepaper.ai
+            Need help? Contact our support team at support@Notepaper-ai
           </p>
           <div className="absolute -left-12 -top-2 text-purple-500/30 rotate-[-20deg]">
             <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -7,6 +7,7 @@ import { generateService } from "../../api/generateService";
 import AutoFlashcardTab from "./AutoFlashcardTab";
 import AutoPresentationTab from "./AutoPresentationTab";
 import AutoQuizTab from "./AutoQuizTab";
+import AutoDiagramTab from "./AutoDiagramTab";
 import GenerateFromContent, { TAB_CONFIG } from "./GenerateFromContent";
 import LimitBanner from "./LimitBanner";
 
@@ -60,7 +61,7 @@ function markdownToHtml(md) {
 }
 
 
-const SYSTEM_INSTRUCTION = `You are Schola — an expert study-note generator inside a note-taking app called Notepaper.ai.
+const SYSTEM_INSTRUCTION = `You are Schola — an expert study-note generator inside a note-taking app called Notepaper-ai.
 Your job is to produce thorough, well-structured, deeply informative content on any topic the student gives you.
 
 Rules:
@@ -102,7 +103,8 @@ const TABS = [
     { id: 'generate',      label: 'AI Generate',   icon: 'auto_awesome' },
     { id: 'flashcards',    label: 'Flashcards',     icon: 'style'        },
     { id: 'quizzes',       label: 'Quizzes',        icon: 'quiz'         },
-    { id: 'presentations', label: 'Presentations',  icon: 'slideshow' },
+    { id: 'presentations', label: 'Presentations',  icon: 'slideshow'    },
+    { id: 'diagrams',      label: 'Diagrams',       icon: 'account_tree' },
 ];
 
 export default function Generate() {
@@ -252,7 +254,7 @@ export default function Generate() {
     const isIdle      = status === "idle";
 
     return (
-        <div className="flex-1 flex min-h-screen bg-slate-50">
+        <div className="flex-1 flex min-h-screen bg-surface-light">
             <main className="flex-1 flex flex-col lg:ml-64 min-h-screen">
 
                 {/* ── Top bar ──────────────────────────────────────────────── */}
@@ -307,6 +309,9 @@ export default function Generate() {
 
                 {/* Quizzes tab */}
                 {activeTab === 'quizzes' && <AutoQuizTab />}
+
+                {/* Diagrams tab */}
+                {activeTab === 'diagrams' && <AutoDiagramTab />}
 
                 {/* Generate tab (default) */}
                 {activeTab === 'generate' && (

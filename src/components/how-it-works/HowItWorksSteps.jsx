@@ -9,10 +9,10 @@ export default function HowItWorksSteps() {
       {/* Steps Container */}
       <div className="space-y-32 relative">
         {/* STEP 1: Record or Type */}
-        <div className="relative flex flex-col md:flex-row items-center gap-12 group">
+        <div className="relative flex flex-col md:flex-row items-center gap-6 md:gap-12 group">
           {/* Left - Image */}
           <div className="md:w-1/2 flex justify-center md:justify-end">
-            <div className="relative w-64 h-64 bg-white paper-shadow rotate-3 p-8 flex flex-col items-center justify-center hand-drawn-border">
+            <div className="relative w-52 h-52 md:w-64 md:h-64 bg-white paper-shadow rotate-3 p-8 flex flex-col items-center justify-center hand-drawn-border">
               <div className="w-24 h-24 bg-accent-yellow/20 rounded-full flex items-center justify-center mb-4">
                 <span className="material-symbols-outlined text-5xl text-accent-yellow">
                   mic
@@ -28,8 +28,8 @@ export default function HowItWorksSteps() {
             <div className="inline-block px-4 py-1 bg-accent-yellow/10 text-accent-yellow font-bold rounded-full text-sm mb-2">
               STEP 01
             </div>
-            <h2 className="text-4xl font-serif-elegant font-extrabold">Record or Type</h2>
-            <p className="text-lg text-slate-600 leading-relaxed">
+            <h2 className="text-3xl md:text-4xl font-serif-elegant font-extrabold">Record or Type</h2>
+            <p className="text-[15px] md:text-lg text-slate-600 leading-relaxed">
               Simply start talking or type out your raw thoughts. Our AI listens for nuances, pauses,
               and emphasis to capture the context of your ideas, not just the words.
             </p>
@@ -109,8 +109,8 @@ export default function HowItWorksSteps() {
             <div className="inline-block px-4 py-1 bg-primary/10 text-primary font-bold rounded-full text-sm mb-2">
               STEP 02
             </div>
-            <h2 className="text-4xl font-serif-elegant font-extrabold">AI Transformation</h2>
-            <p className="text-lg text-slate-600 leading-relaxed">
+            <h2 className="text-3xl md:text-4xl font-serif-elegant font-extrabold">AI Transformation</h2>
+            <p className="text-[15px] md:text-lg text-slate-600 leading-relaxed">
               Watch as digital text morphs into organic, handwritten ink. Our proprietary model
               synthesizes a unique pen-style for you, complete with natural pressure variations and
               flourishes.
@@ -177,7 +177,7 @@ export default function HowItWorksSteps() {
             <div className="inline-block px-4 py-1 bg-accent-green/10 text-accent-green font-bold rounded-full text-sm mb-2">
               STEP 03
             </div>
-            <h2 className="text-4xl font-serif-elegant font-extrabold">
+            <h2 className="text-3xl md:text-4xl font-serif-elegant font-extrabold">
               Organize &amp; Study
             </h2>
             <p className="text-lg text-slate-600 leading-relaxed">

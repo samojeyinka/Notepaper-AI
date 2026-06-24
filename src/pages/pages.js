@@ -17,6 +17,8 @@ import UpgradePage from './UpgradePage';
 import StudyPlanPage from './StudyPlanPage';
 import SprintPage from './SprintPage';
 import ScholarPage from './ScholarPage';
+import ScholarNewPage from './ScholarNewPage';
+import ScholarDocumentPage from './ScholarDocumentPage';
 import LibraryPage from './LibraryPage';
 import BillingPage from './BillingPage';
 import ProfileSettingsPage from './ProfileSettingsPage';
@@ -58,6 +60,8 @@ export{
     UpgradePage,
     StudyPlanPage,
     ScholarPage,
+    ScholarNewPage,
+    ScholarDocumentPage,
     SprintPage,
     LibraryPage,
     BillingPage,

@@ -10,6 +10,9 @@ const cache = {
     tickets:       null,
     activeSprint:  null,
     sprintsList:   null,
+    scholars:      {},
+    noteContent:   {},  // { [id]: { data, fetchedAt } }
+    paperContent:  {},  // { [id]: { data, fetchedAt } }
 };
 
 export const workspaceCache = {
@@ -37,7 +40,27 @@ export const workspaceCache = {
     setSprintsList: (data) => { cache.sprintsList = { data, fetchedAt: Date.now() }; },
     invalidateSprintsList: () => { cache.sprintsList = null; },
 
-    invalidateAll: () => { cache.folders = null; cache.notes = null; cache.papers = null; cache.presentations = null; cache.activeSprint = null; cache.sprintsList = null; },
+    getScholars: (page = 1) => cache.scholars[page] ? { data: cache.scholars[page].data, meta: cache.scholars[page].meta } : null,
+    setScholars: (page, data, meta) => { cache.scholars[page] = { data, meta, fetchedAt: Date.now() }; },
+    invalidateScholars: () => { cache.scholars = {}; },
+
+    getNoteContent: (id) => {
+        const e = cache.noteContent[id];
+        if (!e || Date.now() - e.fetchedAt > 60_000) return null;
+        return e.data;
+    },
+    setNoteContent: (id, data) => { cache.noteContent[id] = { data, fetchedAt: Date.now() }; },
+    invalidateNoteContent: (id) => { delete cache.noteContent[id]; },
+
+    getPaperContent: (id) => {
+        const e = cache.paperContent[id];
+        if (!e || Date.now() - e.fetchedAt > 60_000) return null;
+        return e.data;
+    },
+    setPaperContent: (id, data) => { cache.paperContent[id] = { data, fetchedAt: Date.now() }; },
+    invalidatePaperContent: (id) => { delete cache.paperContent[id]; },
+
+    invalidateAll: () => { cache.folders = null; cache.notes = null; cache.papers = null; cache.presentations = null; cache.activeSprint = null; cache.sprintsList = null; cache.scholars = {}; cache.noteContent = {}; cache.paperContent = {}; },
 
     getTickets: () => cache.tickets?.data ?? null,
     setTickets: (data) => { cache.tickets = { data, fetchedAt: Date.now() }; },

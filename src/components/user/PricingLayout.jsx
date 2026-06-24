@@ -3,7 +3,7 @@ import { billingService } from '../../api/billingService';
 import { useBilling } from '../../hooks/useBilling';
 import { usePlan } from '../../hooks/usePlan';
 
-// ── Static plan metadata (features, styling) ─────────────────────────────────
+// ── Static plan metadata (features hardcoded for instant render, only prices fetched) ──
 const PLAN_META = {
     free: {
         badge: null,
@@ -11,11 +11,11 @@ const PLAN_META = {
         ring: 'ring-slate-200',
         ctaStyle: 'bg-slate-100 text-slate-400 cursor-default',
         features: [
-            'Unlimited notes, papers & folders',
-            'Basic flashcard decks',
-            '5 AI presentation builds / day',
-            '10 AI writes / day',
-            'Unlimited voice to text',
+            { text: 'Unlimited notes, papers & folders' },
+            { text: 'Basic flashcard decks' },
+            { text: '2 AI presentation builds per day' },
+            { text: '5 AI writes & Shakespeare rewrites / day' },
+            { text: 'Unlimited voice to text' },
         ],
     },
     starter: {
@@ -24,13 +24,13 @@ const PLAN_META = {
         ring: 'ring-primary/30',
         ctaStyle: 'bg-primary text-white hover:bg-primary/90 shadow-[0_4px_14px_rgba(101,65,196,0.35)]',
         features: [
-            'Everything in Free',
-            '20 AI presentation builds / day',
-            '50 AI writes / day',
-            'DeepSeek AI — smarter model',
-            'All premium themes & slide art',
-            'Full PDF & PPTX export',
-            'Generate from your content',
+            { text: 'Everything in Free', bold: true },
+            { text: '20 AI presentation builds per day' },
+            { text: '50 AI writes & Shakespeare rewrites / day' },
+            { text: 'Smarter & faster AI model', bold: true },
+            { text: 'All premium themes & slide art' },
+            { text: '3 auto note generations / day — works while you sleep' },
+            { text: 'Scholar AI — 150 research pages / month', bold: true },
         ],
     },
     pro: {
@@ -39,13 +39,14 @@ const PLAN_META = {
         ring: 'ring-indigo-200',
         ctaStyle: 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-[0_4px_14px_rgba(79,70,229,0.3)]',
         features: [
-            'Everything in Starter',
-            '50 AI presentation builds / day',
-            '150 AI writes / day',
-            'AI quiz generator from notes',
-            '10 auto note generations / day',
-            'Smart study reminders',
-            'Early access to new features',
+            { text: 'Everything in Starter', bold: true },
+            { text: '50 AI presentation builds per day' },
+            { text: '150 AI writes & Shakespeare rewrites / day' },
+            { text: 'AI quiz generator from your notes', bold: true },
+            { text: '10 auto note generations / day' },
+            { text: 'Scholar AI — 500 research pages / month', bold: true },
+            { text: 'Smart study reminders' },
+            { text: 'Early access to new features' },
         ],
     },
     premium: {
@@ -54,13 +55,14 @@ const PLAN_META = {
         ring: 'ring-amber-200',
         ctaStyle: 'bg-amber-500 text-white hover:bg-amber-600 shadow-[0_4px_14px_rgba(245,158,11,0.3)]',
         features: [
-            'Everything in Pro',
-            'Unlimited AI presentations',
-            'Unlimited AI writes',
-            'Unlimited auto note generation',
-            'Personalised AI study plans',
-            'Auto flashcard generation',
-            'All future AI features — first access',
+            { text: 'Everything in Pro', bold: true },
+            { text: 'Unlimited AI presentations', bold: true },
+            { text: 'Unlimited AI writes & Shakespeare rewrites', bold: true },
+            { text: 'Unlimited auto note generation', bold: true },
+            { text: 'Unlimited Scholar AI research papers', bold: true },
+            { text: 'Personalised AI study plans' },
+            { text: 'Auto flashcard generation' },
+            { text: 'All future AI features — first access' },
         ],
     },
     team: {
@@ -69,10 +71,10 @@ const PLAN_META = {
         ring: 'ring-yellow-200',
         ctaStyle: 'bg-white text-slate-900 hover:bg-slate-100',
         features: [
-            'Everything in Premium',
-            '5 seats — full Premium for everyone',
-            'One invoice, owner invites by email',
-            'Team collaboration features',
+            { text: 'Everything in Premium', bold: true },
+            { text: '5 seats — full Premium for everyone', bold: true },
+            { text: 'One invoice, owner invites by email' },
+            { text: 'Team collaboration features' },
         ],
     },
 };
@@ -123,7 +125,7 @@ export const PricingLayout = () => {
     const teamPlan = priceMap['team'] ?? null;
 
     return (
-        <div className="flex-1 lg:ml-64 min-h-screen bg-slate-50">
+        <div className="flex-1 lg:ml-64 min-h-screen bg-surface-light">
             <div className="max-w-5xl mx-auto px-4 py-8 md:py-10">
 
                 {/* Header */}
@@ -232,12 +234,12 @@ export const PricingLayout = () => {
                                     )}
                                 </div>
 
-                                {/* Features */}
+                                {/* Features — hardcoded, always instant */}
                                 <ul className="flex flex-col gap-2 flex-1">
                                     {meta.features.map((f, i) => (
                                         <li key={i} className="flex items-start gap-2 text-[13px] text-slate-600">
                                             <span className={`material-icons-round text-[15px] mt-0.5 shrink-0 ${ctaDisabled ? 'text-slate-300' : meta.accent}`}>check</span>
-                                            <span className={i === 0 && key !== 'free' ? 'font-semibold text-slate-700' : ''}>{f}</span>
+                                            <span className={f.bold ? 'font-semibold text-slate-700' : ''}>{f.text}</span>
                                         </li>
                                     ))}
                                 </ul>

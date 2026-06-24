@@ -4,13 +4,14 @@ const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 const BASE = '/scholar';
 
 export const scholarService = {
-    list: () => apiClient(BASE),
+    list: (page = 1) => apiClient(`${BASE}?page=${page}`),
 
-    create: async ({ prompt, exportFormat = 'pdf', citationStyle = 'apa', uploads = [] }) => {
+    create: async ({ prompt, citationStyle = 'apa', pageCount = 20, yearsBack = null, uploads = [] }) => {
         const formData = new FormData();
         formData.append('prompt', prompt);
-        formData.append('export_format', exportFormat);
         formData.append('citation_style', citationStyle);
+        formData.append('page_count', pageCount);
+        if (yearsBack) formData.append('years_back', yearsBack);
         uploads.forEach(file => formData.append('uploads[]', file));
 
         const res = await fetch(`${BASE_URL}${BASE}`, {
@@ -30,20 +31,64 @@ export const scholarService = {
 
     approveOutline: (ulid) => apiClient(`${BASE}/${ulid}/approve-outline`, { method: 'POST' }),
 
-    showChapter: (ulid, chapterNumber) =>
-        apiClient(`${BASE}/${ulid}/chapters/${chapterNumber}`),
+    showPage: (ulid, pageNumber) =>
+        apiClient(`${BASE}/${ulid}/pages/${pageNumber}`),
 
-    updateChapter: (ulid, chapterId, content) =>
-        apiClient(`${BASE}/${ulid}/chapters/${chapterId}`, {
+    updatePage: (ulid, pageId, content) =>
+        apiClient(`${BASE}/${ulid}/pages/${pageId}`, {
             method: 'PATCH',
-            body: JSON.stringify({ content }),
+            body: { content },
         }),
 
-    approveChapter: (ulid, chapterId) =>
-        apiClient(`${BASE}/${ulid}/chapters/${chapterId}/approve`, { method: 'POST' }),
+    approvePage: (ulid, pageId) =>
+        apiClient(`${BASE}/${ulid}/pages/${pageId}/approve`, { method: 'POST' }),
 
-    retryChapter: (ulid, chapterId) =>
-        apiClient(`${BASE}/${ulid}/chapters/${chapterId}/retry`, { method: 'POST' }),
+    retryOutline: (ulid) =>
+        apiClient(`${BASE}/${ulid}/retry-outline`, { method: 'POST' }),
+
+    retryPage: (ulid, pageId) =>
+        apiClient(`${BASE}/${ulid}/pages/${pageId}/retry`, { method: 'POST' }),
+
+    deletePage: (ulid, pageId) =>
+        apiClient(`${BASE}/${ulid}/pages/${pageId}`, { method: 'DELETE' }),
+
+    addPage: (ulid, title) =>
+        apiClient(`${BASE}/${ulid}/pages`, {
+            method: 'POST',
+            body: { title },
+        }),
+
+    reorderPages: (ulid, orderedIds) =>
+        apiClient(`${BASE}/${ulid}/pages/reorder`, {
+            method: 'PATCH',
+            body: { order: orderedIds },
+        }),
+
+    updateBibliography: (ulid, citations) =>
+        apiClient(`${BASE}/${ulid}/bibliography`, {
+            method: 'PATCH',
+            body: { citations },
+        }),
 
     exportUrl: (ulid) => `${BASE_URL}${BASE}/${ulid}/export`,
+
+    updateCover: (ulid, coverData) =>
+        apiClient(`${BASE}/${ulid}/cover`, {
+            method: 'PATCH',
+            body: coverData,
+        }),
+
+    updateMeta: (ulid, metaData) =>
+        apiClient(`${BASE}/${ulid}/meta`, {
+            method: 'PATCH',
+            body: metaData,
+        }),
+
+    updateBody: (ulid, body) =>
+        apiClient(`${BASE}/${ulid}/body`, {
+            method: 'PATCH',
+            body: { body },
+        }),
+
+    presentations: (ulid) => apiClient(`${BASE}/${ulid}/presentations`),
 };

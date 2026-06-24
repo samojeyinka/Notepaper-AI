@@ -26,10 +26,19 @@ export default function SignIn() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError(null);
     setSuccess(null);
 
+    if (!formData.email.trim()) {
+      setError({ message: 'Please enter your email address.' });
+      return;
+    }
+    if (!formData.password) {
+      setError({ message: 'Please enter your password.' });
+      return;
+    }
+
+    setLoading(true);
     try {
       const result = await login({ ...formData, remember_me: rememberMe });
 

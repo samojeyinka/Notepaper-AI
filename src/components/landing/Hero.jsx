@@ -9,10 +9,7 @@ export default function Hero() {
       </div>
 
       <div className="max-w-4xl px-6 space-y-10 mb-20 relative">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 text-slate-600 font-medium text-[10px] md:text-sm underline">
-          <span className="material-symbols-outlined">auto_awesome</span>
-          The soul of paper, the mind of AI
-        </div>
+    
 
         <h1 className="text-4xl lg:text-8xl font-serif-elegant font-extrabold leading-[1.05] text-slate-900">
           Your thoughts,<br />
@@ -26,13 +23,13 @@ export default function Hero() {
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6 relative z-40">
-          <button className="hand-drawn-border bg-white px-12 py-4 text-[15px] md:text-xl font-bold shadow-lg hover:-rotate-1 hover:scale-105 transition-all text-ink-black">
+          <a href='/signup' className="hand-drawn-border bg-white px-12 py-4 text-[15px] md:text-xl font-bold shadow-lg hover:-rotate-1 hover:scale-105 transition-all text-ink-black">
             Start Your Journal
-          </button>
-          <button className="bg-[#FF0000] md:bg-transparent flex items-center gap-2 font-bold text-lg hover:text-primary transition-colors decoration-wavy underline underline-offset-8 text-ink-black">
+          </a>
+          <a href='https://www.youtube.com/' target='_blank' className="bg-[#FF0000] md:bg-transparent flex items-center gap-2 font-bold text-lg hover:text-primary transition-colors decoration-wavy underline underline-offset-8 text-ink-black">
             <span className="material-symbols-outlined">play_circle</span>
             Watch the process
-          </button>
+          </a>
         </div>
 
         <div className="absolute -right-16 top-0 hidden lg:block pointer-events-none z-0">
