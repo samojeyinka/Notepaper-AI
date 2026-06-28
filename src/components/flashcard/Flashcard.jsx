@@ -8,6 +8,7 @@ import { TEMPLATES } from './flashcardTemplates';
 import { FlashcardCard } from './FlashcardCard';
 import { FlashcardHeader } from './FlashcardHeader';
 import { FlashcardToolbar } from './FlashcardToolbar';
+import SEO from '../globals/SEO';
 
 const EMPTY_CARD = { front: '', back: '' };
 
@@ -176,6 +177,7 @@ export const Flashcard = ({ id }) => {
 
     return (
         <div className="flex flex-col flex-1 h-screen overflow-hidden bg-slate-50 lg:ml-64 pt-16 lg:pt-0">
+            <SEO title={title} path={id ? `/lockedin/flashcards/${id}` : '/lockedin/flashcards/new'} noIndex={true} />
             {confirmDelete && (
                 <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/40 backdrop-blur-sm">
                     <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4">

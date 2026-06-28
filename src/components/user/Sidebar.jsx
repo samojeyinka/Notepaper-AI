@@ -69,7 +69,7 @@ export const Sidebar = ({ activePage }) => {
         <div className="h-4 lg:hidden" />
 
         {/* Navigation */}
-        <nav className="flex-1 px-4 space-y-4 mt-4 overflow-visible">
+        <nav className="flex-1 px-4 space-y-4 mt-4 overflow-y-auto scrollbar-none min-h-0">
           {navItems.map((item) => {
             const isActive = activePage === item.path;
             return (

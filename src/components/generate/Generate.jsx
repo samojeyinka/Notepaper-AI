@@ -10,6 +10,7 @@ import AutoQuizTab from "./AutoQuizTab";
 import AutoDiagramTab from "./AutoDiagramTab";
 import GenerateFromContent, { TAB_CONFIG } from "./GenerateFromContent";
 import LimitBanner from "./LimitBanner";
+import SEO from "../globals/SEO";
 
 const EMPTY_SELECTED = { Notes: [], Papers: [], Slides: [], Flashcards: [] };
 
@@ -100,11 +101,11 @@ function Skeleton() {
 }
 
 const TABS = [
-    { id: 'generate',      label: 'AI Generate',   icon: 'auto_awesome' },
-    { id: 'flashcards',    label: 'Flashcards',     icon: 'style'        },
-    { id: 'quizzes',       label: 'Quizzes',        icon: 'quiz'         },
-    { id: 'presentations', label: 'Presentations',  icon: 'slideshow'    },
-    { id: 'diagrams',      label: 'Diagrams',       icon: 'account_tree' },
+    { id: 'generate',      label: 'AI Generate',    icon: 'auto_awesome',  seoTitle: 'AI Generate',       seoDesc: 'Generate notes, summaries, and study content instantly with AI.'    },
+    { id: 'flashcards',    label: 'Flashcards',     icon: 'style',         seoTitle: 'AI Flashcards',     seoDesc: 'Auto-generate flashcard sets from your notes and papers.'          },
+    { id: 'quizzes',       label: 'Quizzes',        icon: 'quiz',          seoTitle: 'AI Quizzes',        seoDesc: 'Create quizzes automatically from your study material.'            },
+    { id: 'presentations', label: 'Presentations',  icon: 'slideshow',     seoTitle: 'AI Presentations',  seoDesc: 'Turn your notes into polished AI-generated presentations.'         },
+    { id: 'diagrams',      label: 'Diagrams',       icon: 'account_tree',  seoTitle: 'AI Diagrams',       seoDesc: 'Generate diagrams and visual study aids from your content.'        },
 ];
 
 export default function Generate() {
@@ -134,6 +135,21 @@ export default function Generate() {
     const abortRef   = useRef(null);
     const outputRef  = useRef(null);
     const promptRef  = useRef(null);
+    const touchStartX = useRef(null);
+
+    const handleTouchStart = (e) => {
+        touchStartX.current = e.touches[0].clientX;
+    };
+
+    const handleTouchEnd = (e) => {
+        if (touchStartX.current === null) return;
+        const delta = e.changedTouches[0].clientX - touchStartX.current;
+        touchStartX.current = null;
+        if (Math.abs(delta) < 50) return;
+        const currentIndex = TABS.findIndex(t => t.id === activeTab);
+        if (delta < 0 && currentIndex < TABS.length - 1) setTab(TABS[currentIndex + 1].id);
+        if (delta > 0 && currentIndex > 0) setTab(TABS[currentIndex - 1].id);
+    };
 
     useEffect(() => { promptRef.current?.focus(); }, []);
 
@@ -253,8 +269,16 @@ export default function Generate() {
     const isDone      = status === "done";
     const isIdle      = status === "idle";
 
+    const activeTabMeta = TABS.find(t => t.id === activeTab);
+
     return (
         <div className="flex-1 flex min-h-screen bg-surface-light">
+            <SEO
+                title={activeTabMeta?.seoTitle}
+                description={activeTabMeta?.seoDesc}
+                path={`/lockedin/generate?tab=${activeTab}`}
+                noIndex={true}
+            />
             <main className="flex-1 flex flex-col lg:ml-64 min-h-screen">
 
                 {/* ── Top bar ──────────────────────────────────────────────── */}
@@ -279,27 +303,28 @@ export default function Generate() {
                 </header>
 
                 {/* ── Tab strip ──────────────────────────────────────────── */}
-                <div className="shrink-0 bg-white border-b border-slate-100 pt-2 px-4 md:px-6 flex items-center gap-1 overflow-x-auto scrollbar-none mt-16 md:mt-0">
+                <div className="shrink-0 bg-white border-b border-slate-100 pt-2 px-2 md:px-6 flex items-center md:gap-1 mt-16 md:mt-0">
                     {TABS.map(tab => (
                         <button
                             key={tab.id}
                             onClick={() => setTab(tab.id)}
-                            className={`flex items-center gap-1.5 px-2 md:px-4 py-1.5 md:py-3.5 text-[10px] md:text-xs font-medium md:font-bold whitespace-nowrap border-b-2 transition-all shrink-0 ${
+                            className={`flex-1 md:flex-none flex flex-col md:flex-row items-center justify-center md:justify-start gap-0.5 md:gap-1.5 px-1 md:px-4 py-2 md:py-3.5 text-[9px] md:text-xs font-medium md:font-bold whitespace-nowrap border-b-2 transition-all ${
                                 activeTab === tab.id
                                     ? 'border-primary text-primary'
                                     : 'border-transparent text-slate-400 hover:text-slate-600 hover:border-slate-200'
                             }`}
                         >
-                            <span className="material-icons-round text-[13px] md:text-[15px]">{tab.icon}</span>
-                            {tab.label}
+                            <span className="material-icons-round text-[18px] md:text-[15px]">{tab.icon}</span>
+                            <span className="hidden sm:inline">{tab.label}</span>
                             {tab.soon && (
-                                <span className="px-1.5 py-0.5 bg-slate-100 text-slate-400 rounded-full text-[8px] font-bold uppercase tracking-wider">Soon</span>
+                                <span className="hidden md:inline px-1.5 py-0.5 bg-slate-100 text-slate-400 rounded-full text-[8px] font-bold uppercase tracking-wider">Soon</span>
                             )}
                         </button>
                     ))}
                 </div>
 
                 {/* ── Tab content ─────────────────────────────────────────── */}
+                <div className="flex-1 flex flex-col" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
 
                 {/* Flashcards tab */}
                 {activeTab === 'flashcards' && <AutoFlashcardTab />}
@@ -543,6 +568,8 @@ export default function Generate() {
                     </section>
                 </div>
                 )}
+
+                </div>{/* end swipe wrapper */}
 
                 {/* ── Mobile output bottom-sheet (md and below only) ── */}
                 {mobilePreview && (

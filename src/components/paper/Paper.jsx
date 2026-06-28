@@ -10,6 +10,7 @@ import { PaperPreferencesSidebar } from "./PaperPreferencesSidebar";
 import { PaperVersionSidebar } from "./PaperVersionSidebar";
 import { PaperPresentationsSidebar } from "./PaperPresentationsSidebar";
 import { PaperPageSidebar } from "./PaperPageSidebar";
+import SEO from "../globals/SEO";
 import { DocumentImportModal } from "./DocumentImportModal";
 import { GeneratePresentationModal } from "./GeneratePresentationModal";
 import ShakespeareModal from "../note/ShakespeareModal";
@@ -593,6 +594,7 @@ export const Paper = () => {
 
     return (
         <div className="relative flex flex-col flex-1 h-screen overflow-hidden bg-white border-l border-slate-200 lg:ml-64 pt-16 lg:pt-0">
+            <SEO title={title} path={paperId ? `/lockedin/papers/${paperId}` : '/lockedin/papers/new'} noIndex={true} />
             {/* White-screen progress bar — cold open only (no cache, no draft) */}
             {showLoadingOverlay && (
                 <div className="absolute inset-0 z-40 bg-white">

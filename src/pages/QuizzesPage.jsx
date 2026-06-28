@@ -1,11 +1,11 @@
-import { LibraryContent } from "../components/LibraryContent";
 import Quizzes from "../components/quizzes/Quizzes";
 import { Sidebar } from "../components/user/Sidebar";
-import { StudyPlannerContent } from "../components/user/StudyPlanner";
+import SEO from "../components/globals/SEO";
 
 const QuizzesPage = () => {
   return (
     <div className="flex min-h-screen">
+      <SEO title="Quizzes" description="Test yourself with AI-generated quizzes from your study material." path="/lockedin/quizzes" noIndex={true} />
       <Sidebar activePage="/lockedin/quizzes" />
       <Quizzes/>
     </div>

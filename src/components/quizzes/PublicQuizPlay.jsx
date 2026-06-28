@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { quizService } from '../../api/quizService';
 import { logo } from '../../assets/assets';
+import SEO from '../globals/SEO';
 
 // ── Instrument Serif font loader ──────────────────────────────────────────────
 const SERIF_FONT_URL =
@@ -290,6 +291,11 @@ export default function PublicQuizPlay() {
     // ── Play UI ───────────────────────────────────────────────────────────────
     return (
         <div className="min-h-screen flex flex-col" style={{ background: '#F8F9FA' }}>
+            <SEO
+                title={quiz.title}
+                description={`Take the "${quiz.title}" quiz on Notepaper AI — test your knowledge and challenge your friends.`}
+                path={`/quiz/${id}`}
+            />
             <Header title={quiz.title} />
 
             <div className="flex-1 p-4 lg:p-8 pt-4 min-w-0 overflow-x-hidden pb-28">
