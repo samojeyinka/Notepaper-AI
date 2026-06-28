@@ -15,4 +15,6 @@ export const billingService = {
 
     verify: (reference) =>
         apiClient(`/billing/verify?reference=${encodeURIComponent(reference)}`),
+
+    getTransactions: () => apiClient('/billing/transactions'),
 };

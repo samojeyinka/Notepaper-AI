@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { paypal, paystack } from '../../assets/assets';
+import { jsPDF } from 'jspdf';
 
 // Tab Component - Reusable
 export const BillingTab = ({ isActive, label, onClick }) => {
@@ -246,29 +247,119 @@ export const InvoiceRow = ({ date, invoiceId, amount, isPaid, onDownload }) => {
   );
 };
 
-// Billing History Tab
-export const BillingHistoryTab = () => {
-  const invoices = [
-    { date: 'June 15, 2024', invoiceId: 'INV-2024-006', amount: '7.99', isPaid: true },
-    { date: 'May 15, 2024', invoiceId: 'INV-2024-005', amount: '7.99', isPaid: true },
-    { date: 'April 15, 2024', invoiceId: 'INV-2024-004', amount: '7.99', isPaid: true },
-    { date: 'March 15, 2024', invoiceId: 'INV-2024-003', amount: '7.99', isPaid: true },
-    { date: 'February 15, 2024', invoiceId: 'INV-2024-002', amount: '7.99', isPaid: true },
-    { date: 'January 15, 2024', invoiceId: 'INV-2024-001', amount: '7.99', isPaid: true },
-  ];
+const downloadReceipt = (tx) => {
+  const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+  const W = doc.internal.pageSize.getWidth();
+  const margin = 56;
+  const contentW = W - margin * 2;
+  let y = 60;
 
-  const handleDownload = (invoiceId) => {
-    console.log('Downloading invoice:', invoiceId);
+  const rule = () => {
+    doc.setDrawColor(220, 214, 254);
+    doc.setLineWidth(0.5);
+    doc.line(margin, y, W - margin, y);
+    y += 18;
+  };
+
+  // Header
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(20);
+  doc.setTextColor(30, 27, 75);
+  doc.text('Notepaper.ai', margin, y);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(156, 163, 175);
+  doc.text('PAYMENT RECEIPT', W - margin, y, { align: 'right' });
+  y += 28;
+
+  rule();
+
+  // Meta row
+  const metaDate = tx.paid_at
+    ? new Date(tx.paid_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+    : '—';
+  doc.setFontSize(9);
+  doc.setTextColor(107, 114, 128);
+  doc.text('Reference', margin, y);
+  doc.text('Date', W - margin - 120, y);
+  y += 14;
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(30, 27, 75);
+  doc.setFontSize(10);
+  doc.text(tx.reference ?? '—', margin, y);
+  doc.text(metaDate, W - margin - 120, y);
+  y += 28;
+
+  rule();
+
+  // Table header
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(156, 163, 175);
+  doc.text('DESCRIPTION', margin, y);
+  doc.text('PLAN', margin + contentW * 0.45, y);
+  doc.text('AMOUNT', W - margin, y, { align: 'right' });
+  y += 16;
+
+  // Table row
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(11);
+  doc.setTextColor(55, 65, 81);
+  doc.text(`${tx.plan_label} Subscription`, margin, y);
+  doc.text(`${tx.plan_label} · ${tx.interval}`, margin + contentW * 0.45, y);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(30, 27, 75);
+  doc.text(tx.amount_formatted, W - margin, y, { align: 'right' });
+  y += 28;
+
+  rule();
+
+  // Totals
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(107, 114, 128);
+  doc.text('TOTAL', W - margin - 100, y);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(13);
+  doc.setTextColor(30, 27, 75);
+  doc.text(tx.amount_formatted, W - margin, y, { align: 'right' });
+  y += 20;
+
+  // Status badge
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.setTextColor(tx.status === 'success' ? 21 : 185, tx.status === 'success' ? 128 : 28, tx.status === 'success' ? 61 : 26);
+  doc.text(tx.status === 'success' ? '✓  PAID' : tx.status.toUpperCase(), W - margin, y, { align: 'right' });
+  y += 36;
+
+  rule();
+
+  // Footer note
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(156, 163, 175);
+  doc.text('Thank you for your payment. This receipt confirms your Notepaper AI subscription.', margin, y, {
+    maxWidth: contentW,
+  });
+  y += 32;
+  doc.text('For billing queries contact support@notepaper.ai', margin, y);
+
+  doc.save(`notepaper-receipt-${tx.reference ?? tx.id}.pdf`);
+};
+
+// Billing History Tab
+export const BillingHistoryTab = ({ transactions = [], loading = false }) => {
+  const formatDate = (iso) => {
+    if (!iso) return '—';
+    return new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
   };
 
   return (
     <div className="paper-card rounded-large p-12 relative">
-      <PlanStatusBadge status="active" nextBillingDate="July 15, 2024" />
-
       <div className="mb-10 flex justify-between items-end">
         <div>
           <h2 className="text-[16px] font-medium mb-1">Billing History</h2>
-          <p className="font-handwriting text-slate-400 text-[12px] font-normal">Download your past transactions</p>
+          <p className="font-handwriting text-slate-400 text-[12px] font-normal">Your past payment transactions</p>
         </div>
         <div className="hidden md:block">
           <span className="material-symbols-outlined text-slate-200 text-6xl rotate-12">
@@ -277,36 +368,78 @@ export const BillingHistoryTab = () => {
         </div>
       </div>
 
-      <div className="relative overflow-x-auto">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100">
-              <th className="pb-4 px-4 font-sketch">Date</th>
-              <th className="pb-4 px-4 font-sketch">Invoice ID</th>
-              <th className="pb-4 px-4 font-sketch text-right">Amount</th>
-              <th className="pb-4 px-4 font-sketch text-center">Action</th>
-            </tr>
-          </thead>
-          <tbody className="ruled-lines font-handwriting text-xl">
-            {invoices.map((invoice, index) => (
-              <InvoiceRow
-                key={index}
-                date={invoice.date}
-                invoiceId={invoice.invoiceId}
-                amount={invoice.amount}
-                isPaid={invoice.isPaid}
-                onDownload={() => handleDownload(invoice.invoiceId)}
-              />
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {loading ? (
+        <div className="flex items-center justify-center py-16">
+          <span className="material-symbols-outlined text-slate-300 text-4xl animate-spin">progress_activity</span>
+        </div>
+      ) : transactions.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 gap-3">
+          <span className="material-symbols-outlined text-slate-200 text-5xl">receipt_long</span>
+          <p className="font-sketch text-slate-400 text-sm">No transactions yet</p>
+        </div>
+      ) : (
+        <div className="relative overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100">
+                <th className="pb-4 px-4 font-sketch">Date</th>
+                <th className="pb-4 px-4 font-sketch">Reference</th>
+                <th className="pb-4 px-4 font-sketch">Plan</th>
+                <th className="pb-4 px-4 font-sketch text-right">Amount</th>
+                <th className="pb-4 px-4 font-sketch text-center">Status</th>
+                <th className="pb-4 px-4 font-sketch text-center">Receipt</th>
+              </tr>
+            </thead>
+            <tbody className="ruled-lines font-handwriting text-xl">
+              {transactions.map((tx) => (
+                <tr key={tx.id} className="group relative text-[13px]">
+                  <td className="h-10 px-4 text-ink-blue">{formatDate(tx.paid_at)}</td>
+                  <td className="h-10 px-4 text-slate-500 font-mono text-[11px]">
+                    {tx.reference ? tx.reference.slice(0, 16) + '…' : '—'}
+                  </td>
+                  <td className="h-10 px-4 text-slate-700">
+                    {tx.plan_label}
+                    <span className="ml-1 text-slate-400 capitalize">({tx.interval})</span>
+                  </td>
+                  <td className="h-10 px-4 text-right font-bold text-slate-900">{tx.amount_formatted}</td>
+                  <td className="h-10 px-4 text-center">
+                    <span className={`inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full ${
+                      tx.status === 'success'
+                        ? 'bg-green-100 text-green-700'
+                        : tx.status === 'failed'
+                        ? 'bg-red-100 text-red-700'
+                        : 'bg-amber-100 text-amber-700'
+                    }`}>
+                      <span className="material-symbols-outlined text-[12px]">
+                        {tx.status === 'success' ? 'check_circle' : tx.status === 'failed' ? 'cancel' : 'schedule'}
+                      </span>
+                      {tx.status}
+                    </span>
+                  </td>
+                  <td className="h-10 px-4 text-center">
+                    <button
+                      onClick={() => downloadReceipt(tx)}
+                      title="Download receipt PDF"
+                      className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-md text-purple-600 hover:bg-purple-50 transition-colors"
+                    >
+                      <span className="material-symbols-outlined text-[14px]">download</span>
+                      PDF
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
-      <div className="mt-12 flex items-center justify-center gap-2">
-        <div className="h-[1px] flex-1 bg-slate-100"></div>
-        <p className="font-sketch text-slate-300 text-sm uppercase tracking-widest">End of History</p>
-        <div className="h-[1px] flex-1 bg-slate-100"></div>
-      </div>
+      {!loading && transactions.length > 0 && (
+        <div className="mt-12 flex items-center justify-center gap-2">
+          <div className="h-[1px] flex-1 bg-slate-100"></div>
+          <p className="font-sketch text-slate-300 text-sm uppercase tracking-widest">End of History</p>
+          <div className="h-[1px] flex-1 bg-slate-100"></div>
+        </div>
+      )}
 
       <div className="mt-4 text-center pb-12">
         <div className="inline-block relative">
@@ -327,34 +460,13 @@ export const BillingHistoryTab = () => {
 
 // Main Billing Page
 export const Billing = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const tabParam = searchParams.get('tab') || 'subscription';
-
-  const handleTabChange = (tab) => {
-    setSearchParams({ tab });
-  };
 
   return (
     <main className="flex-1 lg:ml-64 p-3 lg:p-8 pt-20 lg:pt-8 flex flex-col gap-4 overflow-y-auto max-w-5xl mx-auto w-full z-10 relative">
       <BillingHeader />
-
-      {/* Tabs */}
-      <div className="flex gap-2 px-4 translate-y-px z-20">
-        <BillingTab
-          isActive={tabParam === 'subscription'}
-          label="Subscription"
-          onClick={() => handleTabChange('subscription')}
-        />
-        <BillingTab
-          isActive={tabParam === 'billing-history'}
-          label="Billing History"
-          onClick={() => handleTabChange('billing-history')}
-        />
-      </div>
-
-      {/* Tab Content */}
-      {tabParam === 'subscription' && <SubscriptionTab />}
-      {tabParam === 'billing-history' && <BillingHistoryTab />}
+      <SubscriptionTab />
     </main>
   );
 };

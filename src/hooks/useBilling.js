@@ -1,10 +1,12 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { billingService } from '../api/billingService';
 import { useAuth } from '../context/AuthContext';
 
 export const useBilling = () => {
     const { user } = useAuth();
     const [subscription, setSubscription] = useState(null);
+    const [transactions, setTransactions] = useState([]);
+    const [txLoading, setTxLoading]       = useState(false);
     const [loading, setLoading]           = useState(false);
     const [error, setError]               = useState(null);
 
@@ -15,6 +17,23 @@ export const useBilling = () => {
             setSubscription(res?.data ?? null);
         } catch {
             setSubscription(null);
+        }
+    }, [user]);
+
+    const txFetched = useRef(false);
+
+    const fetchTransactions = useCallback(async () => {
+        if (!user || txFetched.current) return;
+        txFetched.current = true;
+        setTxLoading(true);
+        try {
+            const res = await billingService.getTransactions();
+            setTransactions(res?.data ?? []);
+        } catch {
+            txFetched.current = false; // allow retry on error
+            setTransactions([]);
+        } finally {
+            setTxLoading(false);
         }
     }, [user]);
 
@@ -49,5 +68,15 @@ export const useBilling = () => {
         }
     };
 
-    return { subscription, loading, error, subscribe, cancel, refetch: fetchSubscription };
+    return {
+        subscription,
+        transactions,
+        txLoading,
+        loading,
+        error,
+        subscribe,
+        cancel,
+        refetch: fetchSubscription,
+        fetchTransactions,
+    };
 };
