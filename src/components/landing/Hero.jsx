@@ -58,7 +58,7 @@ export default function Hero() {
 
             <div className="space-y-8">
               <div className="flex justify-between items-center mb-10">
-                <span className="font-sketch text-slate-400 text-lg lg:text-xl">Oct 24, 2024</span>
+                <span className="font-sketch text-slate-400 text-lg lg:text-xl">Jun 24, 2026</span>
                 <div className="flex gap-2">
                   <span className="w-3 h-3 rounded-full bg-slate-100"></span>
                   <span className="w-3 h-3 rounded-full bg-slate-100"></span>

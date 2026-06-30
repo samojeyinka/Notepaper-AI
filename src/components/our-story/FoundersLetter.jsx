@@ -53,7 +53,7 @@ export const FoundersLetter = () => {
               We built Notepaper AI because we missed the weight of a journal in our hands and the freedom of a blank page. We believe that technology should amplify our humanity, not replace it.
             </p>
             <p>
-              Every feature we design—from the "ink & work of art" to our AI-powered reflection prompts—is crafted to help you slow down, think more deeply, and rediscover the joy of your own handwriting.
+              Every feature we design from the "ink & work of art" to our AI-powered reflection prompts are crafted to help you slow down, think more deeply, and rediscover the joy of your own handwriting.
             </p>
             <p>
               Thank you for being part of this journey. We're just getting started.

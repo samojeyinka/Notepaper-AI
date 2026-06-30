@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { scholarService } from '../../api/scholarService';
 import { workspaceCache } from '../../api/workspaceCache';
+import Loader from '../globals/Loader';
 
 // ── Delete confirmation modal ─────────────────────────────────────────────────
 function DeleteModal({ doc, onConfirm, onCancel }) {
@@ -178,22 +179,6 @@ function NewEntryCard({ onClick }) {
     );
 }
 
-// ── Skeleton cards ────────────────────────────────────────────────────────────
-function SkeletonCards() {
-    return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {[1,2,3,4].map(i => (
-                <div key={i} className="bg-white rounded-xl border border-slate-100 p-4 h-44 animate-pulse">
-                    <div className="h-3 bg-slate-100 rounded w-1/3 mb-4" />
-                    <div className="h-3 bg-slate-100 rounded w-full mb-2" />
-                    <div className="h-3 bg-slate-100 rounded w-3/4 mb-2" />
-                    <div className="h-3 bg-slate-100 rounded w-1/2" />
-                </div>
-            ))}
-        </div>
-    );
-}
-
 // ── Main page ─────────────────────────────────────────────────────────────────
 const FILTER_OPTIONS = [
     { value: 'all',      label: 'All'         },
@@ -352,7 +337,9 @@ export default function Scholar() {
 
                 {/* ── Grid ───────────────────────────────────────────── */}
                 {loading ? (
-                    <SkeletonCards />
+                    <div className="flex items-center justify-center py-24">
+                        <Loader size="lg" />
+                    </div>
                 ) : (
                     <>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { scholarService } from '../../api/scholarService';
 import DocumentEditor from './DocumentEditor';
 import Toast from '../globals/Toast';
+import Loader from '../globals/Loader';
 
 // ── CSS injected once for all scholar components ──────────────────────────────
 const SCHOLAR_CSS = `
@@ -134,7 +135,7 @@ function ProgressPanel({ doc }) {
                     <span className="material-icons-round text-emerald-500 text-[14px]">check_circle</span>
                     <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">You can close this tab safely</p>
                 </div>
-                <p className="text-[11px] text-slate-300">Polls every 4 seconds</p>
+               
             </div>
         </div>
     );
@@ -357,12 +358,10 @@ export default function ScholarDocument() {
                         </div>
                     )}
 
-                    {/* Loading skeleton */}
+                    {/* Loading */}
                     {loading && (
-                        <div className="animate-pulse flex flex-col gap-4">
-                            <div className="h-6 bg-slate-100 rounded w-1/2" />
-                            <div className="h-4 bg-slate-100 rounded w-1/3" />
-                            <div className="h-40 bg-slate-100 rounded" />
+                        <div className="flex items-center justify-center py-24">
+                            <Loader size="lg" />
                         </div>
                     )}
 

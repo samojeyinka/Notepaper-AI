@@ -19,13 +19,21 @@ export default function Header() {
       <nav className="fixed top-0 w-full z-50 bg-paper backdrop-blur-md border-b border-slate-200/50">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-          <img src={logo} alt="Notepaper AI" className="w-10"/>
-            <span className="text-xl font-bold tracking-tight font-serif-elegant hidden sm:block text-ink-black">
-              Notepaper<span className="text-primary">-ai</span>
-            </span>
-          
-          </Link>
+          <div className="flex items-center gap-3">
+            <a
+              href="http://127.0.0.1:8020/"
+              className="hidden sm:block text-[12px] font-medium text-slate-400 hover:text-primary transition-colors"
+            >
+              &larr; Synchrome
+            </a>
+            <Link to="/" className="flex items-center gap-2">
+            <img src={logo} alt="Notepaper AI" className="w-10"/>
+              <span className="text-xl font-bold tracking-tight font-serif-elegant hidden sm:block text-ink-black">
+                Notepaper<span className="text-primary">-ai</span>
+              </span>
+
+            </Link>
+          </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8 font-medium">
