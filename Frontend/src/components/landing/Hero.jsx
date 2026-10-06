@@ -18,13 +18,13 @@ export default function Hero() {
         <div className="max-w-3xl mx-auto space-y-6 md:space-y-8">
        
           <h1 className="font-display-serif text-[40px] leading-[1.08] sm:text-6xl lg:text-7xl font-semibold tracking-tight text-stone-900">
-            The note-taking app that
-            <span className="italic text-plum-700"> feels like paper.</span>
+            Write notes in your
+            <span className="italic text-plum-700"> own handwriting.</span>
           </h1>
           <p className="text-stone-600 text-base md:text-xl leading-relaxed max-w-2xl mx-auto">
-            A calm, uncluttered home for everything you want to remember. Write,
-            speak, or paste your thoughts, then organize, search and revisit them
-            whenever you like.
+            A calm, uncluttered home for everything you want to remember. Write
+            in your own handwriting, then let your notes become study plans,
+            flashcards, quizzes and presentations — on a page that feels like paper.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-4 pt-2">
             <Link
@@ -63,7 +63,7 @@ export default function Hero() {
           </div>
           <div className="mx-auto mt-6 max-w-md px-6">
             <p className="text-center text-[13px] text-stone-400">
-              Write by hand, capture by voice, organize into folders, study with flashcards.
+              Your handwriting, turned into study plans, flashcards, quizzes and presentations.
             </p>
           </div>
         </div>
