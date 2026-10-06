@@ -1,0 +1,26 @@
+  version:  '3.8'
+
+  services:
+   cache:
+    image: redis:alpine
+    container_name: notepaper_redis
+    restart: always
+    ports:
+     - "6379:6379"
+    volumes:
+     - cache:/data
+
+   mailpit:
+     image: axllent/mailpit
+     container_name: notepaper_mailpit
+     restart: always
+     ports:
+      - "1025:1025"
+      - "8025:8025"
+  
+  volumes:
+   cache:
+     driver: local
+   
+  
+    

@@ -1,0 +1,1 @@
+export const exportSlug = (title, fallback) => title.replace(/\s+/g, '-').toLowerCase() || fallback;

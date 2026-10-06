@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /backend/
+Disallow: /lockedin/
+Disallow: /signin
+Disallow: /signup
+Disallow: /forgot-password
+Disallow: /restore-account
+
+Sitemap: https://notepaperai.synchrome.co/sitemap.xml

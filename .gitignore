@@ -1,0 +1,33 @@
+# Agent/tooling notes — keep local, not in the repo
+.claude/
+.codex/
+AGENTS_DIFF_SUMMARY.md
+deployment_guide.md
+implementation_plan.md
+
+# Deployment guide — machine-specific, keep local
+deployment-guide.html
+
+# Env / secrets
+.env
+.env.*
+*.env.local
+!.env.example
+
+# Dependencies
+node_modules/
+vendor/
+
+# Build output
+dist/
+dist-ssr/
+build/
+
+# Local databases & caches
+*.sqlite
+*.sqlite-journal
+.phpunit.cache/
+.phpunit.result.cache
+
+# Logs
+*.log

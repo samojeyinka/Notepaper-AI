@@ -1,0 +1,355 @@
+import { useState, useEffect, useCallback, useRef } from 'react';
+import Loader from '../globals/Loader';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
+import { flashcardService } from '../../api/flashcardService';
+import { invalidateFlashcardCache } from '../../pages/FlashcardsPage';
+import { invalidateFolderCache } from '../../pages/FolderPage';
+import { TEMPLATES } from './flashcardTemplates';
+import { FlashcardCard } from './FlashcardCard';
+import { FlashcardHeader } from './FlashcardHeader';
+import { FlashcardToolbar } from './FlashcardToolbar';
+import SEO from '../globals/SEO';
+
+const EMPTY_CARD = { front: '', back: '' };
+
+export const Flashcard = ({ id }) => {
+    const navigate          = useNavigate();
+    const location          = useLocation();
+    const [searchParams]    = useSearchParams();
+    const isNew             = !id;
+    // folder_id from URL when creating a new flashcard from a folder page
+    const urlFolderId       = searchParams.get('folder_id');
+
+    // ── Data state ────────────────────────────────────────────────────────────
+    const [flashcardId, setFlashcardId] = useState(id ?? null);
+    const [title,       setTitle]       = useState('Untitled Flashcard');
+    const [cards,       setCards]       = useState([{ ...EMPTY_CARD }]);
+    const [template,    setTemplate]    = useState('girlies');
+    const [bgColor,     setBgColor]     = useState(TEMPLATES.girlies.defaultBg);
+    const [textColor,   setTextColor]   = useState(TEMPLATES.girlies.defaultText);
+    const [fontFamily,  setFontFamily]  = useState('sans');
+    const [fontSize,    setFontSize]    = useState(18);
+    const [boldSides,   setBoldSides]   = useState({ front: true,  back: true  });
+    const [italicSides, setItalicSides] = useState({ front: false, back: false });
+    const [folder,      setFolder]      = useState(null);
+
+    // ── UI state ──────────────────────────────────────────────────────────────
+    const [activeIndex,    setActiveIndex]    = useState(0);
+    const [editMode,       setEditMode]       = useState(true);
+    const [editSide,       setEditSide]       = useState('front');
+    const [saveStatus,     setSaveStatus]     = useState('idle');
+    const [loading,        setLoading]        = useState(!isNew);
+    const [confirmDelete,  setConfirmDelete]  = useState(false);
+    const saveTimerRef                        = useRef(null);
+    const dirtyRef                            = useRef(false);
+
+    // ── Load existing flashcard ───────────────────────────────────────────────
+    useEffect(() => {
+        if (isNew) return;
+        if (location.state?.skipLoad) return; // data already in memory after first save
+        setLoading(true);
+        flashcardService.show(id)
+            .then(res => {
+                const d = res.data;
+                setTitle(d.title);
+                setCards(d.cards?.length ? d.cards : [{ ...EMPTY_CARD }]);
+                setTemplate(d.template ?? 'girlies');
+                setBgColor(d.bg_color);
+                setTextColor(d.text_color);
+                setFontFamily(d.font_family);
+                setFontSize(d.font_size);
+                // Load per-side overrides if present, otherwise fall back to legacy boolean
+                const overrides = d.style_overrides;
+                setBoldSides(overrides
+                    ? { front: !!overrides.bold_front,   back: !!overrides.bold_back   }
+                    : { front: !!d.is_bold,              back: !!d.is_bold             });
+                setItalicSides(overrides
+                    ? { front: !!overrides.italic_front, back: !!overrides.italic_back }
+                    : { front: !!d.is_italic,            back: !!d.is_italic           });
+                setFolder(d.folder ?? null);
+            })
+            .finally(() => setLoading(false));
+    }, [id, isNew]);
+
+    // ── Auto-save ─────────────────────────────────────────────────────────────
+    const save = useCallback(async (payload) => {
+        setSaveStatus('saving');
+        try {
+            if (!flashcardId) {
+                const res = await flashcardService.create(payload);
+                setFlashcardId(res.data.id);
+                navigate(`/lockedin/flashcards/${res.data.id}`, { replace: true, state: { skipLoad: true } });
+            } else {
+                await flashcardService.update(flashcardId, payload);
+            }
+            setSaveStatus('saved');
+        } catch {
+            setSaveStatus('error');
+        }
+    }, [flashcardId, navigate]);
+
+    const scheduleSave = useCallback(() => {
+        dirtyRef.current = true;
+        clearTimeout(saveTimerRef.current);
+        saveTimerRef.current = setTimeout(() => {
+            if (!dirtyRef.current) return;
+            dirtyRef.current = false;
+            save({
+                title, cards, template,
+                bg_color: bgColor, text_color: textColor,
+                font_family: fontFamily, font_size: fontSize,
+                is_bold:   boldSides.front,
+                is_italic: italicSides.front,
+                style_overrides: {
+                    bold_front:   boldSides.front,
+                    bold_back:    boldSides.back,
+                    italic_front: italicSides.front,
+                    italic_back:  italicSides.back,
+                },
+                ...(urlFolderId && { folder_id: urlFolderId }),
+            });
+        }, 1200);
+    }, [title, cards, template, bgColor, textColor, fontFamily, fontSize, boldSides, italicSides, save]);
+
+    // Watch every style/content change
+    useEffect(() => { if (!loading) scheduleSave(); }, [title, cards, template, bgColor, textColor, fontFamily, fontSize, boldSides, italicSides]); // eslint-disable-line
+
+    // ── Template change resets default colours ────────────────────────────────
+    const handleTemplateChange = (tplKey) => {
+        setTemplate(tplKey);
+        const tpl = TEMPLATES[tplKey];
+        setBgColor(tpl.defaultBg);
+        setTextColor(tpl.defaultText);
+    };
+
+    // ── Card CRUD ─────────────────────────────────────────────────────────────
+    const updateCard = (index, side, html) => {
+        setCards(prev => {
+            const next = [...prev];
+            next[index] = { ...next[index], [side]: html };
+            return next;
+        });
+    };
+
+    const addCard = () => {
+        setCards(prev => [...prev, { ...EMPTY_CARD }]);
+        setActiveIndex(cards.length);
+        setEditSide('front');
+    };
+
+    const removeCard = (index) => {
+        if (cards.length <= 1) return;
+        setCards(prev => prev.filter((_, i) => i !== index));
+        setActiveIndex(i => Math.min(i, cards.length - 2));
+    };
+
+    // ── Navigation ────────────────────────────────────────────────────────────
+    const goNext = () => { setActiveIndex(i => Math.min(i + 1, cards.length - 1)); setEditSide('front'); };
+    const goPrev = () => { setActiveIndex(i => Math.max(i - 1, 0)); setEditSide('front'); };
+
+    // ── Delete ────────────────────────────────────────────────────────────────
+    const handleDelete = () => setConfirmDelete(true);
+
+    const confirmDeleteDeck = async () => {
+        setConfirmDelete(false);
+        if (flashcardId) await flashcardService.delete(flashcardId);
+        invalidateFlashcardCache(folder?.id ?? null);
+        if (folder?.id) invalidateFolderCache(folder.id);
+        navigate(folder?.id ? `/lockedin/folders/${folder.id}` : '/lockedin/library?tab=flashcards');
+    };
+
+    // ── Duplicate ─────────────────────────────────────────────────────────────
+    const handleDuplicate = async () => {
+        if (!flashcardId) return;
+        const res = await flashcardService.duplicate(flashcardId);
+        invalidateFlashcardCache(folder?.id ?? null);
+        if (folder?.id) invalidateFolderCache(folder.id);
+        navigate(`/lockedin/flashcards/${res.data.id}`);
+    };
+
+    if (loading) {
+        return (
+            <div className="flex-1 lg:ml-64 flex items-center justify-center h-screen bg-paper">
+                <Loader size="xl" />
+            </div>
+        );
+    }
+
+    return (
+        <div className="flex flex-col flex-1 h-screen overflow-hidden bg-paper font-display text-stone-900 lg:ml-64 pt-16 lg:pt-0">
+            <SEO title={title} path={id ? `/lockedin/flashcards/${id}` : '/lockedin/flashcards/new'} noIndex={true} />
+            {confirmDelete && (
+                <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+                    <div className="bg-white border border-stone-200 shadow-2xl p-6 max-w-sm w-full mx-4">
+                        <div className="w-12 h-12 bg-red-50 flex items-center justify-center mb-4">
+                            <span className="material-icons-round text-red-500 text-[22px]">delete_outline</span>
+                        </div>
+                        <h3 className="font-display-serif text-lg font-semibold text-stone-900 mb-1">Delete flashcard deck?</h3>
+                        <p className="text-sm text-stone-500 mb-6">This will permanently delete <span className="font-semibold text-stone-700">"{title}"</span> and all its cards. This cannot be undone.</p>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setConfirmDelete(false)}
+                                className="flex-1 px-4 py-2.5 border border-stone-200 text-stone-700 text-sm font-semibold hover:bg-stone-50 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={confirmDeleteDeck}
+                                className="flex-1 px-4 py-2.5 bg-red-500 text-white text-sm font-semibold hover:bg-red-600 transition-colors"
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            <FlashcardHeader
+                title={title}
+                onTitleChange={setTitle}
+                saveStatus={saveStatus}
+                editMode={editMode}
+                onToggleEditMode={() => setEditMode(v => !v)}
+                onDuplicate={handleDuplicate}
+                onDelete={handleDelete}
+                folder={folder}
+                urlFolderId={urlFolderId}
+                flashcardId={flashcardId}
+            />
+
+            {editMode && (
+                <FlashcardToolbar
+                    template={template}   onTemplate={handleTemplateChange}
+                    bgColor={bgColor}     onBgColor={setBgColor}
+                    textColor={textColor} onTextColor={setTextColor}
+                    fontFamily={fontFamily} onFontFamily={setFontFamily}
+                    fontSize={fontSize}   onFontSize={setFontSize}
+                    isBold={boldSides[editSide]}
+                    onBold={val => setBoldSides(s => ({ ...s, [editSide]: val }))}
+                    isItalic={italicSides[editSide]}
+                    onItalic={val => setItalicSides(s => ({ ...s, [editSide]: val }))}
+                />
+            )}
+
+            {/* Main area */}
+            <div className="flex-1 flex flex-col items-center justify-center px-4 py-3 md:py-6 overflow-auto">
+
+                {/* Front / Back toggle (edit mode) */}
+                {editMode && (
+                    <div className="flex items-center bg-stone-100 p-1 gap-1 mb-3 md:mb-4">
+                        {['front', 'back'].map(side => (
+                            <button
+                                key={side}
+                                onClick={() => setEditSide(side)}
+                                className={`px-4 md:px-5 py-1 md:py-1.5 text-[10px] md:text-xs font-semibold transition-colors capitalize ${
+                                    editSide === side
+                                        ? 'bg-white text-stone-900 shadow-sm'
+                                        : 'text-stone-400 hover:text-stone-600'
+                                }`}
+                            >
+                                {side}
+                            </button>
+                        ))}
+                    </div>
+                )}
+
+                {/* Card + side buttons — px-10 on mobile reserves space for the absolute nav buttons */}
+                <div className="relative flex items-center justify-center w-full px-10 md:px-16" style={{ maxWidth: 600 }}>
+
+                    {/* Left side — prev nav (view) / remove card (edit) */}
+                    <div className="absolute left-0 flex flex-col items-center gap-1.5 md:gap-2">
+                        <div className="relative group">
+                            <button
+                                onClick={goPrev}
+                                disabled={activeIndex === 0}
+                                className="w-7 h-7 md:w-9 md:h-9 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-500 hover:border-plum-400 hover:text-plum-700 transition-colors disabled:opacity-25 disabled:cursor-not-allowed shadow-sm active:scale-95"
+                            >
+                                <span className="material-icons-round text-[16px] md:text-[20px]">chevron_left</span>
+                            </button>
+                            <span className="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 bg-stone-900 text-white text-[10px] px-2 py-0.5 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+                                Previous
+                            </span>
+                        </div>
+
+                        {editMode && cards.length > 1 && (
+                            <div className="relative group">
+                                <button
+                                    onClick={() => removeCard(activeIndex)}
+                                    className="w-7 h-7 md:w-9 md:h-9 rounded-full bg-white border border-red-200 flex items-center justify-center text-red-400 hover:bg-red-50 hover:border-red-400 transition-colors shadow-sm active:scale-95"
+                                >
+                                    <span className="material-icons-round text-[15px] md:text-[18px]">remove</span>
+                                </button>
+                                <span className="pointer-events-none absolute -bottom-7 left-1/2 -translate-x-1/2 bg-stone-900 text-white text-[10px] px-2 py-0.5 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+                                    Remove
+                                </span>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Card */}
+                    <FlashcardCard
+                        card={cards[activeIndex]}
+                        template={template}
+                        bgColor={bgColor}
+                        textColor={textColor}
+                        fontFamily={fontFamily}
+                        fontSize={fontSize}
+                        boldSides={boldSides}
+                        italicSides={italicSides}
+                        editMode={editMode}
+                        editSide={editSide}
+                        onChange={(side, html) => updateCard(activeIndex, side, html)}
+                        onSwipeLeft={goNext}
+                        onSwipeRight={goPrev}
+                        cardIndex={activeIndex}
+                        totalCards={cards.length}
+                    />
+
+                    {/* Right side — next nav (view) / add card (edit) */}
+                    <div className="absolute right-0 flex flex-col items-center gap-1.5 md:gap-2">
+                        <div className="relative group">
+                            <button
+                                onClick={goNext}
+                                disabled={activeIndex === cards.length - 1}
+                                className="w-7 h-7 md:w-9 md:h-9 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-500 hover:border-plum-400 hover:text-plum-700 transition-colors disabled:opacity-25 disabled:cursor-not-allowed shadow-sm active:scale-95"
+                            >
+                                <span className="material-icons-round text-[16px] md:text-[20px]">chevron_right</span>
+                            </button>
+                            <span className="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 bg-stone-900 text-white text-[10px] px-2 py-0.5 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+                                Next
+                            </span>
+                        </div>
+
+                        {editMode && (
+                            <div className="relative group">
+                                <button
+                                    onClick={addCard}
+                                    className="w-7 h-7 md:w-9 md:h-9 rounded-full bg-white border border-plum-400 flex items-center justify-center text-plum-700 hover:bg-plum-50 hover:border-plum-600 transition-colors shadow-sm active:scale-95"
+                                >
+                                    <span className="material-icons-round text-[15px] md:text-[18px]">add</span>
+                                </button>
+                                <span className="pointer-events-none absolute -bottom-7 left-1/2 -translate-x-1/2 bg-stone-900 text-white text-[10px] px-2 py-0.5 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+                                    Add Card
+                                </span>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Dot indicators */}
+                <div className="flex items-center gap-2 mt-6">
+                    {cards.map((_, i) => (
+                        <button
+                            key={i}
+                            onClick={() => setActiveIndex(i)}
+                            className={`rounded-full transition-colors ${
+                                i === activeIndex
+                                    ? 'w-5 h-2.5 bg-plum-600'
+                                    : 'w-2.5 h-2.5 bg-stone-300 hover:bg-stone-400'
+                            }`}
+                        />
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+};

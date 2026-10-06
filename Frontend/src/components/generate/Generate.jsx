@@ -1,0 +1,620 @@
+import { useState, useRef, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useAIKeys } from "../../hooks/useAIKeys";
+import { streamWithUserKey } from "../../utils/aiRuntime";
+import { generateService } from "../../api/generateService";
+import AutoFlashcardTab from "./AutoFlashcardTab";
+import AutoPresentationTab from "./AutoPresentationTab";
+import AutoQuizTab from "./AutoQuizTab";
+import AutoDiagramTab from "./AutoDiagramTab";
+import GenerateFromContent from "./GenerateFromContent";
+import { TAB_CONFIG } from "./tabConfig";
+import SEO from "../globals/SEO";
+import NotificationIcon from "../user/NotificationIcon";
+
+const EMPTY_SELECTED = { Notes: [], Papers: [], Slides: [], Flashcards: [] };
+
+// ── Markdown → HTML ───────────────────────────────────────────────────────────
+function escapeHtml(t) {
+    return t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+function inlineFormat(text) {
+    return escapeHtml(text)
+        .replace(/\*\*\*(.+?)\*\*\*/g, "<strong><em>$1</em></strong>")
+        .replace(/\*\*(.+?)\*\*/g,     "<strong>$1</strong>")
+        .replace(/\*(.+?)\*/g,         "<em>$1</em>")
+        .replace(/_(.+?)_/g,           "<em>$1</em>")
+        .replace(/`(.+?)`/g,           "<code class='bg-stone-100 px-1  font-mono'>$1</code>");
+}
+function markdownToHtml(md) {
+    const lines = md.split("\n");
+    const out = [];
+    let inUl = false, inOl = false;
+    const closeList = () => {
+        if (inUl) { out.push("</ul>"); inUl = false; }
+        if (inOl) { out.push("</ol>"); inOl = false; }
+    };
+    for (const raw of lines) {
+        const line = raw.trimEnd();
+        if      (/^### /.test(line)) { closeList(); out.push(`<h3 class="font-bold text-stone-800 mt-3 mb-0.5">${inlineFormat(line.slice(4))}</h3>`); }
+        else if (/^## /.test(line))  { closeList(); out.push(`<h2 class="font-bold text-stone-800 mt-4 mb-1">${inlineFormat(line.slice(3))}</h2>`); }
+        else if (/^# /.test(line))   { closeList(); out.push(`<h1 class="font-bold text-stone-800 mt-5 mb-1">${inlineFormat(line.slice(2))}</h1>`); }
+        else if (/^[-*] /.test(line)) {
+            if (!inUl) { closeList(); out.push('<ul class="list-disc list-inside space-y-0.5 my-1.5 text-stone-700">'); inUl = true; }
+            out.push(`<li>${inlineFormat(line.slice(2))}</li>`);
+        } else if (/^\d+\. /.test(line)) {
+            if (!inOl) { closeList(); out.push('<ol class="list-decimal list-inside space-y-0.5 my-1.5 text-stone-700">'); inOl = true; }
+            out.push(`<li>${inlineFormat(line.replace(/^\d+\. /, ""))}</li>`);
+        } else if (/^-{3,}$/.test(line.trim())) {
+            closeList(); out.push('<hr class="my-3 border-stone-200">');
+        } else if (line.trim() === "") {
+            closeList(); out.push('<div class="h-1.5"></div>');
+        } else {
+            closeList(); out.push(`<p class="leading-relaxed text-stone-700">${inlineFormat(line)}</p>`);
+        }
+    }
+    closeList();
+    return out.join("");
+}
+
+
+const SYSTEM_INSTRUCTION = `You are Schola — an expert study-note generator inside a note-taking app called Notepaper-ai.
+Your job is to produce thorough, well-structured, deeply informative content on any topic the student gives you.
+
+Rules:
+- NEVER add preamble like "Here is your content:" or "Sure!" — start immediately with the content.
+- Use clear headings, bullet points, and numbered lists where appropriate.
+- Provide real depth: explanations, examples, analogies, key facts, and important nuances.
+- Write in plain, readable English unless a different style is requested.
+- Match the requested length. Default to comprehensive — do not cut short unless told to be brief.
+- Never refuse a reasonable academic or writing task.`;
+
+const TONES = [
+    { value: "academic",    label: "Academic",    icon: "school" },
+    { value: "simple",      label: "Simple",      icon: "child_care" },
+    { value: "bullet",      label: "Bullet Notes", icon: "format_list_bulleted" },
+    { value: "storytelling",label: "Story",        icon: "auto_stories" },
+];
+
+const LENGTHS = [
+    { value: "short",    label: "Short",        desc: "~200 words" },
+    { value: "medium",   label: "Medium",       desc: "~500 words" },
+    { value: "long",     label: "Long",         desc: "~1000 words" },
+    { value: "detailed", label: "Very Detailed", desc: "~2000+ words" },
+];
+
+// ── Animated shimmer skeleton ─────────────────────────────────────────────────
+function Skeleton() {
+    return (
+        <div className="flex flex-col gap-3 animate-pulse">
+            {[80, 60, 95, 50, 75, 65, 90].map((w, i) => (
+                <div key={i} className="h-3  bg-stone-200" style={{ width: `${w}%` }} />
+            ))}
+        </div>
+    );
+}
+
+const TABS = [
+    { id: 'generate',      label: 'Generate',      icon: '',  seoTitle: 'AI Generate',       seoDesc: 'Generate notes, summaries, and study content instantly with AI.'    },
+    { id: 'flashcards',    label: 'Flashcards',     icon: 'style',         seoTitle: 'AI Flashcards',     seoDesc: 'Auto-generate flashcard sets from your notes and papers.'          },
+    { id: 'quizzes',       label: 'Quizzes',        icon: 'quiz',          seoTitle: 'AI Quizzes',        seoDesc: 'Create quizzes automatically from your study material.'            },
+    { id: 'presentations', label: 'Presentations',  icon: 'slideshow',     seoTitle: 'AI Presentations',  seoDesc: 'Turn your notes into polished AI-generated presentations.'         },
+    { id: 'diagrams',      label: 'Diagrams',       icon: 'account_tree',  seoTitle: 'AI Diagrams',       seoDesc: 'Generate diagrams and visual study aids from your content.'        },
+];
+
+export default function Generate() {
+    const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
+    const activeTab = searchParams.get('tab') ?? 'generate';
+
+    const setTab = (id) => setSearchParams({ tab: id }, { replace: true });
+
+    const { hasKeys, openModal, loaded } = useAIKeys();
+    const [prompt, setPrompt]   = useState("");
+    const [tone, setTone]       = useState("academic");
+    const [length, setLength]   = useState("long");
+    const [output, setOutput]   = useState("");
+    const [status, setStatus]   = useState("idle"); // idle | streaming | done | error
+    const [copied, setCopied]   = useState(false);
+    const [wordCount, setWordCount] = useState(0);
+    const [mobilePreview, setMobilePreview] = useState(false);
+    const [contentSelected, setContentSelected] = useState(EMPTY_SELECTED);
+    const [contentFiles, setContentFiles] = useState([]);
+
+    const totalSelected = Object.values(contentSelected).reduce((sum, arr) => sum + arr.length, 0);
+    const hasContent = totalSelected > 0 || contentFiles.length > 0;
+
+    const abortRef   = useRef(null);
+    const outputRef  = useRef(null);
+    const promptRef  = useRef(null);
+    const touchStartX = useRef(null);
+
+    const handleTouchStart = (e) => {
+        touchStartX.current = e.touches[0].clientX;
+    };
+
+    const handleTouchEnd = (e) => {
+        if (touchStartX.current === null) return;
+        const delta = e.changedTouches[0].clientX - touchStartX.current;
+        touchStartX.current = null;
+        if (Math.abs(delta) < 50) return;
+        const currentIndex = TABS.findIndex(t => t.id === activeTab);
+        if (delta < 0 && currentIndex < TABS.length - 1) setTab(TABS[currentIndex + 1].id);
+        if (delta > 0 && currentIndex > 0) setTab(TABS[currentIndex - 1].id);
+    };
+
+    useEffect(() => { promptRef.current?.focus(); }, []);
+
+    // Auto-scroll output while streaming
+    useEffect(() => {
+        if (outputRef.current && status === "streaming") {
+            outputRef.current.scrollTop = outputRef.current.scrollHeight;
+        }
+    }, [output, status]);
+
+    // Live word count
+    useEffect(() => {
+        const words = output.trim().split(/\s+/).filter(Boolean).length;
+        setWordCount(output.trim() ? words : 0);
+    }, [output]);
+
+    const buildUserMessage = () => {
+        const toneLabel = TONES.find(t => t.value === tone)?.label ?? tone;
+        const lengthLabel = LENGTHS.find(l => l.value === length)?.label ?? length;
+        return `Topic: ${prompt.trim()}\nTone: ${toneLabel}\nLength: ${lengthLabel}`;
+    };
+
+    const runGenerate = async (userMessage) => {
+        if (!hasKeys) {
+            openModal();
+            setStatus("error");
+            return;
+        }
+
+        setOutput("");
+        setStatus("streaming");
+        abortRef.current = new AbortController();
+
+        try {
+            await streamWithUserKey({
+                system: SYSTEM_INSTRUCTION,
+                prompt: userMessage,
+                signal: abortRef.current.signal,
+                onDelta: (chunk) => setOutput(prev => prev + chunk),
+            });
+            setStatus("done");
+        } catch (err) {
+            if (err.name === "AbortError") {
+                setStatus(output ? "done" : "idle");
+            } else {
+                console.error("[Generate]", err);
+                setStatus("error");
+            }
+        }
+    };
+
+    const handleGenerate = async () => {
+        if ((!prompt.trim() && !hasContent) || status === "streaming") return;
+        setMobilePreview(true);
+
+        if (hasContent) {
+            setOutput("");
+            setStatus("streaming");
+            const materialIds = Object.entries(contentSelected).flatMap(([tab, items]) =>
+                items.map(item => ({ type: TAB_CONFIG[tab].type, id: item.id }))
+            );
+            try {
+                const res = await generateService.notes({
+                    materialIds,
+                    uploads: contentFiles,
+                    topic: prompt.trim() || undefined,
+                    tone,
+                    length,
+                });
+                setOutput(res?.data?.content ?? res?.content ?? '');
+                setStatus("done");
+            } catch (err) {
+                console.error("[Generate]", err);
+                setStatus("error");
+            }
+            return;
+        }
+
+        runGenerate(buildUserMessage());
+    };
+
+    const handleStop = () => abortRef.current?.abort();
+
+    const handleReset = () => {
+        setOutput("");
+        setStatus("idle");
+        setPrompt("");
+        setMobilePreview(false);
+        setTimeout(() => promptRef.current?.focus(), 50);
+    };
+
+    const handleCopy = () => {
+        if (!output.trim()) return;
+        navigator.clipboard.writeText(output.trim()).then(() => {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        });
+    };
+
+    const handleInsert = () => {
+        if (!output.trim()) return;
+        navigate("/lockedin/notes/new", { state: { voiceText: output.trim() } });
+    };
+
+      const handleInsertPaper = () => {
+        if (!output.trim()) return;
+        navigate("/lockedin/papers/new", { state: { voiceText: output.trim() } });
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) handleGenerate();
+    };
+
+    const isStreaming = status === "streaming";
+    const isDone      = status === "done";
+    const isIdle      = status === "idle";
+
+    const activeTabMeta = TABS.find(t => t.id === activeTab);
+
+    return (
+        <div className="flex-1 flex min-h-screen bg-paper font-display text-stone-900 antialiased selection:bg-plum-200">
+            <SEO
+                title={activeTabMeta?.seoTitle}
+                description={activeTabMeta?.seoDesc}
+                path={`/lockedin/generate?tab=${activeTab}`}
+                noIndex={true}
+            />
+            <main className="flex-1 flex flex-col lg:ml-64 min-h-screen">
+
+                {/* ── Top bar ──────────────────────────────────────────────── */}
+                <header className="sticky top-0 z-40 bg-paper/90 backdrop-blur-md border-b border-stone-200/80 px-6 h-16 md:flex items-center justify-between shrink-0">
+                    <div className="flex items-center gap-3">
+                        <span className="font-display-serif text-[18px] font-semibold tracking-tight text-stone-900">AI Studio</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-xs">
+                        {isStreaming && (
+                            <span className="flex items-center gap-1.5 text-primary animate-pulse font-medium">
+                                <span className="w-1.5 h-1.5  bg-primary" />
+                            </span>
+                        )}
+                        {isDone && (
+                            <span className="flex items-center gap-1.5 text-emerald-600 font-medium">
+                                <span className="material-icons-round text-[14px]">check_circle</span>
+                                {wordCount.toLocaleString()} words
+                            </span>
+                        )}
+                        <NotificationIcon />
+                    </div>
+                </header>
+
+                {/* ── Tab strip ──────────────────────────────────────────── */}
+                <div className="shrink-0 bg-paper border-b border-stone-200/80 pt-2 px-2 md:px-6 flex items-center md:gap-1 mt-16 md:mt-0">
+                    {TABS.map(tab => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setTab(tab.id)}
+                            className={`flex-1 md:flex-none flex flex-col md:flex-row items-center justify-center md:justify-start gap-0.5 md:gap-1.5 px-1 md:px-4 py-2 md:py-3.5 text-[9px] md:text-xs font-medium md:font-bold whitespace-nowrap border-b-2 transition-all ${
+                                activeTab === tab.id
+                                    ? 'border-primary text-primary'
+                                    : 'border-transparent text-stone-400 hover:text-stone-600 hover:border-stone-200'
+                            }`}
+                        >
+
+                            <span className="hidden sm:inline">{tab.label}</span>
+                            {tab.soon && (
+                                <span className="hidden md:inline px-1.5 py-0.5 bg-stone-100 text-stone-400  text-[8px] font-bold uppercase tracking-wider">Soon</span>
+                            )}
+                        </button>
+                    ))}
+                </div>
+
+                {/* ── Tab content ─────────────────────────────────────────── */}
+                <div className="flex-1 flex flex-col" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+
+                {/* Flashcards tab */}
+                {activeTab === 'flashcards' && <AutoFlashcardTab />}
+
+                {/* Presentations tab */}
+                {activeTab === 'presentations' && <AutoPresentationTab />}
+
+                {/* Quizzes tab */}
+                {activeTab === 'quizzes' && <AutoQuizTab />}
+
+                {/* Diagrams tab */}
+                {activeTab === 'diagrams' && <AutoDiagramTab />}
+
+                {/* Generate tab (default) */}
+                {activeTab === 'generate' && (
+                <div className="flex-1 p-4 md:p-6 grid grid-cols-12 gap-4 md:gap-6 items-start">
+
+                    {/* ── Left — config panel ──────────────────────────────── */}
+                    <section className="col-span-12 md:col-span-4 flex flex-col gap-4">
+
+                        {/* Settings card */}
+                        <div className="bg-white ring-1 ring-stone-200/70 p-3 md:p-6 flex flex-col gap-5">
+
+                            <div className="flex items-center gap-3">
+                             
+                                <div>
+                                    <h2 className="text-[15px] md:text-base font-semibold text-stone-800 leading-tight">Write settings</h2>
+                                </div>
+                            </div>
+
+                            {/* Prompt */}
+                            <div className="flex flex-col gap-2">
+                                <label className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Topic / prompt</label>
+                                <textarea
+                                    ref={promptRef}
+                                    rows={5}
+                                    value={prompt}
+                                    onChange={e => setPrompt(e.target.value)}
+                                    onKeyDown={handleKeyDown}
+                                    disabled={isStreaming}
+                                    placeholder="What are we writing about today?"
+                                    className="w-full resize-none bg-stone-50 border border-stone-200 px-4 py-3 text-[13px] md:text-sm text-stone-700 placeholder-stone-400 outline-none focus:ring-2 focus:ring-plum-200 transition disabled:opacity-50"
+                                />
+                            </div>
+
+                            {/* Tone */}
+                            <div className="flex flex-col gap-2">
+                                <label className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Tone</label>
+                                <div className="flex flex-wrap gap-2">
+                                    {TONES.map(t => (
+                                        <button
+                                            key={t.value}
+                                            onClick={() => setTone(t.value)}
+                                            disabled={isStreaming}
+                                            className={`px-3 py-2  text-[10px] md:text-xs font-medium md:font-semibold transition-all disabled:opacity-50
+                                                ${tone === t.value
+                                                    ? "bg-stone-900 text-white"
+                                                    : "bg-stone-100 text-stone-500 hover:bg-stone-200"
+                                                }`}
+                                        >
+                                            {t.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Length */}
+                            <div className="flex flex-col gap-2">
+                                <label className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Length</label>
+                                <div className="flex flex-wrap gap-2">
+                                    {LENGTHS.map(l => (
+                                        <button
+                                            key={l.value}
+                                            onClick={() => setLength(l.value)}
+                                            disabled={isStreaming}
+                                            className={`px-3 py-2  text-[10px] md:text-xs font-medium md:font-semibold transition-all disabled:opacity-50
+                                                ${length === l.value
+                                                    ? "bg-stone-900 text-white"
+                                                    : "bg-stone-100 text-stone-500 hover:bg-stone-200"
+                                                }`}
+                                        >
+                                            {l.label}
+                                            <span className="text-[9px] opacity-60 ml-1">{l.desc}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Generate / Stop */}
+                            {isStreaming ? (
+                                <button
+                                    onClick={handleStop}
+                                    className="w-full py-4  bg-red-50 border border-red-200 text-red-500 font-bold flex items-center justify-center gap-2 hover:bg-red-100 transition"
+                                >
+                                    <span className="material-icons-round text-[20px]">stop_circle</span>
+                                    Stop Generating
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={handleGenerate}
+                                    disabled={(!prompt.trim() && !hasContent) || !loaded}
+                                    className="w-full py-3 bg-stone-900 text-white font-semibold text-sm flex items-center justify-center gap-2 hover:bg-stone-700 active:scale-[0.99] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                                >
+                                    {!loaded ? (
+                                        <span className="w-5 h-5 border-2 border-white/30 border-t-white  animate-spin" />
+                                    ) : (
+                                        <>
+                                            {isDone ? "Regenerate" : hasContent ? "Generate from Content" : "Generate"}
+                                        </>
+                                    )}
+                                </button>
+                            )}
+
+                            {isDone && (
+                                <button
+                                    onClick={handleReset}
+                                    className="w-full py-2.5  border border-stone-200 text-stone-500 text-sm font-semibold hover:bg-stone-50 transition"
+                                >
+                                    Start Over
+                                </button>
+                            )}
+                        </div>
+
+                        <GenerateFromContent
+                            description="Generate content directly from your existing Notepaper notes and papers."
+                            sources={[
+                                { icon: 'description', label: 'From a Note' },
+                                { icon: 'article',     label: 'From a Paper' },
+                                { icon: 'folder_open', label: 'From a Folder' },
+                            ]}
+                            selected={contentSelected}
+                            onSelectedChange={setContentSelected}
+                            uploadedFiles={contentFiles}
+                            onUploadedFilesChange={setContentFiles}
+                        />
+                    </section>
+
+                    {/* ── Right — output workspace ─────────────────────────── */}
+                    <section className="hidden md:block md:col-span-8">
+                        <div className="bg-white ring-1 ring-stone-200/70 flex flex-col overflow-hidden relative md:min-h-[500px]">
+
+                            {/* Workspace header */}
+                            <div className="px-6 py-4 flex items-center justify-between border-b border-stone-100 shrink-0">
+                                <div className="flex items-center gap-3">
+                                    <div className="flex items-center gap-2">
+                                      
+                                        <span className="text-xs font-semibold text-stone-500 tracking-wide">Output preview</span>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                    <button
+                                        onClick={handleCopy}
+                                        disabled={!output.trim() || isStreaming}
+                                        title={copied ? "Copied!" : "Copy text"}
+                                        className="p-2 text-stone-400 hover:text-plum-700 hover:bg-plum-50 disabled:opacity-30 transition-colors"
+                                    >
+                                        <span className="material-icons-round text-[18px]">{copied ? "check" : "content_copy"}</span>
+                                    </button>
+                                    <button
+                                        onClick={handleInsert}
+                                        disabled={!output.trim() || isStreaming}
+                                        title="Insert into Note"
+                                        className="p-2 text-stone-400 hover:text-plum-700 hover:bg-plum-50 disabled:opacity-30 transition-colors"
+                                    >
+                                        <span className="material-icons-round text-[18px]">note_add</span>
+                                    </button>
+                                    <button
+                                        onClick={handleInsertPaper}
+                                        disabled={!output.trim() || isStreaming}
+                                        title="Insert into Paper"
+                                        className="p-2 text-stone-400 hover:text-plum-700 hover:bg-plum-50 disabled:opacity-30 transition-colors"
+                                    >
+                                        <span className="material-icons-round text-[18px]">article</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Content area */}
+                            <div ref={outputRef} className="flex-1 overflow-y-auto p-6 md:p-8">
+
+                                {/* Empty state */}
+                                {isIdle && !output && (
+                                    <div className="h-full flex flex-col items-center justify-center gap-6 text-center py-10">
+                                        <div className="w-24 h-24 bg-plum-50 text-plum-700 flex items-center justify-center">
+                                            <span className="material-icons-round text-[44px]">edit_note</span>
+                                        </div>
+                                        <div>
+                                            <h3 className="font-display-serif text-[22px] font-semibold text-stone-900 mb-2 tracking-tight">Ready when you are</h3>
+                                            <p className="text-sm text-stone-500 max-w-sm leading-relaxed mx-auto">
+                                                Tell it what to write below, or pull from a note, paper or folder.
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {isStreaming && !output && <Skeleton />}
+
+                                {output && (
+                                    <div className="text-[13px] leading-relaxed text-stone-700">
+                                        <div dangerouslySetInnerHTML={{ __html: markdownToHtml(output) }} />
+                                        {isStreaming && (
+                                            <span className="inline-block w-0.5 h-3.5 bg-primary ml-0.5 animate-pulse align-text-bottom" />
+                                        )}
+                                    </div>
+                                )}
+
+                                {status === "error" && (
+                                    <div className="flex items-center gap-2 text-red-500 text-sm mt-4">
+                                        <span className="material-icons-round text-[18px]">error_outline</span>
+                                        Something went wrong. Check your API key or try again.
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                )}
+
+                </div>{/* end swipe wrapper */}
+
+                {/* ── Mobile output bottom-sheet (md and below only) ── */}
+                {mobilePreview && (
+                    <div className="md:hidden fixed inset-0 z-50 flex flex-col">
+                        {/* Backdrop */}
+                        <div className="absolute inset-0 bg-black/40" onClick={() => !isStreaming && setMobilePreview(false)} />
+
+                        {/* Sheet */}
+                        <div className="relative mt-auto bg-white flex flex-col shadow-[0_-12px_36px_rgba(28,25,23,0.18)] max-h-[85vh]">
+
+                            {/* Handle + header */}
+                            <div className="px-4 pt-3 pb-3 flex items-center justify-between border-b border-stone-100 shrink-0">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-8 h-1 bg-stone-200  mx-auto absolute left-1/2 -translate-x-1/2 top-2" />
+                                    <span className="text-sm font-semibold text-stone-700 mt-1">Output</span>
+                                    {isStreaming && (
+                                        <span className="flex items-center gap-1 text-[11px] text-primary font-medium animate-pulse">
+                                            <span className="w-1.5 h-1.5  bg-primary" />
+                                        </span>
+                                    )}
+                                    {isDone && (
+                                        <span className="text-[11px] text-emerald-600 font-medium">{wordCount.toLocaleString()} words</span>
+                                    )}
+                                </div>
+                                <div className="flex items-center gap-1">
+                                    <button onClick={handleCopy} disabled={!output.trim() || isStreaming} className="p-1.5  text-stone-400 hover:text-primary disabled:opacity-30 transition-colors">
+                                        <span className="material-icons-round text-[18px]">{copied ? "check" : "content_copy"}</span>
+                                    </button>
+                                    <button onClick={handleInsert} disabled={!output.trim() || isStreaming} className="p-1.5  text-stone-400 hover:text-primary disabled:opacity-30 transition-colors">
+                                        <span className="material-icons-round text-[18px]">note_add</span>
+                                    </button>
+                                    <button onClick={handleInsertPaper} disabled={!output.trim() || isStreaming} className="p-1.5  text-stone-400 hover:text-primary disabled:opacity-30 transition-colors">
+                                        <span className="material-icons-round text-[18px]">article</span>
+                                    </button>
+                                    {!isStreaming && (
+                                        <button onClick={() => setMobilePreview(false)} className="p-1.5  text-stone-400 hover:text-stone-600 transition-colors ml-1">
+                                            <span className="material-icons-round text-[20px]">close</span>
+                                        </button>
+                                    )}
+                                    {isStreaming && (
+                                        <button onClick={handleStop} className="p-1.5  text-red-400 hover:text-red-600 transition-colors ml-1">
+                                            <span className="material-icons-round text-[20px]">stop_circle</span>
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Content */}
+                            <div ref={outputRef} className="flex-1 overflow-y-auto p-5">
+                                {isStreaming && !output && <Skeleton />}
+                                {output && (
+                                    <div className="text-[13px] leading-relaxed text-stone-700">
+                                        <div dangerouslySetInnerHTML={{ __html: markdownToHtml(output) }} />
+                                        {isStreaming && (
+                                            <span className="inline-block w-0.5 h-3.5 bg-primary ml-0.5 animate-pulse align-text-bottom" />
+                                        )}
+                                    </div>
+                                )}
+                                {status === "error" && (
+                                    <div className="flex items-center gap-2 text-red-500 text-sm mt-4">
+                                        <span className="material-icons-round text-[18px]">error_outline</span>
+                                        Something went wrong. Try again.
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Footer actions */}
+                            {isDone && (
+                                <div className="shrink-0 px-5 pb-6 pt-3 border-t border-stone-100 flex gap-2">
+                                    <button onClick={handleReset} className="flex-1 py-2.5  border border-stone-200 text-stone-500 text-sm font-semibold hover:bg-stone-50 transition">
+                                        Start Over
+                                    </button>
+                                    <button onClick={() => setMobilePreview(false)} className="flex-1 py-2.5 bg-stone-900 text-white text-sm font-semibold transition">
+                                        Back to Settings
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
+            </main>
+        </div>
+    );
+}
