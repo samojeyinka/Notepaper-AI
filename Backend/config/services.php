@@ -52,10 +52,6 @@ return [
         'public_key' => env('PAYSTACK_PUBLIC_KEY'),
     ],
 
-    'pexels' => [
-        'key' => env('PEXELS_API_KEY'),
-    ],
-
     'pixabay' => [
         'key' => env('PIXABAY_API_KEY'),
     ],

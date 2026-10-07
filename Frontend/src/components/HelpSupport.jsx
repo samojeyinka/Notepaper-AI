@@ -64,10 +64,6 @@ const CATEGORY_CONTENT = {
         body: 'Add your Gemini or DeepSeek key at /lockedin/profile-settings. Keys are encrypted at rest and only used to call the provider you choose.',
       },
       {
-        heading: 'Application preferences',
-        body: 'Theme, notification preferences, and other app-level settings live at /lockedin/application-settings.',
-      },
-      {
         heading: 'Deleting your account',
         body: 'If you\'d like to close your account you can do so at /lockedin/delete-account. This action is permanent, export any content you want to keep first.',
       },
@@ -162,7 +158,6 @@ const ROUTE_LABELS = {
   '/lockedin/model-guide': 'AI Model Guide',
   '/lockedin/profile-settings': 'Profile Settings',
   '/lockedin/change-password': 'Change Password',
-  '/lockedin/application-settings': 'Application Settings',
   '/lockedin/delete-account': 'Delete Account',
   '/lockedin/support-tickets/new': 'Create a Support Ticket',
   '/lockedin/generate': 'AI Generate',

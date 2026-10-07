@@ -17,7 +17,6 @@ import SprintPage from './SprintPage';
 import LibraryPage from './LibraryPage';
 import ProfileSettingsPage from './ProfileSettingsPage';
 import ChangePasswordPage from './ChangePasswordPage';
-import ApplicationSettingsPage from './ApplicationSettingsPage';
 import NotificationsPage from './NotificationsPage';
 import HelpSupportPage from './HelpSupportPage';
 import SupportTicketsPage from './SupportTicketsPage';
@@ -57,7 +56,6 @@ export{
     LibraryPage,
     ProfileSettingsPage,
     ChangePasswordPage,
-    ApplicationSettingsPage,
     NotificationsPage,
     SupportTicketsPage,
     NewSupportTicketsPage,

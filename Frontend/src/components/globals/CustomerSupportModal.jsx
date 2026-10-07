@@ -23,7 +23,6 @@ const ROUTES_MAP = {
   '/lockedin/study-plan':           'Study Plan',
   '/lockedin/profile-settings':     'Profile Settings',
   '/lockedin/change-password':      'Change Password',
-  '/lockedin/application-settings': 'Application Settings',
   '/lockedin/notifications':        'Notifications',
   '/lockedin/support-tickets':      'My Support Tickets',
   '/lockedin/support-tickets/new':  'Create a Support Ticket',

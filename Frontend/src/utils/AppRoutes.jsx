@@ -5,7 +5,7 @@ import {
     SignInPage, ForgotPasswordPage, ResetPasswordPage, RestoreAccountPage, RestoreAccountFinalPage, DeleteAccountPage, CheckMailPage, VerifyEmailPage, TwoFactorPage, AboutUsPage, FeaturesPage,
     ContactUsPage, HowItWorksPage, OurStoryPage, PrivacyPage,
     LockedInPage, StudyPlanPage, SprintPage, LibraryPage,
-    ProfileSettingsPage, ChangePasswordPage, ApplicationSettingsPage,
+    ProfileSettingsPage, ChangePasswordPage,
     NotificationsPage, HelpSupportPage, SupportTicketsPage, NewSupportTicketsPage, SupportTicketPage,
     TermsPage, PublicFlashcardPage
 } from '../pages/pages';
@@ -236,13 +236,6 @@ const AppRoutes = createBrowserRouter([
         path: '/lockedin/change-password',
         element: <ProtectedRoute><ScrollToTop>
             <ChangePasswordPage />
-        </ScrollToTop></ProtectedRoute>,
-    },
-
-    {
-        path: '/lockedin/application-settings',
-        element: <ProtectedRoute><ScrollToTop>
-            <ApplicationSettingsPage />
         </ScrollToTop></ProtectedRoute>,
     },
 
