@@ -32,7 +32,7 @@ export function AuthProvider({ children }) {
   const initial = readSession();
 
   const [user, setUser] = useState(initial.user);
-  const [isChecked, setIsChecked] = useState(false); // have we tried to hydrate?
+  const [, setIsChecked] = useState(false); // have we tried to hydrate?
 
   const isAuthenticated = !!user;
 

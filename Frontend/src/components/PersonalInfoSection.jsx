@@ -62,7 +62,7 @@ export const PersonalInfoSection = () => {
       } else {
         throw new Error('Upload failed');
       }
-    } catch (err) {
+    } catch {
       setToast({ type: 'error', message: 'Image upload failed. Please try again.' });
     } finally {
       setUploading(false);

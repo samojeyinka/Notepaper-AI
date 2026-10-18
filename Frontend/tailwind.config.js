@@ -31,9 +31,7 @@ export default {
         "note-green": "#10B981",
         "note-purple": "#A78BFA",
         "organic-purple": "#A78BFA",
-        "note-green":"#10B981",
-         "note-yellow":"#FBBF24",
-         "washi-tape": "#F472B6",
+        "washi-tape": "#F472B6",
         accent: {
           yellow: "#FBBF24",
           green: "#10B981",

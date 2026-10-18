@@ -1,5 +1,4 @@
 import React from 'react';
-import { logo } from '../../assets/assets';
 
 /**
  * Shared shell for auth pages: paper background, one  two-column

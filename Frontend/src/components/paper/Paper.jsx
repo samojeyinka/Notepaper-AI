@@ -66,7 +66,7 @@ export const Paper = () => {
     const [aiGeneratingTimedOut, setAIGeneratingTimedOut] = useState(false);
     const [exportWarning, setExportWarning] = useState(null); // 'docx' | 'pptx' | null
     const [folderId, setFolderId] = useState(() => searchParams.get('folder') ?? null);
-    const [folder, setFolder]     = useState(null);
+    const [, setFolder]           = useState(null);
     const [title, setTitle]       = useState("Untitled Paper");
     const [pages, setPages]       = useState(() => {
         const voiceText = location.state?.voiceText;

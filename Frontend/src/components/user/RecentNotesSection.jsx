@@ -23,7 +23,7 @@ const extractSnippet = (raw) => {
     const quoted = cleaned.match(/"((?:[^"\\]|\\.)*)"/);
     if (quoted && quoted[1].trim()) return quoted[1].trim().slice(0, 120);
     return cleaned
-      .replace(/[{}\[\]\\"]/g, ' ')
+      .replace(/[{}\]\\"]/g, ' ')
       .replace(/\s+/g, ' ')
       .trim()
       .slice(0, 120);
