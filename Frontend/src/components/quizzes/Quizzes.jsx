@@ -304,7 +304,7 @@ export default function Quizzes() {
                             Turn your notes into a quiz
                         </h2>
                         <p className="text-stone-400 text-[13px] mt-1.5 leading-relaxed">
-                            Point it at a topic — or one of your notes, papers or decks — and it writes the questions.
+                            Point it at a topic, or one of your notes, papers or decks — and it writes the questions.
                         </p>
                     </div>
                     <button
