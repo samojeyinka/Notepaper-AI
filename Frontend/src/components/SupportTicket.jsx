@@ -150,7 +150,7 @@ const ImageLightbox = ({ src, onClose }) => {
 
 // Message Component
 // isOwn = current user sent this message
-export const Message = ({ author, role, timestamp, content, image, isOwn = false, profilePicture, initials, onImageClick }) => {
+export const Message = ({ author, timestamp, content, image, isOwn = false, profilePicture, initials, onImageClick }) => {
     return (
         <div className={`flex items-end gap-3 ${isOwn ? 'flex-row-reverse' : 'flex-row'}`}>
             {/* Avatar */}

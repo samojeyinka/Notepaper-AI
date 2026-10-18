@@ -111,7 +111,7 @@ export default function VoiceToSpeechPage() {
     const [elapsed, setElapsed] = useState(0);
     const elapsedRef = useRef(null);
 
-    const { voiceState, toggle, supported } = useVoiceToText((segment, isFinal) => {
+    const { voiceState, toggle } = useVoiceToText((segment, isFinal) => {
         if (isFinal) {
             setText(prev => {
                 const base = prev.slice(0, prev.length - interimRef.current.length);

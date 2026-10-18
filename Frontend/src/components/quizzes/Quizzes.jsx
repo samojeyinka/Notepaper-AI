@@ -30,13 +30,10 @@ const subjectLabel = (s) => {
     return s.charAt(0).toUpperCase() + s.slice(1);
 };
 
-const titleCase = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : '');
-
 const PAGE_SIZE = 8;
 
 // ── Quiz card (planner style) ─────────────────────────────────────────────────
 const QuizCard = ({ quiz, onPlay, onDelete }) => {
-    const navigate      = useNavigate();
     const best          = getBestScore(quiz.id);
     const [menuOpen, setMenuOpen] = useState(false);
     const menuRef = useRef(null);

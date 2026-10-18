@@ -468,7 +468,6 @@ const SprintCreate = () => {
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                             {TABS.map(tab => {
                                 const cnt = selectedCount(tab);
-                                const cfg = TAB_CONFIG[tab];
                                 return (
                                     <button key={tab} onClick={() => { setPickerTab(tab); setPickerSearch(''); setPickerOpen(true); }}
                                         className={`group relative overflow-hidden bg-white p-5 text-left transition-all duration-200 hover:-translate-y-0.5 border ${cnt > 0 ? 'border-plum-300' : 'border-stone-200 hover:border-stone-300'}`}>
@@ -493,7 +492,6 @@ const SprintCreate = () => {
                                 <div className="flex flex-wrap gap-2">
                                     {Object.entries(selected).flatMap(([tab, items]) =>
                                         items.map(item => {
-                                            const cfg = TAB_CONFIG[tab];
                                             return (
                                                 <div key={item.id} className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold bg-plum-50 text-plum-700 border border-plum-200">
                                                 

@@ -1,17 +1,21 @@
 name: CI/CD - NotepaperAI
 
-# Runs only on main. Each push goes through commit lint, backend tests with
-# coverage, and a frontend lint+build before anything is deployed. Only if all
-# three checks pass does the deploy job SSH into the VPS.
+# Checks run on every push to main and on every PR targeting main. Each run
+# goes through commit lint, backend tests with coverage, and a frontend
+# lint+build. Only a push to main (never a PR) triggers the deploy job, and
+# only after all three checks pass.
 #
 # Required repository secrets (Settings -> Secrets and variables -> Actions):
 #   VPS_HOST    - IP or hostname of the Ubuntu VPS
-#   VPS_USER    - SSH user (the `deploy` user from the deployment guide)
+#   VPS_USER    - SSH user (on this deployment, `root`)
 #   VPS_SSH_KEY - private SSH key (no passphrase) that can ssh into the VPS
 #   VPS_PORT    - optional, defaults to 22
 
 on:
   push:
+    branches:
+      - main
+  pull_request:
     branches:
       - main
   workflow_dispatch:
@@ -33,13 +37,20 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Lint pushed commit messages
+      - name: Lint commit messages
         run: |
-          if [ "${{ github.event.before }}" != "0000000000000000000000000000000000000000" ]; then
-            npx --yes @commitlint/cli@19 --config commitlint.config.mjs --from "${{ github.event.before }}" --to HEAD
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            FROM="${{ github.event.pull_request.base.sha }}"
+            TO="${{ github.event.pull_request.head.sha }}"
+          elif [ -n "${{ github.event.before }}" ] && [ "${{ github.event.before }}" != "0000000000000000000000000000000000000000" ]; then
+            FROM="${{ github.event.before }}"
+            TO="HEAD"
           else
-            npx --yes @commitlint/cli@19 --config commitlint.config.mjs --from "$(git rev-list --max-parents=0 HEAD)"
+            FROM="$(git rev-parse HEAD~1 2>/dev/null || git rev-list --max-parents=0 HEAD)"
+            TO="HEAD"
           fi
+          echo "Linting commits in range $FROM..$TO"
+          npx --yes @commitlint/cli@19 --config commitlint.config.mjs --from "$FROM" --to "$TO"
 
   backend-tests:
     name: Backend - tests & coverage
@@ -110,6 +121,7 @@ jobs:
   deploy:
     name: Deploy to VPS
     needs: [commitlint, backend-tests, frontend-checks]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: production
     steps:
@@ -121,4 +133,4 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT != '' && secrets.VPS_PORT || '22' }}
           script: |
-            bash /home/deploy/notepaperai-deploy.sh
+            bash /root/notepaperai-deploy.sh

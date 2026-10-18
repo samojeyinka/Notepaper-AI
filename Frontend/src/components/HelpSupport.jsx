@@ -184,7 +184,7 @@ function InlineLinks({ text }) {
 }
 
 // ── Category Card ─────────────────────────────────────────────────────────────
-export const CategoryCard = ({ icon, title, description, onClick }) => {
+export const CategoryCard = ({ title, description, onClick }) => {
   return (
     <button
       onClick={onClick}

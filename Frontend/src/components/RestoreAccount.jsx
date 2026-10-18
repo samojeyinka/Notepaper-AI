@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation, useSearchParams, Link } from 'react-router-dom';
+import { useLocation, useSearchParams, Link } from 'react-router-dom';
 import { authService } from '../api/authService';
 import Toast from './globals/Toast';
 
 export default function RestoreAccount() {
   const location = useLocation();
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
   const prefillEmail = location.state?.email || searchParams.get('email') || '';
