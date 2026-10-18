@@ -24,7 +24,7 @@ export default function Hero() {
           <p className="text-stone-600 text-base md:text-xl leading-relaxed max-w-2xl mx-auto">
             A calm, uncluttered home for everything you want to remember. Write
             in your own handwriting, then let your notes become study plans,
-            flashcards, quizzes and presentations — on a page that feels like paper.
+            flashcards, quizzes and presentations on a page that feels like paper.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-4 pt-2">
             <Link
@@ -53,7 +53,7 @@ export default function Hero() {
             {/* Ruled writing area */}
             <div className="px-6 md:px-10 py-6 md:py-9 paper-rule">
               <p className="font-handwritten text-[19px] md:text-[24px] leading-[28px] text-stone-700">
-                Some of the best ideas arrive quietly — usually when the page
+                Some of the best ideas arrive quietly, usually when the page
                 is open and the phone is somewhere else.
               </p>
               <p className="font-handwritten text-[19px] md:text-[24px] leading-[28px] text-stone-400 mt-4">
