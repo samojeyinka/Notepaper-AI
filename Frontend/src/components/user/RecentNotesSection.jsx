@@ -102,7 +102,7 @@ const PaperMiniCard = ({ paper, onClick }) => (
 const FolderMiniCard = ({ folder, onClick }) => (
   <button onClick={onClick} className={CARD_CLASS}>
     <div className="flex items-center gap-3">
-      <FolderShape shape={folder.shape ?? 'squircle'} color={folder.color ?? '#7c5cc4'} icon={folder.icon ?? 'folder'} size={42} />
+      <FolderShape shape={folder.shape ?? 'squircle'} color={folder.color ?? '#55786d'} icon={folder.icon ?? 'folder'} size={42} />
       <div className="min-w-0">
         <h4 className="font-semibold text-[13.5px] text-stone-800 truncate">{folder.name}</h4>
         <p className="text-[11px] text-stone-400 mt-0.5 capitalize">{folder.shape ?? 'folder'} · {timeAgo(folder.updated_at)}</p>

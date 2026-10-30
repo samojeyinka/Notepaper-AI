@@ -19,7 +19,7 @@ const COLORS = [
     { label: 'Amber',   value: '#B45309' },
     { label: 'Emerald', value: '#059669' },
     { label: 'Rose',    value: '#BE123C' },
-    { label: 'Plum',    value: '#6C4EA6' },
+    { label: 'Sage',    value: '#55786d' },
     { label: 'Sky',     value: '#0284C7' },
     { label: 'Orange',  value: '#C2410C' },
     { label: 'Slate',   value: '#475569' },
@@ -33,7 +33,7 @@ const ICONS = [
 ];
 
 // ── Reusable folder icon renderer ────────────────────────────────────────────
-export const FolderShape = ({ shape = 'squircle', color = '#6C4EA6', icon = 'folder', size = 56 }) => {
+export const FolderShape = ({ shape = 'squircle', color = '#55786d', icon = 'folder', size = 56 }) => {
     const shapeStyle = SHAPES.find(s => s.id === shape)?.style ?? SHAPES[0].style;
     return (
         <div style={{ width: size, height: size, backgroundColor: color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, ...shapeStyle }}>
@@ -46,7 +46,7 @@ export const FolderShape = ({ shape = 'squircle', color = '#6C4EA6', icon = 'fol
 export const CreateFolderModal = ({ onClose, onCreated }) => {
     const [name, setName]               = useState('');
     const [description, setDescription] = useState('');
-    const [color, setColor]             = useState(COLORS[3].value); // Plum default
+    const [color, setColor]             = useState(COLORS[3].value);
     const [shape, setShape]             = useState(SHAPES[0].id);
     const [icon, setIcon]               = useState(ICONS[0]);
     const [loading, setLoading]         = useState(false);
@@ -80,9 +80,9 @@ export const CreateFolderModal = ({ onClose, onCreated }) => {
         "w-full bg-stone-50 border border-stone-200  px-4 py-2.5 text-sm text-stone-800 placeholder:text-stone-400 outline-none focus:border-plum-500 focus:ring-2 focus:ring-plum-100 transition-colors";
 
     return createPortal(
-        <div className="fixed inset-0 z-[100] flex items-center justify-center"
+        <div className="workspace-modal fixed inset-0 z-[100] flex items-center justify-center"
             style={{ background: 'rgba(28,25,23,0.5)', backdropFilter: 'blur(4px)' }}>
-            <div className="bg-paper  md: shadow-2xl ring-1 ring-stone-200 w-full max-w-md mx-4 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="workspace-modal-panel bg-paper md: shadow-2xl ring-1 ring-stone-200 w-full max-w-md mx-4 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
 
                 {/* Header */}
                 <div className="px-6 pt-6 pb-4 border-b border-stone-200/70 flex items-center justify-between">
@@ -238,11 +238,11 @@ export const FloatingAIButton = ({ exclude = [], folderId = null }) => {
     const fcFolderSuffix = folderId ? `?folder_id=${folderId}` : '';
 
     const ITEMS = [
-        { label: 'New Note',       icon: 'edit_note',          color: '#6C4EA6', onClick: () => { setMenuOpen(false); navigate(`/lockedin/notes/new${folderSuffix}`); } },
-        { label: 'New Paper',      icon: 'article',            color: '#6C4EA6', onClick: () => { setMenuOpen(false); navigate(`/lockedin/papers/new${folderSuffix}`); } },
-        { label: 'New Slides',     icon: 'slideshow',          color: '#6C4EA6', onClick: handleNewSlides, loading: creatingSlides },
-        { label: 'New Folder',     icon: 'create_new_folder',  color: '#6C4EA6', onClick: () => { setMenuOpen(false); setShowCreateFolder(true); } },
-        { label: 'New Flashcards', icon: 'style',              color: '#6C4EA6', onClick: () => { setMenuOpen(false); navigate(`/lockedin/flashcards/new${fcFolderSuffix}`); } },
+        { label: 'New Note',       icon: 'edit_note',          color: '#55786d', onClick: () => { setMenuOpen(false); navigate(`/lockedin/notes/new${folderSuffix}`); } },
+        { label: 'New Paper',      icon: 'article',            color: '#55786d', onClick: () => { setMenuOpen(false); navigate(`/lockedin/papers/new${folderSuffix}`); } },
+        { label: 'New Slides',     icon: 'slideshow',          color: '#55786d', onClick: handleNewSlides, loading: creatingSlides },
+        { label: 'New Folder',     icon: 'create_new_folder',  color: '#55786d', onClick: () => { setMenuOpen(false); setShowCreateFolder(true); } },
+        { label: 'New Flashcards', icon: 'style',              color: '#55786d', onClick: () => { setMenuOpen(false); navigate(`/lockedin/flashcards/new${fcFolderSuffix}`); } },
     ];
 
     const visibleItems = ITEMS.filter(item => !exclude.includes(item.label));

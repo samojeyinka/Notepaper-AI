@@ -338,7 +338,7 @@ export const SupportTickets = () => {
     };
 
     return (
-        <main className="flex-1 lg:ml-64 px-4 sm:px-6 lg:px-10 pt-20 lg:pt-10 pb-32 min-w-0 overflow-x-hidden">
+        <main className="support-content flex-1 lg:ml-64 px-4 sm:px-6 lg:px-10 pt-20 lg:pt-10 pb-32 min-w-0 overflow-x-hidden">
             <div className="max-w-4xl mx-auto">
                 <SupportArchiveHeader />
                 <SupportArchiveContent activeTab={activeTab} onTabChange={handleTabChange} />

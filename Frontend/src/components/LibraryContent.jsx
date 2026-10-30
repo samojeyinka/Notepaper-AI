@@ -44,11 +44,11 @@ const extractSnippet = (raw) => {
 
 // ── Tab config ────────────────────────────────────────────────────────────────
 const TABS = [
-    { id: 'notes',         label: 'Notes',         icon: 'description', accent: '#6C4EA6' },
-    { id: 'papers',        label: 'Papers',        icon: 'article',     accent: '#6C4EA6' },
-    { id: 'folders',       label: 'Folders',       icon: 'folder',      accent: '#6C4EA6' },
-    { id: 'presentations', label: 'Slides',        icon: 'slideshow',   accent: '#6C4EA6' },
-    { id: 'flashcards',    label: 'Flashcards',    icon: 'style',       accent: '#6C4EA6' },
+    { id: 'notes',         label: 'Notes',         icon: 'description', accent: '#55786d' },
+    { id: 'papers',        label: 'Papers',        icon: 'article',     accent: '#55786d' },
+    { id: 'folders',       label: 'Folders',       icon: 'folder',      accent: '#55786d' },
+    { id: 'presentations', label: 'Slides',        icon: 'slideshow',   accent: '#55786d' },
+    { id: 'flashcards',    label: 'Flashcards',    icon: 'style',       accent: '#55786d' },
 ];
 
 // ── Sort options ──────────────────────────────────────────────────────────────
@@ -155,13 +155,13 @@ const CardShell = ({ onClick, className = '', children }) => (
 const FolderGridCard = ({ folder, onClick, onDelete }) => (
     <CardShell onClick={onClick}>
         <div className="bg-white ring-1 ring-stone-200/70 p-5 flex flex-col items-center justify-center relative overflow-hidden transition-all duration-300 hover:-translate-y-0.5 hover:ring-plum-200 aspect-square">
-            <div className="absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity" style={{ backgroundColor: folder.color ?? '#6C4EA6' }} />
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity" style={{ backgroundColor: folder.color ?? '#55786d' }} />
             {onDelete && (
                 <div className="absolute top-2 right-2 z-10">
                     <CardMenu onDelete={onDelete} />
                 </div>
             )}
-            <FolderShape shape={folder.shape ?? 'squircle'} color={folder.color ?? '#6C4EA6'} icon={folder.icon ?? 'folder'} size={56} />
+            <FolderShape shape={folder.shape ?? 'squircle'} color={folder.color ?? '#55786d'} icon={folder.icon ?? 'folder'} size={56} />
             <h3 className="text-[13px] font-semibold text-stone-800 text-center mt-3 leading-tight line-clamp-2">{folder.name}</h3>
             <p className="text-stone-400 text-[11px] mt-1">{timeAgo(folder.updated_at)}</p>
         </div>
@@ -187,7 +187,7 @@ const NoteCard = ({ note, onClick, onDelete }) => {
                 <p className="text-stone-400 text-[12px] line-clamp-3 font-serif italic leading-relaxed flex-1">{snippet || 'No content yet.'}</p>
                 {note.folder && (
                     <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-stone-100">
-                        <div className="w-3.5 h-3.5  shrink-0" style={{ backgroundColor: note.folder.color ?? '#6C4EA6' }} />
+                        <div className="w-3.5 h-3.5 shrink-0" style={{ backgroundColor: note.folder.color ?? '#55786d' }} />
                         <span className="text-[11px] text-stone-400 truncate">{note.folder.name}</span>
                     </div>
                 )}
@@ -215,7 +215,7 @@ const PaperCard = ({ paper, onClick, onDelete }) => {
                 <p className="text-stone-400 text-[12px] line-clamp-3 leading-relaxed flex-1">{snippet || 'No content yet.'}</p>
                 {paper.folder && (
                     <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-stone-100">
-                        <div className="w-3.5 h-3.5  shrink-0" style={{ backgroundColor: paper.folder.color ?? '#6C4EA6' }} />
+                        <div className="w-3.5 h-3.5 shrink-0" style={{ backgroundColor: paper.folder.color ?? '#55786d' }} />
                         <span className="text-[11px] text-stone-400 truncate">{paper.folder.name}</span>
                     </div>
                 )}
@@ -359,11 +359,11 @@ const FAB = ({ onNote, onPaper, onFolder, onPresentation, onFlashcard }) => {
     }, []);
 
     const items = [
-        { icon: 'note_add',           label: 'New Note',         color: '#6C4EA6', onClick: onNote },
-        { icon: 'article',            label: 'New Paper',        color: '#6C4EA6', onClick: onPaper },
-        { icon: 'create_new_folder',  label: 'New Folder',       color: '#6C4EA6', onClick: onFolder },
-        { icon: 'slideshow',          label: 'New Slides',       color: '#6C4EA6', onClick: onPresentation },
-        { icon: 'style',              label: 'New Flashcards',   color: '#6C4EA6', onClick: onFlashcard },
+        { icon: 'note_add',           label: 'New Note',         color: '#55786d', onClick: onNote },
+        { icon: 'article',            label: 'New Paper',        color: '#55786d', onClick: onPaper },
+        { icon: 'create_new_folder',  label: 'New Folder',       color: '#55786d', onClick: onFolder },
+        { icon: 'slideshow',          label: 'New Slides',       color: '#55786d', onClick: onPresentation },
+        { icon: 'style',              label: 'New Flashcards',   color: '#55786d', onClick: onFlashcard },
     ];
 
     return (
@@ -636,9 +636,9 @@ export const LibraryContent = () => {
                 onCancel={() => setDeleteTarget(null)}
             />
         )}
-        <main className="flex-1 lg:ml-64 p-4 lg:p-8 pt-20 lg:pt-8 min-w-0 overflow-x-hidden pb-28">
+        <main className="library-content flex-1 lg:ml-64 p-4 lg:p-8 pt-20 lg:pt-8 min-w-0 overflow-x-hidden pb-28">
             {/* Header */}
-            <header className="mb-8 flex items-center justify-between">
+            <header className="library-header mb-8 flex items-center justify-between">
                 <div>
                     <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-plum-700 mb-1.5">Your workspace</p>
                     <h1 className="font-display-serif text-[28px] md:text-[34px] font-semibold tracking-tight text-stone-900 leading-tight">Library</h1>
@@ -648,7 +648,7 @@ export const LibraryContent = () => {
             </header>
 
             {/* Tabs */}
-            <div className="flex items-center gap-1 mb-3 md:mb-6 border-b border-stone-200 overflow-x-auto">
+            <div className="library-tabs flex items-center gap-1 mb-3 md:mb-6 border-b border-stone-200 overflow-x-auto">
                 {TABS.map(tab => (
                     <button
                         key={tab.id}
@@ -665,7 +665,7 @@ export const LibraryContent = () => {
             </div>
 
             {/* Search + Sort row */}
-            <div className="flex items-center gap-3 mb-3 md:mb-6 flex-wrap">
+            <div className="library-controls flex items-center gap-3 mb-3 md:mb-6 flex-wrap">
                 <div className="flex-1 min-w-0">
                     <SearchBar value={search} onChange={handleSearch} placeholder={`Search ${activeTab}…`} />
                 </div>
@@ -707,7 +707,7 @@ export const LibraryContent = () => {
                     {view === 'grid' && (
                         <>
                             {activeTab === 'notes' && (
-                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+                                <div className="library-grid grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
                                     {tabData.map(note => (
                                         <NoteCard key={note.id} note={note} onClick={() => navigate(`/lockedin/notes/${note.id}`)} onDelete={() => setDeleteTarget({ tab: 'notes', item: note })} />
                                     ))}
@@ -721,7 +721,7 @@ export const LibraryContent = () => {
                                 </div>
                             )}
                             {activeTab === 'papers' && (
-                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+                                <div className="library-grid grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
                                     {tabData.map(paper => (
                                         <PaperCard key={paper.id} paper={paper} onClick={() => navigate(`/lockedin/papers/${paper.id}`)} onDelete={() => setDeleteTarget({ tab: 'papers', item: paper })} />
                                     ))}
@@ -735,7 +735,7 @@ export const LibraryContent = () => {
                                 </div>
                             )}
                             {activeTab === 'folders' && (
-                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
+                                <div className="library-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
                                     {tabData.map(f => (
                                         <FolderGridCard key={f.id} folder={f} onClick={() => navigate(`/lockedin/folders/${f.id}`)} onDelete={() => setDeleteTarget({ tab: 'folders', item: f })} />
                                     ))}
@@ -749,7 +749,7 @@ export const LibraryContent = () => {
                                 </div>
                             )}
                             {activeTab === 'presentations' && (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
+                                <div className="library-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
                                     {tabData.map(pres => (
                                         <PresentationCard key={pres.id} pres={pres} onClick={() => navigate(`/lockedin/presentations/${pres.id}`)} onDelete={() => setDeleteTarget({ tab: 'presentations', item: pres })} />
                                     ))}
@@ -763,7 +763,7 @@ export const LibraryContent = () => {
                                 </div>
                             )}
                             {activeTab === 'flashcards' && (
-                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+                                <div className="library-grid grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
                                     {tabData.map(deck => (
                                         <FlashcardCard key={deck.id} deck={deck} onClick={() => navigate(`/lockedin/flashcards/${deck.id}`)} />
                                     ))}

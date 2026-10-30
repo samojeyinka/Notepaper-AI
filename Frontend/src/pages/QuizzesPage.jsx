@@ -4,7 +4,7 @@ import SEO from "../components/globals/SEO";
 
 const QuizzesPage = () => {
   return (
-    <div className="flex min-h-screen bg-paper font-display text-stone-900 antialiased selection:bg-plum-200">
+    <div className="lockedin-page quizzes-page flex min-h-screen font-display text-stone-900 antialiased">
       <SEO title="Quizzes" description="Test yourself with AI-generated quizzes from your study material." path="/lockedin/quizzes" noIndex={true} />
       <Sidebar activePage="/lockedin/quizzes" />
       <Quizzes/>

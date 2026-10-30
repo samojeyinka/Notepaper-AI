@@ -162,10 +162,10 @@ const SprintsList = () => {
     const hasData = !loading && !error && sprints.length > 0;
 
     return (
-        <div className="flex-1 lg:ml-64 px-4 sm:px-6 lg:px-10 pt-20 lg:pt-10 pb-32 min-w-0 overflow-x-hidden">
+        <div className="sprints-content flex-1 lg:ml-64 px-4 sm:px-6 lg:px-10 pt-20 lg:pt-10 pb-32 min-w-0 overflow-x-hidden">
 
             {/* Header */}
-            <div className="flex items-end justify-between gap-4 mb-8">
+            <div className="sprints-header flex items-end justify-between gap-4 mb-8">
                 <div>
                     <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-plum-700 mb-1.5">Focused study</p>
                     <h1 className="font-display-serif text-[28px] md:text-[34px] font-semibold tracking-tight text-stone-900 leading-tight">Sprints</h1>

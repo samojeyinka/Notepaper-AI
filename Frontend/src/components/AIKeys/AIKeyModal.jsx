@@ -322,10 +322,10 @@ export default function AIKeyModal() {
     };
 
     return (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center">
+        <div className="workspace-modal fixed inset-0 z-[60] flex items-center justify-center">
             <div className="absolute inset-0 bg-stone-900/40 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
 
-            <div className="relative w-[92%] max-w-lg bg-white shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-200 border border-stone-900/10 max-h-[90vh] flex flex-col">
+            <div className="workspace-modal-panel relative w-[92%] max-w-lg bg-white shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-200 border border-stone-900/10 max-h-[90vh] flex flex-col">
                 <div className="px-5 py-4 bg-stone-900 text-white flex items-center justify-between shrink-0">
                     <div className="flex items-center gap-3">
                         <span className="w-9 h-9 bg-white/10 text-plum-300 flex items-center justify-center">
