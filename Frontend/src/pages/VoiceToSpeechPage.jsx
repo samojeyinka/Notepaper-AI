@@ -130,7 +130,6 @@ export default function VoiceToSpeechPage() {
     // Countdown display
     useEffect(() => {
         if (voiceState === 'countdown') {
-            setCountdown(3);
             countdownIntervalRef.current = setInterval(() => {
                 setCountdown(c => c - 1);
             }, 1000);
@@ -143,7 +142,6 @@ export default function VoiceToSpeechPage() {
     // Elapsed timer while listening
     useEffect(() => {
         if (voiceState === 'listening') {
-            setElapsed(0);
             elapsedRef.current = setInterval(() => setElapsed(s => s + 1), 1000);
         } else {
             clearInterval(elapsedRef.current);
@@ -194,6 +192,13 @@ export default function VoiceToSpeechPage() {
     const isListening   = voiceState === 'listening';
     const isCountdown   = voiceState === 'countdown';
     const isUnsupported = voiceState === 'unsupported';
+    const handleVoiceToggle = () => {
+        if (voiceState === 'idle') {
+            setCountdown(3);
+            setElapsed(0);
+        }
+        toggle();
+    };
 
     return (
         <div className="flex min-h-screen bg-paper font-display text-stone-900 antialiased selection:bg-plum-200">
@@ -241,7 +246,7 @@ export default function VoiceToSpeechPage() {
                                     </>
                                 )}
                                 <button
-                                    onClick={toggle}
+                                    onClick={handleVoiceToggle}
                                     disabled={isUnsupported}
                                     className={`relative w-24 h-24 md:w-28 md:h-28 flex items-center justify-center text-white transition-all focus:outline-none border-2
                                         ${isListening

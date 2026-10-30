@@ -51,18 +51,13 @@ const ChallengeCard = ({ challenge, onClick }) => {
 
 const UpcomingQuizzesSection = () => {
     const navigate = useNavigate();
-    const [sprint,     setSprint]     = useState(null);
-    const [challenges, setChallenges] = useState([]);
-    const [loading,    setLoading]    = useState(true);
+    const [cachedActiveSprint] = useState(() => workspaceCache.getActiveSprint());
+    const [sprint,     setSprint]     = useState(() => cachedActiveSprint?.sprint ?? null);
+    const [challenges, setChallenges] = useState(() => cachedActiveSprint?.challenges ?? []);
+    const [loading,    setLoading]    = useState(() => !cachedActiveSprint);
 
     useEffect(() => {
-        const cached = workspaceCache.getActiveSprint();
-        if (cached) {
-            setSprint(cached.sprint);
-            setChallenges(cached.challenges);
-            setLoading(false);
-            return;
-        }
+        if (cachedActiveSprint) return;
 
         sprintService.list()
             .then(res => {
@@ -83,7 +78,7 @@ const UpcomingQuizzesSection = () => {
             })
             .catch(() => {})
             .finally(() => setLoading(false));
-    }, []);
+    }, [cachedActiveSprint]);
 
     return (
         <div className="xl:col-span-1">

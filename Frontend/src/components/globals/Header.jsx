@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { notepaperMark } from '../../assets/assets';
 import { useAuth } from '../../context/AuthContext';
 
 const NAV_LINKS = [

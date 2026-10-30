@@ -1,5 +1,4 @@
 import React from 'react';
-import { notepaperMark } from '../../assets/assets';
 import { Link } from 'react-router-dom';
 import { FiGithub, FiTwitter, FiFacebook } from 'react-icons/fi';
 

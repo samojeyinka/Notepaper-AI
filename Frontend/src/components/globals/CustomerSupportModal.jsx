@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { isAIOverloadedError } from '../../utils/aiErrors';
 import { apiClient } from '../../api/apiClient';
-import { notepaperMark } from '../../assets/assets';
 
 const TICKET_URL     = '/lockedin/support-tickets/new';
 
