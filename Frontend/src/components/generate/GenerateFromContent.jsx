@@ -31,12 +31,12 @@ const MaterialPickerModal = ({
 
     return createPortal(
         <div
-            className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center"
+            className="workspace-modal fixed inset-0 z-[9999] flex items-end sm:items-center justify-center"
             style={{ background: 'rgba(15,23,42,0.5)', backdropFilter: 'blur(4px)' }}
             onClick={onClose}
         >
             <div
-                className="bg-white w-full sm:max-w-md -[1rem] sm:-[1rem] shadow-2xl flex flex-col overflow-hidden"
+                className="workspace-modal-panel bg-white w-full sm:max-w-md -[1rem] sm:-[1rem] shadow-2xl flex flex-col overflow-hidden"
                 style={{ maxHeight: '85vh' }}
                 onClick={e => e.stopPropagation()}
             >

@@ -262,17 +262,17 @@ export default function Generate() {
     const activeTabMeta = TABS.find(t => t.id === activeTab);
 
     return (
-        <div className="flex-1 flex min-h-screen bg-paper font-display text-stone-900 antialiased selection:bg-plum-200">
+        <div className="studio-workspace flex-1 flex min-h-screen font-display text-stone-900 antialiased">
             <SEO
                 title={activeTabMeta?.seoTitle}
                 description={activeTabMeta?.seoDesc}
                 path={`/lockedin/generate?tab=${activeTab}`}
                 noIndex={true}
             />
-            <main className="flex-1 flex flex-col lg:ml-64 min-h-screen">
+            <main className="studio-main flex-1 flex flex-col lg:ml-64 min-h-screen">
 
                 {/* ── Top bar ──────────────────────────────────────────────── */}
-                <header className="sticky top-0 z-40 bg-paper/90 backdrop-blur-md border-b border-stone-200/80 px-6 h-16 md:flex items-center justify-between shrink-0">
+                <header className="studio-header sticky top-0 z-40 border-b px-6 h-16 md:flex items-center justify-between shrink-0">
                     <div className="flex items-center gap-3">
                         <span className="font-display-serif text-[18px] font-semibold tracking-tight text-stone-900">AI Studio</span>
                     </div>
@@ -293,7 +293,7 @@ export default function Generate() {
                 </header>
 
                 {/* ── Tab strip ──────────────────────────────────────────── */}
-                <div className="shrink-0 bg-paper border-b border-stone-200/80 pt-2 px-2 md:px-6 flex items-center md:gap-1 mt-16 md:mt-0">
+                <div className="studio-tabs shrink-0 border-b pt-2 px-2 md:px-6 flex items-center md:gap-1 mt-16 md:mt-0">
                     {TABS.map(tab => (
                         <button
                             key={tab.id}
@@ -314,7 +314,7 @@ export default function Generate() {
                 </div>
 
                 {/* ── Tab content ─────────────────────────────────────────── */}
-                <div className="flex-1 flex flex-col" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+                <div className="studio-tab-content flex-1 flex flex-col" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
 
                 {/* Flashcards tab */}
                 {activeTab === 'flashcards' && <AutoFlashcardTab />}
@@ -330,13 +330,13 @@ export default function Generate() {
 
                 {/* Generate tab (default) */}
                 {activeTab === 'generate' && (
-                <div className="flex-1 p-4 md:p-6 grid grid-cols-12 gap-4 md:gap-6 items-start">
+                <div className="studio-config-grid flex-1 p-4 md:p-6 grid grid-cols-12 gap-4 md:gap-6 items-start">
 
                     {/* ── Left — config panel ──────────────────────────────── */}
                     <section className="col-span-12 md:col-span-4 flex flex-col gap-4">
 
                         {/* Settings card */}
-                        <div className="bg-white ring-1 ring-stone-200/70 p-3 md:p-6 flex flex-col gap-5">
+                        <div className="studio-settings-card bg-white ring-1 ring-stone-200/70 p-3 md:p-6 flex flex-col gap-5">
 
                             <div className="flex items-center gap-3">
                              
@@ -453,7 +453,7 @@ export default function Generate() {
                     </section>
 
                     {/* ── Right — output workspace ─────────────────────────── */}
-                    <section className="hidden md:block md:col-span-8">
+                    <section className="studio-preview hidden md:block md:col-span-8">
                         <div className="bg-white ring-1 ring-stone-200/70 flex flex-col overflow-hidden relative md:min-h-[500px]">
 
                             {/* Workspace header */}

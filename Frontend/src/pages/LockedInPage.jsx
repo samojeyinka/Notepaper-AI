@@ -2,7 +2,6 @@ import { DashboardContent } from "../components/user/DashboardContent";
 import { FloatingAIButton } from "../components/user/FloatingAIButton";
 import { Sidebar } from "../components/user/Sidebar";
 import SEO from "../components/globals/SEO";
-import "../styles/Dashboard.css";
 
 const LockedInPage = () => {
   return (

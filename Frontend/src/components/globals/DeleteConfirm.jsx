@@ -22,7 +22,7 @@ export function CardMenu({ onDelete, extraActions = [] }) {
                 <span className="material-icons-round text-[18px]">more_vert</span>
             </button>
             {open && (
-                <div className="absolute right-0 top-full mt-1 bg-white border border-slate-200  shadow-lg z-20 py-1 min-w-[130px]">
+                <div className="workspace-menu absolute right-0 top-full mt-1 bg-white border border-slate-200 shadow-lg z-20 py-1 min-w-[130px]">
                     {extraActions.map((action, i) => (
                         <button
                             key={i}
@@ -51,10 +51,10 @@ export function CardMenu({ onDelete, extraActions = [] }) {
 // ── Delete confirmation modal ─────────────────────────────────────────────────
 export function DeleteConfirmModal({ title, subtitle, warning, onConfirm, onCancel }) {
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onCancel}>
+        <div className="workspace-modal fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onCancel}>
             <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px]" />
             <div
-                className="relative bg-white  shadow-xl w-full max-w-sm p-6 flex flex-col gap-4"
+                className="workspace-modal-panel relative bg-white shadow-xl w-full max-w-sm p-6 flex flex-col gap-4"
                 onClick={e => e.stopPropagation()}
             >
                 <div className="flex items-center gap-3">

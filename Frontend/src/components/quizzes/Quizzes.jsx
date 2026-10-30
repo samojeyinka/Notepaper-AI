@@ -113,7 +113,7 @@ const QuizCard = ({ quiz, onPlay, onDelete }) => {
                         right: menuRef.current ? window.innerWidth - menuRef.current.getBoundingClientRect().right : 0,
                         zIndex: 9999,
                     }}
-                    className="bg-white ring-1 ring-stone-200 shadow-xl shadow-stone-900/10 py-1 w-40"
+                    className="workspace-menu bg-white ring-1 ring-stone-200 shadow-xl shadow-stone-900/10 py-1 w-40"
                 >
                     <button
                         onClick={() => {
@@ -235,10 +235,10 @@ export default function Quizzes() {
     const goPlay = (id) => navigate(`/lockedin/quizzes/${id}/play`);
 
     return (
-        <div className="flex-1 lg:ml-64 px-4 sm:px-6 lg:px-10 pt-20 lg:pt-10 pb-32 min-w-0 overflow-x-hidden">
+        <div className="quizzes-content flex-1 lg:ml-64 px-4 sm:px-6 lg:px-10 pt-20 lg:pt-10 pb-32 min-w-0 overflow-x-hidden">
 
             {/* Header */}
-            <div className="flex items-end justify-between gap-4 mb-8">
+            <div className="quizzes-header flex items-end justify-between gap-4 mb-8">
                 <div>
                     <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-plum-700 mb-1.5">Test yourself</p>
                     <h1 className="font-display-serif text-[28px] md:text-[34px] font-semibold tracking-tight text-stone-900 leading-tight">Quizzes</h1>

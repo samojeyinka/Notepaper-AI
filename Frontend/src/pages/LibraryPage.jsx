@@ -4,7 +4,7 @@ import SEO from "../components/globals/SEO";
 
 const LibraryPage = () => {
   return (
-    <div className="flex min-h-screen bg-paper font-display text-stone-900 antialiased selection:bg-plum-200">
+    <div className="lockedin-page library-page flex min-h-screen font-display text-stone-900 antialiased">
       <SEO title="Library" description="All your notes, papers, and flashcards in one place." path="/lockedin/library" noIndex={true} />
       <Sidebar activePage="/lockedin/library" />
       <LibraryContent/>
