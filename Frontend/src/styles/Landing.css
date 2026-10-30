@@ -21,7 +21,19 @@
 .landing-page nav a.bg-stone-900,
 .landing-page nav button.bg-stone-900 { border-radius: 999px; }
 
-.landing-hero { background: var(--landing-cream); }
+.landing-hero { padding: 10px 18px 0; background: var(--landing-cream); }
+.landing-hero-panel {
+  min-height: clamp(500px, 68vh, 740px);
+  max-width: 1500px;
+  border-radius: 20px;
+  color: #fffdfa;
+  background: linear-gradient(165deg, #52777c 0%, #7e9998 54%, #c4bca9 100%);
+  isolation: isolate;
+}
+.landing-hero-copy p { color: rgba(255, 253, 250, .9); }
+.landing-hero-panel .landing-heading span { color: #f0dfc5; }
+.landing-button-hero-ghost { border: 1px solid rgba(255, 253, 250, .68); color: #fffdfa; background: rgba(255, 253, 250, .08); }
+.landing-button-hero-ghost:hover { border-color: #fffdfa; background: rgba(255, 253, 250, .18); }
 .landing-kicker {
   color: #77716a;
   font-size: 11px;
@@ -364,6 +376,12 @@
 }
 
 @media (max-width: 767px) {
+  .landing-hero { padding: 8px 12px 0; }
+  .landing-hero-panel { min-height: 490px; border-radius: 14px; }
+  .landing-hero-copy { padding-top: 62px; padding-bottom: 62px; }
+  .landing-hero-copy .landing-heading { font-size: clamp(38px, 11vw, 54px); }
+  .landing-dune-back { height: 48%; }
+  .landing-dune-front { height: 36%; bottom: -40%; }
   .auth-aside { display: none; }
   .auth-main { padding: 22px 12px; }
   .auth-shell { border-radius: 18px; }

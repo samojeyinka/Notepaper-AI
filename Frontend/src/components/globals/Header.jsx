@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import AccountMenu from '../user/AccountMenu';
 
 const NAV_LINKS = [
   { label: 'Features', href: 'features' },
@@ -10,7 +11,7 @@ const NAV_LINKS = [
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   return (
     <>
@@ -40,20 +41,7 @@ export default function Header() {
           {/* Desktop actions */}
           <div className="hidden md:flex items-center gap-3">
             {isAuthenticated ? (
-              <>
-                <Link
-                  to="/lockedin"
-                  className="px-5 py-2  text-[14px] font-semibold border border-stone-300 text-stone-800 hover:border-stone-900 transition-colors"
-                >
-                  Dashboard
-                </Link>
-                <button
-                  onClick={logout}
-                  className="px-5 py-2  text-[14px] font-semibold text-stone-500 hover:text-stone-900 transition-colors"
-                >
-                  Log out
-                </button>
-              </>
+              <AccountMenu />
             ) : (
               <>
                 <Link
@@ -73,15 +61,18 @@ export default function Header() {
           </div>
 
           {/* Mobile toggle */}
-          <button
-            aria-label="Toggle menu"
-            onClick={() => setMobileMenuOpen((v) => !v)}
-            className="md:hidden p-2 -mr-2  hover:bg-stone-100 transition-colors text-stone-900"
-          >
-            <span className="material-symbols-outlined text-[28px]">
-              {mobileMenuOpen ? 'close' : 'menu'}
-            </span>
-          </button>
+          <div className="md:hidden flex items-center gap-2">
+            {isAuthenticated && <AccountMenu compact />}
+            <button
+              aria-label="Toggle menu"
+              onClick={() => setMobileMenuOpen((v) => !v)}
+              className="p-2 -mr-2 hover:bg-stone-100 transition-colors text-stone-900"
+            >
+              <span className="material-symbols-outlined text-[28px]">
+                {mobileMenuOpen ? 'close' : 'menu'}
+              </span>
+            </button>
+          </div>
         </div>
 
         {/* Mobile menu */}
@@ -101,45 +92,24 @@ export default function Header() {
                 {link.label}
               </Link>
             ))}
-            <div className="pt-3 mt-2 border-t border-stone-200 flex gap-3">
-              {isAuthenticated ? (
-                <>
-                  <Link
-                    to="/lockedin"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex-1 text-center py-2.5  text-[14px] font-semibold border border-stone-300 text-stone-800"
-                  >
-                    Dashboard
-                  </Link>
-                  <button
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      logout();
-                    }}
-                    className="flex-1 py-2.5  text-[14px] font-semibold border border-stone-300 text-stone-500"
-                  >
-                    Log out
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Link
-                    to="/signin"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex-1 text-center py-2.5  text-[14px] font-semibold border border-stone-300 text-stone-800"
-                  >
-                    Log in
-                  </Link>
-                  <Link
-                    to="/signup"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex-1 text-center py-2.5  text-[14px] font-semibold bg-stone-900 text-white"
-                  >
-                    Get started
-                  </Link>
-                </>
-              )}
-            </div>
+            {!isAuthenticated && (
+              <div className="pt-3 mt-2 border-t border-stone-200 flex gap-3">
+                <Link
+                  to="/signin"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex-1 text-center py-2.5 text-[14px] font-semibold border border-stone-300 text-stone-800"
+                >
+                  Log in
+                </Link>
+                <Link
+                  to="/signup"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex-1 text-center py-2.5 text-[14px] font-semibold bg-stone-900 text-white"
+                >
+                  Get started
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </nav>

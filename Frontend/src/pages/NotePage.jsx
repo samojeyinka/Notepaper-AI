@@ -4,7 +4,7 @@ import { Note } from "../components/note/Note";
 
 const NotePage = () => {
     return (
-        <div className="flex min-h-screen bg-white">
+        <div className="lockedin-page flex min-h-screen">
             {/* Global Sidebar */}
             <Sidebar activePage="/lockedin/notes" />
             

@@ -10,7 +10,7 @@ const Loader = ({ size = 'md', className = '' }) => (
     <span
         role="status"
         aria-label="Loading"
-        className={`inline-block animate-spin rounded-full border-2 border-stone-200 border-t-plum-700 ${SIZES[size] ?? SIZES.md} ${className}`}
+        className={`inline-block animate-spin rounded-full border-2 border-stone-200 border-t-[#55786d] ${SIZES[size] ?? SIZES.md} ${className}`}
     />
 );
 

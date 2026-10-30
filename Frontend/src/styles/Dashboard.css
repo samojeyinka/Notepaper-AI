@@ -11,9 +11,12 @@
 }
 .lockedin-page [class*="text-plum-"] { color: #55786d; }
 .lockedin-page [class*="bg-plum-"] { background-color: #e9efeb; }
+.lockedin-page [class~="bg-plum-500"], .lockedin-page [class~="bg-plum-600"], .lockedin-page [class~="bg-plum-700"], .lockedin-page [class~="bg-plum-800"], .lockedin-page [class~="bg-plum-900"] { background-color: #55786d; }
 .lockedin-page [class*="border-plum-"] { border-color: #c7d5cb; }
+.lockedin-page [class*="border-t-plum-"] { border-top-color: #55786d; }
 .lockedin-page [class*="hover:text-plum-"]:hover { color: #355c53; }
 .lockedin-page [class*="hover:bg-plum-"]:hover { background-color: #e5ede7; }
+.lockedin-page [class*="hover:bg-plum-600"]:hover, .lockedin-page [class*="hover:bg-plum-700"]:hover, .lockedin-page [class*="hover:bg-plum-800"]:hover { background-color: #3e6356; }
 .lockedin-page [class*="hover:border-plum-"]:hover { border-color: #8da99d; }
 .lockedin-page [class*="hover:ring-plum-"]:hover { --tw-ring-color: #c7d5cb; }
 .lockedin-page [class*="text-primary"] { color: #55786d; }

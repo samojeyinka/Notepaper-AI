@@ -11,8 +11,14 @@ export const UserProfileCard = () => {
 
   const menuItems = [
     {
+      icon: 'dashboard',
+      label: 'Dashboard',
+      href: '/lockedin',
+      onClick: () => setIsMenuOpen(false),
+    },
+    {
       icon: 'person',
-      label: 'Profile Settings',
+      label: 'Settings',
       href: '/lockedin/profile-settings',
       onClick: () => setIsMenuOpen(false),
     },
