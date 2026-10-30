@@ -3,6 +3,7 @@ import Loader from '../globals/Loader';
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import NotificationIcon from "./NotificationIcon";
+import AccountMenu from "./AccountMenu";
 import { noteService } from "../../api/noteService";
 import { paperService } from "../../api/paperService";
 import { folderService } from "../../api/folderService";
@@ -54,10 +55,6 @@ export const DashboardHeader = () => {
     const [open,    setOpen]    = useState(false);
     const [loading, setLoading] = useState(false);
     const [results, setResults] = useState({ notes: [], papers: [], folders: [], presentations: [], flashcards: [] });
-
-    const initials = user?.full_name
-        ? user.full_name.split(' ').map((n) => n[0]).slice(0, 2).join('').toUpperCase()
-        : '?';
 
     const first = (user?.full_name ?? '').trim().split(/\s+/)[0] || 'there';
 
@@ -237,17 +234,7 @@ export const DashboardHeader = () => {
 
                 <div className="flex items-center gap-2.5 md:gap-3 shrink-0">
                     <NotificationIcon />
-                    <Link
-                        to="/lockedin/profile-settings"
-                            className="dashboard-avatar w-9 h-9 md:w-10 md:h-10 bg-white ring-1 ring-stone-200 overflow-hidden flex items-center justify-center transition-all"
-                        aria-label="Profile settings"
-                    >
-                        {user?.profile_picture ? (
-                            <img alt={user.full_name || 'User Profile'} className="w-full h-full object-cover" src={user.profile_picture} />
-                        ) : (
-                            <span className="text-[13px] font-semibold text-stone-600">{initials}</span>
-                        )}
-                    </Link>
+                    <AccountMenu />
                 </div>
             </div>
         </header>

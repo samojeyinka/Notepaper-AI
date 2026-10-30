@@ -4,33 +4,29 @@ import { Link } from 'react-router-dom';
 export default function Hero() {
   return (
     <section className="landing-hero overflow-hidden">
-      <div className="max-w-7xl mx-auto px-5 sm:px-6 pt-16 md:pt-20 lg:pt-24 text-center">
-        <div className="max-w-3xl mx-auto">
-          
-          <h1 className="landing-heading mt-5 text-[40px] leading-[1.04] sm:text-6xl lg:text-[76px] font-semibold tracking-[-0.055em] text-stone-950">
+      <div className="landing-hero-panel relative flex items-center justify-center overflow-hidden mx-auto text-center">
+        <div className="landing-hero-copy relative z-10 max-w-4xl px-5 sm:px-8 py-16 md:py-24">
+          <h1 className="landing-heading text-[40px] leading-[1.04] sm:text-6xl lg:text-[76px] font-semibold tracking-[-0.055em] text-white">
             Your notes, ready
             <br className="hidden sm:block" /> to become <span>something more.</span>
           </h1>
-          <p className="text-stone-600 text-base md:text-lg leading-relaxed max-w-xl mx-auto mt-5">
+          <p className="text-base md:text-lg leading-relaxed max-w-2xl mx-auto mt-5">
             Write, dictate, or collect your ideas. Then turn them into study plans, flashcards, and quizzes when you need them.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-7">
-            <Link
-              to="/signup"
-              className="landing-button landing-button-dark w-full sm:w-auto px-7 py-3.5 text-[15px] font-semibold transition-colors"
-            >
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-8">
+            <Link to="/signup" className="landing-button landing-button-paper w-full sm:w-auto px-8 py-3.5 text-[15px] font-semibold transition-colors shadow-sm">
               Start writing for free
             </Link>
-            <Link
-              to="/how-it-works"
-              className="landing-button landing-button-light w-full sm:w-auto px-7 py-3.5 text-[15px] font-semibold transition-colors"
-            >
+            <Link to="/how-it-works" className="landing-button landing-button-hero-ghost w-full sm:w-auto px-8 py-3.5 text-[15px] font-semibold transition-colors">
               See how it works
             </Link>
           </div>
         </div>
+        <div className="landing-dune landing-dune-back" aria-hidden="true" />
+        <div className="landing-dune landing-dune-front" aria-hidden="true" />
+      </div>
 
-        <div className="landing-preview relative mt-12 md:mt-16 pb-8">
+      <div className="landing-preview relative mt-12 md:mt-16 pb-8">
           <div className="landing-app-window mx-auto max-w-5xl overflow-hidden text-left">
             <div className="landing-app-topbar flex items-center justify-between px-5 md:px-7 py-4">
               <div className="flex items-center gap-2"><span className="landing-dot"/><span className="landing-dot"/><span className="landing-dot"/></div>
@@ -63,7 +59,6 @@ export default function Hero() {
               </div>
             </div>
           </div>
-        </div>
       </div>
     </section>
   );

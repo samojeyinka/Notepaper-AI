@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Loader from '../globals/Loader';
 import { Link } from "react-router-dom";
 import NotificationIcon from "../user/NotificationIcon";
+import AccountMenu from "../user/AccountMenu";
 import { APP_BASENAME } from "../../utils/basename";
 import { shakespearepurple } from "../../assets/assets";
 
@@ -308,6 +309,7 @@ export const PaperHeader = ({
                         listening={voiceState === 'listening'}
                     />
                     <NotificationIcon />
+                    <AccountMenu compact />
                 </div>
             </div>
 

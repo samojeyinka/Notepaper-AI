@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Loader from '../globals/Loader';
 import NotificationIcon from '../user/NotificationIcon';
+import AccountMenu from '../user/AccountMenu';
 import { APP_BASENAME } from '../../utils/basename';
 
 export const FlashcardHeader = ({
@@ -134,6 +135,7 @@ export const FlashcardHeader = ({
                     )}
                 </div>
                 <NotificationIcon />
+                <AccountMenu compact />
             </div>
         </header>
     );
