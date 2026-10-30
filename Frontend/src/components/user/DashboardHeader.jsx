@@ -119,14 +119,14 @@ export const DashboardHeader = () => {
     };
 
     return (
-        <header className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between mb-8 lg:mb-12">
+        <header className="dashboard-header flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between mb-8 lg:mb-12">
             {/* Greeting */}
-            <div className="flex flex-col gap-1">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-stone-400">
+            <div className="dashboard-greeting flex flex-col gap-1">
+                <p className="dashboard-date text-[11px] font-semibold uppercase tracking-[0.22em] text-stone-400">
                     {todayLabel()}
                 </p>
-                <h1 className="font-display-serif text-[30px] md:text-[36px] font-semibold tracking-tight text-stone-900 leading-tight">
-                    Good {dayParts()}, <span className="italic text-plum-700">{first}</span>
+                <h1 className="text-[30px] md:text-[36px] font-semibold tracking-tight text-stone-900 leading-tight">
+                    Good {dayParts()}, <span>{first}</span>
                 </h1>
                 <p className="text-[13px] md:text-[14px] text-stone-500">
                     A calm page for whatever you want to keep close.
@@ -134,11 +134,11 @@ export const DashboardHeader = () => {
             </div>
 
             {/* Right section */}
-            <div className="w-full lg:w-auto flex items-center gap-3 md:gap-4">
+            <div className="dashboard-header-tools w-full lg:w-auto flex items-center gap-3 md:gap-4">
 
                 {/* ── Search ── */}
-                <div ref={wrapperRef} className="relative w-full lg:w-72 transition-all duration-200">
-                    <div className={`flex items-center gap-2 bg-white  pl-4 pr-1.5 h-10 ring-1 transition-all duration-200 ${open ? 'ring-stone-900/25 shadow-lg shadow-stone-900/5' : 'ring-stone-200'}`}>
+                <div ref={wrapperRef} className="dashboard-search relative w-full lg:w-72 transition-all duration-200">
+                    <div className={`dashboard-search-frame flex items-center gap-2 bg-white pl-4 pr-1.5 h-10 ring-1 transition-all duration-200 ${open ? 'ring-stone-900/25 shadow-lg shadow-stone-900/5' : 'ring-stone-200'}`}>
                         {loading
                             ? <Loader size="sm" className="shrink-0" />
                             : <span className="material-icons-round text-stone-400 text-[19px] shrink-0">search</span>
@@ -239,7 +239,7 @@ export const DashboardHeader = () => {
                     <NotificationIcon />
                     <Link
                         to="/lockedin/profile-settings"
-                        className="w-9 h-9 md:w-10 md:h-10  bg-white ring-1 ring-stone-200 overflow-hidden flex items-center justify-center hover:ring-plum-300 transition-all"
+                            className="dashboard-avatar w-9 h-9 md:w-10 md:h-10 bg-white ring-1 ring-stone-200 overflow-hidden flex items-center justify-center transition-all"
                         aria-label="Profile settings"
                     >
                         {user?.profile_picture ? (
