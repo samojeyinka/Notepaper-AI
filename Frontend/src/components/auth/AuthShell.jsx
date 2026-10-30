@@ -28,7 +28,7 @@ export function AuthAside({ title = [], sub, step, totalSteps, children }) {
   return (
     <section className="auth-aside relative flex flex-col justify-between overflow-hidden p-7 sm:p-10 lg:p-12 xl:p-14">
       <div className="auth-aside-content relative z-10">
-        <div className="auth-aside-copy mt-10 lg:mt-16 max-w-md">
+        <div className="auth-aside-copy mt-0 max-w-md">
           <h2 className="text-3xl sm:text-4xl xl:text-[48px] font-semibold tracking-[-0.055em] leading-[1.05]">
             {primary}{accent && <><br /><span>{accent}</span></>}
           </h2>

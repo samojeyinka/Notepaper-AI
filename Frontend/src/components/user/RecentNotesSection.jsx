@@ -322,7 +322,7 @@ export default function RecentNotesSection() {
   };
 
   return (
-    <div className="xl:col-span-3">
+    <div className="dashboard-recent xl:col-span-3">
       <div className="flex justify-between items-center mb-5">
         <TabDropdown activeTab={activeTab} onChange={handleTabChange} />
         <Link

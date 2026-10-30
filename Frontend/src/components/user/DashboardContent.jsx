@@ -5,11 +5,11 @@ import UpcomingQuizzesSection from "./UpcomingQuizzesSection";
 
 export const DashboardContent = () => {
   return (
-    <main className="flex-1 lg:ml-64 px-4 sm:px-6 lg:px-10 pt-20 lg:pt-10 pb-32 min-w-0">
-      <div className="max-w-[1400px] mx-auto">
+    <main className="dashboard-content flex-1 lg:ml-64 px-4 sm:px-6 lg:px-10 pt-20 lg:pt-10 pb-32 min-w-0">
+      <div className="dashboard-content-inner max-w-[1400px] mx-auto">
         <DashboardHeader />
 
-        <div className="space-y-12 lg:space-y-16">
+        <div className="dashboard-sections space-y-12 lg:space-y-16">
           {/* Quick create strip */}
           <ActionCardsSection />
 

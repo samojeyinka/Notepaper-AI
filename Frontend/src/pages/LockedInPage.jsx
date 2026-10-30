@@ -2,10 +2,11 @@ import { DashboardContent } from "../components/user/DashboardContent";
 import { FloatingAIButton } from "../components/user/FloatingAIButton";
 import { Sidebar } from "../components/user/Sidebar";
 import SEO from "../components/globals/SEO";
+import "../styles/Dashboard.css";
 
 const LockedInPage = () => {
   return (
-    <div className="flex min-h-screen bg-paper font-display text-stone-900 antialiased selection:bg-plum-200">
+    <div className="lockedin-page flex min-h-screen font-display text-stone-900 antialiased">
       <SEO title="Dashboard" description="Your Notepaper AI workspace." path="/lockedin" noIndex={true} />
        <Sidebar activePage="/lockedin" />
       <DashboardContent />

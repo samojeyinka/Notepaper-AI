@@ -63,11 +63,11 @@ export const ActionCardsSection = () => {
 
   return (
     <>
-      <section>
+      <section className="dashboard-actions">
         <div className="mb-5">
-          <p className="eyebrow text-plum-700 mb-1.5">Quick start</p>
-          <h2 className="font-display-serif text-[24px] md:text-[27px] font-semibold tracking-tight text-stone-900">
-            Start something new
+          <p className="dashboard-section-kicker mb-1.5">Make a new page</p>
+          <h2 className="text-[24px] md:text-[27px] font-semibold tracking-tight text-stone-900">
+            What would you like to make?
           </h2>
         </div>
 
