@@ -42,7 +42,7 @@ function playCheckTick() {
 
 // ── Input ────────────────────────────────────────────────────────────────────
 const inputBase =
-  'w-full  border bg-white px-4 py-3 text-[15px] text-stone-900 placeholder:text-stone-300 focus:outline-none focus:ring-2 focus:ring-plum-200 focus:border-plum-400 transition-colors';
+  'auth-input w-full border bg-white px-4 py-3 text-[15px] text-stone-900 placeholder:text-stone-400 focus:outline-none transition-colors';
 
 function Field({ id, label, type = 'text', value, onChange, placeholder, children }) {
   return (
@@ -162,8 +162,8 @@ export default function SignIn() {
           children: (
             <ul className="space-y-3">
               {asidePerks.map((p) => (
-                <li key={p} className="flex items-center gap-3 text-[15px] text-stone-300">
-                  <span className="material-symbols-outlined text-[18px] text-plum-300">check</span>
+                <li key={p} className="flex items-center gap-3 text-[15px]">
+                  <span className="auth-perk-mark" aria-hidden="true" />
                   {p}
                 </li>
               ))}
@@ -172,8 +172,8 @@ export default function SignIn() {
         }}
       >
         <header className="mb-8">
-                <p className="eyebrow text-plum-700 mb-3">Sign in</p>
-                <h1 className="font-display-serif text-3xl md:text-4xl font-semibold tracking-tight text-stone-900">
+                <p className="auth-kicker mb-3">Sign in to your account</p>
+                <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-stone-900">
                   Welcome back
                 </h1>
                 <p className="text-stone-500 text-[15px] mt-2">
@@ -235,9 +235,7 @@ export default function SignIn() {
                       className="sr-only"
                     />
                     <span
-                      className={`w-[18px] h-[18px]  border-2 flex items-center justify-center transition-colors ${
-                        rememberMe ? 'bg-plum-700 border-plum-700' : 'bg-white border-stone-300'
-                      }`}
+                      className={`auth-checkbox w-[18px] h-[18px] border-2 flex items-center justify-center transition-colors ${rememberMe ? 'is-checked' : ''}`}
                     >
                       {rememberMe && (
                         <span className="material-symbols-outlined text-white text-[11px]" style={{ fontVariationSettings: "'FILL' 1" }}>check</span>
@@ -246,7 +244,7 @@ export default function SignIn() {
                     <span className="text-[13px] text-stone-500">Keep me logged in</span>
                   </label>
 
-                  <Link to="/forgot-password" className="text-[13px] font-semibold text-plum-700 hover:text-plum-600 link-underline">
+                  <Link to="/forgot-password" className="auth-text-link text-[13px] font-semibold link-underline">
                     Forgot password?
                   </Link>
                 </div>
@@ -254,7 +252,7 @@ export default function SignIn() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-stone-900 hover:bg-stone-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold py-3.5  transition-colors text-[15px] flex items-center justify-center gap-2"
+                  className="auth-primary-btn w-full disabled:opacity-60 disabled:cursor-not-allowed font-semibold py-3.5 transition-colors text-[15px] flex items-center justify-center gap-2"
                 >
                   {loading ? (
                     <span className="w-4 h-4 border-2 border-white/30 border-t-white  animate-spin" />
@@ -264,7 +262,7 @@ export default function SignIn() {
 
               <p className="mt-8 text-center text-stone-500 text-[14px]">
                 Don&rsquo;t have an account?{' '}
-                <Link to="/signup" className="text-plum-700 font-semibold hover:text-plum-600 link-underline">
+                <Link to="/signup" className="auth-text-link font-semibold link-underline">
                   Sign up free
                 </Link>
               </p>

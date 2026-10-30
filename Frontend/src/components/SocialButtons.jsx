@@ -11,14 +11,14 @@ export const SocialButton = () => {
         <div className="grid grid-cols-2 gap-2 md:gap-4 mb-4 md:mb-8">
             <button 
                 onClick={() => handleSocialLogin('google')}
-                className="flex items-center justify-center gap-2 px-2 md:px-4 py-1.5 md:py-3 border border-slate-200  md: hover:bg-slate-50 transition-colors duration-200 shadow-sm"
+                className="auth-social-btn flex items-center justify-center gap-2 px-2 md:px-4 py-2.5 md:py-3 transition-colors duration-200"
             >
                 <BsGoogle className="text-[13px] md:text-xl text-red-500" />
                 <span className="text-[12px] md:text-sm font-medium md:font-semibold text-slate-700">Google</span>
             </button>
             <button 
                 onClick={() => handleSocialLogin('github')}
-                className="flex items-center justify-center gap-2 px-2 md:px-4 py-1.5 md:py-3 border border-slate-200  hover:bg-slate-50 transition-colors duration-200 shadow-sm"
+                className="auth-social-btn flex items-center justify-center gap-2 px-2 md:px-4 py-2.5 md:py-3 transition-colors duration-200"
             >
                 <BsGithub className="text-[13px] md:text-xl text-slate-900" />
                 <span className="text-[12px] md:text-sm font-medium md:font-semibold text-slate-700">GitHub</span>

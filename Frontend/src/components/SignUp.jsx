@@ -187,7 +187,7 @@ const LEFT_CONTENT = {
 
 // ── Input ────────────────────────────────────────────────────────────────────
 const inputBase =
-  'w-full  border bg-white px-4 py-3 text-[15px] text-stone-900 placeholder:text-stone-300 focus:outline-none focus:ring-2 focus:ring-plum-200 focus:border-plum-400 transition-colors';
+  'auth-input w-full border bg-white px-4 py-3 text-[15px] text-stone-900 placeholder:text-stone-400 focus:outline-none transition-colors';
 
 function Field({ id, label, type = 'text', value, onChange, placeholder, children }) {
   return (
@@ -364,7 +364,7 @@ export default function SignUp() {
   };
 
   const primaryBtn =
-    'w-full bg-stone-900 hover:bg-stone-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3.5  transition-colors text-[15px] flex items-center justify-center gap-2';
+    'auth-primary-btn w-full disabled:opacity-50 disabled:cursor-not-allowed font-semibold py-3.5 transition-colors text-[15px] flex items-center justify-center gap-2';
 
   const lc = LEFT_CONTENT[step];
 
@@ -385,7 +385,7 @@ export default function SignUp() {
                     type="button"
                     onClick={handleBack}
                     aria-label="Go back"
-                    className="flex items-center justify-center w-8 h-8  border border-stone-200 text-stone-500 hover:border-plum-300 hover:text-plum-700 transition-colors"
+                    className="auth-back-btn flex items-center justify-center w-9 h-9 border border-stone-200 text-stone-500 transition-colors"
                   >
                     <span className="material-symbols-outlined text-[16px]">arrow_back</span>
                   </button>
@@ -402,8 +402,8 @@ export default function SignUp() {
                 {step === 1 && (
                   <>
                     <header className="mb-6">
-                      <p className="eyebrow text-plum-700 mb-3">Create your account</p>
-                      <h1 className="font-display-serif text-3xl md:text-4xl font-semibold tracking-tight text-stone-900">
+                      <p className="auth-kicker mb-3">Create your account</p>
+                      <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-stone-900">
                         I am a&hellip;
                       </h1>
                       <p className="text-stone-500 text-[15px] mt-2">Choose the role that best describes you.</p>
@@ -434,17 +434,17 @@ export default function SignUp() {
                                 }}
                                 className={`relative flex flex-col items-center justify-center gap-2 p-3  border text-center transition-all duration-200 active:scale-[0.97] ${
                                   isSelected
-                                    ? 'border-plum-500 bg-plum-50 shadow-[0_0_0_1.5px_#6c4ea6]'
+                                    ? 'auth-role-selected'
                                     : 'border-stone-200 bg-stone-50/60 hover:border-stone-300'
                                 }`}
                                 style={{ animation: 'fadeUp 0.35s ease-out both', animationDelay: `${Math.min(i, 12) * 30}ms` }}
                               >
-                                <Icon size={17} color={isSelected ? '#6c4ea6' : '#a8a29e'} />
-                                <p className="text-[11px] font-semibold leading-tight" style={{ color: isSelected ? '#583d8b' : '#57534e' }}>
+                                <Icon size={17} color={isSelected ? '#54786f' : '#8b8981'} />
+                                <p className="text-[11px] font-semibold leading-tight" style={{ color: isSelected ? '#355c53' : '#57534e' }}>
                                   {formatLabel(type)}
                                 </p>
                                 {isSelected && (
-                                  <span className="absolute top-2 right-2 w-4 h-4  bg-plum-700 text-white flex items-center justify-center">
+                                  <span className="auth-selected-mark absolute top-2 right-2 w-4 h-4 rounded-full text-white flex items-center justify-center">
                                     <span className="material-symbols-outlined text-[10px]" style={{ fontVariationSettings: "'FILL' 1" }}>check</span>
                                   </span>
                                 )}
@@ -467,8 +467,8 @@ export default function SignUp() {
                 {step === 2 && (
                   <>
                     <header className="mb-6">
-                      <p className="eyebrow text-plum-700 mb-3">Your details</p>
-                      <h1 className="font-display-serif text-3xl md:text-4xl font-semibold tracking-tight text-stone-900">
+                      <p className="auth-kicker mb-3">Your details</p>
+                      <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-stone-900">
                         How should we address you?
                       </h1>
                     </header>
@@ -505,8 +505,8 @@ export default function SignUp() {
                 {step === 3 && (
                   <form onSubmit={handleSubmit}>
                     <header className="mb-6">
-                      <p className="eyebrow text-plum-700 mb-3">Secure your account</p>
-                      <h1 className="font-display-serif text-3xl md:text-4xl font-semibold tracking-tight text-stone-900">
+                      <p className="auth-kicker mb-3">Secure your account</p>
+                      <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-stone-900">
                         Choose a password
                       </h1>
                       <p className="text-stone-500 text-[15px] mt-2">Something strong you&rsquo;ll remember.</p>
@@ -546,9 +546,7 @@ export default function SignUp() {
                           className="sr-only"
                         />
                         <span
-                          className={`w-[18px] h-[18px] mt-0.5  border-2 flex items-center justify-center transition-colors shrink-0 ${
-                            agreeToTerms ? 'bg-plum-700 border-plum-700' : 'bg-white border-stone-300'
-                          }`}
+                          className={`auth-checkbox w-[18px] h-[18px] mt-0.5 border-2 flex items-center justify-center transition-colors shrink-0 ${agreeToTerms ? 'is-checked' : ''}`}
                         >
                           {agreeToTerms && (
                             <span className="material-symbols-outlined text-white text-[11px]" style={{ fontVariationSettings: "'FILL' 1" }}>check</span>
@@ -556,9 +554,9 @@ export default function SignUp() {
                         </span>
                         <span className="text-[13px] text-stone-500 leading-relaxed">
                           I agree to the{' '}
-                          <Link to="/terms" className="text-plum-700 font-semibold hover:text-plum-600">Terms of Service</Link>
+                          <Link to="/terms" className="auth-text-link font-semibold">Terms of Service</Link>
                           {' '}and{' '}
-                          <Link to="/privacy" className="text-plum-700 font-semibold hover:text-plum-600">Privacy Policy</Link>.
+                          <Link to="/privacy" className="auth-text-link font-semibold">Privacy Policy</Link>.
                         </span>
                       </label>
                     </div>
@@ -584,7 +582,7 @@ export default function SignUp() {
               <footer className="mt-8 text-center">
                 <p className="text-stone-500 text-[14px]">
                   Already have an account?{' '}
-                  <Link to="/signin" className="text-plum-700 font-semibold hover:text-plum-600 link-underline">
+                  <Link to="/signin" className="auth-text-link font-semibold link-underline">
                     Log in here
                   </Link>
                 </p>
