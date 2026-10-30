@@ -1,26 +1,40 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-export default function CTA() {
+export default function CTA({
+  variant = 'default',
+  title,
+  description,
+  buttonText = 'Start writing free',
+  buttonLink = '/signup'
+}) {
+  const isLanding = variant === 'landing';
+  const headingText = title || (isLanding ? 'Capture what matters' : 'Your next idea deserves a clean page');
+  const bodyText = description || (isLanding
+    ? 'Write down ideas, thoughts, and everything in between, then turn them into something you can learn from.'
+    : 'Start a notebook today with no setup and no noise. Just you and a page that feels like paper.');
+
   return (
-    <section className="bg-stone-900 text-white">
-      <div className="max-w-4xl mx-auto px-5 sm:px-6 py-20 md:py-32 text-center">
-        <h2 className="font-display-serif text-3xl md:text-5xl font-semibold tracking-tight leading-tight">
-          Your next great idea is worth writing down.
-        </h2>
-        <p className="text-stone-400 text-base md:text-lg mt-5 max-w-xl mx-auto leading-relaxed">
-          Start a notebook today, no setup, no noise. Just you and a page that
-          feels like paper.
-        </p>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-9">
-          <Link
-            to="/signup"
-            className="w-full sm:w-auto px-8 py-3.5  bg-white text-stone-900 text-[15px] font-semibold hover:bg-stone-200 transition-colors"
-          >
-            Get started free
-          </Link>
-         
+    <section className="landing-cta">
+      <div className="landing-cta-panel relative flex items-center justify-center overflow-hidden mx-auto text-center">
+        <div className="landing-cta-copy relative z-10 max-w-3xl px-5 sm:px-8 py-16 md:py-24">
+          <h2 className="text-3xl sm:text-5xl md:text-6xl font-semibold tracking-[-0.045em] leading-[1.08] text-white">
+            {headingText}
+          </h2>
+          <p className="text-base md:text-lg mt-5 leading-relaxed text-white/90 max-w-xl mx-auto">
+            {bodyText}
+          </p>
+          <div className="mt-8">
+            <Link
+              to={buttonLink}
+              className="landing-button landing-button-paper px-8 py-3.5 text-[15px] font-semibold transition-colors shadow-sm"
+            >
+              {buttonText}
+            </Link>
+          </div>
         </div>
+        <div className="landing-dune landing-dune-back" aria-hidden="true" />
+        <div className="landing-dune landing-dune-front" aria-hidden="true" />
       </div>
     </section>
   );

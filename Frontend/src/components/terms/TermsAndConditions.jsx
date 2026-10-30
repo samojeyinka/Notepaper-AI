@@ -2,11 +2,11 @@ import React from 'react';
 
 export default function TermsAndConditions() {
   return (
-    <div className="max-w-5xl mx-auto px-5 sm:px-6 pt-8 md:pt-16 pb-20 md:pb-28 space-y-10">
+    <main className="terms-document max-w-7xl mx-auto px-5 sm:px-6 pt-12 md:pt-20 pb-20 md:pb-28">
       {/* Header */}
-      <header className="text-center pb-4">
-        <p className="eyebrow text-plum-700 mb-5">Legal</p>
-        <h1 className="font-display-serif text-4xl md:text-6xl font-semibold tracking-tight text-stone-900">
+      <header className="terms-header pb-8 md:pb-12">
+        <p className="landing-kicker mb-4">LEGAL</p>
+        <h1 className="text-4xl md:text-6xl font-semibold tracking-[-0.055em] text-stone-900">
           Terms &amp; Conditions
         </h1>
         <p className="text-stone-500 text-sm md:text-base mt-5">
@@ -15,8 +15,8 @@ export default function TermsAndConditions() {
       </header>
 
       {/* Introduction */}
-      <section className=" bg-white ring-1 ring-stone-200/80 p-8 md:p-14">
-        <h2 className="font-display-serif text-2xl md:text-3xl font-semibold tracking-tight text-stone-900 mb-5">
+      <section className="terms-intro bg-[#edf3ef] border border-[#dce5df] p-7 md:p-10 mb-10">
+        <h2 className="text-2xl md:text-3xl font-semibold tracking-[-0.04em] text-stone-900 mb-5">
           Our agreement with you
         </h2>
         <p className="text-stone-600 text-[15px] md:text-lg leading-relaxed">
@@ -28,9 +28,9 @@ export default function TermsAndConditions() {
       </section>
 
       {/* Content rows */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <div className=" bg-white ring-1 ring-stone-200/80 p-8">
-          <h4 className="font-display-serif text-xl font-semibold text-stone-900 mb-4">
+      <section className="terms-sections grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="terms-section bg-white border border-stone-200 p-7 md:p-8">
+          <h4 className="text-lg font-semibold text-stone-900 mb-4">
             1. Acceptance &amp; use of services
           </h4>
           <div className="space-y-3 text-stone-600 text-[14px] md:text-[15px] leading-relaxed">
@@ -46,8 +46,8 @@ export default function TermsAndConditions() {
           </div>
         </div>
 
-        <div className=" bg-white ring-1 ring-stone-200/80 p-8">
-          <h4 className="font-display-serif text-xl font-semibold text-stone-900 mb-4">
+        <div className="terms-section bg-white border border-stone-200 p-7 md:p-8">
+          <h4 className="text-lg font-semibold text-stone-900 mb-4">
             2. User accounts &amp; security
           </h4>
           <div className="space-y-3 text-stone-600 text-[14px] md:text-[15px] leading-relaxed">
@@ -64,8 +64,8 @@ export default function TermsAndConditions() {
           </div>
         </div>
 
-        <div className=" bg-white ring-1 ring-stone-200/80 p-8">
-          <h4 className="font-display-serif text-xl font-semibold text-stone-900 mb-4">
+        <div className="terms-section bg-white border border-stone-200 p-7 md:p-8">
+          <h4 className="text-lg font-semibold text-stone-900 mb-4">
             3. Fees, payments &amp; third-party AI providers
           </h4>
           <div className="space-y-3 text-stone-600 text-[14px] md:text-[15px] leading-relaxed">
@@ -90,8 +90,8 @@ export default function TermsAndConditions() {
           </div>
         </div>
 
-        <div className=" bg-white ring-1 ring-stone-200/80 p-8">
-          <h4 className="font-display-serif text-xl font-semibold text-stone-900 mb-4">
+        <div className="terms-section bg-white border border-stone-200 p-7 md:p-8">
+          <h4 className="text-lg font-semibold text-stone-900 mb-4">
             4. Intellectual property &amp; your content
           </h4>
           <div className="space-y-3 text-stone-600 text-[14px] md:text-[15px] leading-relaxed">
@@ -102,14 +102,14 @@ export default function TermsAndConditions() {
             </p>
             <p>
               You grant Notepaper a limited license to process your content only as
-              required to perform the actions you request — such as summarising,
+              required to perform the actions you request, such as summarising,
               styling, and exporting.
             </p>
           </div>
         </div>
 
-        <div className=" bg-white ring-1 ring-stone-200/80 p-8">
-          <h4 className="font-display-serif text-xl font-semibold text-stone-900 mb-4">
+        <div className="terms-section bg-white border border-stone-200 p-7 md:p-8">
+          <h4 className="text-lg font-semibold text-stone-900 mb-4">
             5. Acceptable use policy
           </h4>
           <div className="space-y-3 text-stone-600 text-[14px] md:text-[15px] leading-relaxed">
@@ -125,8 +125,8 @@ export default function TermsAndConditions() {
           </div>
         </div>
 
-        <div className=" bg-white ring-1 ring-stone-200/80 p-8">
-          <h4 className="font-display-serif text-xl font-semibold text-stone-900 mb-4">
+        <div className="terms-section bg-white border border-stone-200 p-7 md:p-8">
+          <h4 className="text-lg font-semibold text-stone-900 mb-4">
             6. Limitation of liability
           </h4>
           <div className="space-y-3 text-stone-600 text-[14px] md:text-[15px] leading-relaxed">
@@ -142,8 +142,8 @@ export default function TermsAndConditions() {
       </section>
 
       {/* Business details */}
-      <footer className="text-center pt-8 border-t border-stone-200">
-        <h4 className="font-display-serif text-lg md:text-xl font-semibold text-stone-800 mb-2">
+      <footer className="terms-contact text-center py-8 border-t border-stone-200 mt-10">
+        <h4 className="text-lg md:text-xl font-semibold text-stone-800 mb-2">
           Questions about these terms?
         </h4>
        
@@ -151,6 +151,6 @@ export default function TermsAndConditions() {
           Email: support@synchrome.co &bull; Phone: +2349131710995
         </p>
       </footer>
-    </div>
+    </main>
   );
 }

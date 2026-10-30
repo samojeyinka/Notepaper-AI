@@ -5,9 +5,9 @@ import CustomerSupport from '../globals/CustomerSupport';
 
 export default function ContactUs() {
   return (
-    <main className="bg-paper pt-10 pb-24 md:pt-20 md:pb-36">
-      <div className="max-w-6xl mx-auto px-5 sm:px-6 grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-20 items-start">
-        <div className="lg:sticky lg:top-28">
+    <main className="contact-layout bg-paper pt-12 pb-20 md:pt-20 md:pb-28">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 grid grid-cols-1 lg:grid-cols-[.9fr_1.1fr] gap-12 lg:gap-24 items-start">
+        <div className="lg:sticky lg:top-28 pt-3">
           <ContactHero />
         </div>
         <ContactForm />

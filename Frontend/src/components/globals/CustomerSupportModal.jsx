@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { isAIOverloadedError } from '../../utils/aiErrors';
 import { apiClient } from '../../api/apiClient';
+import { notepaperMark } from '../../assets/assets';
 
 const TICKET_URL     = '/lockedin/support-tickets/new';
 
@@ -85,7 +86,7 @@ function BotText({ text }) {
     if (!ROUTES_MAP[path]) continue;
     if (match.index > last) parts.push(text.slice(last, match.index));
     parts.push(
-      <Link key={match.index} to={path} className="underline font-medium text-plum-700 hover:text-plum-600">
+      <Link key={match.index} to={path} className="underline font-medium text-[#45666c] hover:text-[#355358]">
         {ROUTES_MAP[path]}
       </Link>
     );
@@ -99,7 +100,7 @@ function BotText({ text }) {
 const INITIAL_MESSAGE = {
   id: 1,
   type: 'bot',
-  text: "Hi, I'm the Notepaper support assistant. I can help with features, plans and common issues — or point you to a real human. What do you need?",
+  text: "Hi there. I can help you use NotepaperAI or guide you to human support. What would you like to know?",
   timestamp: new Date(),
 };
 
@@ -114,11 +115,18 @@ export default function CustomerSupportModal({ onClose }) {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
 
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') onClose?.();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   const quickReplies = [
     'How do I create a note?',
-    'What plans are available?',
-    'I have a technical issue',
     'How do flashcards work?',
+    'I have a technical issue',
     'I need human support',
   ];
 
@@ -150,17 +158,12 @@ export default function CustomerSupportModal({ onClose }) {
     if (!text.trim() || isLoading) return;
     setInputMessage('');
     setIsLoading(true);
-
-    let updated;
-    setMessages((prev) => {
-      updated = [...prev, { id: Date.now(), type: 'user', text, timestamp: new Date() }];
-      return updated;
-    });
+    const userMessage = { id: Date.now(), type: 'user', text, timestamp: new Date() };
+    const updated = [...messages, userMessage];
+    setMessages(updated);
 
     try {
-      // small delay so state flushes before we read it
-      await new Promise((r) => setTimeout(r, 0));
-      const botText = await askGemini(text, updated ?? []);
+      const botText = await askGemini(text, updated);
       setMessages((prev) => [...prev, { id: Date.now() + 1, type: 'bot', text: botText, timestamp: new Date() }]);
     } catch (err) {
       const fallbackText = isAIOverloadedError(err)
@@ -183,43 +186,41 @@ export default function CustomerSupportModal({ onClose }) {
   return (
     <>
       {/* Backdrop */}
-      <div className="fixed inset-0 bg-stone-900/40 z-40 backdrop-blur-sm" onClick={onClose} />
+      <div className="fixed inset-0 bg-[#1b2827]/25 z-40 backdrop-blur-[2px]" onClick={onClose} aria-hidden="true" />
 
       {/* Modal */}
-      <div className="fixed bottom-24 right-4 w-[92%] max-w-sm z-50 animate-in fade-in slide-in-from-bottom-4 duration-300">
-        <div className="bg-white  shadow-2xl overflow-hidden flex flex-col h-[560px] ring-1 ring-stone-900/10">
+      <div className="fixed bottom-24 right-4 left-4 sm:left-auto sm:w-[390px] z-50 animate-in fade-in slide-in-from-bottom-4 duration-300">
+        <div id="customer-support-dialog" role="dialog" aria-modal="true" aria-label="NotepaperAI support" style={{ height: 'min(650px, calc(100dvh - 8rem))' }} className="bg-[#fffdfa] shadow-[0_24px_80px_-24px_rgba(20,33,31,.38)] overflow-hidden flex flex-col min-h-[360px] rounded-[20px] ring-1 ring-[#354d49]/10">
 
           {/* Header */}
-          <div className="bg-stone-900 text-white px-4 py-3.5 flex items-center justify-between">
+          <div className="bg-[#edf3ef] border-b border-[#dfe8e2] px-4 py-3.5 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 md:w-10 md:h-10  bg-white/10 text-plum-300 flex items-center justify-center">
-                <span className="material-symbols-outlined text-[20px]">support_agent</span>
-              </div>
+            
               <div>
-                <h3 className="font-semibold text-[15px] leading-tight">Support</h3>
-                <p className="text-[11px] text-stone-400 mt-0.5">Usually replies instantly</p>
+                <h3 className="font-display font-semibold text-[15px] leading-tight text-stone-900">Support</h3>
+                <p className="text-[11px] text-stone-500 mt-0.5">A little help for your notebook</p>
               </div>
             </div>
-            <button onClick={onClose} className="p-1.5 hover:bg-white/10  transition-colors" aria-label="Close">
+            <button onClick={onClose} className="w-9 h-9 rounded-full text-stone-600 hover:bg-white transition-colors flex items-center justify-center" aria-label="Close support">
               <span className="material-symbols-outlined text-[20px]">close</span>
             </button>
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-stone-50">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 bg-[#f8f6f1]">
             {messages.map((msg) => (
               <div key={msg.id} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-200`}>
                 <div
                   className={`max-w-[82%] px-4 py-2.5  ${
                     msg.type === 'user'
-                      ? 'bg-plum-700 text-white -md'
-                      : 'bg-white text-stone-800 -md border border-stone-200/90 shadow-sm'
+                      ? 'bg-[#587a7d] text-white rounded-2xl rounded-br-md'
+                      : 'bg-white text-stone-800 rounded-2xl rounded-bl-md border border-stone-200/80 shadow-sm'
                   }`}
                 >
                   <p className="text-[13px] leading-relaxed">
                     {msg.type === 'bot' ? <BotText text={msg.text} /> : msg.text}
                   </p>
-                  <span className={`text-[10px] mt-1.5 block ${msg.type === 'user' ? 'text-plum-200' : 'text-stone-400'}`}>
+                  <span className={`text-[10px] mt-1.5 block ${msg.type === 'user' ? 'text-white/70' : 'text-stone-400'}`}>
                     {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
@@ -228,7 +229,7 @@ export default function CustomerSupportModal({ onClose }) {
 
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-white px-4 py-3  -md border border-stone-200/90 shadow-sm">
+                <div className="bg-white px-4 py-3 rounded-2xl rounded-bl-md border border-stone-200/80 shadow-sm">
                   <div className="flex gap-1 items-center">
                     <span className="w-1.5 h-1.5 bg-stone-400  animate-bounce" />
                     <span className="w-1.5 h-1.5 bg-stone-400  animate-bounce" style={{ animationDelay: '0.15s' }} />
@@ -240,18 +241,18 @@ export default function CustomerSupportModal({ onClose }) {
             <div ref={bottomRef} />
           </div>
 
-          {/* Quick Replies — only shown before user sends first message */}
+          {/* Quick replies shown before the first message */}
           {messages.length === 1 && !isLoading && (
-            <div className="px-4 pt-3 pb-1 bg-white border-t border-stone-100">
-              <p className="text-[11px] font-semibold text-stone-400 uppercase tracking-wider mb-2">
-                Start with a topic
+            <div className="px-4 sm:px-5 pt-3 pb-3 bg-[#fffdfa] border-t border-stone-100">
+              <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-[0.12em] mb-2.5">
+                Try one of these
               </p>
-              <div className="flex flex-col gap-1.5">
+              <div className="grid grid-cols-2 gap-2">
                 {quickReplies.map((reply) => (
                   <button
                     key={reply}
                     onClick={() => send(reply)}
-                    className="w-full text-left px-3 py-2 text-[13px] text-plum-700 bg-plum-50 hover:bg-plum-100  transition-colors border border-plum-100"
+                    className="w-full min-h-10 text-left px-3 py-2 text-[11px] leading-snug text-[#45666c] bg-white hover:bg-[#edf3ef] rounded-xl transition-colors border border-[#dce5df]"
                   >
                     {reply}
                   </button>
@@ -261,28 +262,28 @@ export default function CustomerSupportModal({ onClose }) {
           )}
 
           {/* Input */}
-          <div className="border-t border-stone-100 p-3 bg-white">
+          <div className="border-t border-stone-100 p-3 bg-[#fffdfa]">
             <form onSubmit={handleSendMessage} className="flex gap-2">
               <input
                 type="text"
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
-                placeholder="Ask anything…"
+                placeholder="Ask a question"
                 disabled={isLoading}
-                className="flex-1 px-3.5 py-2.5 border text-[14px] text-stone-900 border-stone-200  focus:outline-none focus:border-plum-400 focus:ring-2 focus:ring-plum-100 placeholder:text-stone-400 disabled:opacity-50 transition-colors"
+                className="flex-1 min-w-0 px-3.5 py-2.5 rounded-xl border text-[13px] text-stone-900 border-stone-200 focus:outline-none focus:border-[#668489] focus:ring-2 focus:ring-[#eaf0ee] placeholder:text-stone-400 disabled:opacity-50 transition-colors"
               />
               <button
                 type="submit"
                 disabled={!inputMessage.trim() || isLoading}
-                className="px-3.5 py-2.5 bg-stone-900 text-white  hover:bg-plum-700 active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                className="w-11 h-11 rounded-xl bg-[#45666c] text-white hover:bg-[#355358] active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                 aria-label="Send"
               >
                 <span className="material-symbols-outlined text-[18px]">send</span>
               </button>
             </form>
-            <p className="text-center text-[11px] text-stone-400 mt-2">
-              Need a human?{' '}
-              <Link to={TICKET_URL} className="text-plum-700 font-medium hover:text-plum-600 underline underline-offset-2">
+            <p className="text-center text-[10px] text-stone-400 mt-2">
+              Need a person?{' '}
+              <Link to={TICKET_URL} className="text-[#45666c] font-medium hover:text-[#355358] underline underline-offset-2">
                 Open a ticket
               </Link>
             </p>

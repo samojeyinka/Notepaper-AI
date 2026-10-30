@@ -1,48 +1,26 @@
 import React from 'react';
 
 const ITEMS = [
-  {
-    icon: 'ink_pen',
-    title: 'Notes & papers',
-    body: 'A realistic page to write on clean, quiet and saved as you go. Style it your way when you want to.',
-  },
-  {
-    icon: 'mic',
-    title: 'Voice notes',
-    body: 'Dictate a lecture or a passing idea and read it back as text, tidied into your notebook.',
-  },
-  {
-    icon: 'style',
-    title: 'Flashcards & quizzes',
-    body: 'Turn what you have written into something you can actually study fronts, backs and all.',
-  },
+  { number: '01', title: 'Write it your way', body: 'Keep notes, papers, and voice thoughts together in a workspace that feels like yours.' },
+  { number: '02', title: 'Make it make sense', body: 'Turn your notes into clear summaries and study plans, ready when you are.' },
+  { number: '03', title: 'Learn by doing', body: 'Create flashcards and quizzes from what you have written, then practice at your pace.' },
 ];
 
 export default function Highlights() {
   return (
-    <section className="py-16 md:py-28 bg-paper">
-      <div className="max-w-7xl mx-auto px-5 sm:px-6">
-        <div className="max-w-2xl mb-12 md:mb-16">
-          <p className="eyebrow text-plum-700 mb-4">Inside your notebook</p>
-          <h2 className="font-display-serif text-3xl md:text-5xl font-semibold tracking-tight text-stone-900">
-            Everything you write, kept in one place
-          </h2>
+    <section className="landing-features py-16 md:py-24">
+      <div className="max-w-6xl mx-auto px-5 sm:px-6">
+        <div className="max-w-2xl mb-9 md:mb-12">
+          <p className="landing-kicker">From blank page to ready to learn</p>
+          <h2 className="text-3xl md:text-5xl font-semibold tracking-[-0.045em] leading-tight mt-4">A little more from every note.</h2>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="grid md:grid-cols-3 border-y border-stone-200">
           {ITEMS.map((item) => (
-            <div
-              key={item.title}
-              className="group  border border-stone-200/90 bg-white p-8 md:p-10 hover:border-plum-200 hover:shadow-[0_16px_40px_-24px_rgba(88,61,139,0.35)] transition-all"
-            >
-              <div className="w-11 h-11  bg-plum-50 text-plum-700 flex items-center justify-center mb-6 group-hover:bg-plum-100 transition-colors">
-                <span className="material-symbols-outlined text-[22px]">{item.icon}</span>
-              </div>
-              <h3 className="font-display-serif text-xl md:text-2xl font-semibold text-stone-900 mb-2.5">
-                {item.title}
-              </h3>
-              <p className="text-[15px] leading-relaxed text-stone-500">{item.body}</p>
-            </div>
+            <article key={item.number} className="landing-feature py-7 md:py-8 md:px-7 first:md:pl-0 last:md:pr-0 border-b md:border-b-0 md:border-r last:border-r-0 border-stone-200">
+              <span className="landing-feature-number">{item.number}</span>
+              <h3 className="text-xl font-semibold mt-5 tracking-tight">{item.title}</h3>
+              <p className="text-sm leading-6 text-stone-500 mt-2 max-w-xs">{item.body}</p>
+            </article>
           ))}
         </div>
       </div>

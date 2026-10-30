@@ -33,15 +33,15 @@ export const FinePrint = () => {
   return (
     <section className="mt-12">
       <div className="text-center mb-8">
-        <p className="eyebrow text-plum-700 mb-4">The fine print</p>
-        <h2 className="font-display-serif text-2xl md:text-4xl font-semibold tracking-tight text-stone-900">
+        <p className="landing-kicker mb-4">DETAILS</p>
+        <h2 className="text-2xl md:text-4xl font-semibold tracking-[-0.045em] text-stone-900">
           Written for humans, not just lawyers
         </h2>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {SECTIONS.map((s) => (
-          <div key={s.title} className=" bg-white ring-1 ring-stone-200/80 p-8">
+          <div key={s.title} className="privacy-detail bg-white border border-stone-200 p-6 md:p-8">
             <h4 className="text-lg font-semibold text-stone-900 mb-4">{s.title}</h4>
             <div className="space-y-3 text-stone-600 text-[14px] md:text-[15px] leading-relaxed">
               {s.body.map((p, i) => (

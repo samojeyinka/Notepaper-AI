@@ -1,6 +1,7 @@
-import React from 'react'
-import Features from '../components/features/Features'
-import SEO from '../components/globals/SEO'
+import React from 'react';
+import Features from '../components/features/Features';
+import SEO from '../components/globals/SEO';
+import '@/styles/Landing.css';
 
 const FeaturesPage = () => {
   return (
@@ -8,11 +9,11 @@ const FeaturesPage = () => {
       <SEO
         title="Features"
         path="/features"
-        description="Everything Notepaper does: notes, papers, voice memos, flashcards, quizzes and presentations — one calm notebook for all of it."
+        description="Capture notes and transform them into study plans, flashcards, and practice quizzes in one calm notebook."
       />
       <Features />
     </>
-  )
-}
+  );
+};
 
-export default FeaturesPage
+export default FeaturesPage;

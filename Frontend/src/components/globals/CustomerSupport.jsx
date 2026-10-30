@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import CustomerSupportModal from './CustomerSupportModal';
+import { notepaperMark } from '../../assets/assets';
 
 export default function CustomerSupport() {
   const [isOpen, setIsOpen] = useState(false);
@@ -8,11 +9,13 @@ export default function CustomerSupport() {
     <>
       <button
         onClick={() => setIsOpen((v) => !v)}
-        className="fixed bottom-6 right-6 z-50 w-12 h-12 md:w-14 md:h-14  bg-stone-900 text-white shadow-xl flex items-center justify-center hover:bg-stone-700 hover:scale-105 active:scale-95 transition-all"
-        aria-label="Customer support"
-        title="Need help?"
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-[#edf3ef] border border-[#d7e2dc] shadow-[0_10px_30px_-8px_rgba(35,62,57,.32)] flex items-center justify-center hover:bg-white hover:shadow-[0_14px_34px_-8px_rgba(35,62,57,.38)] hover:-translate-y-0.5 active:scale-95 transition-all"
+        aria-label={isOpen ? 'Close customer support' : 'Open customer support'}
+        aria-expanded={isOpen}
+        aria-controls="customer-support-dialog"
+        title={isOpen ? 'Close support' : 'Ask NotepaperAI'}
       >
-        <span className="material-symbols-outlined text-[24px] md:text-[26px]">support_agent</span>
+        <img src={notepaperMark} alt="" aria-hidden="true" className="w-8 h-8 object-contain" />
       </button>
 
       {isOpen && <CustomerSupportModal onClose={() => setIsOpen(false)} />}

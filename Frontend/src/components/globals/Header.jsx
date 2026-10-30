@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { logo } from '../../assets/assets';
+import { notepaperMark } from '../../assets/assets';
 import { useAuth } from '../../context/AuthContext';
 
 const NAV_LINKS = [
@@ -19,9 +19,9 @@ export default function Header() {
         <div className="max-w-7xl mx-auto px-5 sm:px-6 h-16 lg:h-[72px] flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5" onClick={() => setMobileMenuOpen(false)}>
-            <img src={logo} alt="Notepaper AI" className="w-8 h-8 md:w-9 md:h-9 object-contain" />
-            <span className="font-display-serif text-[20px] md:text-[22px] font-bold tracking-tight text-stone-900">
-              Notepaper<span className="text-plum-600 text-[15px] md:text-[16px] font-bold tracking-[0.18em] align-middle">AI</span>
+            {/* <img src={notepaperMark} alt="" aria-hidden="true" className="w-8 h-8 md:w-9 md:h-9 object-contain" /> */}
+            <span className="font-display text-[20px] md:text-[22px] font-bold tracking-tight text-stone-900">
+              Notepaper<span className="text-[#587A7D] text-[15px] md:text-[16px] font-bold tracking-[0.08em] align-middle"> AI</span>
             </span>
           </Link>
 

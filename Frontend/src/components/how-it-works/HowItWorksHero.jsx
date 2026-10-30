@@ -1,15 +1,26 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+
+const FLOW = ['Write', 'Organize', 'Practice', 'Review'];
 
 export default function HowItWorksHero() {
   return (
-    <header className="max-w-3xl mx-auto px-5 sm:px-6 pt-6 md:pt-12 text-center">
-      <p className="eyebrow text-plum-700 mb-5">How it works</p>
-      <h1 className="font-display-serif text-4xl sm:text-6xl font-semibold tracking-tight leading-[1.08] text-stone-900">
-        Three steps. No learning curve.
-      </h1>
-      <p className="text-stone-600 text-base md:text-lg mt-6 max-w-xl mx-auto leading-relaxed">
-        If you have ever used a notebook, you already know how Notepaper works.
-      </p>
-    </header>
+    <section className="how-opening">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 pt-16 md:pt-24 pb-14 md:pb-20">
+        <div className="how-opening-grid">
+          <div>
+            <p className="landing-kicker">FROM FIRST THOUGHT TO NEXT REVIEW</p>
+            <h1 className="landing-heading mt-5 text-[42px] leading-[1.02] sm:text-6xl lg:text-[76px] font-semibold tracking-[-0.06em] text-stone-950">A simple way to keep learning <span>in motion.</span></h1>
+          </div>
+          <div className="how-opening-aside">
+            <p className="text-lg md:text-xl leading-relaxed text-stone-600">Begin with a note. NotepaperAI helps you shape it into a plan, practice what matters, and see what you want to revisit.</p>
+            <Link to="/signup" className="landing-button landing-button-dark mt-7 px-7 py-3.5 text-[15px] font-semibold">Start with a note</Link>
+          </div>
+        </div>
+        <div className="how-flow" aria-label="Write, organize, practice, review">
+          {FLOW.map((step, index) => <div className="how-flow-item" key={step}><span>0{index + 1}</span><b>{step}</b></div>)}
+        </div>
+      </div>
+    </section>
   );
 }

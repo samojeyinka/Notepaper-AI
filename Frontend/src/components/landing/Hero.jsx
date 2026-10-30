@@ -2,69 +2,66 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 export default function Hero() {
-  const today = new Date().toLocaleDateString('en-GB', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-  });
-
   return (
-    <section className="relative overflow-hidden">
-      {/* faint texture, kept very subtle */}
-      <div className="absolute inset-0 dot-grid opacity-40 -z-10" aria-hidden="true" />
-      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-paper-darker/40 -z-10" aria-hidden="true" />
-
-      <div className="max-w-7xl mx-auto px-5 sm:px-6 pt-16 md:pt-24 lg:pt-28 text-center">
-        <div className="max-w-3xl mx-auto space-y-6 md:space-y-8">
-       
-          <h1 className="font-display-serif text-[40px] leading-[1.08] sm:text-6xl lg:text-7xl font-semibold tracking-tight text-stone-900">
-            Write notes in your
-            <span className="italic text-plum-700"> own handwriting.</span>
+    <section className="landing-hero overflow-hidden">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 pt-16 md:pt-20 lg:pt-24 text-center">
+        <div className="max-w-3xl mx-auto">
+          
+          <h1 className="landing-heading mt-5 text-[40px] leading-[1.04] sm:text-6xl lg:text-[76px] font-semibold tracking-[-0.055em] text-stone-950">
+            Your notes, ready
+            <br className="hidden sm:block" /> to become <span>something more.</span>
           </h1>
-          <p className="text-stone-600 text-base md:text-xl leading-relaxed max-w-2xl mx-auto">
-            A calm, uncluttered home for everything you want to remember. Write
-            in your own handwriting, then let your notes become study plans,
-            flashcards, quizzes and presentations on a page that feels like paper.
+          <p className="text-stone-600 text-base md:text-lg leading-relaxed max-w-xl mx-auto mt-5">
+            Write, dictate, or collect your ideas. Then turn them into study plans, flashcards, and quizzes when you need them.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-4 pt-2">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-7">
             <Link
               to="/signup"
-              className="w-full sm:w-auto px-7 py-3.5  bg-stone-900 text-white text-[15px] font-semibold hover:bg-stone-700 transition-colors"
+              className="landing-button landing-button-dark w-full sm:w-auto px-7 py-3.5 text-[15px] font-semibold transition-colors"
             >
-              Start writing, it&rsquo;s free
+              Start writing for free
             </Link>
             <Link
               to="/how-it-works"
-              className="w-full sm:w-auto px-7 py-3.5  border border-stone-300 text-stone-800 text-[15px] font-semibold hover:border-stone-900 transition-colors"
+              className="landing-button landing-button-light w-full sm:w-auto px-7 py-3.5 text-[15px] font-semibold transition-colors"
             >
               See how it works
             </Link>
           </div>
         </div>
 
-        {/* Product preview — one quiet sheet, no scrapbook */}
-        <div className="relative mt-14 md:mt-20 pb-4">
-          <div className="max-w-2xl mx-auto bg-white  shadow-[0_1px_2px_rgba(28,25,23,0.05),0_20px_45px_-20px_rgba(28,25,23,0.25)] ring-1 ring-stone-900/5 overflow-hidden text-left">
-            {/* Sheet header */}
-            <div className="flex items-center justify-between px-6 md:px-10 pt-6 md:pt-8 pb-3 border-b border-stone-100">
-              <span className="text-[13px] font-medium text-stone-400">{today}</span>
-              <span className="text-[12px] tracking-wide text-stone-300 uppercase">Morning pages</span>
+        <div className="landing-preview relative mt-12 md:mt-16 pb-8">
+          <div className="landing-app-window mx-auto max-w-5xl overflow-hidden text-left">
+            <div className="landing-app-topbar flex items-center justify-between px-5 md:px-7 py-4">
+              <div className="flex items-center gap-2"><span className="landing-dot"/><span className="landing-dot"/><span className="landing-dot"/></div>
+              <span className="text-xs text-stone-500">My study notebook</span>
+              <span className="text-xs text-stone-400">Saved just now</span>
             </div>
-            {/* Ruled writing area */}
-            <div className="px-6 md:px-10 py-6 md:py-9 paper-rule">
-              <p className="font-handwritten text-[19px] md:text-[24px] leading-[28px] text-stone-700">
-                Some of the best ideas arrive quietly, usually when the page
-                is open and the phone is somewhere else.
-              </p>
-              <p className="font-handwritten text-[19px] md:text-[24px] leading-[28px] text-stone-400 mt-4">
-                Keep a notebook. You never know which thought will matter.
-              </p>
+            <div className="grid md:grid-cols-[220px_1fr] min-h-[310px] md:min-h-[385px]">
+              <aside className="landing-app-sidebar hidden md:block p-5">
+                <div className="text-[11px] uppercase tracking-wider text-stone-400 mb-4">Your workspace</div>
+                <div className="landing-side-active">◫ <span>All notes</span></div>
+                <div className="landing-side-item">▤ <span>Biology 101</span></div>
+                <div className="landing-side-item">▤ <span>Lecture notes</span></div>
+                <div className="landing-side-item">✦ <span>Study materials</span></div>
+              </aside>
+              <div className="grid sm:grid-cols-[1.1fr_.9fr] gap-4 p-4 md:p-6 bg-white">
+                <article className="landing-note p-5 md:p-6">
+                  <div className="text-[11px] font-medium text-stone-400">BIOLOGY 101 · TODAY</div>
+                  <h2 className="landing-note-writing landing-note-title font-semibold mt-4 text-stone-900">Cellular respiration</h2>
+                  <p className="landing-note-writing landing-note-body text-stone-700 mt-2">Cells convert glucose into usable energy. Glycolysis happens in the cytoplasm; the Krebs cycle and electron transport chain happen in the mitochondria.</p>
+                  <div className="landing-note-writing landing-note-reminder mt-4 rounded-lg bg-[#f7f4ef] p-3 text-stone-600">Remember: oxygen is the final electron acceptor in the electron transport chain.</div>
+                  <div className="flex gap-2 mt-5"><span className="landing-tag">Lecture notes</span><span className="landing-tag">Biology</span></div>
+                </article>
+                <article className="landing-study-card p-5 md:p-6 flex flex-col justify-between">
+                  <div><div className="flex items-center justify-between"><span className="landing-study-label">MADE FROM YOUR NOTE</span><span className="landing-study-spark">✦</span></div>
+                    <h3 className="text-xl font-semibold mt-5">Quick recall</h3>
+                    <p className="text-sm text-stone-500 mt-2">What role does oxygen play in the electron transport chain?</p>
+                  </div>
+                  <div className="border-t border-stone-200 pt-4 mt-6"><span className="text-[11px] uppercase tracking-wider text-stone-400">Answer</span><p className="text-sm text-stone-700 mt-1">It acts as the final electron acceptor.</p></div>
+                </article>
+              </div>
             </div>
-          </div>
-          <div className="mx-auto mt-6 max-w-md px-6">
-            <p className="text-center text-[13px] text-stone-400">
-              Your handwriting, turned into study plans, flashcards, quizzes and presentations.
-            </p>
           </div>
         </div>
       </div>

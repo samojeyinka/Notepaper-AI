@@ -2,22 +2,18 @@ import React from 'react';
 
 export const TheSpark = () => {
   return (
-    <section className="py-10 md:py-20">
-      <div className="max-w-3xl mx-auto px-5 sm:px-6">
-        <p className="eyebrow text-plum-700 mb-4">Chapter one · The spark</p>
-        <h2 className="font-display-serif text-3xl md:text-5xl font-semibold tracking-tight text-stone-900 mb-6 leading-snug">
+    <section className="story-chapter story-chapter-spark py-12 md:py-20">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 grid md:grid-cols-[120px_1fr_1fr] gap-6 md:gap-10">
+        <p className="landing-kicker">01, THE SPARK</p>
+        <h2 className="text-3xl md:text-5xl font-semibold tracking-[-0.05em] text-stone-900 mb-6 leading-tight">
           Why we missed paper
         </h2>
-        <div className="space-y-5 text-stone-600 text-[15px] md:text-lg leading-relaxed">
+        <div className="story-chapter-copy space-y-5 text-stone-600 text-[15px] md:text-lg leading-relaxed">
           <p>
-            A few years ago we moved most of our work onto screens, like everyone
-            else. It was faster. It was searchable. And somewhere in the middle of
-            it all, we noticed our best ideas had started coming less often.
+            Moving our work to screens made it easier to search and share. We also missed the feeling of giving an idea room to arrive before deciding how to organize it.
           </p>
           <p>
-            The pages we reached for — real ones, with ruled lines and margins —
-            slowed us down just enough. A thought had room to arrive before we had
-            to format it. That feeling was the whole idea for Notepaper.
+            A ruled page gave us that pause. We wanted to bring the same open space to a digital notebook. That became the beginning of Notepaper.
           </p>
         </div>
       </div>

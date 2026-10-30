@@ -18,24 +18,23 @@ export default function ContactHero() {
   return (
     <div className="space-y-10">
       <div className="space-y-5">
-        <p className="eyebrow text-plum-700">Contact us</p>
-        <h1 className="font-display-serif text-4xl md:text-5xl font-semibold tracking-tight leading-[1.1] text-stone-900">
-          Talk to a human
+        <p className="landing-kicker">CONTACT</p>
+        <h1 className="text-4xl md:text-6xl font-semibold tracking-[-0.055em] leading-[1.04] text-stone-900 mt-3">
+          Tell us what is on your mind.
         </h1>
         <p className="text-stone-600 text-base md:text-lg leading-relaxed max-w-md">
-          A question, a bug, an idea for a feature, we read everything and we
-          reply ourselves. No bots standing between you and us.
+          Have a question, an idea, or something that needs a closer look? Send a note and our team will get back to you.
         </p>
       </div>
 
-      <ul className="space-y-5">
+      <ul className="contact-details grid sm:grid-cols-2 lg:grid-cols-1 gap-5 border-t border-stone-200 pt-6">
         {DETAILS.map((d) => (
           <li key={d.label}>
-            <p className="text-[12px] uppercase tracking-[0.16em] font-semibold text-stone-400 mb-1">
+            <p className="text-[10px] uppercase tracking-[0.15em] font-semibold text-stone-500 mb-1.5">
               {d.label}
             </p>
             {d.href ? (
-              <a href={d.href} className="text-[15px] md:text-base text-plum-700 hover:text-plum-600 font-medium link-underline">
+              <a href={d.href} className="text-[15px] md:text-base text-[#45666c] hover:text-[#355358] font-medium underline underline-offset-4 decoration-[#afc2bc]">
                 {d.value}
               </a>
             ) : (

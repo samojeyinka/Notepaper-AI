@@ -1,53 +1,32 @@
 import React from 'react';
 
 const STEPS = [
-  {
-    n: '01',
-    icon: 'edit_note',
-    title: 'Write or record',
-    body: 'Open a blank page and write the way you like, or dictate a lecture and read it back as text. Nothing to configure, nothing in the way.',
-  },
-  {
-    n: '02',
-    icon: 'folder_open',
-    title: 'Put it somewhere you will find it',
-    body: 'Drop notes into folders for each course or project. Search works across everything, so a line from three months ago is never lost.',
-  },
-  {
-    n: '03',
-    icon: 'style',
-    title: 'Revisit and study',
-    body: 'Turn any note into flashcards or a quick quiz, and test yourself later. Your notebook quietly becomes a study space.',
-  },
+  { number: '01', label: 'CAPTURE', title: 'Start with your own words', summary: 'Write on a paper like page, type a structured note, or dictate an idea while it is fresh.', kind: 'note' },
+  { number: '02', label: 'ORGANIZE', title: 'Give your ideas a place', summary: 'Keep notes together by subject, then use them as the source for your study session.', kind: 'plan' },
+  { number: '03', label: 'PRACTICE', title: 'Turn key ideas into recall', summary: 'Create flashcards from your notes and practice the details you want to remember.', kind: 'cards' },
+  { number: '04', label: 'CHECK IN', title: 'See what you know', summary: 'Use a quiz to check your understanding and decide what deserves another review.', kind: 'quiz' },
 ];
+
+function StepPreview({ kind }) {
+  if (kind === 'note') return <div className="how-preview-paper"><small>BIOLOGY 101, TODAY</small><strong>Cellular energy</strong><p>Glycolysis begins in the cytoplasm. The next steps take place in the mitochondria.</p><span>Lecture notes</span></div>;
+  if (kind === 'plan') return <div className="how-preview-plan"><small>THIS WEEK</small><div><b>01</b><span>Review cell structure</span><i>12 min</i></div><div><b>02</b><span>Recall key terms</span><i>8 min</i></div><div><b>03</b><span>Practice a quiz</span><i>10 min</i></div></div>;
+  if (kind === 'cards') return <div className="how-preview-flash"><small>FLASHCARD, 4 OF 12</small><strong>Where does glycolysis happen?</strong><div>Think of your answer, then turn the card.</div></div>;
+  return <div className="how-preview-quiz"><small>QUICK CHECK, 1 QUESTION</small><strong>What is the cell's usable energy molecule?</strong><div>Glucose</div><div className="how-answer">ATP <span>Correct</span></div><div>Oxygen</div></div>;
+}
 
 export default function HowItWorksSteps() {
   return (
-    <section className="max-w-3xl mx-auto px-5 sm:px-6 py-14 md:py-24">
-      <div className="space-y-12 md:space-y-16">
-        {STEPS.map((step, i) => (
-          <div key={step.n} className="flex gap-6 md:gap-10">
-            {/* Number */}
-            <div className="flex flex-col items-center">
-              <span className="font-display-serif text-2xl md:text-3xl font-semibold text-plum-600 leading-none pt-1">
-                {step.n}
-              </span>
-              {i < STEPS.length - 1 && <span className="w-px flex-1 bg-stone-200 my-4" />}
-            </div>
-            {/* Content */}
-            <div className="pb-2">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-9 h-9  bg-plum-50 text-plum-700 flex items-center justify-center">
-                  <span className="material-symbols-outlined text-[19px]">{step.icon}</span>
-                </div>
-                <h2 className="text-xl md:text-2xl font-semibold text-stone-900">{step.title}</h2>
-              </div>
-              <p className="text-stone-600 text-[15px] md:text-base leading-relaxed max-w-xl">
-                {step.body}
-              </p>
-            </div>
-          </div>
-        ))}
+    <section className="how-sequence py-16 md:py-24">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6">
+        <div className="how-sequence-heading"><p className="landing-kicker">A SIMPLE RHYTHM</p><h2>Write it down.<br /><span>Work it through.</span></h2></div>
+        <div className="how-sequence-list">
+          {STEPS.map((step, index) => (
+            <article key={step.number} className={`how-sequence-row ${index % 2 ? 'how-sequence-row-reverse' : ''}`}>
+              <div className="how-sequence-copy"><div className="how-sequence-index"><span>{step.number}</span><i /></div><p className="landing-kicker">{step.label}</p><h3>{step.title}</h3><p className="how-sequence-summary">{step.summary}</p></div>
+              <div className={`how-sequence-visual how-sequence-${step.kind}`}><StepPreview kind={step.kind} /></div>
+            </article>
+          ))}
+        </div>
       </div>
     </section>
   );

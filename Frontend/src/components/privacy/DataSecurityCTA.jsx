@@ -1,8 +1,8 @@
 export const DataSecurityCTA = () => {
   return (
-    <section className="my-12 md:my-16  bg-stone-900 p-8 md:p-16 text-center text-white">
+    <section className="privacy-contact my-12 md:my-16 bg-[#45666c] p-8 md:p-12 text-center text-white">
       <div className="max-w-2xl mx-auto">
-        <h3 className="font-display-serif text-2xl md:text-4xl font-semibold tracking-tight mb-4">
+        <h3 className="text-2xl md:text-4xl font-semibold tracking-[-0.045em] mb-4">
           Have questions about your data?
         </h3>
         <p className="text-stone-400 text-[15px] md:text-base leading-relaxed mb-8">
@@ -12,13 +12,13 @@ export const DataSecurityCTA = () => {
         <div className="flex flex-col sm:flex-row justify-center gap-3">
           <a
             href="mailto:support@synchrome.co"
-            className="px-7 py-3  bg-white text-stone-900 text-[14px] font-semibold hover:bg-stone-200 transition-colors"
+            className="px-7 py-3 rounded-full bg-white text-stone-900 text-[14px] font-semibold hover:bg-stone-100 transition-colors"
           >
             Email the team
           </a>
           <a
             href="/privacy"
-            className="px-7 py-3  border border-stone-600 text-white text-[14px] font-semibold hover:border-stone-400 transition-colors"
+            className="px-7 py-3 rounded-full border border-white/50 text-white text-[14px] font-semibold hover:bg-white/10 transition-colors"
           >
             Re-read the policy
           </a>

@@ -3,7 +3,7 @@ import Loader from '../globals/Loader';
 import { apiClient } from '../../api/apiClient';
 
 const inputCls =
-  'w-full  border border-stone-200 bg-white px-4 py-3 text-[15px] text-stone-900 placeholder:text-stone-300 focus:outline-none focus:ring-2 focus:ring-plum-200 focus:border-plum-400 transition-colors';
+  'w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-[15px] text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-[#e6eeea] focus:border-[#78958e] transition-colors';
 
 export default function ContactForm() {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
@@ -34,19 +34,17 @@ export default function ContactForm() {
 
   if (success) {
     return (
-      <div className=" bg-white ring-1 ring-stone-900/5 shadow-[0_24px_50px_-28px_rgba(28,25,23,0.25)] p-10 md:p-14 flex flex-col items-center justify-center text-center min-h-[380px]">
-        <div className="w-14 h-14  bg-plum-50 text-plum-700 flex items-center justify-center mb-6">
-          <span className="material-symbols-outlined text-[28px]">check</span>
-        </div>
-        <h3 className="font-display-serif text-2xl font-semibold text-stone-900 mb-2">
+      <div className="contact-form-panel bg-white border border-stone-200 p-8 md:p-12 flex flex-col items-center justify-center text-center min-h-[380px]">
+        <div className="w-12 h-12 rounded-full bg-[#edf3ef] text-[#45666c] flex items-center justify-center mb-6 text-xl">✓</div>
+        <h3 className="text-2xl font-semibold text-stone-900 mb-2">
           Message sent
         </h3>
         <p className="text-stone-500 text-[15px] max-w-sm">
-          Thanks for reaching out — we&rsquo;ll get back to you shortly.
+          Thanks for reaching out. We will get back to you shortly.
         </p>
         <button
           onClick={() => setSuccess(false)}
-          className="mt-8 text-[14px] font-semibold text-plum-700 link-underline"
+          className="mt-8 text-[14px] font-semibold text-[#45666c] underline underline-offset-4"
         >
           Send another message
         </button>
@@ -56,7 +54,7 @@ export default function ContactForm() {
 
   return (
     <form
-      className=" bg-white ring-1 ring-stone-900/5 shadow-[0_24px_50px_-28px_rgba(28,25,23,0.25)] p-8 md:p-12 space-y-6"
+      className="contact-form-panel bg-white border border-stone-200 p-6 sm:p-8 md:p-10 space-y-5"
       onSubmit={handleSubmit}
     >
       <div>
@@ -98,7 +96,7 @@ export default function ContactForm() {
         <textarea
           className={`${inputCls} resize-none min-h-[140px]`}
           id="message"
-          placeholder="What&rsquo;s on your mind?"
+          placeholder="What is on your mind?"
           rows="5"
           value={formData.message}
           onChange={handleChange}
@@ -110,7 +108,7 @@ export default function ContactForm() {
       {error && <p className="text-red-500 text-[13px]">{error}</p>}
 
       <button
-        className="w-full py-3.5  bg-plum-700 text-white text-[15px] font-semibold hover:bg-plum-600 disabled:opacity-60 transition-colors flex items-center justify-center gap-2"
+        className="w-full rounded-xl py-3.5 bg-[#45666c] text-white text-[15px] font-semibold hover:bg-[#355358] disabled:opacity-60 transition-colors flex items-center justify-center gap-2"
         type="submit"
         disabled={loading}
       >
@@ -119,7 +117,6 @@ export default function ContactForm() {
         ) : (
           <>
             Send message
-            <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
           </>
         )}
       </button>

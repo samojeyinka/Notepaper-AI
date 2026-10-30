@@ -1,5 +1,5 @@
 import React from 'react';
-import { logo } from '../../assets/assets';
+import { notepaperMark } from '../../assets/assets';
 import { Link } from 'react-router-dom';
 import { FiGithub, FiTwitter, FiFacebook } from 'react-icons/fi';
 
@@ -12,12 +12,12 @@ const EXPLORE = [
 const COMPANY = [
   { label: 'About us', href: 'about-us' },
   { label: 'Contact us', href: 'contact-us' },
-  { label: 'Help & support', href: 'help-&-support' },
+  { label: 'Help and support', href: 'help-&-support' },
 ];
 
 const LEGAL = [
   { label: 'Privacy policy', href: 'privacy' },
-  { label: 'Terms & conditions', href: 'terms' },
+  { label: 'Terms and conditions', href: 'terms' },
   { label: 'Refund policy', href: 'refund-policy' },
 ];
 
@@ -28,24 +28,23 @@ const socials = [
 ];
 
 export default function Footer() {
-  const linkCls = 'text-[13px] text-stone-400 hover:text-white transition-colors';
-  const colTitle = 'text-[12px] uppercase tracking-[0.18em] font-semibold text-stone-300 mb-5';
+  const linkCls = 'text-sm text-stone-600 hover:text-[#45666C] transition-colors';
+  const colTitle = 'text-xs uppercase tracking-[0.14em] font-semibold text-stone-900 mb-4';
 
   return (
-    <footer className="bg-stone-900 text-stone-300">
-      <div className="max-w-7xl mx-auto px-5 sm:px-6 py-14 md:py-20">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-10 md:gap-8">
+    <footer className="site-footer bg-[#F3F1EB] text-stone-700 border-t border-stone-200">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 py-12 md:py-16">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-10 md:gap-8">
           {/* Brand */}
-          <div className="col-span-2">
-            <Link to="/" className="flex items-center gap-2.5 mb-5">
-              <img src={logo} alt="Notepaper AI" className="w-8 md:w-9 object-contain" />
-              <span className="font-display-serif text-[20px] md:text-[22px] font-bold tracking-tight text-white">
-                Notepaper<span className="text-plum-300 text-[15px] md:text-[16px] font-bold tracking-[0.18em] align-middle">AI</span>
+          <div className="col-span-2 md:col-span-2">
+            <Link to="/" className="flex items-center gap-2.5 mb-4">
+              {/* <img src={notepaperMark} alt="" aria-hidden="true" className="w-9 h-9 object-contain" /> */}
+              <span className="font-display text-[20px] md:text-[22px] font-bold tracking-tight text-stone-900">
+                Notepaper<span className="text-[#587A7D] text-[15px] md:text-[16px] font-bold tracking-[0.08em] align-middle"> AI</span>
               </span>
             </Link>
-            <p className="text-[13px] md:text-sm text-stone-400 leading-relaxed max-w-xs">
-              A calm home for your notes, thoughts and study material with the
-              feel of real paper.
+            <p className="text-sm text-stone-600 leading-relaxed max-w-sm">
+              A calm place for class notes, voice notes, and useful study tools.
             </p>
             <div className="flex gap-4 mt-6">
               {socials.map((s) => (
@@ -55,7 +54,7 @@ export default function Footer() {
                   target="_blank"
                   rel="noreferrer"
                   aria-label={s.label}
-                  className="w-8 h-8  border border-stone-700 flex items-center justify-center text-stone-400 hover:text-white hover:border-stone-500 transition-colors"
+                  className="w-9 h-9 rounded-full border border-stone-300 flex items-center justify-center text-stone-600 hover:text-[#45666C] hover:border-[#587A7D] transition-colors"
                 >
                   {s.icon}
                 </a>
@@ -87,11 +86,15 @@ export default function Footer() {
                   </Link>
                 </li>
               ))}
+            </ul>
+          </div>
+
+          <div>
+            <h4 className={colTitle}>Legal</h4>
+            <ul className="space-y-3">
               {LEGAL.map((l) => (
                 <li key={l.href}>
-                  <Link to={`/${l.href}`} className={linkCls}>
-                    {l.label}
-                  </Link>
+                  <Link to={`/${l.href}`} className={linkCls}>{l.label}</Link>
                 </li>
               ))}
             </ul>
@@ -99,15 +102,15 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className={colTitle}>Get in touch</h4>
-            <ul className="space-y-3 text-[13px] text-stone-400">
+            <h4 className={colTitle}>Contact</h4>
+            <ul className="space-y-3 text-sm text-stone-600">
               <li>
-                <a href="mailto:support@synchrome.co" className="hover:text-white transition-colors">
+                <a href="mailto:support@synchrome.co" className="hover:text-[#45666C] transition-colors">
                   support@synchrome.co
                 </a>
               </li>
               <li>
-                <a href="tel:+2349131710995" className="hover:text-white transition-colors">
+                <a href="tel:+2349131710995" className="hover:text-[#45666C] transition-colors">
                   +234 913 171 0995
                 </a>
               </li>
@@ -116,9 +119,9 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 pt-6 border-t border-stone-800 flex flex-col md:flex-row justify-between gap-3 items-start md:items-center">
-          <p className="text-[12px] text-stone-500">© {new Date().getFullYear()} Notepaper AI. All rights reserved.</p>
-          <p className="text-[12px] text-stone-500">A Synchrome product</p>
+        <div className="mt-10 pt-5 border-t border-stone-300 flex flex-col md:flex-row justify-between gap-2 items-start md:items-center">
+          <p className="text-xs text-stone-500">© {new Date().getFullYear()} Notepaper AI. All rights reserved.</p>
+          <p className="text-xs text-stone-500">Made by Synchrome</p>
         </div>
       </div>
     </footer>

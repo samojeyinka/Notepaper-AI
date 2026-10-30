@@ -4,10 +4,11 @@ import Header from '../components/globals/Header'
 import Footer from '../components/globals/Footer'
 import CustomerSupport from '../components/globals/CustomerSupport'
 import SEO from '../components/globals/SEO'
+import '@/styles/Landing.css'
 
 const PrivacyPage = () => {
   return (
-    <>
+    <div className="landing-page legal-page legal-privacy bg-paper font-display text-stone-900 antialiased">
       <SEO
         title="Privacy Policy"
         path="/privacy"
@@ -17,7 +18,7 @@ const PrivacyPage = () => {
       <Privacy />
       <CustomerSupport />
       <Footer />
-    </>
+    </div>
   )
 }
 

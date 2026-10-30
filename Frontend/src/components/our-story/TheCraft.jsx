@@ -2,22 +2,18 @@ import React from 'react';
 
 export const TheCraft = () => {
   return (
-    <section className="py-10 md:py-20 bg-paper-darker/60">
-      <div className="max-w-3xl mx-auto px-5 sm:px-6">
-        <p className="eyebrow text-plum-700 mb-4">Chapter two · The craft</p>
-        <h2 className="font-display-serif text-3xl md:text-5xl font-semibold tracking-tight text-stone-900 mb-6 leading-snug">
+    <section className="story-chapter story-chapter-craft py-12 md:py-20 bg-[#f3f1eb]">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 grid md:grid-cols-[120px_1fr_1fr] gap-6 md:gap-10">
+        <p className="landing-kicker">02, THE CRAFT</p>
+        <h2 className="text-3xl md:text-5xl font-semibold tracking-[-0.05em] text-stone-900 mb-6 leading-tight">
           Digital pages, taken seriously
         </h2>
-        <div className="space-y-5 text-stone-600 text-[15px] md:text-lg leading-relaxed">
+        <div className="story-chapter-copy space-y-5 text-stone-600 text-[15px] md:text-lg leading-relaxed">
           <p>
-            Most of Notepaper&rsquo;s work is invisible. It&rsquo;s in the spacing
-            of a ruled line, the way a page keeps out of your way, the quiet detail
-            of your own writing rendered honestly on screen.
+            The craft is in the small details. The spacing of a ruled line. The way a page leaves room for your thoughts. Your writing, kept clear on screen.
           </p>
           <p>
-            We are a small team, so we say no to a lot. No newsfeeds, no streaks,
-            no features that exist only to bring you back. The page is the product,
-            and the page should feel like yours.
+            The page is the center of the product. Tools should support the work you came to do and let you return to your notes in your own way.
           </p>
         </div>
       </div>
