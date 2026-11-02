@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { authService } from '../api/authService';
 import Alert from './globals/Alert';
+import AuthShell from './auth/AuthShell';
 
 export default function VerifyEmail() {
   const { token } = useParams();
@@ -61,74 +62,54 @@ export default function VerifyEmail() {
       }
   };
 
+  const stateIcon = loading ? 'mail' : status === 'success' ? 'verified' : 'error';
+  const stateColor = loading || status === 'success'
+    ? 'bg-[#edf3ef] text-[#54786f]'
+    : 'bg-red-50 text-red-600';
+
   return (
-    <main className="w-full max-w-6xl mx-auto flex flex-col md:flex-row overflow-hidden bg-white md:min-h-[85vh]">
-       {/* UI for verifying / success / error */}
-       <section className="flex-1 p-8 md:p-16 flex flex-col justify-center bg-[#fdfaf3] relative items-center text-center" style={{
-        backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(0,0,0,0.02) 1px, transparent 0)',
-        backgroundSize: '24px 24px',
-      }}>
-         <div className="max-w-md w-full bg-white  p-5 md:p-10  md: shadow-sm border border-stone-200 flex flex-col items-center relative">
-             
-             {/* Yellow Accent Shape */}
-             <div className="absolute -top-6 -right-6 w-20 h-20 flex items-center justify-center transform rotate-12" style={{
-              backgroundColor: '#ffedbc',
-              filter: 'drop-shadow(2px 4px 6px rgba(0,0,0,0.1))',
-              border: '1px solid #e7e2d5',
-              clipPath: 'polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)',
-            }}>
-              <span className="material-symbols-outlined text-2xl text-amber-600">mark_email_read</span>
-            </div>
+    <AuthShell aside={{
+      title: ['A little confirmation,', 'then you’re in.'],
+      sub: 'Confirming your email keeps your notebook secure and makes sure we can help you recover your account if you need us.',
+      children: <div className="flex items-center gap-3 text-sm text-[#50675f]"><span className="material-symbols-outlined text-[#54786f]">lock</span> Your account details stay private.</div>,
+    }}>
+      <div className="text-center">
+        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5 ${stateColor}`}>
+          {loading
+            ? <span className="w-6 h-6 rounded-full border-[3px] border-[#c7d5cb] border-t-[#54786f] animate-spin" aria-label="Verifying email" />
+            : <span className="material-symbols-outlined text-[30px]" aria-hidden="true">{stateIcon}</span>}
+        </div>
 
-             {loading ? (
-                <>
-                  <div className="w-10 h-10 md:w-16 md:h-16  border-[5px] border-purple-100 border-t-purple-600 border-l-purple-600 animate-spin mb-6"></div>
-                  <h2 className="text-xl md:text-2xl font-semibold md:font-extrabold text-slate-800 mb-2">Verifying Email</h2>
-                  <p className="text-slate-500 text-[12px] md:text-base">Please wait while we verify your account securely...</p>
-                </>
-             ) : status === 'success' ? (
-                <>
-                  <div className="w-16 h-16  bg-emerald-100 flex items-center justify-center mb-6 ring-4 ring-emerald-50">
-                    <span className="material-symbols-outlined text-4xl text-emerald-600">verified</span>
-                  </div>
-                  <h2 className="text-2xl font-extrabold text-slate-800 mb-2">Verified!</h2>
-                  <p className="text-slate-500 mb-8">{message}</p>
-                  <Link to="/signin" className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium md:font-bold py-1.5 px-3 md:py-3 md:px-6  md: shadow-[0_10px_15px_-3px_rgba(147,51,234,0.3)] transition-all active:scale-[0.98]">
-                    Continue to Sign In
-                  </Link>
-                </>
-             ) : (
-                <>
-                  <div className="w-10 h-10 md:w-16 md:h-16  bg-red-100 flex items-center justify-center mb-6 ring-4 ring-red-50">
-                    <span className="material-symbols-outlined text-2xl md:text-4xl text-red-600">error</span>
-                  </div>
-                  <h2 className="text-xl md:text-2xl font-semibold md:font-extrabold text-slate-800 mb-2">Verification Failed</h2>
-                  <p className="text-slate-500 mb-3 md:mb-6 text-[13px] md:text-base">{message}</p>
-                  
-                  {resendStatus && (
-                     <div className="w-full text-left mb-6 text-sm">
-                       <Alert type={resendStatus.type} message={resendStatus.message} />
-                     </div>
-                  )}
+        <p className="auth-kicker mb-3">Email confirmation</p>
+        <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-stone-900">
+          {loading ? 'Checking your email' : status === 'success' ? 'You’re verified' : 'Couldn’t verify your email'}
+        </h1>
+        <p className="text-stone-500 text-[15px] leading-relaxed mt-3 mb-7">
+          {loading ? 'Please wait while we securely confirm your account.' : message}
+        </p>
 
-                  {email && (
-                    <button 
-                       onClick={handleResend}
-                       disabled={resending}
-                       className="w-full bg-slate-900 hover:bg-slate-800 text-white text-[12px] md:text-[15px] font-medium md:font-semibold py-1.5 px-3 md:py-2 md:px-4  md: shadow-md transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed mb-4"
-                    >
-                      {resending ? 'Sending Link...' : 'Resend Verification Link'}
-                    </button>
-                  )}
-                  
-                  <Link to="/signup" className="text-purple-600 text-[13px] font-medium md:font-bold hover:underline inline-flex items-center gap-1">
-                    <span className="material-symbols-outlined text-sm">arrow_back</span>
-                    Back to Sign Up
-                  </Link>
-                </>
-             )}
-         </div>
-       </section>
-    </main>
+        {!loading && status === 'success' && (
+          <Link to="/signin" className="auth-primary-btn w-full font-semibold py-3.5 transition-colors text-[15px] inline-flex items-center justify-center gap-2">
+            Continue to sign in <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+          </Link>
+        )}
+
+        {!loading && status === 'error' && (
+          <>
+            {resendStatus && <div className="text-left mb-5"><Alert type={resendStatus.type} message={resendStatus.message} /></div>}
+            {email && (
+              <button type="button" onClick={handleResend} disabled={resending}
+                className="auth-primary-btn w-full font-semibold py-3.5 transition-colors text-[15px] inline-flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
+                {resending && <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" aria-hidden="true" />}
+                {resending ? 'Sending link…' : 'Resend verification link'}
+              </button>
+            )}
+            <Link to="/signup" className="auth-text-link mt-6 font-semibold hover:underline inline-flex items-center gap-1 text-sm">
+              <span className="material-symbols-outlined text-[16px]">arrow_back</span>Back to sign up
+            </Link>
+          </>
+        )}
+      </div>
+    </AuthShell>
   );
 }

@@ -79,7 +79,7 @@ export const NotificationsHeader = ({ onMarkAllAsRead, hasUnread }) => (
                 disabled={!hasUnread}
                 className="flex items-center gap-1.5 text-[13px] font-medium text-stone-600 hover:text-plum-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
-                <span className="material-icons-round text-[18px]">done_all</span>
+                <span className="material-symbols-outlined text-[18px]">done_all</span>
                 Mark all as read
             </button>
             <NotificationIcon />
@@ -99,7 +99,7 @@ const RowAction = ({ icon, title, onClick, danger }) => (
                 : 'text-stone-400 hover:text-plum-700 hover:bg-plum-50'
         }`}
     >
-        <span className="material-icons-round text-[18px]">{icon}</span>
+        <span className="material-symbols-outlined text-[18px]">{icon}</span>
     </button>
 );
 
@@ -128,7 +128,7 @@ export const NotificationCard = ({
 
         {/* Icon */}
         <div className={`w-10 h-10 shrink-0 border border-stone-200/70 flex items-center justify-center ${iconBgColor}`}>
-            <span className={`material-icons-round text-[20px] ${iconColor}`}>{icon}</span>
+            <span className={`material-symbols-outlined text-[20px] ${iconColor}`}>{icon}</span>
         </div>
 
         {/* Content */}
@@ -237,7 +237,7 @@ function Section({ label, count, children }) {
 const EmptyState = () => (
     <div className="flex flex-col items-center justify-center py-20 text-center">
         <div className="w-14 h-14 bg-plum-50 text-plum-600 flex items-center justify-center mb-4">
-            <span className="material-icons-round text-[26px]">notifications_none</span>
+            <span className="material-symbols-outlined text-[26px]">notifications_none</span>
         </div>
         <h3 className="font-display-serif text-[20px] font-semibold text-stone-900 mb-1">You're all caught up</h3>
         <p className="text-[13px] text-stone-500">New activity will show up here.</p>
@@ -305,7 +305,7 @@ export const Notifications = () => {
                             disabled={loadingMore}
                             className="flex items-center gap-1.5 px-4 py-2 border border-stone-200 text-[13px] font-medium text-stone-600 hover:border-plum-400 hover:text-plum-700 disabled:opacity-50 transition-colors"
                         >
-                            <span className="material-icons-round text-[18px]">expand_more</span>
+                            <span className="material-symbols-outlined text-[18px]">expand_more</span>
                             {loadingMore ? 'Loading…' : 'Load more'}
                         </button>
                     </div>

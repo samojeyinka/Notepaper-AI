@@ -277,7 +277,7 @@ Rules:
                     {/* Generate button */}
                     {isGenerating ? (
                         <div className="flex items-center justify-center gap-1.5 md:gap-3 py-2 md:py-4 bg-plum-50/70 ">
-                            <span className="w-5 h-5 border-2 border-plum-600/30 border-t-primary  animate-spin" />
+                            <span className="w-5 h-5 border-2 border-plum-600/30 border-t-primary  animate-spin rounded-full" />
                             <span className="text-sm font-medium md:font-semibold text-plum-700">Generating {cardCount} cards…</span>
                         </div>
                     ) : (
@@ -287,7 +287,7 @@ Rules:
                             className="w-full py-2 md:py-4 bg-stone-900 text-white  font-semibold text-sm flex items-center justify-center gap-2 hover:scale-[0.98] active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:shadow-none"
                         >
                             {!loaded ? (
-                                <span className="w-5 h-5 border-2 border-white/30 border-t-white  animate-spin" />
+                                <span className="w-5 h-5 border-2 border-white/30 border-t-white  animate-spin rounded-full" />
                             ) : (
                                 <>
                                     
@@ -341,7 +341,7 @@ Rules:
                                 <div className="relative">
                                     <div className="absolute inset-0 " />
                                     <div className="relative w-28 h-28 bg-stone-50  flex items-center justify-center shadow-[0_8px_32px_rgba(0,0,0,0.08)]">
-                                        <span className="material-icons-round text-plum-700 text-5xl">style</span>
+                                        <span className="material-symbols-outlined text-plum-700 text-5xl">style</span>
                                     </div>
                                  
                                 </div>
@@ -371,7 +371,7 @@ Rules:
                         {/* Error */}
                         {status === 'error' && (
                             <div className="flex items-center gap-2 text-red-500 text-sm mt-4">
-                                <span className="material-icons-round text-[18px]">error_outline</span>
+                                <span className="material-symbols-outlined text-[18px]">error_outline</span>
                                 {error}
                             </div>
                         )}
@@ -408,10 +408,10 @@ Rules:
                             className="flex items-center gap-2 px-5 py-2.5  bg-stone-900 text-white text-xs font-bold hover:scale-[0.98] active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed transition "
                         >
                             {isSaving ? (
-                                <span className="w-4 h-4 border-2 border-white/30 border-t-white  animate-spin" />
+                                <span className="w-4 h-4 border-2 border-white/30 border-t-white  animate-spin rounded-full" />
                             ) : (
                                 <>
-                                    <span className="material-icons-round text-[16px]">save</span>
+                                    <span className="material-symbols-outlined text-[16px]">save</span>
                                     Save to Library
                                 </>
                             )}
@@ -444,7 +444,7 @@ Rules:
                         </div>
                         {!isGenerating && !isSaving && (
                             <button onClick={() => setMobilePreview(false)} className="p-1.5  text-stone-400 hover:text-stone-600 transition-colors">
-                                <span className="material-icons-round text-[20px]">close</span>
+                                <span className="material-symbols-outlined text-[20px]">close</span>
                             </button>
                         )}
                     </div>
@@ -459,7 +459,7 @@ Rules:
                         )}
                         {status === 'error' && (
                             <div className="flex items-center gap-2 text-red-500 text-sm mt-4">
-                                <span className="material-icons-round text-[18px]">error_outline</span>
+                                <span className="material-symbols-outlined text-[18px]">error_outline</span>
                                 {error}
                             </div>
                         )}
@@ -479,7 +479,7 @@ Rules:
                                 Back
                             </button>
                             <button onClick={handleSave} disabled={isSaving} className="flex-1 py-2.5  bg-stone-900 text-white text-sm font-semibold flex items-center justify-center gap-1.5 disabled:opacity-40">
-                                {isSaving ? <span className="w-4 h-4 border-2 border-white/30 border-t-white  animate-spin" /> : <><span className="material-icons-round text-[16px]">save</span>Save to Library</>}
+                                {isSaving ? <span className="w-4 h-4 border-2 border-white/30 border-t-white  animate-spin rounded-full" /> : <><span className="material-symbols-outlined text-[16px]">save</span>Save to Library</>}
                             </button>
                         </div>
                     )}

@@ -210,7 +210,7 @@ const ScoreScreen = ({ score, total, quiz, onRestart, onBack}) => {
             <div className="relative z-10 w-full max-w-md">
                 <div className="bg-white  border border-stone-200 shadow-[0_16px_40px_-24px_rgba(28,25,23,0.35)] p-8 text-center space-y-6">
                     <div className={`w-16 h-16 ${grade.tint}  flex items-center justify-center mx-auto`}>
-                        <span className="material-icons-round text-[30px]">{grade.icon}</span>
+                        <span className="material-symbols-outlined text-[30px]">{grade.icon}</span>
                     </div>
                     <div>
                         <p className={`text-sm font-semibold uppercase tracking-[0.16em] ${grade.color}`}>{grade.label}</p>
@@ -361,7 +361,7 @@ export default function QuizPlay() {
     if (loadError) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-paper font-display text-stone-900">
-                <span className="material-icons-round text-stone-300 text-5xl">quiz</span>
+                <span className="material-symbols-outlined text-stone-300 text-5xl">quiz</span>
                 <p className="text-stone-500 font-medium">Quiz not found.</p>
                 <button onClick={() => navigate('/lockedin/quizzes')} className="text-plum-700 text-sm font-semibold hover:underline">
                     Back to Quizzes
@@ -395,7 +395,7 @@ export default function QuizPlay() {
                         onClick={() => navigate('/lockedin/quizzes')}
                         className="flex items-center gap-1.5 px-3 md:px-4 py-2 text-xs md:text-sm font-semibold text-stone-500 hover:text-stone-900 transition-colors"
                     >
-                        <span className="material-icons-round text-[14px] md:text-[16px]">close</span>
+                        <span className="material-symbols-outlined text-[14px] md:text-[16px]">close</span>
                         Exit Quiz
                     </button>
                     <button
@@ -406,7 +406,7 @@ export default function QuizPlay() {
 }}
                         className="flex items-center gap-1.5 px-3 md:px-4 py-2 text-xs md:text-sm font-semibold text-stone-500 hover:text-plum-700 transition-colors"
                     >
-                        <span className="material-icons-round text-[14px] md:text-[16px]">
+                        <span className="material-symbols-outlined text-[14px] md:text-[16px]">
                             {copied ? 'check_circle' : 'share'}
                         </span>
                         {copied ? 'Link copied!' : 'Share'}
@@ -438,7 +438,7 @@ export default function QuizPlay() {
                     <div className="hidden lg:flex lg:col-span-4 flex-col gap-6">
                         {/* Tip card */}
                         <div className="relative p-6 bg-plum-50 border border-plum-200  flex items-start gap-4">
-                            <span className="material-icons-round text-plum-600 shrink-0 mt-0.5">lightbulb</span>
+                            <span className="material-symbols-outlined text-plum-600 shrink-0 mt-0.5">lightbulb</span>
                             <p className="text-sm text-plum-800 leading-relaxed italic">
                                 "Try to recall the answer before looking at the choices — it strengthens memory retrieval."
                             </p>
@@ -447,7 +447,7 @@ export default function QuizPlay() {
                         {/* Question counter card */}
                         <div className="bg-white border border-stone-200  p-5 shadow-sm flex items-center gap-4">
                             <div className="w-12 h-12 bg-plum-50  flex items-center justify-center">
-                                <span className="material-icons-round text-plum-600 text-[20px]">quiz</span>
+                                <span className="material-symbols-outlined text-plum-600 text-[20px]">quiz</span>
                             </div>
                             <div>
                                 <p className="text-xs text-stone-400 font-semibold uppercase tracking-[0.16em]">Score so far</p>
@@ -487,7 +487,7 @@ export default function QuizPlay() {
                                             ? 'bg-emerald-50 text-emerald-700'
                                             : 'bg-rose-50 text-rose-700'
 }`}>
-                                        <span className="material-icons-round text-[17px] shrink-0 mt-0.5">
+                                        <span className="material-symbols-outlined text-[17px] shrink-0 mt-0.5">
                                             {flash === 'correct' ? 'check_circle' : 'cancel'}
                                         </span>
                                         <div>
@@ -539,9 +539,9 @@ export default function QuizPlay() {
                                                             : 'bg-stone-100 text-stone-500 group-hover:bg-plum-600 group-hover:text-white'
 }`}>
                                                 {isCorrect
-                                                    ? <span className="material-icons-round text-[14px] md:text-[16px]">check</span>
+                                                    ? <span className="material-symbols-outlined text-[14px] md:text-[16px]">check</span>
                                                     : isWrong
-                                                        ? <span className="material-icons-round text-[16px]">close</span>
+                                                        ? <span className="material-symbols-outlined text-[16px]">close</span>
                                                         : LETTERS[i]
 }
                                             </div>
@@ -558,7 +558,7 @@ export default function QuizPlay() {
 
                                             {/* Check icon on selected */}
                                             {isSelected && !submitted && (
-                                                <span className="material-icons-round text-plum-600 text-[18px] ml-auto shrink-0">
+                                                <span className="material-symbols-outlined text-plum-600 text-[18px] ml-auto shrink-0">
                                                     check_circle
                                                 </span>
                                             )}
@@ -598,7 +598,7 @@ export default function QuizPlay() {
                                 disabled={currentIdx === 0 || submitted}
                                 className="flex items-center gap-2 text-stone-400 hover:text-stone-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors font-medium text-sm md:text-base"
                             >
-                                <span className="material-icons-round text-[18px]">arrow_back</span>
+                                <span className="material-symbols-outlined text-[18px]">arrow_back</span>
                                 Previous
                             </button>
 
@@ -609,7 +609,7 @@ export default function QuizPlay() {
                                     className="flex items-center gap-2 md:gap-3 px-3 md:px-10 py-1.5 md:py-4 bg-plum-600 text-white   font-medium md:font-semibold text-sm md:text-base hover:bg-plum-700 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                                 >
                                     Submit Answer
-                                    <span className="material-icons-round text-[18px]">arrow_forward</span>
+                                    <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
                                 </button>
                             ) : (
                                 <button
@@ -617,7 +617,7 @@ export default function QuizPlay() {
                                     className="flex items-center gap-2 md:gap-3 px-3 md:px-10 py-1.5 md:py-4 bg-plum-600 text-white   font-medium md:font-semibold text-sm md:text-base hover:bg-plum-700 active:scale-95 transition-all"
                                 >
                                     {currentIdx + 1 >= questions.length ? 'See Results' : 'Next Question'}
-                                    <span className="material-icons-round text-[18px]">arrow_forward</span>
+                                    <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
                                 </button>
                             )}
                         </div>

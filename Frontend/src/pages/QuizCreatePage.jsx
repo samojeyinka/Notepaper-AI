@@ -7,11 +7,11 @@ import NotificationIcon from '../components/user/NotificationIcon';
 const LockedSource = ({ icon, label, color, bg }) => (
     <div className="relative flex items-center gap-3 p-3 rounded-2xl border border-slate-100 bg-slate-50/50 opacity-60 cursor-not-allowed select-none">
         <div className={`w-8 h-8 ${bg} rounded-xl flex items-center justify-center`}>
-            <span className={`material-icons-round text-[15px] ${color}`}>{icon}</span>
+            <span className={`material-symbols-outlined text-[15px] ${color}`}>{icon}</span>
         </div>
         <span className="text-sm text-slate-500 font-medium flex-1">{label}</span>
         <div className="flex items-center gap-1 bg-amber-100 text-amber-600 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider">
-            <span className="material-icons-round text-[10px]">lock</span>
+            <span className="material-symbols-outlined text-[10px]">lock</span>
             Pro
         </div>
     </div>
@@ -30,14 +30,14 @@ const TypeOption = ({ id, icon, label, description, selected, onSelect }) => (
         <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
             selected ? 'bg-primary text-white' : 'bg-slate-100 text-slate-500'
         }`}>
-            <span className="material-icons-round text-[17px]">{icon}</span>
+            <span className="material-symbols-outlined text-[17px]">{icon}</span>
         </div>
         <div className="min-w-0">
             <p className={`text-sm font-semibold ${selected ? 'text-primary' : 'text-slate-700'}`}>{label}</p>
             <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">{description}</p>
         </div>
         {selected && (
-            <span className="material-icons-round text-primary text-[16px] shrink-0 mt-0.5">check_circle</span>
+            <span className="material-symbols-outlined text-primary text-[16px] shrink-0 mt-0.5">check_circle</span>
         )}
     </button>
 );
@@ -92,7 +92,7 @@ export default function QuizCreatePage() {
                             onClick={() => navigate('/lockedin/quizzes')}
                             className="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-800 hover:border-slate-300 transition-all"
                         >
-                            <span className="material-icons-round text-[18px]">arrow_back</span>
+                            <span className="material-symbols-outlined text-[18px]">arrow_back</span>
                         </button>
                         <div>
                             <h1 className="text-xl font-bold text-slate-900">Create Quiz</h1>
@@ -148,7 +148,7 @@ export default function QuizCreatePage() {
                                     }`}
                                 >
                                     <div className={`w-8 h-8 rounded-xl ${s.color} flex items-center justify-center`}>
-                                        <span className="material-icons-round text-[15px]">{s.icon}</span>
+                                        <span className="material-symbols-outlined text-[15px]">{s.icon}</span>
                                     </div>
                                     <span className={`text-[11px] font-semibold ${subject === s.id ? 'text-primary' : 'text-slate-600'}`}>
                                         {s.label}
@@ -206,7 +206,7 @@ export default function QuizCreatePage() {
                         <div className="flex items-center justify-between mb-3">
                             <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Source Material</h2>
                             <div className="flex items-center gap-1 bg-gradient-to-r from-amber-400 to-orange-400 text-white px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider shadow-sm">
-                                <span className="material-icons-round text-[11px]">lock</span>
+                                <span className="material-symbols-outlined text-[11px]">lock</span>
                                 Pro Feature
                             </div>
                         </div>
@@ -227,7 +227,7 @@ export default function QuizCreatePage() {
                             onClick={() => {/* navigate to upgrade */}}
                             className="mt-4 w-full py-3 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-400 text-white text-sm font-bold shadow-md shadow-amber-200 hover:opacity-90 transition-all flex items-center justify-center gap-2"
                         >
-                            <span className="material-icons-round text-[16px]">workspace_premium</span>
+                            <span className="material-symbols-outlined text-[16px]">workspace_premium</span>
                             Upgrade to Pro
                         </button>
                     </div>
@@ -238,7 +238,7 @@ export default function QuizCreatePage() {
                         disabled={!canCreate}
                         className="w-full py-4 rounded-3xl bg-primary text-white font-bold text-sm shadow-lg shadow-primary/30 hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-[0.98] flex items-center justify-center gap-2"
                     >
-                        <span className="material-icons-round text-[18px]">quiz</span>
+                        <span className="material-symbols-outlined text-[18px]">quiz</span>
                         Create Quiz
                     </button>
 

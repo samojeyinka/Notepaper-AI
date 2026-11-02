@@ -37,6 +37,21 @@ const QuizCard = ({ quiz, onPlay, onDelete }) => {
     const best          = getBestScore(quiz.id);
     const [menuOpen, setMenuOpen] = useState(false);
     const menuRef = useRef(null);
+    const menuPanelRef = useRef(null);
+
+    useEffect(() => {
+        if (!menuOpen) return;
+        const onPointerDown = (e) => {
+            if (!menuRef.current?.contains(e.target) && !menuPanelRef.current?.contains(e.target)) setMenuOpen(false);
+        };
+        const onKeyDown = (e) => { if (e.key === 'Escape') setMenuOpen(false); };
+        document.addEventListener('pointerdown', onPointerDown);
+        document.addEventListener('keydown', onKeyDown);
+        return () => {
+            document.removeEventListener('pointerdown', onPointerDown);
+            document.removeEventListener('keydown', onKeyDown);
+        };
+    }, [menuOpen]);
 
     return (
         <div className="group w-full text-left bg-white ring-1 ring-stone-200/70 px-5 md:px-6 py-4 hover:ring-plum-300 hover:-translate-y-0.5 transition-all">
@@ -70,12 +85,12 @@ const QuizCard = ({ quiz, onPlay, onDelete }) => {
                     <div className="text-right">
                         {best !== null ? (
                             <>
-                                <p className="font-display-serif text-[22px] font-semibold leading-none text-plum-700">{best}%</p>
+                                <p className="text-[22px] font-semibold leading-none text-plum-700">{best}%</p>
                                 <p className="text-[9.5px] font-semibold uppercase tracking-widest text-stone-400 mt-1">Best score</p>
                             </>
                         ) : (
                             <>
-                                <p className="font-display-serif text-[22px] font-semibold leading-none text-stone-300">—</p>
+                                <p className="text-[22px] font-semibold leading-none text-stone-300">—</p>
                                 <p className="text-[9.5px] font-semibold uppercase tracking-widest text-stone-300 mt-1">Not played</p>
                             </>
                         )}
@@ -85,9 +100,11 @@ const QuizCard = ({ quiz, onPlay, onDelete }) => {
                         ref={menuRef}
                         onClick={(e) => { e.stopPropagation(); setMenuOpen(v => !v); }}
                         aria-label="Quiz options"
+                        aria-haspopup="menu"
+                        aria-expanded={menuOpen}
                         className="p-1.5 text-stone-400 hover:text-stone-700 transition-colors"
                     >
-                        <span className="material-icons-round text-[20px]">more_vert</span>
+                        <span className="material-symbols-outlined text-[20px]">more_vert</span>
                     </button>
                 </div>
             </div>
@@ -98,10 +115,10 @@ const QuizCard = ({ quiz, onPlay, onDelete }) => {
                 </span>
                 <button
                     onClick={onPlay}
-                    className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-plum-700 opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-plum-700 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
                 >
                     {best !== null ? 'Play again' : 'Start'}
-                    <span className="material-icons-round text-[14px]">arrow_forward</span>
+                    <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
                 </button>
             </div>
 
@@ -113,7 +130,9 @@ const QuizCard = ({ quiz, onPlay, onDelete }) => {
                         right: menuRef.current ? window.innerWidth - menuRef.current.getBoundingClientRect().right : 0,
                         zIndex: 9999,
                     }}
-                    className="workspace-menu bg-white ring-1 ring-stone-200 shadow-xl shadow-stone-900/10 py-1 w-40"
+                    ref={menuPanelRef}
+                    role="menu"
+                    className="workspace-menu rounded-xl bg-white ring-1 ring-stone-200 shadow-xl shadow-stone-900/10 py-1 w-40"
                 >
                     <button
                         onClick={() => {
@@ -122,7 +141,7 @@ const QuizCard = ({ quiz, onPlay, onDelete }) => {
                         }}
                         className="w-full flex items-center gap-2.5 px-3.5 py-2 text-[13px] font-medium text-stone-600 hover:bg-stone-50 transition-colors"
                     >
-                        <span className="material-icons-round text-[15px] text-stone-400">link</span>
+                        <span className="material-symbols-outlined text-[15px] text-stone-400">link</span>
                         Copy link
                     </button>
                     <div className="h-px bg-stone-100 my-0.5" />
@@ -130,7 +149,7 @@ const QuizCard = ({ quiz, onPlay, onDelete }) => {
                         onClick={() => { setMenuOpen(false); onDelete(quiz.id); }}
                         className="w-full flex items-center gap-2.5 px-3.5 py-2 text-[13px] font-medium text-red-600 hover:bg-red-50 transition-colors"
                     >
-                        <span className="material-icons-round text-[15px]">delete_outline</span>
+                        <span className="material-symbols-outlined text-[15px]">delete_outline</span>
                         Delete quiz
                     </button>
                 </div>,
@@ -143,13 +162,13 @@ const QuizCard = ({ quiz, onPlay, onDelete }) => {
 // ── Empty state (no quizzes at all) ──────────────────────────────────────────
 const EmptyState = ({ onCreate }) => (
     <div className="flex flex-col items-center justify-center py-24 text-center">
-        <h3 className="font-display-serif text-[22px] font-semibold text-stone-900 mb-2">Test yourself on what you know</h3>
+        <h3 className="text-[22px] font-semibold text-stone-900 mb-2">Test yourself on what you know</h3>
         <p className="text-stone-500 text-sm max-w-sm leading-relaxed mb-7">
             Feed in a topic or your own notes, and get a quiz that actually checks your understanding.
         </p>
         <button
             onClick={onCreate}
-            className="px-6 py-3 bg-stone-900 text-white text-sm font-semibold hover:bg-stone-700 transition-all active:scale-[0.98]"
+            className="rounded-full px-6 py-3 bg-stone-900 text-white text-sm font-semibold hover:bg-stone-700 transition-all active:scale-[0.98]"
         >
             Create a quiz
         </button>
@@ -166,6 +185,7 @@ export default function Quizzes() {
     const [sortBy,   setSortBy]   = useState('newest');
     const [sortOpen, setSortOpen] = useState(false);
     const [page,     setPage]     = useState(1);
+    const sortRef = useRef(null);
 
     const SORT_OPTIONS = [
         { id: 'newest',     label: 'Newest'          },
@@ -193,6 +213,18 @@ export default function Quizzes() {
     };
 
     useEffect(() => { load(); }, []);
+
+    useEffect(() => {
+        if (!sortOpen) return;
+        const onPointerDown = (e) => { if (!sortRef.current?.contains(e.target)) setSortOpen(false); };
+        const onKeyDown = (e) => { if (e.key === 'Escape') setSortOpen(false); };
+        document.addEventListener('pointerdown', onPointerDown);
+        document.addEventListener('keydown', onKeyDown);
+        return () => {
+            document.removeEventListener('pointerdown', onPointerDown);
+            document.removeEventListener('keydown', onKeyDown);
+        };
+    }, [sortOpen]);
 
     const handleDelete = async (id) => {
         try {
@@ -241,13 +273,13 @@ export default function Quizzes() {
             <div className="quizzes-header flex items-end justify-between gap-4 mb-8">
                 <div>
                     <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-plum-700 mb-1.5">Test yourself</p>
-                    <h1 className="font-display-serif text-[28px] md:text-[34px] font-semibold tracking-tight text-stone-900 leading-tight">Quizzes</h1>
+                    <h1 className="text-[28px] md:text-[34px] font-semibold tracking-tight text-stone-900 leading-tight">Quizzes</h1>
                     <p className="text-stone-500 text-[13px] md:text-sm mt-1.5">Quiet check-ins to see what actually stuck.</p>
                 </div>
                 <div className="flex items-center gap-3 md:gap-5">
                     <button
                         onClick={() => navigate('/lockedin/generate?tab=quizzes')}
-                        className="bg-stone-900 text-white px-5 py-2 text-sm font-semibold hover:bg-stone-700 active:scale-[0.98] transition-all"
+                        className="rounded-full bg-stone-900 text-white px-5 py-2 text-sm font-semibold hover:bg-stone-700 active:scale-[0.98] transition-all"
                     >
                         New Quiz
                     </button>
@@ -260,7 +292,7 @@ export default function Quizzes() {
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-paper-darker/70 ring-1 ring-stone-200/80 px-6 md:px-9 py-6 md:py-8 mb-8">
                     <div className="max-w-sm">
                         <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-plum-700 mb-2">Your record</p>
-                        <p className="font-display-serif text-[19px] md:text-[22px] font-semibold text-stone-900 leading-snug">
+                        <p className="text-[19px] md:text-[22px] font-semibold text-stone-900 leading-snug">
                             {playedCount > 0
                                 ? `Best score so far is ${bestScore}%.`
                                 : 'Nothing attempted yet — pick one and give it a go.'}
@@ -272,19 +304,19 @@ export default function Quizzes() {
 
                     <div className="flex items-center gap-8 md:gap-10 shrink-0">
                         <div>
-                            <p className="font-display-serif text-[26px] md:text-[30px] font-semibold text-plum-700 leading-none">
+                            <p className="text-[26px] md:text-[30px] font-semibold text-plum-700 leading-none">
                                 {quizzes.length}
                             </p>
                             <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 mt-1.5">Quizzes</p>
                         </div>
                         <div className="w-px h-9 bg-stone-300/70 hidden md:block" />
                         <div>
-                            <p className="font-display-serif text-[26px] md:text-[30px] font-semibold text-stone-900 leading-none">{totalQuestions}</p>
+                            <p className="text-[26px] md:text-[30px] font-semibold text-stone-900 leading-none">{totalQuestions}</p>
                             <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 mt-1.5">Questions</p>
                         </div>
                         <div className="w-px h-9 bg-stone-300/70 hidden md:block" />
                         <div>
-                            <p className="font-display-serif text-[26px] md:text-[30px] font-semibold text-stone-900 leading-none">
+                            <p className="text-[26px] md:text-[30px] font-semibold text-stone-900 leading-none">
                                 {bestScore >= 0 ? `${bestScore}%` : '—'}
                             </p>
                             <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 mt-1.5">Best score</p>
@@ -297,19 +329,19 @@ export default function Quizzes() {
             {!loading && (
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 bg-stone-900 text-white px-6 md:px-9 py-6 md:py-8 mb-8">
                     <div className="max-w-md">
-                        <h2 className="font-display-serif text-[20px] md:text-[23px] font-semibold leading-snug">
+                        <h2 className="text-[20px] md:text-[23px] font-semibold leading-snug">
                             Turn your notes into a quiz
                         </h2>
                         <p className="text-stone-400 text-[13px] mt-1.5 leading-relaxed">
-                            Point it at a topic, or one of your notes, papers or decks — and it writes the questions.
+                            Point it at a topic, or one of your notes, papers or decks and it writes the questions.
                         </p>
                     </div>
                     <button
                         onClick={() => navigate('/lockedin/generate?tab=quizzes')}
-                        className="shrink-0 inline-flex items-center gap-2 bg-white text-stone-900 px-5 py-2.5 text-sm font-semibold hover:bg-stone-200 transition-colors"
+                        className="shrink-0 rounded-full inline-flex items-center gap-2 bg-white text-stone-900 px-5 py-2.5 text-sm font-semibold hover:bg-stone-200 transition-colors"
                     >
                         Create a quiz
-                        <span className="material-icons-round text-[16px]">arrow_forward</span>
+                        <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
                     </button>
                 </div>
             )}
@@ -318,34 +350,33 @@ export default function Quizzes() {
             {hasData && (
                 <div className="flex items-center gap-3 mb-6">
                     <div className="relative flex-1 max-w-md">
-                        <span className="material-icons-round absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-[18px] pointer-events-none">search</span>
+                        <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-[18px] pointer-events-none">search</span>
                         <input
                             type="text"
                             value={search}
                             onChange={e => { setSearch(e.target.value); setPage(1); }}
                             placeholder="Search your quizzes…"
-                            className="w-full bg-white border border-stone-200 py-2.5 pl-10 pr-4 text-sm text-stone-700 placeholder-stone-400 outline-none focus:ring-2 focus:ring-plum-200 transition-all"
+                            className="w-full rounded-xl bg-white border border-stone-200 py-2.5 pl-10 pr-4 text-sm text-stone-700 placeholder-stone-400 outline-none focus:ring-2 focus:ring-plum-200 transition-all"
                         />
                         {search && (
                             <button onClick={() => { setSearch(''); setPage(1); }} className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600">
-                                <span className="material-icons-round text-[16px]">close</span>
+                                <span className="material-symbols-outlined text-[16px]">close</span>
                             </button>
                         )}
                     </div>
 
-                    <div className="relative shrink-0">
+                    <div ref={sortRef} className="relative shrink-0">
                         <button
                             onClick={() => setSortOpen(v => !v)}
-                            className="flex items-center gap-2 bg-white border border-stone-200 px-4 py-2.5 text-[13px] font-medium text-stone-600 hover:bg-stone-50 transition-colors whitespace-nowrap"
+                            className="rounded-xl flex items-center gap-2 bg-white border border-stone-200 px-4 py-2.5 text-[13px] font-medium text-stone-600 hover:bg-stone-50 transition-colors whitespace-nowrap"
                         >
-                            <span className="material-icons-round text-stone-400 text-[16px]">sort</span>
+                            <span className="material-symbols-outlined text-stone-400 text-[16px]">sort</span>
                             <span className="hidden sm:inline">{currentSortLabel}</span>
-                            <span className="material-icons-round text-stone-400 text-[16px]">expand_more</span>
+                            <span className="material-symbols-outlined text-stone-400 text-[16px]">expand_more</span>
                         </button>
                         {sortOpen && (
                             <div
-                                className="absolute right-0 top-11 bg-white border border-stone-100 py-1 w-44 z-50 shadow-[0_12px_32px_rgba(28,25,23,0.12)]"
-                                onMouseLeave={() => setSortOpen(false)}
+                                className="absolute right-0 top-11 rounded-xl bg-white border border-stone-100 py-1 w-44 z-50 shadow-[0_12px_32px_rgba(28,25,23,0.12)]"
                             >
                                 {SORT_OPTIONS.map(opt => (
                                     <button
@@ -354,7 +385,7 @@ export default function Quizzes() {
                                         className={`w-full flex items-center justify-between px-4 py-2.5 text-[13px] font-medium transition-colors ${sortBy === opt.id ? 'text-plum-700 bg-plum-50' : 'text-stone-600 hover:bg-stone-50'}`}
                                     >
                                         {opt.label}
-                                        {sortBy === opt.id && <span className="material-icons-round text-[14px]">check</span>}
+                                        {sortBy === opt.id && <span className="material-symbols-outlined text-[14px]">check</span>}
                                     </button>
                                 ))}
                             </div>
@@ -400,15 +431,15 @@ export default function Quizzes() {
                                     onClick={() => setPage(p => Math.max(1, p - 1))}
                                     disabled={page === 1}
                                     aria-label="Previous page"
-                                    className="w-9 h-9 flex items-center justify-center text-stone-500 border border-stone-200 hover:border-stone-400 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                                    className="w-9 h-9 rounded-full flex items-center justify-center text-stone-500 border border-stone-200 hover:border-stone-400 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                                 >
-                                    <span className="material-icons-round text-[18px]">chevron_left</span>
+                                    <span className="material-symbols-outlined text-[18px]">chevron_left</span>
                                 </button>
                                 {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
                                     <button
                                         key={n}
                                         onClick={() => setPage(n)}
-                                        className={`w-9 h-9 text-[13px] font-semibold border transition-all ${n === page ? 'bg-stone-900 border-stone-900 text-white' : 'text-stone-500 border-stone-200 hover:border-stone-400'}`}
+                                        className={`w-9 h-9 rounded-full text-[13px] font-semibold border transition-all ${n === page ? 'bg-stone-900 border-stone-900 text-white' : 'text-stone-500 border-stone-200 hover:border-stone-400'}`}
                                     >
                                         {n}
                                     </button>
@@ -417,9 +448,9 @@ export default function Quizzes() {
                                     onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                                     disabled={page === totalPages}
                                     aria-label="Next page"
-                                    className="w-9 h-9 flex items-center justify-center text-stone-500 border border-stone-200 hover:border-stone-400 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                                    className="w-9 h-9 rounded-full flex items-center justify-center text-stone-500 border border-stone-200 hover:border-stone-400 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                                 >
-                                    <span className="material-icons-round text-[18px]">chevron_right</span>
+                                    <span className="material-symbols-outlined text-[18px]">chevron_right</span>
                                 </button>
                             </div>
                         </div>

@@ -33,7 +33,10 @@ const WIZARD_STEPS = [
     { label: 'Review',    icon: 'check_circle'  },
 ];
 
-const today = () => new Date().toISOString().split('T')[0];
+const today = () => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+};
 
 // ── Date Picker ───────────────────────────────────────────────────────────────
 
@@ -46,7 +49,7 @@ const RDP_CLS = {
     button_next:      'w-7 h-7 flex items-center justify-center text-stone-400 hover:bg-stone-100 transition-colors',
     weekday:          'text-center text-[10px] font-semibold text-stone-400 uppercase pb-2 w-9',
     day:              'p-0.5',
-    day_button:       'w-9 h-9 text-[13px] font-medium w-full h-full transition-colors hover:bg-plum-50 hover:text-plum-700 focus:outline-none',
+    day_button:       'w-9 h-9 rounded-full text-[13px] font-medium w-full h-full transition-colors hover:bg-plum-50 hover:text-plum-700 focus:outline-none',
     today:            'font-bold text-plum-700',
     selected:         '!bg-plum-600 !text-white hover:!bg-plum-700',
     disabled:         'opacity-30 pointer-events-none',
@@ -97,15 +100,15 @@ const DatePickerInput = ({ label, value, onChange, minDate, required, alignRight
                 <button
                     type="button"
                     onClick={() => setOpen(v => !v)}
-                    className={`w-full bg-white border px-4 py-3 text-[14px] text-left flex items-center gap-2 outline-none transition-colors ${
+                    className={`w-full rounded-xl bg-white border px-4 py-3 text-[14px] text-left flex items-center gap-2 outline-none transition-colors ${
                         open ? 'border-plum-400' : 'border-stone-200 hover:border-stone-300'
                     }`}
                 >
-                    <span className="material-icons-round text-stone-400 text-[16px]">calendar_today</span>
+                    <span className="material-symbols-outlined text-stone-400 text-[16px]">calendar_today</span>
                     <span className={display ? 'text-stone-800 flex-1' : 'text-stone-400 flex-1'}>
                         {display ?? 'Pick a date'}
                     </span>
-                    <span className={`material-icons-round text-stone-300 text-[14px] transition-transform ${open ? 'rotate-180' : ''}`}>
+                    <span className={`material-symbols-outlined text-stone-300 text-[14px] transition-transform ${open ? 'rotate-180' : ''}`}>
                         expand_more
                     </span>
                 </button>
@@ -113,7 +116,7 @@ const DatePickerInput = ({ label, value, onChange, minDate, required, alignRight
                 {open && (
                     <div
                         className={`absolute top-full mt-2 z-50 bg-white border border-stone-200 shadow-xl p-4 ${alignRight ? 'right-0' : 'left-0'}`}
-                        style={{ '--rdp-accent-color': '#6C4EA6' }}
+                        style={{ '--rdp-accent-color': '#54786f' }}
                     >
                         <DayPicker
                             mode="single"
@@ -137,8 +140,13 @@ const MaterialPickerModal = ({ tab, setTab, search, setSearch, selected, onToggl
 
     useEffect(() => {
         const h = (e) => { if (!ref.current?.contains(e.target)) onClose(); };
+        const onKeyDown = (e) => { if (e.key === 'Escape') onClose(); };
         document.addEventListener('mousedown', h);
-        return () => document.removeEventListener('mousedown', h);
+        document.addEventListener('keydown', onKeyDown);
+        return () => {
+            document.removeEventListener('mousedown', h);
+            document.removeEventListener('keydown', onKeyDown);
+        };
     }, [onClose]);
 
     const items = (library[tab] ?? []).filter(i =>
@@ -146,19 +154,19 @@ const MaterialPickerModal = ({ tab, setTab, search, setSearch, selected, onToggl
     );
 
     return (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-stone-900/40 backdrop-blur-sm">
-            <div ref={ref} className="bg-white border border-stone-200 w-full sm:max-w-md shadow-2xl flex flex-col overflow-hidden" style={{ maxHeight: '85vh' }}>
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-stone-900/40 backdrop-blur-sm" role="presentation" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+            <div ref={ref} role="dialog" aria-modal="true" aria-labelledby="sprint-materials-title" className="bg-white border border-stone-200 w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden" style={{ maxHeight: '85vh' }}>
                 <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-stone-200 shrink-0">
-                    <h3 className="font-display-serif text-[16px] font-semibold text-stone-900">Add Materials</h3>
+                    <h3 id="sprint-materials-title" className="text-[16px] font-semibold text-stone-900">Add materials</h3>
                     <button onClick={onClose} className="w-8 h-8 flex items-center justify-center text-stone-400 hover:bg-stone-100 hover:text-stone-700 transition-colors">
-                        <span className="material-icons-round text-[18px]">close</span>
+                        <span className="material-symbols-outlined text-[18px]">close</span>
                     </button>
                 </div>
 
                 <div className="flex gap-1 px-4 pt-3 pb-2 shrink-0 overflow-x-auto">
                     {TABS.map(t => (
                         <button key={t} onClick={() => { setTab(t); setSearch(''); }}
-                            className={`flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold whitespace-nowrap transition-colors ${tab === t ? 'bg-plum-50 text-plum-700' : 'text-stone-400 hover:bg-stone-50'}`}>
+                            className={`rounded-full flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold whitespace-nowrap transition-colors ${tab === t ? 'bg-plum-50 text-plum-700' : 'text-stone-400 hover:bg-stone-50'}`}>
                            
                             {t}
                         </button>
@@ -167,9 +175,9 @@ const MaterialPickerModal = ({ tab, setTab, search, setSearch, selected, onToggl
 
                 <div className="px-4 pb-2 shrink-0">
                     <div className="relative">
-                        <span className="material-icons-round absolute left-3 top-1/2 -translate-y-1/2 text-stone-300 text-[16px]">search</span>
+                        <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-stone-300 text-[16px]">search</span>
                         <input value={search} onChange={e => setSearch(e.target.value)} placeholder={`Search ${tab.toLowerCase()}…`}
-                            className="w-full bg-white border border-stone-200 pl-9 pr-4 py-2 text-[13px] outline-none focus:border-plum-400 transition-colors" />
+                            className="w-full rounded-xl bg-white border border-stone-200 pl-9 pr-4 py-2 text-[13px] outline-none focus:border-plum-400 transition-colors" />
                     </div>
                 </div>
 
@@ -181,7 +189,7 @@ const MaterialPickerModal = ({ tab, setTab, search, setSearch, selected, onToggl
                     )}
                     {!libLoading[tab] && items.length === 0 && (
                         <div className="py-10 flex flex-col items-center gap-2 text-stone-300">
-                            <span className="material-icons-round text-4xl">search_off</span>
+                            <span className="material-symbols-outlined text-4xl">search_off</span>
                             <p className="text-[13px]">Nothing found</p>
                         </div>
                     )}
@@ -189,14 +197,14 @@ const MaterialPickerModal = ({ tab, setTab, search, setSearch, selected, onToggl
                         const checked = selected[tab]?.some(s => s.id === item.id);
                         return (
                             <button key={item.id} onClick={() => onToggle(tab, item)}
-                                className={`w-full flex items-center gap-3 p-3 border transition-colors text-left ${checked ? 'bg-plum-50 border-plum-200' : 'border-stone-200 hover:bg-stone-50'}`}>
+                                className={`w-full rounded-xl flex items-center gap-3 p-3 border transition-colors text-left ${checked ? 'bg-plum-50 border-plum-200' : 'border-stone-200 hover:bg-stone-50'}`}>
                                
                                 <div className="flex-1 min-w-0">
                                     <p className="text-[13px] font-semibold text-stone-800 truncate">{item.title}</p>
                                     {item.sub && <p className="text-[11px] text-stone-400">{item.sub}</p>}
                                 </div>
-                                <div className={`w-5 h-5 border-2 flex items-center justify-center shrink-0 transition-colors ${checked ? 'bg-plum-600 border-plum-600' : 'border-stone-300'}`}>
-                                    {checked && <span className="material-icons-round text-white text-[12px]">check</span>}
+                                <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-colors ${checked ? 'bg-plum-600 border-plum-600' : 'border-stone-300'}`}>
+                                    {checked && <span className="material-symbols-outlined text-white text-[12px]">check</span>}
                                 </div>
                             </button>
                         );
@@ -206,17 +214,17 @@ const MaterialPickerModal = ({ tab, setTab, search, setSearch, selected, onToggl
                 {libHasMore[tab] && !search && (
                     <div className="px-4 pb-3 shrink-0">
                         <button onClick={() => onLoadMore(tab)} disabled={libLoadingMore[tab]}
-                            className="w-full py-2.5 border border-stone-200 text-[13px] font-semibold text-stone-500 hover:bg-stone-50 disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
+                            className="w-full rounded-xl py-2.5 border border-stone-200 text-[13px] font-semibold text-stone-500 hover:bg-stone-50 disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
                             {libLoadingMore[tab]
                                 ? <><Loader size="sm" /></>
-                                : <><span className="material-icons-round text-[16px]">expand_more</span> Load more</>
+                                : <><span className="material-symbols-outlined text-[16px]">expand_more</span> Load more</>
                             }
                         </button>
                     </div>
                 )}
 
                 <div className="px-4 py-3 border-t border-stone-200 shrink-0">
-                    <button onClick={onClose} className="w-full py-3 bg-plum-600 hover:bg-plum-700 text-white font-semibold text-[14px] transition-colors active:scale-[0.98]">Done</button>
+                    <button onClick={onClose} className="w-full rounded-full py-3 bg-plum-600 hover:bg-plum-700 text-white font-semibold text-[14px] transition-colors active:scale-[0.98]">Done</button>
                 </div>
             </div>
         </div>
@@ -253,14 +261,22 @@ const SprintCreate = () => {
     const fileRef = useRef(null);
 
     const ACCEPTED_EXTS = new Set(['.pdf', '.docx', '.xlsx', '.xls', '.csv']);
+    const MAX_FILE_SIZE = 20 * 1024 * 1024;
+    const [uploadError, setUploadError] = useState('');
     const filterFiles = (fileList) =>
         Array.from(fileList).filter(f => {
             const ext = '.' + f.name.split('.').pop().toLowerCase();
-            return ACCEPTED_EXTS.has(ext);
+            return ACCEPTED_EXTS.has(ext) && f.size <= MAX_FILE_SIZE;
         });
 
     const addFiles = (fileList) => {
-        const valid = filterFiles(fileList);
+        const files = Array.from(fileList);
+        const valid = filterFiles(files);
+        if (valid.length !== files.length) {
+            setUploadError('Some files were skipped. Use PDF, DOCX, XLSX, XLS, or CSV files up to 20 MB each.');
+        } else {
+            setUploadError('');
+        }
         if (valid.length) setUploadedFiles(prev => [...prev, ...valid]);
     };
 
@@ -370,20 +386,20 @@ const SprintCreate = () => {
             {/* Top bar */}
             <div className="sticky top-0 z-20 bg-paper/95 backdrop-blur px-4 md:px-6 py-4 flex items-center justify-between border-b border-stone-200">
                 <button onClick={() => navigate('/lockedin/sprints')} className="flex items-center gap-2 text-stone-600 hover:text-stone-900 font-semibold text-[14px] transition-colors">
-                    <span className="material-icons-round text-[20px]">arrow_back</span>
+                    <span className="material-symbols-outlined text-[20px]">arrow_back</span>
                     <span className="hidden sm:inline">Sprints</span>
                 </button>
 
                 <div className="flex items-center gap-1.5">
                     {WIZARD_STEPS.map((s, i) => (
                         <div key={i} className="flex items-center gap-1.5">
-                            <div className={`w-6 h-6 flex items-center justify-center text-[11px] font-semibold transition-colors ${
+                                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-semibold transition-colors ${
                                 i + 1 < step  ? 'bg-plum-600 text-white'
                                 : i + 1 === step ? 'bg-stone-900 text-white'
                                 : 'bg-stone-200 text-stone-500'
                             }`}>
                                 {i + 1 < step
-                                    ? <span className="material-icons-round text-[12px]">check</span>
+                                    ? <span className="material-symbols-outlined text-[12px]">check</span>
                                     : i + 1
                                 }
                             </div>
@@ -403,19 +419,19 @@ const SprintCreate = () => {
                     <div className="space-y-6">
                         <div>
                             <p className="eyebrow text-plum-700 mb-2">Step 1 of 3</p>
-                            <h1 className="font-display-serif text-[30px] md:text-[38px] font-semibold tracking-tight text-stone-900 leading-tight mb-2">Set up your sprint</h1>
+                            <h1 className="text-[30px] md:text-[38px] font-semibold tracking-tight text-stone-900 leading-tight mb-2">Set up your sprint</h1>
                             <p className="text-stone-500 text-[15px]">Give it a name, pick your dates, and tell the AI what you want to achieve.</p>
                         </div>
 
-                        <div className="bg-white border border-stone-200 p-6 md:p-8 space-y-6">
+                        <div className="bg-white border border-stone-200 rounded-2xl p-6 md:p-8 space-y-6">
                             <div className="space-y-2">
                                 <label className="text-[11px] font-semibold text-stone-500 uppercase tracking-[0.16em] block">Sprint Name <span className="text-red-400">*</span></label>
                                 <input value={name} onChange={e => setName(e.target.value)}
                                     placeholder='e.g. "Finals Week — Biology"'
-                                    className="w-full bg-white border border-stone-200 px-4 py-3 text-[15px] text-stone-800 placeholder-stone-400 outline-none focus:border-plum-400 transition-colors" />
+                                    className="w-full rounded-xl bg-white border border-stone-200 px-4 py-3 text-[15px] text-stone-800 placeholder-stone-400 outline-none focus:border-plum-400 transition-colors" />
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <DatePickerInput
                                     label="Start Date"
                                     value={startDate}
@@ -434,8 +450,8 @@ const SprintCreate = () => {
                             </div>
 
                             {durationDays && (
-                                <div className="flex items-center gap-2 px-4 py-3 bg-plum-50 border border-plum-200">
-                                    <span className="material-icons-round text-plum-600 text-[18px]">calendar_month</span>
+                                <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-plum-50 border border-plum-200">
+                                    <span className="material-symbols-outlined text-plum-600 text-[18px]">calendar_month</span>
                                     <p className="text-[13px] text-stone-600">
                                         <span className="font-semibold text-plum-700">{durationDays} day{durationDays !== 1 ? 's' : ''}</span> — the AI will plan your challenges across this period
                                     </p>
@@ -449,7 +465,7 @@ const SprintCreate = () => {
                                 <textarea value={goal} onChange={e => setGoal(e.target.value)}
                                     placeholder="Mention specific topics to focus on, an exam date, or what you find hardest…"
                                     rows={3}
-                                    className="w-full bg-white border border-stone-200 px-4 py-3 text-[14px] text-stone-800 placeholder-stone-400 outline-none focus:border-plum-400 transition-colors resize-none" />
+                                    className="w-full rounded-xl bg-white border border-stone-200 px-4 py-3 text-[14px] text-stone-800 placeholder-stone-400 outline-none focus:border-plum-400 transition-colors resize-none" />
                             </div>
                         </div>
                     </div>
@@ -460,7 +476,7 @@ const SprintCreate = () => {
                     <div className="space-y-6">
                         <div>
                             <p className="eyebrow text-plum-700 mb-2">Step 2 of 3</p>
-                            <h1 className="font-display-serif text-[30px] md:text-[38px] font-semibold tracking-tight text-stone-900 leading-tight mb-2">Add your materials</h1>
+                            <h1 className="text-[30px] md:text-[38px] font-semibold tracking-tight text-stone-900 leading-tight mb-2">Add your materials</h1>
                             <p className="text-stone-500 text-[15px]">Select from your library or upload files. The AI will study everything you add.</p>
                         </div>
 
@@ -470,7 +486,7 @@ const SprintCreate = () => {
                                 const cnt = selectedCount(tab);
                                 return (
                                     <button key={tab} onClick={() => { setPickerTab(tab); setPickerSearch(''); setPickerOpen(true); }}
-                                        className={`group relative overflow-hidden bg-white p-5 text-left transition-all duration-200 hover:-translate-y-0.5 border ${cnt > 0 ? 'border-plum-300' : 'border-stone-200 hover:border-stone-300'}`}>
+                                        className={`group relative overflow-hidden rounded-2xl bg-white p-5 text-left transition-all duration-200 hover:-translate-y-0.5 border ${cnt > 0 ? 'border-plum-300' : 'border-stone-200 hover:border-stone-300'}`}>
                                       
                                         <p className="text-[13px] font-semibold text-stone-800">{tab}</p>
                                         {cnt > 0
@@ -478,7 +494,7 @@ const SprintCreate = () => {
                                             : <p className="text-[11px] text-stone-400 mt-0.5">Tap to browse</p>
                                         }
                                         {cnt > 0 && (
-                                            <div className="absolute top-3 right-3 min-w-[20px] h-5 px-1 bg-plum-600 flex items-center justify-center text-[10px] font-semibold text-white">{cnt}</div>
+                                            <div className="absolute top-3 right-3 min-w-[20px] h-5 px-1 rounded-full bg-plum-600 flex items-center justify-center text-[10px] font-semibold text-white">{cnt}</div>
                                         )}
                                     </button>
                                 );
@@ -487,17 +503,17 @@ const SprintCreate = () => {
 
                         {/* Selected chips */}
                         {totalSelected > 0 && (
-                            <div className="bg-white border border-stone-200 p-5">
+                                    <div className="bg-white border border-stone-200 rounded-2xl p-5">
                                 <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-plum-700 mb-3">{totalSelected} item{totalSelected !== 1 ? 's' : ''} selected</p>
                                 <div className="flex flex-wrap gap-2">
                                     {Object.entries(selected).flatMap(([tab, items]) =>
                                         items.map(item => {
                                             return (
-                                                <div key={item.id} className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold bg-plum-50 text-plum-700 border border-plum-200">
+                                                <div key={item.id} className="rounded-full flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold bg-plum-50 text-plum-700 border border-plum-200">
                                                 
                                                     <span className="truncate max-w-[120px]">{item.title}</span>
                                                     <button onClick={() => toggleMaterial(tab, item)} className="opacity-60 hover:opacity-100 transition-opacity">
-                                                        <span className="material-icons-round text-[13px]">close</span>
+                                                        <span className="material-symbols-outlined text-[13px]">close</span>
                                                     </button>
                                                 </div>
                                             );
@@ -508,34 +524,35 @@ const SprintCreate = () => {
                         )}
 
                         {/* Upload */}
-                        <div className="bg-white border border-stone-200 p-5 md:p-6">
+                        <div className="bg-white border border-stone-200 rounded-2xl p-5 md:p-6">
                             <div className="flex items-center gap-3 mb-4">
                                 <div className="w-9 h-9 bg-stone-100 flex items-center justify-center">
-                                    <span className="material-icons-round text-stone-500 text-[18px]">upload_file</span>
+                                    <span className="material-symbols-outlined text-stone-500 text-[18px]">upload_file</span>
                                 </div>
                                 <div>
                                     <p className="text-[13px] font-semibold text-stone-800">Upload custom files</p>
                                     <p className="text-[11px] text-stone-400">PDF, DOCX, XLSX, XLS, CSV — up to 20 MB each</p>
                                 </div>
                             </div>
-                            <div
+                            <button type="button"
                                 onClick={() => fileRef.current?.click()}
                                 onDragOver={handleDragOver}
                                 onDragEnter={handleDragOver}
                                 onDragLeave={handleDragLeave}
                                 onDrop={handleDrop}
-                                className={`w-full border border-dashed py-7 flex flex-col items-center gap-2 cursor-pointer transition-colors select-none
+                                className={`w-full rounded-2xl border border-dashed py-7 flex flex-col items-center gap-2 cursor-pointer transition-colors select-none
                                     ${isDragging
                                         ? 'border-plum-400 bg-plum-50 text-plum-700'
                                         : 'border-stone-300 text-stone-400 hover:border-plum-300 hover:text-plum-700'
                                     }`}
                             >
-                                <span className="material-icons-round text-[30px]">{isDragging ? 'file_download' : 'cloud_upload'}</span>
+                                <span className="material-symbols-outlined text-[30px]">{isDragging ? 'file_download' : 'cloud_upload'}</span>
                                 <span className="text-[13px] font-semibold">
                                     {isDragging ? 'Drop files here' : 'Click to upload or drag files here'}
                                 </span>
                                 <span className="text-[11px] opacity-70">PDF, DOCX, XLSX, XLS, CSV</span>
-                            </div>
+                            </button>
+                            {uploadError && <p role="alert" className="mt-2 text-[12px] text-red-600">{uploadError}</p>}
                             <input ref={fileRef} type="file" multiple accept=".pdf,.docx,.xlsx,.xls,.csv"
                                 style={{ display: 'none' }}
                                 onChange={e => { addFiles(e.target.files); e.target.value = ''; }} />
@@ -543,10 +560,10 @@ const SprintCreate = () => {
                                 <div className="mt-3 space-y-2">
                                     {uploadedFiles.map((f, i) => (
                                         <div key={i} className="flex items-center gap-3 px-3 py-2 bg-stone-50 border border-stone-100">
-                                            <span className="material-icons-round text-stone-400 text-[16px]">description</span>
+                                            <span className="material-symbols-outlined text-stone-400 text-[16px]">description</span>
                                             <span className="flex-1 text-[12px] font-medium text-stone-700 truncate">{f.name}</span>
                                             <button onClick={() => setUploadedFiles(prev => prev.filter((_, j) => j !== i))} className="text-stone-400 hover:text-red-500 transition-colors">
-                                                <span className="material-icons-round text-[16px]">close</span>
+                                                <span className="material-symbols-outlined text-[16px]">close</span>
                                             </button>
                                         </div>
                                     ))}
@@ -561,7 +578,7 @@ const SprintCreate = () => {
                     <div className="space-y-6">
                         <div>
                             <p className="eyebrow text-plum-700 mb-2">Step 3 of 3</p>
-                            <h1 className="font-display-serif text-[30px] md:text-[38px] font-semibold tracking-tight text-stone-900 leading-tight mb-2">Review your sprint</h1>
+                            <h1 className="text-[30px] md:text-[38px] font-semibold tracking-tight text-stone-900 leading-tight mb-2">Review your sprint</h1>
                             <p className="text-stone-500 text-[15px]">Everything looks good? Hit create and the AI will get to work.</p>
                         </div>
 
@@ -570,14 +587,14 @@ const SprintCreate = () => {
                                 <Alert type="error" message={submitError} />
                                 {isKeyRequired && (
                                     <button onClick={openAIKeyModal} className="inline-flex items-center gap-1.5 mt-2 text-[13px] font-semibold text-plum-700 hover:underline">
-                                        <span className="material-icons-round text-[15px]">key</span>
+                                        <span className="material-symbols-outlined text-[15px]">key</span>
                                         Add your AI API key
                                     </button>
                                 )}
                             </div>
                         )}
 
-                        <div className="bg-white border border-stone-200 p-6 md:p-8 space-y-5">
+                        <div className="bg-white border border-stone-200 rounded-2xl p-6 md:p-8 space-y-5">
                             <div className="flex items-start gap-4">
                               
                                 <div>
@@ -588,7 +605,7 @@ const SprintCreate = () => {
                             </div>
                             <div className="h-px bg-stone-200" />
                             <div className="flex items-center gap-4">
-                                <span className="material-icons-round text-stone-400 text-[18px]">date_range</span>
+                                <span className="material-symbols-outlined text-stone-400 text-[18px]">date_range</span>
                                 <div>
                                     <p className="text-[10px] text-stone-400 font-semibold uppercase tracking-[0.16em]">Duration</p>
                                     <p className="text-[14px] font-semibold text-stone-800">{startDate} → {endDate} · <span className="text-plum-700">{durationDays} day{durationDays !== 1 ? 's' : ''}</span></p>
@@ -598,7 +615,7 @@ const SprintCreate = () => {
                                 <>
                                     <div className="h-px bg-stone-200" />
                                     <div className="flex items-start gap-4">
-                                        <span className="material-icons-round text-stone-400 text-[18px] mt-0.5">library_books</span>
+                                        <span className="material-symbols-outlined text-stone-400 text-[18px] mt-0.5">library_books</span>
                                         <div className="flex-1 min-w-0">
                                             <p className="text-[10px] text-stone-400 font-semibold uppercase tracking-[0.16em] mb-2">Materials</p>
                                             <div className="flex flex-wrap gap-1.5">
@@ -617,7 +634,7 @@ const SprintCreate = () => {
                             )}
                         </div>
 
-                        <div className="bg-white border border-stone-200 p-6">
+                        <div className="bg-white border border-stone-200 rounded-2xl p-6">
                             <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-plum-700 mb-4">What happens next</p>
                             <div className="space-y-3">
                                 {[
@@ -632,8 +649,8 @@ const SprintCreate = () => {
                                     </div>
                                 ))}
                             </div>
-                            <div className="mt-5 flex items-center gap-2 px-4 py-3 bg-stone-50 border border-stone-100">
-                                <span className="material-icons-round text-stone-400 text-[16px]">schedule</span>
+                            <div className="mt-5 flex items-center gap-2 px-4 py-3 rounded-xl bg-stone-50 border border-stone-100">
+                                <span className="material-symbols-outlined text-stone-400 text-[16px]">schedule</span>
                                 <p className="text-[12px] text-stone-500">Estimated time: <span className="font-semibold text-stone-700">2–4 minutes</span></p>
                             </div>
                         </div>
@@ -643,21 +660,21 @@ const SprintCreate = () => {
             </div>
 
             {/* Fixed bottom nav */}
-            <div className="fixed bottom-0 left-0 lg:left-64 right-0 z-50 flex justify-between items-center px-6 py-4 bg-paper/95 backdrop-blur border-t border-stone-200">
+            <div className="fixed bottom-0 left-0 lg:left-64 right-0 z-50 flex justify-between items-center px-4 sm:px-6 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] bg-paper/95 backdrop-blur border-t border-stone-200">
                 <button onClick={step > 1 ? () => setStep(s => s - 1) : () => navigate('/lockedin/sprints')}
-                    className="flex items-center gap-2 text-stone-600 px-4 py-2.5 font-semibold text-[13px] hover:bg-stone-100 transition-colors active:scale-95">
-                    <span className="material-icons-round text-[18px]">arrow_back</span>
+                    className="rounded-full flex items-center gap-2 text-stone-600 px-4 py-2.5 font-semibold text-[13px] hover:bg-stone-100 transition-colors active:scale-95">
+                    <span className="material-symbols-outlined text-[18px]">arrow_back</span>
                     Back
                 </button>
                 {step < 3 ? (
                     <button onClick={() => setStep(s => s + 1)} disabled={!canNext}
-                        className="flex items-center gap-2 bg-plum-600 text-white px-6 py-2.5 font-semibold text-[13px] hover:bg-plum-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors active:scale-95">
+                        className="rounded-full flex items-center gap-2 bg-plum-600 text-white px-6 py-2.5 font-semibold text-[13px] hover:bg-plum-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors active:scale-95">
                         Continue
-                        <span className="material-icons-round text-[18px]">arrow_forward</span>
+                        <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
                     </button>
                 ) : (
                     <button onClick={handleCreate} disabled={submitting}
-                        className="flex items-center gap-2 bg-plum-600 text-white px-6 py-2.5 font-semibold text-[13px] hover:bg-plum-700 disabled:opacity-50 transition-colors active:scale-95">
+                        className="rounded-full flex items-center gap-2 bg-plum-600 text-white px-6 py-2.5 font-semibold text-[13px] hover:bg-plum-700 disabled:opacity-50 transition-colors active:scale-95">
                         {submitting
                             ? <><Loader size="sm" /></>
                             : <>Create Sprint</>

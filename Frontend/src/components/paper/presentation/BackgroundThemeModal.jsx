@@ -14,7 +14,7 @@ export const BgThemeModal = ({ slide, onChange, themeId, onThemeChange, onClose 
                 <div className="flex items-center justify-between px-5 py-3.5 border-b border-stone-200">
                     <h3 className="font-display-serif font-semibold text-[15px] text-stone-900">Background &amp; Theme</h3>
                     <button onClick={onClose} className="w-7 h-7  flex items-center justify-center text-stone-400 hover:bg-stone-100 transition-colors">
-                        <span className="material-icons-round text-[18px]">close</span>
+                        <span className="material-symbols-outlined text-[18px]">close</span>
                     </button>
                 </div>
 
@@ -42,7 +42,7 @@ export const BgThemeModal = ({ slide, onChange, themeId, onThemeChange, onClose 
                             })}
                             {/* Custom picker */}
                             <label className="w-10 h-8  cursor-pointer border border-dashed border-stone-300 hover:border-plum-400 flex items-center justify-center transition-colors shrink-0 relative" title="Custom colour">
-                                <span className="material-icons-round text-[14px] text-stone-400 pointer-events-none">colorize</span>
+                                <span className="material-symbols-outlined text-[14px] text-stone-400 pointer-events-none">colorize</span>
                                 <input type="color"
                                     value={slide.bgColor?.startsWith('#') ? slide.bgColor : '#0f172a'}
                                     onChange={e => set({bgColor: e.target.value})}

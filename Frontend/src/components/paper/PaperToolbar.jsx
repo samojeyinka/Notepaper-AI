@@ -32,7 +32,7 @@ const ToolbarButton = ({ icon, action, active, disabled, title, onClick, onActio
       ${disabled ? 'opacity-40 cursor-not-allowed' : ''}`}
     title={title}
   >
-    <span className="material-icons-round text-[13px] md:text-[20px]">{icon}</span>
+    <span className="material-symbols-outlined text-[13px] md:text-[20px]">{icon}</span>
   </button>
 );
 
@@ -59,7 +59,7 @@ const FontSizePopover = ({ anchorRef, options, onSelect }) => (
         <button key={opt.value} onMouseDown={(e) => { e.preventDefault(); onSelect(opt.value); }}
           className="flex items-center justify-between px-1.5 py-1 md:px-3 md:py-2  text-[10px] md:text-xs font-medium md:font-bold uppercase transition-colors text-stone-600 hover:bg-stone-50">
           {opt.label}
-          <span className="material-icons-round text-stone-300"
+          <span className="material-symbols-outlined text-stone-300"
             style={{ fontSize: opt.value==='1'?'12px':opt.value==='3'?'16px':opt.value==='5'?'20px':'24px' }}>format_size</span>
         </button>
       ))}
@@ -79,7 +79,7 @@ const AdvancedColorPicker = ({ anchorRef, color, onChange, onClose, title, recen
           {showNone && (
             <button onMouseDown={(e) => { e.preventDefault(); onNone?.(); onClose(); }}
               className="flex items-center gap-1 px-2.5 py-1  bg-stone-100 hover:bg-red-50 hover:text-red-500 text-stone-500 text-[10px] font-bold transition-colors" title="Remove background color">
-              <span className="material-icons-round text-[12px]">format_color_reset</span>None
+              <span className="material-symbols-outlined text-[12px]">format_color_reset</span>None
             </button>
           )}
         </div>
@@ -129,11 +129,11 @@ const DrawPopover = ({ anchorRef, drawMode, onAction }) => {
         <div className="flex gap-2">
           <button onMouseDown={(e)=>{e.preventDefault();onAction('drawEraser',false);}}
             className={`flex-1 flex items-center justify-center gap-1 py-1 md:py-2   text-[10px] md:text-[11px] font-medium md:font-bold transition-colors ${!drawMode?.eraser?'bg-stone-900 text-white':'bg-stone-100 text-stone-500'}`}>
-            <span className="material-icons-round text-[11px] md:text-[14px]">edit</span>Pen
+            <span className="material-symbols-outlined text-[11px] md:text-[14px]">edit</span>Pen
           </button>
           <button onMouseDown={(e)=>{e.preventDefault();onAction('drawEraser',true);}}
             className={`flex-1 flex items-center justify-center gap-1 py-1 md:py-2   text-[10px] md:text-[11px] font-medium md:font-bold transition-colors ${drawMode?.eraser?'bg-stone-900 text-white':'bg-stone-100 text-stone-500'}`}>
-            <span className="material-icons-round text-[11px] md:text-[14px]">auto_fix_normal</span>Eraser
+            <span className="material-symbols-outlined text-[11px] md:text-[14px]">auto_fix_normal</span>Eraser
           </button>
         </div>
         <div>
@@ -285,7 +285,7 @@ export const PaperToolbar = ({ onAction, activeState, recentColors = [], onAddRe
             <button onMouseDown={(e) => { e.preventDefault(); setShowFontSize(v=>!v); setShowTextColor(false); setShowHighlight(false); setShowUrlInput(false); }}
               className={`w-7 h-7 md:w-10 md:h-10   flex items-center justify-center transition-all ${showFontSize?'bg-stone-900 text-white shadow-lg':'text-stone-500 hover:bg-stone-100 hover:text-stone-900'}`}
               title="Text Size">
-              <span className="material-icons-round text-[13px] md:text-[22px]">text_fields</span>
+              <span className="material-symbols-outlined text-[13px] md:text-[22px]">text_fields</span>
             </button>
           </div>
           {showFontSize && <FontSizePopover anchorRef={fontSizeBtnRef} options={fontSizeOptions} onSelect={(val) => { onAction('fontSize',val); setShowFontSize(false); }} />}
@@ -307,7 +307,7 @@ export const PaperToolbar = ({ onAction, activeState, recentColors = [], onAddRe
             <button onMouseDown={(e) => { e.preventDefault(); setShowTextColor(v=>!v); setShowHighlight(false); setShowFontSize(false); setShowUrlInput(false); }}
               className={`w-7 h-7 md:w-10 md:h-10   flex items-center justify-center transition-all ${showTextColor?'bg-stone-900 text-white':'text-stone-500 hover:bg-stone-100 hover:text-stone-900'}`}
               title="Text Color">
-              <span className="material-icons-round text-[13px] md:text-[22px]">format_color_text</span>
+              <span className="material-symbols-outlined text-[13px] md:text-[22px]">format_color_text</span>
             </button>
           </div>
           {showTextColor && (
@@ -319,7 +319,7 @@ export const PaperToolbar = ({ onAction, activeState, recentColors = [], onAddRe
             <button onMouseDown={(e) => { e.preventDefault(); setShowHighlight(v=>!v); setShowTextColor(false); setShowFontSize(false); setShowUrlInput(false); }}
               className={`w-7 h-7 md:w-10 md:h-10   flex items-center justify-center transition-all ${showHighlight?'bg-stone-900 text-white':'text-stone-500 hover:bg-stone-100 hover:text-stone-900'}`}
               title="Highlight">
-              <span className="material-icons-round text-[13px] md:text-[22px]">draw</span>
+              <span className="material-symbols-outlined text-[13px] md:text-[22px]">draw</span>
             </button>
           </div>
           {showHighlight && (
@@ -338,14 +338,14 @@ export const PaperToolbar = ({ onAction, activeState, recentColors = [], onAddRe
           <button onMouseDown={(e) => { e.preventDefault(); onOpenWebImport?.(); }}
             title="Web to Text — extract from any article URL"
             className="w-7 h-7 md:w-10 md:h-10   flex items-center justify-center text-stone-500 hover:bg-stone-100 hover:text-stone-900 active:scale-90 transition-all">
-            <span className="material-icons-round text-[13px] md:text-[20px]">article</span>
+            <span className="material-symbols-outlined text-[13px] md:text-[20px]">article</span>
           </button>
 
           {/* Doc / PDF import */}
           <button onMouseDown={(e) => { e.preventDefault(); onOpenDocImport?.(); }}
             title="Import PDF or DOCX"
             className="w-7 h-7 md:w-10 md:h-10   flex items-center justify-center text-stone-500 hover:bg-stone-100 hover:text-stone-900 active:scale-90 transition-all">
-            <span className="material-icons-round text-[13px] md:text-[20px]">upload_file</span>
+            <span className="material-symbols-outlined text-[13px] md:text-[20px]">upload_file</span>
           </button>
 
           {/* Image upload */}
@@ -368,7 +368,7 @@ export const PaperToolbar = ({ onAction, activeState, recentColors = [], onAddRe
             disabled={isUploading}
             className={`w-7 h-7 md:w-10 md:h-10   flex items-center justify-center transition-all ${isUploading?'bg-plum-100 text-plum-700 animate-pulse':'text-stone-500 hover:bg-stone-100 hover:text-stone-900'}`}
             title="Insert Image">
-            <span className="material-icons-round text-[13px] md:text-[20px]">{isUploading?'hourglass_top':'image'}</span>
+            <span className="material-symbols-outlined text-[13px] md:text-[20px]">{isUploading?'hourglass_top':'image'}</span>
           </button>
 
           {/* Draw */}
@@ -378,7 +378,7 @@ export const PaperToolbar = ({ onAction, activeState, recentColors = [], onAddRe
                 ${activeState?.drawMode?.active?'bg-stone-900 text-white':'text-stone-500 hover:bg-stone-100 hover:text-stone-900'}
                 ${showDraw?'ring-2 ring-primary ring-offset-1':''}`}
               title="Draw">
-              <span className="material-icons-round text-[13px] md:text-[20px]">gesture</span>
+              <span className="material-symbols-outlined text-[13px] md:text-[20px]">gesture</span>
             </button>
           </div>
           {showDraw && <DrawPopover anchorRef={drawBtnRef} drawMode={activeState?.drawMode} onAction={onAction} />}

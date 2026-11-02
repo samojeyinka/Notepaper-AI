@@ -80,21 +80,21 @@ const MaterialPickerModal = ({ tab, setTab, search, setSearch, selected, onToggl
                 <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-slate-100 shrink-0">
                     <h3 className="font-semibold text-[15px] text-slate-800">Add Materials</h3>
                     <button onClick={onClose} className="w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:bg-slate-100 transition-colors">
-                        <span className="material-icons-round text-[18px]">close</span>
+                        <span className="material-symbols-outlined text-[18px]">close</span>
                     </button>
                 </div>
                 <div className="flex gap-1 px-4 pt-3 pb-2 shrink-0 overflow-x-auto">
                     {Object.keys(MOCK_LIBRARY).map(t => (
                         <button key={t} onClick={() => setTab(t)}
                             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[12px] font-semibold whitespace-nowrap transition-all ${tab === t ? `${TAB_CONFIG[t].bg} ${TAB_CONFIG[t].color}` : 'text-slate-400 hover:bg-slate-50'}`}>
-                            <span className="material-icons-round text-[14px]">{TAB_CONFIG[t].icon}</span>
+                            <span className="material-symbols-outlined text-[14px]">{TAB_CONFIG[t].icon}</span>
                             {t}
                         </button>
                     ))}
                 </div>
                 <div className="px-4 pb-2 shrink-0">
                     <div className="relative">
-                        <span className="material-icons-round absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 text-[16px]">search</span>
+                        <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 text-[16px]">search</span>
                         <input value={search} onChange={e => setSearch(e.target.value)} placeholder={`Search ${tab.toLowerCase()}…`}
                             className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-4 py-2 text-[13px] outline-none focus:border-primary/40 transition-colors" />
                     </div>
@@ -102,7 +102,7 @@ const MaterialPickerModal = ({ tab, setTab, search, setSearch, selected, onToggl
                 <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-1.5">
                     {items.length === 0 && (
                         <div className="py-10 flex flex-col items-center gap-2 text-slate-300">
-                            <span className="material-icons-round text-4xl">search_off</span>
+                            <span className="material-symbols-outlined text-4xl">search_off</span>
                             <p className="text-[13px]">Nothing found</p>
                         </div>
                     )}
@@ -112,14 +112,14 @@ const MaterialPickerModal = ({ tab, setTab, search, setSearch, selected, onToggl
                             <button key={item.id} onClick={() => onToggle(tab, item.id)}
                                 className={`w-full flex items-center gap-3 p-3 rounded-2xl border transition-all text-left ${checked ? `${TAB_CONFIG[tab].bg} border-primary/20 ring-1 ring-primary/20` : 'border-slate-100 hover:bg-slate-50'}`}>
                                 <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${checked ? TAB_CONFIG[tab].bg : 'bg-slate-100'}`}>
-                                    <span className={`material-icons-round text-[16px] ${checked ? TAB_CONFIG[tab].color : 'text-slate-400'}`}>{TAB_CONFIG[tab].icon}</span>
+                                    <span className={`material-symbols-outlined text-[16px] ${checked ? TAB_CONFIG[tab].color : 'text-slate-400'}`}>{TAB_CONFIG[tab].icon}</span>
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <p className="text-[13px] font-semibold text-slate-800 truncate">{item.title}</p>
                                     <p className="text-[11px] text-slate-400">{item.sub}</p>
                                 </div>
                                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${checked ? 'bg-primary border-primary' : 'border-slate-300'}`}>
-                                    {checked && <span className="material-icons-round text-white text-[12px]">check</span>}
+                                    {checked && <span className="material-symbols-outlined text-white text-[12px]">check</span>}
                                 </div>
                             </button>
                         );
@@ -180,7 +180,7 @@ const SprintsLanding = ({ sprints, onCreate, onOpen }) => {
                 </div>
                 <button onClick={onCreate}
                     className="flex items-center gap-2 px-3 md:px-5 py-2 md:py-3 rounded-full bg-primary text-white text-sm font-semibold shadow-md shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95">
-                    <span className="material-icons-round text-[16px]">add_circle</span>
+                    <span className="material-symbols-outlined text-[16px]">add_circle</span>
                     <span className="hidden sm:inline">New Sprint</span>
                 </button>
             </div>
@@ -194,7 +194,7 @@ const SprintsLanding = ({ sprints, onCreate, onOpen }) => {
                 ].map(stat => (
                     <div key={stat.label} className="bg-white rounded-md md:rounded-2xl p-3 md:p-5 flex flex-col md:flex-row md:items-center gap-2 md:gap-4" style={{ boxShadow: '0 10px 30px rgba(44,47,50,0.06)' }}>
                         <div className={`w-8 h-8 md:w-12 md:h-12 ${stat.bg} rounded-xl flex items-center justify-center shrink-0`}>
-                            <span className={`material-icons-round text-[16px] md:text-[22px] ${stat.text}`}>{stat.icon}</span>
+                            <span className={`material-symbols-outlined text-[16px] md:text-[22px] ${stat.text}`}>{stat.icon}</span>
                         </div>
                         <div>
                             <p className="text-[8px] md:text-[10px] font-semibold text-slate-400 uppercase tracking-widest">{stat.label}</p>
@@ -211,7 +211,7 @@ const SprintsLanding = ({ sprints, onCreate, onOpen }) => {
                     <h3 className="text-slate-800 font-semibold text-xl mb-2">No sprints yet</h3>
                     <p className="text-slate-400 text-sm max-w-xs leading-relaxed mb-6">Create your first AI-powered sprint and start a structured learning journey.</p>
                     <button onClick={onCreate} className="flex items-center gap-2 px-5 py-3 rounded-full bg-primary text-white text-sm font-semibold shadow-md shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95">
-                        <span className="material-icons-round text-[16px]">add_circle</span>
+                        <span className="material-symbols-outlined text-[16px]">add_circle</span>
                         Create Sprint
                     </button>
                 </div>
@@ -282,7 +282,7 @@ const SprintCreateWizard = ({ onBack, onCreated }) => {
             {/* Top bar */}
             <div className="sticky top-0 z-20 bg-white/95 backdrop-blur px-4 md:px-6 py-4 flex items-center justify-between border-b border-slate-100">
                 <button onClick={onBack} className="flex items-center gap-2 text-slate-700 hover:text-slate-900 font-semibold text-[14px] transition-colors">
-                    <span className="material-icons-round text-[20px]">arrow_back</span>
+                    <span className="material-symbols-outlined text-[20px]">arrow_back</span>
                     <span className="hidden sm:inline">Sprints</span>
                 </button>
 
@@ -296,7 +296,7 @@ const SprintCreateWizard = ({ onBack, onCreated }) => {
                                 : 'bg-slate-200 text-slate-500'
                             }`}>
                                 {i + 1 < step
-                                    ? <span className="material-icons-round text-[12px]">check</span>
+                                    ? <span className="material-symbols-outlined text-[12px]">check</span>
                                     : i + 1
                                 }
                             </div>
@@ -343,7 +343,7 @@ const SprintCreateWizard = ({ onBack, onCreated }) => {
 
                             {durationDays && (
                                 <div className="flex items-center gap-2 px-4 py-3 bg-primary/5 rounded-xl border border-primary/10">
-                                    <span className="material-icons-round text-primary text-[18px]">calendar_month</span>
+                                    <span className="material-symbols-outlined text-primary text-[18px]">calendar_month</span>
                                     <p className="text-[13px] text-slate-600">
                                         <span className="font-semibold text-primary">{durationDays} day{durationDays !== 1 ? 's' : ''}</span> — the AI will plan your challenges across this period
                                     </p>
@@ -382,7 +382,7 @@ const SprintCreateWizard = ({ onBack, onCreated }) => {
                                         style={{ boxShadow: '0 10px 30px rgba(44,47,50,0.06)' }}>
                                         <div className="absolute -top-4 -right-4 w-16 h-16 rounded-full bg-slate-100 group-hover:scale-110 transition-transform duration-300 pointer-events-none" />
                                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${cfg.bg}`}>
-                                            <span className={`material-icons-round text-[18px] ${cfg.color}`}>{cfg.icon}</span>
+                                            <span className={`material-symbols-outlined text-[18px] ${cfg.color}`}>{cfg.icon}</span>
                                         </div>
                                         <p className="text-[13px] font-semibold text-slate-800">{tab}</p>
                                         {cnt > 0
@@ -408,10 +408,10 @@ const SprintCreateWizard = ({ onBack, onCreated }) => {
                                             if (!item) return null;
                                             return (
                                                 <div key={id} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold ${TAB_CONFIG[tab].bg} ${TAB_CONFIG[tab].color}`}>
-                                                    <span className="material-icons-round text-[13px]">{TAB_CONFIG[tab].icon}</span>
+                                                    <span className="material-symbols-outlined text-[13px]">{TAB_CONFIG[tab].icon}</span>
                                                     <span className="truncate max-w-[120px]">{item.title}</span>
                                                     <button onClick={() => toggleMaterial(tab, id)} className="opacity-60 hover:opacity-100 transition-opacity">
-                                                        <span className="material-icons-round text-[13px]">close</span>
+                                                        <span className="material-symbols-outlined text-[13px]">close</span>
                                                     </button>
                                                 </div>
                                             );
@@ -425,7 +425,7 @@ const SprintCreateWizard = ({ onBack, onCreated }) => {
                         <div className="bg-white rounded-2xl p-5 md:p-6" style={{ boxShadow: '0 10px 30px rgba(44,47,50,0.06)' }}>
                             <div className="flex items-center gap-3 mb-4">
                                 <div className="w-9 h-9 bg-slate-100 rounded-xl flex items-center justify-center">
-                                    <span className="material-icons-round text-slate-500 text-[18px]">upload_file</span>
+                                    <span className="material-symbols-outlined text-slate-500 text-[18px]">upload_file</span>
                                 </div>
                                 <div>
                                     <p className="text-[13px] font-semibold text-slate-800">Upload custom files</p>
@@ -434,7 +434,7 @@ const SprintCreateWizard = ({ onBack, onCreated }) => {
                             </div>
                             <button onClick={() => fileRef.current?.click()}
                                 className="w-full border-2 border-dashed border-slate-200 rounded-xl py-7 flex flex-col items-center gap-2 text-slate-400 hover:border-primary/40 hover:text-primary transition-all">
-                                <span className="material-icons-round text-[30px]">cloud_upload</span>
+                                <span className="material-symbols-outlined text-[30px]">cloud_upload</span>
                                 <span className="text-[13px] font-semibold">Click to upload or drag files here</span>
                             </button>
                             <input ref={fileRef} type="file" multiple accept=".pdf,.docx,.txt" className="hidden"
@@ -443,10 +443,10 @@ const SprintCreateWizard = ({ onBack, onCreated }) => {
                                 <div className="mt-3 space-y-2">
                                     {uploadedFiles.map((f, i) => (
                                         <div key={i} className="flex items-center gap-3 px-3 py-2 bg-slate-50 rounded-xl">
-                                            <span className="material-icons-round text-slate-400 text-[16px]">description</span>
+                                            <span className="material-symbols-outlined text-slate-400 text-[16px]">description</span>
                                             <span className="flex-1 text-[12px] font-medium text-slate-700 truncate">{f.name}</span>
                                             <button onClick={() => setUploadedFiles(prev => prev.filter((_, j) => j !== i))} className="text-slate-400 hover:text-red-500 transition-colors">
-                                                <span className="material-icons-round text-[16px]">close</span>
+                                                <span className="material-symbols-outlined text-[16px]">close</span>
                                             </button>
                                         </div>
                                     ))}
@@ -456,7 +456,7 @@ const SprintCreateWizard = ({ onBack, onCreated }) => {
 
                         {/* Content limit notice */}
                         <div className="flex items-start gap-3 px-4 py-3 bg-amber-50 rounded-xl border border-amber-100">
-                            <span className="material-icons-round text-amber-500 text-[18px] mt-0.5">info</span>
+                            <span className="material-symbols-outlined text-amber-500 text-[18px] mt-0.5">info</span>
                             <p className="text-[12px] text-amber-800 leading-relaxed">
                                 Up to 20 pages of source content per material. Trim longer files to stay within the limit.
                             </p>
@@ -477,7 +477,7 @@ const SprintCreateWizard = ({ onBack, onCreated }) => {
                         <div className="bg-white rounded-2xl p-6 md:p-8 space-y-5" style={{ boxShadow: '0 10px 30px rgba(44,47,50,0.06)' }}>
                             <div className="flex items-start gap-4">
                                 <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center shrink-0">
-                                    <span className="material-icons-round text-primary text-[22px]" style={{ fontVariationSettings: "'FILL' 1" }}>bolt</span>
+                                    <span className="material-symbols-outlined text-primary text-[22px]" style={{ fontVariationSettings: "'FILL' 1" }}>bolt</span>
                                 </div>
                                 <div>
                                     <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 mb-0.5">Sprint</p>
@@ -487,7 +487,7 @@ const SprintCreateWizard = ({ onBack, onCreated }) => {
                             </div>
                             <div className="h-px bg-slate-100" />
                             <div className="flex items-center gap-4">
-                                <span className="material-icons-round text-slate-400 text-[18px]">date_range</span>
+                                <span className="material-symbols-outlined text-slate-400 text-[18px]">date_range</span>
                                 <div>
                                     <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-widest">Duration</p>
                                     <p className="text-[14px] font-semibold text-slate-800">{startDate} → {endDate} · <span className="text-primary">{durationDays} day{durationDays !== 1 ? 's' : ''}</span></p>
@@ -497,7 +497,7 @@ const SprintCreateWizard = ({ onBack, onCreated }) => {
                                 <>
                                     <div className="h-px bg-slate-100" />
                                     <div className="flex items-start gap-4">
-                                        <span className="material-icons-round text-slate-400 text-[18px] mt-0.5">library_books</span>
+                                        <span className="material-symbols-outlined text-slate-400 text-[18px] mt-0.5">library_books</span>
                                         <div className="flex-1 min-w-0">
                                             <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-widest mb-2">Materials</p>
                                             <div className="flex flex-wrap gap-1.5">
@@ -530,14 +530,14 @@ const SprintCreateWizard = ({ onBack, onCreated }) => {
                                 ].map((item, i) => (
                                     <div key={i} className="flex items-start gap-3">
                                         <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-                                            <span className="material-icons-round text-primary text-[14px]">{item.icon}</span>
+                                            <span className="material-symbols-outlined text-primary text-[14px]">{item.icon}</span>
                                         </div>
                                         <p className="text-[13px] text-slate-600 leading-snug">{item.text}</p>
                                     </div>
                                 ))}
                             </div>
                             <div className="mt-5 flex items-center gap-2 px-4 py-3 bg-slate-50 rounded-xl">
-                                <span className="material-icons-round text-slate-400 text-[16px]">schedule</span>
+                                <span className="material-symbols-outlined text-slate-400 text-[16px]">schedule</span>
                                 <p className="text-[12px] text-slate-500">Estimated generation time: <span className="font-semibold text-slate-700">2–4 minutes</span></p>
                             </div>
                         </div>
@@ -549,19 +549,19 @@ const SprintCreateWizard = ({ onBack, onCreated }) => {
             <div className="fixed bottom-0 left-0 lg:left-64 right-0 z-50 flex justify-between items-center px-6 py-4 bg-white/95 backdrop-blur border-t border-slate-100">
                 <button onClick={step > 1 ? () => setStep(s => s - 1) : onBack}
                     className="flex items-center gap-2 text-slate-600 px-4 py-2.5 rounded-xl font-semibold text-[13px] hover:bg-slate-100 transition-all active:scale-95">
-                    <span className="material-icons-round text-[18px]">arrow_back</span>
+                    <span className="material-symbols-outlined text-[18px]">arrow_back</span>
                     Back
                 </button>
                 {step < 3 ? (
                     <button onClick={() => setStep(s => s + 1)} disabled={!canNext}
                         className="flex items-center gap-2 bg-primary text-white px-6 py-2.5 rounded-xl font-semibold text-[13px] shadow-md shadow-primary/20 hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95">
                         Continue
-                        <span className="material-icons-round text-[18px]">arrow_forward</span>
+                        <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
                     </button>
                 ) : (
                     <button onClick={() => onCreated({ name, goal, startDate, endDate })}
                         className="flex items-center gap-2 bg-primary text-white px-6 py-2.5 rounded-xl font-semibold text-[13px] shadow-md shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95">
-                        <span className="material-icons-round text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>bolt</span>
+                        <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>bolt</span>
                         Create Sprint
                     </button>
                 )}
@@ -622,7 +622,7 @@ const SprintGenerating = ({ sprintName, onDone, onLeave }) => {
                 <div className="relative w-24 h-24 mx-auto mb-8">
                     <div className="absolute inset-0 bg-primary/20 rounded-full animate-ping" />
                     <div className="relative w-24 h-24 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/30">
-                        <span className="material-icons-round text-white text-[40px]" style={{ fontVariationSettings: "'FILL' 1" }}>bolt</span>
+                        <span className="material-symbols-outlined text-white text-[40px]" style={{ fontVariationSettings: "'FILL' 1" }}>bolt</span>
                     </div>
                 </div>
 
@@ -677,7 +677,7 @@ const SprintRoadmap = ({ sprint, onBack }) => {
             <div className="sticky top-0 z-20 bg-white/95 backdrop-blur border-b border-slate-100 px-4 md:px-8 pt-16 lg:pt-4 pb-4">
                 <div className="flex items-center gap-4">
                     <button onClick={onBack} className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 transition-colors shrink-0">
-                        <span className="material-icons-round text-[18px]">arrow_back</span>
+                        <span className="material-symbols-outlined text-[18px]">arrow_back</span>
                     </button>
                     <div className="flex-1 min-w-0">
                         <h1 className="text-[15px] md:text-lg font-semibold text-slate-900 truncate">{sprint.title}</h1>
@@ -731,10 +731,10 @@ const SprintRoadmap = ({ sprint, onBack }) => {
                                             >
                                                 {nodeCfg.pulse && <div className="absolute inset-0 rounded-full bg-primary/25 animate-ping" />}
 
-                                                {challenge.status === 'completed' && <span className="material-icons-round text-white text-[22px]">check</span>}
-                                                {challenge.status === 'active'    && <span className="material-icons-round text-white text-[22px]" style={{ fontVariationSettings: "'FILL' 1" }}>bolt</span>}
+                                                {challenge.status === 'completed' && <span className="material-symbols-outlined text-white text-[22px]">check</span>}
+                                                {challenge.status === 'active'    && <span className="material-symbols-outlined text-white text-[22px]" style={{ fontVariationSettings: "'FILL' 1" }}>bolt</span>}
                                                 {challenge.status === 'ready'     && <span className={`font-semibold text-[15px] ${nodeCfg.textColor}`}>{challenge.id}</span>}
-                                                {challenge.status === 'locked'    && <span className="material-icons-round text-slate-400 text-[18px]">lock</span>}
+                                                {challenge.status === 'locked'    && <span className="material-symbols-outlined text-slate-400 text-[18px]">lock</span>}
                                             </button>
 
                                             <p className={`text-[10px] font-semibold mt-1.5 ${challenge.status === 'locked' ? 'text-slate-300' : 'text-slate-500'}`}>
@@ -755,7 +755,7 @@ const SprintRoadmap = ({ sprint, onBack }) => {
                                                     <h3 className="text-[15px] font-semibold text-slate-900">{challenge.title}</h3>
                                                 </div>
                                                 <button onClick={() => setSelectedId(null)} className="text-slate-400 hover:text-slate-600 transition-colors ml-2 mt-0.5 shrink-0">
-                                                    <span className="material-icons-round text-[18px]">close</span>
+                                                    <span className="material-symbols-outlined text-[18px]">close</span>
                                                 </button>
                                             </div>
                                             <p className="text-[12px] text-slate-500 leading-relaxed mb-4">{challenge.description}</p>
@@ -765,7 +765,7 @@ const SprintRoadmap = ({ sprint, onBack }) => {
                                                         const m = COMPONENT_META[type];
                                                         return (
                                                             <span key={type} className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold ${m.bg} ${m.color}`}>
-                                                                <span className="material-icons-round text-[12px]">{m.icon}</span>
+                                                                <span className="material-symbols-outlined text-[12px]">{m.icon}</span>
                                                                 {m.label}
                                                             </span>
                                                         );
@@ -773,7 +773,7 @@ const SprintRoadmap = ({ sprint, onBack }) => {
                                                 </div>
                                             )}
                                             <button className="w-full py-2.5 bg-primary text-white rounded-xl font-semibold text-[13px] hover:bg-primary/90 transition-all active:scale-95 flex items-center justify-center gap-2">
-                                                <span className="material-icons-round text-[16px]">play_arrow</span>
+                                                <span className="material-symbols-outlined text-[16px]">play_arrow</span>
                                                 {challenge.status === 'completed' ? 'Review' : challenge.status === 'active' ? 'Continue' : 'Start Challenge'}
                                             </button>
                                         </div>
@@ -787,7 +787,7 @@ const SprintRoadmap = ({ sprint, onBack }) => {
                         {/* Finish flag */}
                         <div className="relative z-10 mt-2 flex flex-col items-center">
                             <div className="w-12 h-12 rounded-full bg-white border-4 border-slate-200 flex items-center justify-center shadow-sm">
-                                <span className="material-icons-round text-slate-300 text-[20px]">flag</span>
+                                <span className="material-symbols-outlined text-slate-300 text-[20px]">flag</span>
                             </div>
                             <p className="text-[10px] text-slate-300 font-semibold mt-1.5">{sprint.endDate}</p>
                         </div>
@@ -804,7 +804,7 @@ const SprintRoadmap = ({ sprint, onBack }) => {
                                     <h2 className="text-[18px] font-semibold text-slate-900 leading-snug">{selected.title}</h2>
                                 </div>
                                 <button onClick={() => setSelectedId(null)} className="text-slate-400 hover:text-slate-600 transition-colors mt-0.5 shrink-0 ml-3">
-                                    <span className="material-icons-round text-[20px]">close</span>
+                                    <span className="material-symbols-outlined text-[20px]">close</span>
                                 </button>
                             </div>
 
@@ -817,7 +817,7 @@ const SprintRoadmap = ({ sprint, onBack }) => {
                                         const m = COMPONENT_META[type];
                                         return (
                                             <div key={type} className={`flex items-center gap-3 p-3 rounded-xl ${m.bg}`}>
-                                                <span className={`material-icons-round text-[18px] ${m.color}`}>{m.icon}</span>
+                                                <span className={`material-symbols-outlined text-[18px] ${m.color}`}>{m.icon}</span>
                                                 <span className={`text-[13px] font-semibold ${m.color}`}>{m.label}</span>
                                             </div>
                                         );
@@ -826,14 +826,14 @@ const SprintRoadmap = ({ sprint, onBack }) => {
                             )}
 
                             <button className="w-full py-3 bg-primary text-white rounded-xl font-semibold text-[14px] hover:bg-primary/90 transition-all active:scale-95 flex items-center justify-center gap-2 shadow-md shadow-primary/20 mt-auto">
-                                <span className="material-icons-round text-[18px]">play_arrow</span>
+                                <span className="material-symbols-outlined text-[18px]">play_arrow</span>
                                 {selected.status === 'completed' ? 'Review Challenge' : selected.status === 'active' ? 'Continue Challenge' : 'Start Challenge'}
                             </button>
                         </>
                     ) : (
                         <div className="flex-1 flex flex-col items-center justify-center text-center px-4">
                             <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
-                                <span className="material-icons-round text-primary text-[28px]">touch_app</span>
+                                <span className="material-symbols-outlined text-primary text-[28px]">touch_app</span>
                             </div>
                             <p className="text-[14px] font-semibold text-slate-700 mb-1">Select a challenge</p>
                             <p className="text-[12px] text-slate-400 leading-relaxed">Tap any unlocked node on the roadmap to see what's inside</p>

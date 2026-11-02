@@ -16,7 +16,7 @@ export const NotePageSidebar = ({
                     onClick={onCollapse}
                     className="w-7 h-7 flex items-center justify-center text-stone-400 hover:bg-stone-100 hover:text-stone-700 transition-colors"
                 >
-                    <span className="material-icons-round text-[16px]">close</span>
+                    <span className="material-symbols-outlined text-[16px]">close</span>
                 </button>
             </div>
 
@@ -44,7 +44,7 @@ export const NotePageSidebar = ({
                                     }}
                                     className="opacity-0 group-hover:opacity-100 w-6 h-6 bg-red-50 text-red-400 hover:bg-red-100 hover:text-red-500 flex items-center justify-center transition-all"
                                 >
-                                    <span className="material-icons-round text-[15px]">delete</span>
+                                    <span className="material-symbols-outlined text-[15px]">delete</span>
                                 </button>
                             )}
                         </div>
@@ -63,12 +63,12 @@ export const NotePageSidebar = ({
                 onClick={onAddPage}
                 className="mt-auto w-full group flex items-center justify-center gap-2 bg-stone-900 hover:bg-stone-800 text-white py-2 md:py-3 transition-colors active:scale-[0.98]"
             >
-                <span className="material-icons-round text-[16px] group-hover:rotate-90 transition-transform">add</span>
+                <span className="material-symbols-outlined text-[16px] group-hover:rotate-90 transition-transform">add</span>
                 <span className="text-[10px] font-semibold uppercase tracking-widest">New Page</span>
             </button>
 
             <div className="flex items-center justify-center gap-2 text-stone-400 text-[10px] font-medium uppercase tracking-widest border-t border-stone-200 pt-3">
-                <span className="material-icons-round text-[14px]">description</span>
+                <span className="material-symbols-outlined text-[14px]">description</span>
                 {pages.length} Pages Total
             </div>
         </aside>

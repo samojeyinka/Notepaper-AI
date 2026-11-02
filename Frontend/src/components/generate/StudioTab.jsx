@@ -114,7 +114,7 @@ const ContentPicker = ({ selected, onToggle }) => {
                                 : 'bg-stone-100 text-stone-500 hover:bg-stone-200'
                         }`}
                     >
-                        <span className="material-icons-round text-[13px]">{s.icon}</span>
+                        <span className="material-symbols-outlined text-[13px]">{s.icon}</span>
                         {s.label}
                     </button>
                 ))}
@@ -122,7 +122,7 @@ const ContentPicker = ({ selected, onToggle }) => {
 
             {/* Search */}
             <div className="relative">
-                <span className="material-icons-round absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-[16px]">search</span>
+                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-[16px]">search</span>
                 <input
                     type="text"
                     value={search}
@@ -136,7 +136,7 @@ const ContentPicker = ({ selected, onToggle }) => {
             <div className="flex flex-col gap-1.5 max-h-56 overflow-y-auto">
                 {loadingItems && items.length === 0 && (
                     <div className="flex justify-center py-6">
-                        <span className="w-5 h-5 border-2 border-primary/30 border-t-primary  animate-spin" />
+                        <span className="w-5 h-5 border-2 border-primary/30 border-t-primary  animate-spin rounded-full" />
                     </div>
                 )}
                 {!loadingItems && items.length === 0 && (
@@ -158,9 +158,9 @@ const ContentPicker = ({ selected, onToggle }) => {
                             <div className={`w-4 h-4  border-2 flex items-center justify-center shrink-0 transition-all ${
                                 isChecked ? 'bg-primary border-primary' : 'border-stone-300'
                             }`}>
-                                {isChecked && <span className="material-icons-round text-white text-[11px]">check</span>}
+                                {isChecked && <span className="material-symbols-outlined text-white text-[11px]">check</span>}
                             </div>
-                            <span className="material-icons-round text-stone-400 text-[15px]">{src.icon}</span>
+                            <span className="material-symbols-outlined text-stone-400 text-[15px]">{src.icon}</span>
                             <span className="text-[13px] text-stone-700 font-medium flex-1 truncate">{item.title ?? 'Untitled'}</span>
                         </button>
                     );
@@ -491,7 +491,7 @@ Rules:
                     <div className="absolute inset-0 bg-primary/10  animate-pulse" />
                     <div className="absolute inset-2 bg-primary/20  animate-ping" />
                     <div className="relative w-full h-full flex items-center justify-center">
-                        <span className="material-icons-round text-primary text-[36px]">auto_awesome</span>
+                        <span className="material-symbols-outlined text-primary text-[36px]">auto_awesome</span>
                     </div>
                 </div>
                 <div className="text-center">
@@ -511,7 +511,7 @@ Rules:
         return (
             <div className="flex flex-col items-center justify-center h-full py-16 gap-6 px-4">
                 <div className={`w-20 h-20 ${meta.bg}  flex items-center justify-center`}>
-                    <span className={`material-icons-round text-[40px] ${meta.color}`}>{meta.icon}</span>
+                    <span className={`material-symbols-outlined text-[40px] ${meta.color}`}>{meta.icon}</span>
                 </div>
                 <div className="text-center">
                     <p className="text-[13px] font-semibold text-stone-400 uppercase tracking-widest">{meta.label} ready</p>
@@ -525,8 +525,8 @@ Rules:
                     <button onClick={handleSave} disabled={isSaving}
                         className="w-full flex items-center justify-center gap-2 py-3 bg-primary text-white  font-semibold text-[14px] hover:bg-primary/90 disabled:opacity-50 transition-all active:scale-[0.98] shadow-md shadow-primary/20">
                         {isSaving
-                            ? <span className="w-4 h-4 border-2 border-white/30 border-t-white  animate-spin" />
-                            : <><span className="material-icons-round text-[18px]">save</span> Save to Library</>
+                            ? <span className="w-4 h-4 border-2 border-white/30 border-t-white  animate-spin rounded-full" />
+                            : <><span className="material-symbols-outlined text-[18px]">save</span> Save to Library</>
                         }
                     </button>
                     <button onClick={() => { setStep('source'); setResult(null); setSelected([]); setPasteText(''); }}
@@ -562,7 +562,7 @@ Rules:
                             <span key={s.key} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-primary/10 text-primary  text-[11px] font-semibold">
                                 {s.title.slice(0, 28)}{s.title.length > 28 ? '…' : ''}
                                 <button onClick={() => toggleItem(s)} className="hover:text-primary/60">
-                                    <span className="material-icons-round text-[13px]">close</span>
+                                    <span className="material-symbols-outlined text-[13px]">close</span>
                                 </button>
                             </span>
                         ))}
@@ -572,7 +572,7 @@ Rules:
                 {/* Paste text */}
                 <div className="flex flex-col gap-2">
                     <label className="text-[10px] font-bold text-stone-400 uppercase tracking-widest flex items-center gap-1.5">
-                        <span className="material-icons-round text-[13px]">edit_note</span>
+                        <span className="material-symbols-outlined text-[13px]">edit_note</span>
                         Or paste your own text
                     </label>
                     <textarea
@@ -607,7 +607,7 @@ Rules:
                                     : 'bg-stone-50 border-transparent hover:bg-stone-100'
                             }`}
                         >
-                            <span className={`material-icons-round text-[22px] ${outputType === t.id ? t.color : 'text-stone-400'}`}>{t.icon}</span>
+                            <span className={`material-symbols-outlined text-[22px] ${outputType === t.id ? t.color : 'text-stone-400'}`}>{t.icon}</span>
                             <span className={`text-[10px] font-bold leading-tight text-center ${outputType === t.id ? t.color : 'text-stone-500'}`}>{t.label}</span>
                         </button>
                     ))}
@@ -619,7 +619,7 @@ Rules:
             {/* Error */}
             {error && (
                 <div className="flex items-center gap-2 text-red-500 text-[12px] bg-red-50 px-4 py-3 ">
-                    <span className="material-icons-round text-[16px]">error_outline</span>
+                    <span className="material-symbols-outlined text-[16px]">error_outline</span>
                     {error}
                 </div>
             )}
@@ -631,8 +631,8 @@ Rules:
                 className="w-full py-4 bg-primary text-white  font-semibold text-[15px] flex items-center justify-center gap-2 shadow-[0_8px_24px_rgba(101,65,196,0.3)] hover:scale-[0.99] active:scale-[0.97] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:shadow-none transition-all"
             >
                 {!loaded
-                    ? <span className="w-5 h-5 border-2 border-white/30 border-t-white  animate-spin" />
-                    : <><span className="material-icons-round text-[20px]">auto_awesome</span> Generate</>
+                    ? <span className="w-5 h-5 border-2 border-white/30 border-t-white  animate-spin rounded-full" />
+                    : <><span className="material-symbols-outlined text-[20px]">auto_awesome</span> Generate</>
                 }
             </button>
         </div>

@@ -17,7 +17,6 @@ const COMPANY = [
 const LEGAL = [
   { label: 'Privacy policy', href: 'privacy' },
   { label: 'Terms and conditions', href: 'terms' },
-  { label: 'Refund policy', href: 'refund-policy' },
 ];
 
 const socials = [
@@ -37,10 +36,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="col-span-2 md:col-span-2">
             <Link to="/" className="flex items-center gap-2.5 mb-4">
-              {/* <img src={notepaperMark} alt="" aria-hidden="true" className="w-9 h-9 object-contain" /> */}
-              <span className="font-display text-[20px] md:text-[22px] font-bold tracking-tight text-stone-900">
-                Notepaper<span className="text-[#587A7D] text-[15px] md:text-[16px] font-bold tracking-[0.08em] align-middle"> AI</span>
-              </span>
+              <img src="/logo.png" alt="Notepaper AI" className="w-[150px] h-[50px] object-contain object-left" />
             </Link>
             <p className="text-sm text-stone-600 leading-relaxed max-w-sm">
               A calm place for class notes, voice notes, and useful study tools.

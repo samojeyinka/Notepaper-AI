@@ -8,7 +8,7 @@ import NotificationIcon from './user/NotificationIcon';
 // Password field
 export const PasswordInput = ({ label, placeholder, value, onChange, name, hint }) => {
   const fieldCls =
-    'w-full bg-white border border-stone-200 px-4 py-2.5 text-sm text-stone-800 placeholder:text-stone-300 outline-none focus:ring-2 focus:ring-plum-200 transition-colors';
+    'w-full rounded-xl bg-white border border-stone-200 px-4 py-2.5 text-sm text-stone-800 placeholder:text-stone-300 outline-none focus:ring-2 focus:ring-plum-200 transition-colors';
   return (
     <div className="space-y-2">
       <label className="block text-[10px] font-bold uppercase tracking-widest text-stone-400">{label}</label>
@@ -130,13 +130,13 @@ export const ChangePasswordForm = () => {
   };
 
   return (
-    <div className="bg-white ring-1 ring-stone-200/70 p-7 md:p-10">
+    <div className="bg-white ring-1 ring-stone-200/70 rounded-2xl p-5 sm:p-7 md:p-10">
       {toast && <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
 
       <header className="flex items-start justify-between gap-4 mb-8">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-plum-700 mb-1.5">Account security</p>
-          <h1 className="font-display-serif text-[24px] md:text-[28px] font-semibold tracking-tight text-stone-900 leading-tight">
+          <h1 className="text-[24px] md:text-[28px] font-semibold tracking-tight text-stone-900 leading-tight">
             Change password
           </h1>
           <p className="text-stone-500 text-[13px] mt-1.5">Pick a strong password you haven't used before.</p>
@@ -145,7 +145,7 @@ export const ChangePasswordForm = () => {
       </header>
 
       {validationErrors.length > 0 && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200">
+        <div className="mb-6 rounded-xl p-4 bg-red-50 border border-red-200">
           <p className="text-[13px] font-semibold text-red-800 mb-2">Before you save:</p>
           <ul className="space-y-1">
             {validationErrors.map((msg, i) => (
@@ -156,7 +156,7 @@ export const ChangePasswordForm = () => {
       )}
 
       {!token && (
-        <div className="mb-6 p-4 bg-amber-50 border border-amber-200 text-[13px] text-amber-800 leading-relaxed">
+        <div className="mb-6 rounded-xl p-4 bg-amber-50 border border-amber-200 text-[13px] text-amber-800 leading-relaxed">
           No security token found, did you open this from the link in your email?
         </div>
       )}
@@ -190,13 +190,13 @@ export const ChangePasswordForm = () => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3 bg-stone-900 text-white font-semibold text-sm hover:bg-stone-700 active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full rounded-full py-3 bg-stone-900 text-white font-semibold text-sm hover:bg-stone-700 active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? (
             <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
           ) : (
             <>
-              <span className="material-icons-round text-[17px]">lock</span>
+              <span className="material-symbols-outlined text-[17px]">lock</span>
               Save new password
             </>
           )}
@@ -221,7 +221,7 @@ export const ChangePasswordForm = () => {
           onClick={() => navigate('/lockedin/profile-settings')}
           className="inline-flex items-center gap-1.5 text-[13px] font-medium text-stone-500 hover:text-stone-800 transition-colors"
         >
-          <span className="material-icons-round text-[15px]">arrow_back</span>
+          <span className="material-symbols-outlined text-[15px]">arrow_back</span>
           Keep my current password
         </button>
       </div>

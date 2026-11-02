@@ -284,7 +284,7 @@ export default function Generate() {
                         )}
                         {isDone && (
                             <span className="flex items-center gap-1.5 text-emerald-600 font-medium">
-                                <span className="material-icons-round text-[14px]">check_circle</span>
+                                <span className="material-symbols-outlined text-[14px]">check_circle</span>
                                 {wordCount.toLocaleString()} words
                             </span>
                         )}
@@ -409,7 +409,7 @@ export default function Generate() {
                                     onClick={handleStop}
                                     className="w-full py-4  bg-red-50 border border-red-200 text-red-500 font-bold flex items-center justify-center gap-2 hover:bg-red-100 transition"
                                 >
-                                    <span className="material-icons-round text-[20px]">stop_circle</span>
+                                    <span className="material-symbols-outlined text-[20px]">stop_circle</span>
                                     Stop Generating
                                 </button>
                             ) : (
@@ -419,7 +419,7 @@ export default function Generate() {
                                     className="w-full py-3 bg-stone-900 text-white font-semibold text-sm flex items-center justify-center gap-2 hover:bg-stone-700 active:scale-[0.99] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                                 >
                                     {!loaded ? (
-                                        <span className="w-5 h-5 border-2 border-white/30 border-t-white  animate-spin" />
+                                        <span className="w-5 h-5 border-2 border-white/30 border-t-white  animate-spin rounded-full" />
                                     ) : (
                                         <>
                                             {isDone ? "Regenerate" : hasContent ? "Generate from Content" : "Generate"}
@@ -471,7 +471,7 @@ export default function Generate() {
                                         title={copied ? "Copied!" : "Copy text"}
                                         className="p-2 text-stone-400 hover:text-plum-700 hover:bg-plum-50 disabled:opacity-30 transition-colors"
                                     >
-                                        <span className="material-icons-round text-[18px]">{copied ? "check" : "content_copy"}</span>
+                                        <span className="material-symbols-outlined text-[18px]">{copied ? "check" : "content_copy"}</span>
                                     </button>
                                     <button
                                         onClick={handleInsert}
@@ -479,7 +479,7 @@ export default function Generate() {
                                         title="Insert into Note"
                                         className="p-2 text-stone-400 hover:text-plum-700 hover:bg-plum-50 disabled:opacity-30 transition-colors"
                                     >
-                                        <span className="material-icons-round text-[18px]">note_add</span>
+                                        <span className="material-symbols-outlined text-[18px]">note_add</span>
                                     </button>
                                     <button
                                         onClick={handleInsertPaper}
@@ -487,7 +487,7 @@ export default function Generate() {
                                         title="Insert into Paper"
                                         className="p-2 text-stone-400 hover:text-plum-700 hover:bg-plum-50 disabled:opacity-30 transition-colors"
                                     >
-                                        <span className="material-icons-round text-[18px]">article</span>
+                                        <span className="material-symbols-outlined text-[18px]">article</span>
                                     </button>
                                 </div>
                             </div>
@@ -499,7 +499,7 @@ export default function Generate() {
                                 {isIdle && !output && (
                                     <div className="h-full flex flex-col items-center justify-center gap-6 text-center py-10">
                                         <div className="w-24 h-24 bg-plum-50 text-plum-700 flex items-center justify-center">
-                                            <span className="material-icons-round text-[44px]">edit_note</span>
+                                            <span className="material-symbols-outlined text-[44px]">edit_note</span>
                                         </div>
                                         <div>
                                             <h3 className="font-display-serif text-[22px] font-semibold text-stone-900 mb-2 tracking-tight">Ready when you are</h3>
@@ -523,7 +523,7 @@ export default function Generate() {
 
                                 {status === "error" && (
                                     <div className="flex items-center gap-2 text-red-500 text-sm mt-4">
-                                        <span className="material-icons-round text-[18px]">error_outline</span>
+                                        <span className="material-symbols-outlined text-[18px]">error_outline</span>
                                         Something went wrong. Check your API key or try again.
                                     </div>
                                 )}
@@ -560,22 +560,22 @@ export default function Generate() {
                                 </div>
                                 <div className="flex items-center gap-1">
                                     <button onClick={handleCopy} disabled={!output.trim() || isStreaming} className="p-1.5  text-stone-400 hover:text-primary disabled:opacity-30 transition-colors">
-                                        <span className="material-icons-round text-[18px]">{copied ? "check" : "content_copy"}</span>
+                                        <span className="material-symbols-outlined text-[18px]">{copied ? "check" : "content_copy"}</span>
                                     </button>
                                     <button onClick={handleInsert} disabled={!output.trim() || isStreaming} className="p-1.5  text-stone-400 hover:text-primary disabled:opacity-30 transition-colors">
-                                        <span className="material-icons-round text-[18px]">note_add</span>
+                                        <span className="material-symbols-outlined text-[18px]">note_add</span>
                                     </button>
                                     <button onClick={handleInsertPaper} disabled={!output.trim() || isStreaming} className="p-1.5  text-stone-400 hover:text-primary disabled:opacity-30 transition-colors">
-                                        <span className="material-icons-round text-[18px]">article</span>
+                                        <span className="material-symbols-outlined text-[18px]">article</span>
                                     </button>
                                     {!isStreaming && (
                                         <button onClick={() => setMobilePreview(false)} className="p-1.5  text-stone-400 hover:text-stone-600 transition-colors ml-1">
-                                            <span className="material-icons-round text-[20px]">close</span>
+                                            <span className="material-symbols-outlined text-[20px]">close</span>
                                         </button>
                                     )}
                                     {isStreaming && (
                                         <button onClick={handleStop} className="p-1.5  text-red-400 hover:text-red-600 transition-colors ml-1">
-                                            <span className="material-icons-round text-[20px]">stop_circle</span>
+                                            <span className="material-symbols-outlined text-[20px]">stop_circle</span>
                                         </button>
                                     )}
                                 </div>
@@ -594,7 +594,7 @@ export default function Generate() {
                                 )}
                                 {status === "error" && (
                                     <div className="flex items-center gap-2 text-red-500 text-sm mt-4">
-                                        <span className="material-icons-round text-[18px]">error_outline</span>
+                                        <span className="material-symbols-outlined text-[18px]">error_outline</span>
                                         Something went wrong. Try again.
                                     </div>
                                 )}

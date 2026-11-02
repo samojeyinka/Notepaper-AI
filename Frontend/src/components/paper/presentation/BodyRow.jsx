@@ -25,7 +25,7 @@ export const BodyRow = ({ value, index, total, listStyle, onChange, onRemove, co
                     style={{ background:'rgba(239,68,68,0.15)', color:'#ef4444' }}
                     onMouseEnter={e=>e.currentTarget.style.background='rgba(239,68,68,0.3)'}
                     onMouseLeave={e=>e.currentTarget.style.background='rgba(239,68,68,0.15)'}>
-                    <span className="material-icons-round text-[12px]">close</span>
+                    <span className="material-symbols-outlined text-[12px]">close</span>
                 </button>
             )}
         </div>

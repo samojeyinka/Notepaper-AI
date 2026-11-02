@@ -19,7 +19,7 @@ function QrCanvas({ value }) {
   return (
     <canvas
       ref={canvasRef}
-      className=" border-2 border-slate-100 shadow-sm"
+      className="rounded-xl border-2 border-stone-100 shadow-sm"
     />
   );
 }
@@ -79,8 +79,8 @@ function OtpInput({ value, onChange, disabled }) {
           onKeyDown={(e) => handleKeyDown(i, e)}
           disabled={disabled}
           autoFocus={i === 0}
-          className={`w-7 md:w-10 h-7 md:h-12 text-center text-[15px] md:text-lg font-medium md:font-bold  md: border-2 outline-none transition-all duration-150 focus:border-purple-500 focus:ring-2 focus:ring-purple-100 ${digit ? 'border-purple-400 bg-purple-50' : 'border-slate-200 bg-white'}`}
-          style={{ color: '#1e293b', caretColor: '#7c3aed' }}
+          className={`w-7 md:w-10 h-7 md:h-12 rounded-lg text-center text-[15px] md:text-lg font-medium md:font-bold border-2 outline-none transition-all duration-150 focus:border-[#78988d] focus:ring-2 focus:ring-[#54786f]/15 ${digit ? 'border-[#78988d] bg-[#edf3ef]' : 'border-stone-200 bg-white'}`}
+          style={{ color: '#1e293b', caretColor: '#54786f' }}
         />
       ))}
     </div>
@@ -120,6 +120,9 @@ export default function TwoFactorModal({ isOpen, onClose, currentlyEnabled, onSu
       setSetupData(null);
       setOtp('');
       setError(null);
+      const onKeyDown = (event) => { if (event.key === 'Escape') onClose(); };
+      window.addEventListener('keydown', onKeyDown);
+      return () => window.removeEventListener('keydown', onKeyDown);
     } else {
       // Clear lock so next open re-reads the correct current state
       lockedMode.current = null;
@@ -171,42 +174,45 @@ export default function TwoFactorModal({ isOpen, onClose, currentlyEnabled, onSu
 
   return (
     <div
-      className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+      className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-6"
       style={{ background: 'rgba(15,23,42,0.5)', backdropFilter: 'blur(4px)' }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div
-        className="bg-white  md: shadow-2xl w-full max-w-md overflow-hidden"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="two-factor-modal-title"
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] min-h-0 overflow-hidden flex flex-col"
         style={{ boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)' }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+        <div className="flex items-center justify-between px-5 md:px-6 py-4 border-b border-stone-100 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-7 h-7 md:w-9 md:h-9  md: bg-purple-100 flex items-center justify-center">
-              <span className="material-symbols-outlined text-purple-600" style={{ fontSize: '20px' }}>
+            <div className="w-9 h-9 rounded-xl bg-[#edf3ef] flex items-center justify-center">
+              <span className="material-symbols-outlined text-[#54786f]" style={{ fontSize: '20px' }}>
                 {mode === 'enable' ? 'security' : 'lock_open'}
               </span>
             </div>
             <div>
-              <h3 className="font-medium md:font-bold text-slate-900 text-[15px]">
+              <h3 id="two-factor-modal-title" className="font-semibold text-stone-900 text-[15px]">
                 {mode === 'enable' ? 'Enable 2FA' : 'Disable 2FA'}
               </h3>
-              <p className="text-[11.5px] md:text-xs text-slate-400">
+              <p className="text-xs text-stone-500">
                 {mode === 'enable' ? 'Add an extra layer of security' : 'Remove two-factor authentication'}
               </p>
             </div>
           </div>
-          <button onClick={onClose} className="w-6 h-6 md:w-8 md:h-8  hover:bg-slate-100 flex items-center justify-center transition-colors">
+          <button onClick={onClose} aria-label="Close two-factor authentication dialog" className="w-9 h-9 rounded-full hover:bg-stone-100 flex items-center justify-center transition-colors">
             <span className="material-symbols-outlined text-slate-400" style={{ fontSize: '18px' }}>close</span>
           </button>
         </div>
 
         {/* Body */}
-        <div className="px-3 py-3 md:px-6 md:py-6">
+        <div className="min-h-0 overflow-y-auto overscroll-contain px-4 py-4 md:px-6 md:py-6">
 
           {/* Error */}
           {error && (
-            <div className="mb-2 md:mb-4 flex items-start gap-2 p-1.5 md:p-3 bg-red-50 border border-red-100  md: text-[12px] md:text-sm text-red-600">
+            <div role="alert" className="mb-4 flex items-start gap-2 rounded-xl p-3 bg-red-50 border border-red-100 text-[13px] text-red-700">
               <span className="material-symbols-outlined mt-0.5" style={{ fontSize: '16px' }}>error</span>
               <span>{error}</span>
             </div>
@@ -215,20 +221,22 @@ export default function TwoFactorModal({ isOpen, onClose, currentlyEnabled, onSu
           {/* ── STEP: setup ──────────────────────────── */}
           {step === 'setup' && (
             <div className="text-center">
-              <div className="w-12 h-12 md:w-16 md:h-16  md: bg-indigo-50 flex items-center justify-center mx-auto mb-4">
-                <span className="material-symbols-outlined text-indigo-500 text-4xl">qr_code_2</span>
+              <div className="w-14 h-14 rounded-2xl bg-[#edf3ef] flex items-center justify-center mx-auto mb-4">
+                <span className="material-symbols-outlined text-[#54786f] text-4xl">qr_code_2</span>
               </div>
-              <h4 className="text-[14px] md:text-base font-medium md:font-bold text-slate-800 mb-2">Set Up Authenticator</h4>
-              <p className="text-slate-500 text-[12px] md:text-sm mb-3 md:mb-6 leading-relaxed">
+              <h4 className="text-base font-semibold text-stone-900 mb-2">Set up authenticator</h4>
+              <p className="text-stone-500 text-sm mb-5 leading-relaxed">
                 You'll need an authenticator app like <strong>Google Authenticator</strong> or <strong>Authy</strong> to scan the QR code on the next step.
               </p>
               <button
                 onClick={handleSetup}
                 disabled={loading}
-                className="w-full text-[14px] md:text-base bg-purple-600 hover:bg-purple-700 text-white font-medium py-1.5   md: transition-all active:scale-[0.98] disabled:opacity-60"
-                style={{ boxShadow: '0 10px 20px -5px rgba(124,58,237,0.3)' }}
+                className="w-full rounded-full bg-[#355c53] hover:bg-[#294b43] text-white font-semibold py-3 transition-all active:scale-[0.98] disabled:opacity-60"
+                style={{ boxShadow: '0 10px 20px -5px rgba(53,92,83,0.22)' }}
               >
-                {loading ? 'Generating QR Code...' : 'Generate QR Code →'}
+                {loading
+                  ? <span className="inline-flex items-center justify-center gap-2"><span className="w-4 h-4 rounded-full border-2 border-white/35 border-t-white animate-spin" />Generating QR code…</span>
+                  : 'Generate QR code →'}
               </button>
             </div>
           )}
@@ -239,29 +247,29 @@ export default function TwoFactorModal({ isOpen, onClose, currentlyEnabled, onSu
               {/* Show QR only when enabling */}
               {mode === 'enable' && setupData && (
                 <div className="mb-6">
-                  <p className="text-[14px] md:text-sm font-medium md:font-semibold text-slate-700 mb-3 text-center">
+                  <p className="text-sm font-semibold text-stone-700 mb-3 text-center">
                     Scan with your authenticator app
                   </p>
                   <div className="flex flex-col items-center gap-3">
                     <QrCanvas value={setupData.qr_url} />
                     {/* Manual entry fallback */}
                     <details className="w-full text-center">
-                      <summary className="text-[11px] md:text-xs text-slate-400 cursor-pointer hover:text-slate-600 transition-colors">
+                      <summary className="text-xs text-stone-500 cursor-pointer hover:text-stone-700 transition-colors">
                         Can't scan? Enter manually
                       </summary>
-                      <div className="w-[fit-content] m-auto mt-1 md:mt-2 p-1.5 md:p-3 bg-slate-50  md: font-mono text-xs text-slate-600 break-all select-all border border-slate-200">
+                      <div className="w-fit max-w-full m-auto mt-2 p-3 rounded-lg bg-stone-50 font-mono text-xs text-stone-600 break-all select-all border border-stone-200">
                         {setupData.secret_key}
                       </div>
                     </details>
                   </div>
-                  <hr className="border-dashed border-slate-200 my-5" />
+                  <hr className="border-dashed border-stone-200 my-5" />
                 </div>
               )}
 
-              <p className="text-[13px] md:text-sm font-medium md:font-semibold text-slate-700 mb-1 text-center">
+              <p className="text-sm font-semibold text-stone-700 mb-1 text-center">
                 {mode === 'enable' ? 'Enter the 6-digit code shown in your app' : 'Enter your current authenticator code to confirm'}
               </p>
-              <p className="text-[11px] md:text-xs text-slate-400 text-center mb-4">
+              <p className="text-xs text-stone-500 text-center mb-4">
                 The code refreshes every 30 seconds
               </p>
 
@@ -270,10 +278,12 @@ export default function TwoFactorModal({ isOpen, onClose, currentlyEnabled, onSu
               <button
                 onClick={handleVerify}
                 disabled={loading || otp.length < 6}
-                className="mt-6 w-full bg-purple-600 hover:bg-purple-700 text-white font-medium md:font-bold py-1.5 md:py-3  md: transition-all active:scale-[0.98] disabled:opacity-60"
-                style={{ boxShadow: '0 10px 20px -5px rgba(124,58,237,0.3)' }}
+                className="mt-6 w-full rounded-full bg-[#355c53] hover:bg-[#294b43] text-white font-semibold py-3 transition-all active:scale-[0.98] disabled:opacity-60"
+                style={{ boxShadow: '0 10px 20px -5px rgba(53,92,83,0.22)' }}
               >
-                {loading ? 'Verifying...' : mode === 'enable' ? 'Enable 2FA' : 'Disable 2FA'}
+                {loading
+                  ? <span className="inline-flex items-center justify-center gap-2"><span className="w-4 h-4 rounded-full border-2 border-white/35 border-t-white animate-spin" />Verifying…</span>
+                  : mode === 'enable' ? 'Enable 2FA' : 'Disable 2FA'}
               </button>
             </div>
           )}
@@ -281,7 +291,7 @@ export default function TwoFactorModal({ isOpen, onClose, currentlyEnabled, onSu
           {/* ── STEP: done ───────────────────────────── */}
           {step === 'done' && (
             <div className="text-center py-4">
-              <div className={`w-16 h-16  flex items-center justify-center mx-auto mb-4 ring-4 ${
+              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 ring-4 ${
                 mode === 'enable' ? 'bg-emerald-100 ring-emerald-50' : 'bg-slate-100 ring-slate-50'
               }`}>
                 <span className={`material-symbols-outlined text-4xl ${
@@ -290,17 +300,17 @@ export default function TwoFactorModal({ isOpen, onClose, currentlyEnabled, onSu
                   {mode === 'enable' ? 'verified_user' : 'lock_open'}
                 </span>
               </div>
-              <h4 className="font-bold text-slate-800 mb-2">
+              <h4 className="font-semibold text-stone-900 mb-2">
                 {mode === 'enable' ? '2FA Enabled!' : '2FA Disabled'}
               </h4>
-              <p className="text-slate-500 text-sm mb-6">
+              <p className="text-stone-500 text-sm mb-6">
                 {mode === 'enable'
                   ? 'Your account is now protected with two-factor authentication.'
                   : 'Two-factor authentication has been removed from your account.'}
               </p>
               <button
                 onClick={onClose}
-                className="w-full text-[14px] md:text-base bg-slate-900 hover:bg-slate-800 text-white font-medium md:font-bold py-1.5 md:py-3  md: transition-all active:scale-[0.98]"
+                className="w-full rounded-full bg-[#355c53] hover:bg-[#294b43] text-white font-semibold py-3 transition-all active:scale-[0.98]"
               >
                 Done
               </button>

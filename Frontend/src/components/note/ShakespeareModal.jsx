@@ -129,7 +129,7 @@ const ShakespeareModal = ({ onClose, onInsert }) => {
                         onClick={onClose}
                         className="w-7 h-7  flex items-center justify-center text-stone-400 hover:bg-stone-100 transition-colors"
                     >
-                        <span className="material-icons-round text-[13px] md:text-[16px]">close</span>
+                        <span className="material-symbols-outlined text-[13px] md:text-[16px]">close</span>
                     </button>
                 </div>
 
@@ -184,7 +184,7 @@ const ShakespeareModal = ({ onClose, onInsert }) => {
 
                     {status === 'error' && (
                         <p className="text-[11px] text-red-500 flex items-center gap-1">
-                            <span className="material-icons-round text-[11px] md:text-[13px]">error_outline</span>
+                            <span className="material-symbols-outlined text-[11px] md:text-[13px]">error_outline</span>
                             {errorMsg}
                         </p>
                     )}
@@ -205,7 +205,7 @@ const ShakespeareModal = ({ onClose, onInsert }) => {
                                 disabled={!refinePrompt.trim()}
                                 className="shrink-0 w-6 h-6 md:w-8 md:h-8  bg-stone-100 hover:bg-primary hover:text-white text-stone-600 flex items-center justify-center transition-colors disabled:opacity-40"
                             >
-                                <span className="material-icons-round text-[14px] md:text-[16px]">send</span>
+                                <span className="material-symbols-outlined text-[14px] md:text-[16px]">send</span>
                             </button>
                         </div>
                     )}

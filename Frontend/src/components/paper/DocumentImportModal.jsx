@@ -74,14 +74,14 @@ export const DocumentImportModal = ({ onClose, onInsert }) => {
             <div className="bg-white  shadow-2xl w-full max-w-lg animate-in fade-in zoom-in-95 duration-150 overflow-hidden">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100">
                     <div className="flex items-center gap-2.5">
-                        <span className="material-icons-round text-primary text-[22px]">upload_file</span>
+                        <span className="material-symbols-outlined text-primary text-[22px]">upload_file</span>
                         <div>
                             <h2 className="font-display font-semibold text-stone-900 text-base leading-tight">Import Document</h2>
                             <p className="text-[11px] text-stone-400">PDF or DOCX — content will be inserted into your paper</p>
                         </div>
                     </div>
                     <button onClick={onClose} className="w-8 h-8  flex items-center justify-center text-stone-400 hover:bg-stone-100 transition-colors">
-                        <span className="material-icons-round text-[18px]">close</span>
+                        <span className="material-symbols-outlined text-[18px]">close</span>
                     </button>
                 </div>
 
@@ -94,7 +94,7 @@ export const DocumentImportModal = ({ onClose, onInsert }) => {
                             onClick={() => fileRef.current?.click()}
                             className="border-2 border-dashed border-stone-200  p-8 flex flex-col items-center gap-3 cursor-pointer hover:border-plum-400 hover:bg-plum-50 transition-all"
                         >
-                            <span className="material-icons-round text-[48px] text-stone-300">cloud_upload</span>
+                            <span className="material-symbols-outlined text-[48px] text-stone-300">cloud_upload</span>
                             <div className="text-center">
                                 <p className="text-sm font-semibold text-stone-700">Drop your file here</p>
                                 <p className="text-[11px] text-stone-400 mt-1">or click to browse — PDF, DOCX (max {MAX_FILE_MB}MB)</p>
@@ -110,7 +110,7 @@ export const DocumentImportModal = ({ onClose, onInsert }) => {
                     ) : (
                         <div className="flex flex-col gap-3">
                             <div className="flex items-center gap-2 px-3 py-2 bg-green-50  border border-plum-100">
-                                <span className="material-icons-round text-plum-500 text-[18px]">check_circle</span>
+                                <span className="material-symbols-outlined text-plum-500 text-[18px]">check_circle</span>
                                 <p className="text-xs text-plum-700 font-medium">{fileName} parsed successfully</p>
                             </div>
                             <div

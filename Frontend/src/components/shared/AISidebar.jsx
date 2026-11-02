@@ -63,12 +63,12 @@ const FeatureCard = ({ icon, title, desc, isActive, onToggle }) => (
     >
         <div className="flex items-start gap-3">
             <div className="w-6 h-6 bg-plum-50 text-plum-700 flex items-center justify-center shrink-0">
-                <span className="material-icons-round text-[14px]">{icon}</span>
+                <span className="material-symbols-outlined text-[14px]">{icon}</span>
             </div>
             <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1">
                     <p className="text-xs font-medium text-stone-800">{title}</p>
-                    <span className={`ml-auto material-icons-round text-[15px] text-stone-400 transition-transform duration-200 ${isActive ? 'rotate-180' : ''}`}>
+                    <span className={`ml-auto material-symbols-outlined text-[15px] text-stone-400 transition-transform duration-200 ${isActive ? 'rotate-180' : ''}`}>
                         expand_more
                     </span>
                 </div>
@@ -273,7 +273,7 @@ export const AISidebar = ({ sourceType, sourceId, sourceTitle }) => {
                                 <p className="text-[9px] text-stone-400">Study smarter. Stay motivated.</p>
                             </div>
                         </div>
-                        <span className={`material-icons-round text-[18px] text-stone-400 transition-transform duration-200 ${scholaOpen ? 'rotate-180' : ''}`}>
+                        <span className={`material-symbols-outlined text-[18px] text-stone-400 transition-transform duration-200 ${scholaOpen ? 'rotate-180' : ''}`}>
                             expand_more
                         </span>
                     </button>
@@ -323,9 +323,9 @@ export const AISidebar = ({ sourceType, sourceId, sourceTitle }) => {
                                             {Q_TYPES.map(t => (
                                                 <button key={t.id} onClick={() => setQuizType(t.id)}
                                                     className={`flex items-center gap-1.5 px-2 py-1.5 text-[10px] font-semibold transition-colors text-left ${quizType === t.id ? 'bg-plum-50 text-plum-700' : 'bg-stone-50 text-stone-500 hover:bg-stone-100'}`}>
-                                                    <span className={`material-icons-round text-[12px] ${quizType === t.id ? 'text-plum-600' : 'text-stone-400'}`}>{t.icon}</span>
+                                                    <span className={`material-symbols-outlined text-[12px] ${quizType === t.id ? 'text-plum-600' : 'text-stone-400'}`}>{t.icon}</span>
                                                     {t.label}
-                                                    {quizType === t.id && <span className="ml-auto material-icons-round text-[11px] text-plum-600">check</span>}
+                                                    {quizType === t.id && <span className="ml-auto material-symbols-outlined text-[11px] text-plum-600">check</span>}
                                                 </button>
                                             ))}
                                         </div>
@@ -335,7 +335,7 @@ export const AISidebar = ({ sourceType, sourceId, sourceTitle }) => {
                                         <button onClick={handleGenerateQuiz}
                                             disabled={!sourceId}
                                             className="w-full py-2 bg-plum-600 text-white text-[11px] font-medium flex items-center justify-center gap-1.5 hover:bg-plum-700 active:scale-95 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
-                                            <span className="material-icons-round text-[13px]">quiz</span>
+                                            <span className="material-symbols-outlined text-[13px]">quiz</span>
                                             Generate Quiz
                                         </button>
                                     )}
@@ -346,7 +346,7 @@ export const AISidebar = ({ sourceType, sourceId, sourceTitle }) => {
                                         <div className="flex flex-col gap-2">
                                             <div className="bg-emerald-50 border border-emerald-200 p-3 flex flex-col items-center gap-2 text-center">
                                                 <div className="w-9 h-9 bg-emerald-100 flex items-center justify-center">
-                                                    <span className="material-icons-round text-emerald-600 text-[18px]">check_circle</span>
+                                                    <span className="material-symbols-outlined text-emerald-600 text-[18px]">check_circle</span>
                                                 </div>
                                                 <p className="text-[12px] font-semibold text-stone-800">{quizGenerated.length} Questions Ready</p>
                                                 <div className="flex items-center gap-1.5 flex-wrap justify-center">
@@ -360,7 +360,7 @@ export const AISidebar = ({ sourceType, sourceId, sourceTitle }) => {
                                             </div>
                                             <button onClick={handleSaveQuiz}
                                                 className="w-full py-2 bg-plum-600 text-white text-[11px] font-medium flex items-center justify-center gap-1.5 hover:bg-plum-700 active:scale-95 transition-colors">
-                                                <span className="material-icons-round text-[13px]">save</span>
+                                                <span className="material-symbols-outlined text-[13px]">save</span>
                                                 Save & Play
                                             </button>
                                             <button onClick={() => { setQuizStatus('idle'); setQuizGenerated(null); }}
@@ -374,7 +374,7 @@ export const AISidebar = ({ sourceType, sourceId, sourceTitle }) => {
 
                                     {quizStatus === 'error' && quizError && (
                                         <p className="text-[10px] text-red-500 flex items-center gap-1 mt-0.5">
-                                            <span className="material-icons-round text-[12px]">error_outline</span>
+                                            <span className="material-symbols-outlined text-[12px]">error_outline</span>
                                             {quizError}
                                         </p>
                                     )}
@@ -397,7 +397,7 @@ export const AISidebar = ({ sourceType, sourceId, sourceTitle }) => {
                                         <button onClick={handleExpandTopic}
                                             disabled={!sourceId}
                                             className="w-full py-2 bg-plum-600 text-white text-[11px] font-medium flex items-center justify-center gap-1.5 hover:bg-plum-700 active:scale-95 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
-                                            <span className="material-icons-round text-[13px]">{cfg.expandIcon}</span>
+                                            <span className="material-symbols-outlined text-[13px]">{cfg.expandIcon}</span>
                                             Expand This Topic
                                         </button>
                                     )}
@@ -414,14 +414,14 @@ export const AISidebar = ({ sourceType, sourceId, sourceTitle }) => {
 
                                     {expandStatus === 'opened' && (
                                         <div className="bg-plum-50 p-2.5 flex items-center gap-2">
-                                            <span className="material-icons-round text-plum-600 text-[16px]">open_in_new</span>
+                                            <span className="material-symbols-outlined text-plum-600 text-[16px]">open_in_new</span>
                                             <p className="text-[11px] font-medium text-plum-700">Generating in new tab…</p>
                                         </div>
                                     )}
 
                                     {expandStatus === 'error' && expandError && (
                                         <p className="text-[10px] text-red-500 flex items-center gap-1">
-                                            <span className="material-icons-round text-[12px]">error_outline</span>
+                                            <span className="material-symbols-outlined text-[12px]">error_outline</span>
                                             {expandError}
                                         </p>
                                     )}
@@ -444,7 +444,7 @@ export const AISidebar = ({ sourceType, sourceId, sourceTitle }) => {
                                         <button onClick={handleSimplifyTopic}
                                             disabled={!sourceId}
                                             className="w-full py-2 bg-stone-900 text-white text-[11px] font-medium flex items-center justify-center gap-1.5 hover:bg-stone-800 active:scale-95 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
-                                            <span className="material-icons-round text-[13px]">filter_alt</span>
+                                            <span className="material-symbols-outlined text-[13px]">filter_alt</span>
                                             Simplify This Topic
                                         </button>
                                     )}
@@ -461,14 +461,14 @@ export const AISidebar = ({ sourceType, sourceId, sourceTitle }) => {
 
                                     {simplifyStatus === 'opened' && (
                                         <div className="bg-plum-50 p-2.5 flex items-center gap-2">
-                                            <span className="material-icons-round text-plum-600 text-[16px]">open_in_new</span>
+                                            <span className="material-symbols-outlined text-plum-600 text-[16px]">open_in_new</span>
                                             <p className="text-[11px] font-medium text-plum-700">Generating in new tab…</p>
                                         </div>
                                     )}
 
                                     {simplifyStatus === 'error' && simplifyError && (
                                         <p className="text-[10px] text-red-500 flex items-center gap-1">
-                                            <span className="material-icons-round text-[12px]">error_outline</span>
+                                            <span className="material-symbols-outlined text-[12px]">error_outline</span>
                                             {simplifyError}
                                         </p>
                                     )}
@@ -502,7 +502,7 @@ export const AISidebar = ({ sourceType, sourceId, sourceTitle }) => {
                                         onClick={handleCreatePlan}
                                         disabled={!planDate}
                                         className="w-full py-2 bg-plum-600 text-white text-[11px] font-medium flex items-center justify-center gap-1.5 hover:bg-plum-700 active:scale-95 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
-                                        <span className="material-icons-round text-[13px]">event_note</span>
+                                        <span className="material-symbols-outlined text-[13px]">event_note</span>
                                         Set Up Study Plan
                                     </button>
                                 </div>

@@ -37,7 +37,7 @@ export const FolderShape = ({ shape = 'squircle', color = '#55786d', icon = 'fol
     const shapeStyle = SHAPES.find(s => s.id === shape)?.style ?? SHAPES[0].style;
     return (
         <div style={{ width: size, height: size, backgroundColor: color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, ...shapeStyle }}>
-            <span className="material-icons-round text-white" style={{ fontSize: size * 0.45 }}>{icon}</span>
+            <span className="material-symbols-outlined text-white" style={{ fontSize: size * 0.45 }}>{icon}</span>
         </div>
     );
 };
@@ -96,7 +96,7 @@ export const CreateFolderModal = ({ onClose, onCreated }) => {
                         </div>
                     </div>
                     <button onClick={onClose} aria-label="Close" className="w-8 h-8  flex items-center justify-center text-stone-400 hover:bg-stone-100 hover:text-stone-700 transition-colors">
-                        <span className="material-icons-round text-[18px]">close</span>
+                        <span className="material-symbols-outlined text-[18px]">close</span>
                     </button>
                 </div>
 
@@ -162,7 +162,7 @@ export const CreateFolderModal = ({ onClose, onCreated }) => {
                                     className={`w-8 h-8 md:w-9 md:h-9  flex items-center justify-center transition-all
                                         ${icon === ic ? 'bg-plum-600 text-white shadow-md shadow-plum-600/25' : 'bg-stone-100 text-stone-500 hover:bg-stone-200'}`}
                                 >
-                                    <span className="material-icons-round text-[16px] md:text-[18px]">{ic}</span>
+                                    <span className="material-symbols-outlined text-[16px] md:text-[18px]">{ic}</span>
                                 </button>
                             ))}
                         </div>
@@ -170,7 +170,7 @@ export const CreateFolderModal = ({ onClose, onCreated }) => {
 
                     {error && (
                         <p className="text-xs text-rose-600 flex items-center gap-1">
-                            <span className="material-icons-round text-[14px]">error_outline</span>{error}
+                            <span className="material-symbols-outlined text-[14px]">error_outline</span>{error}
                         </p>
                     )}
 
@@ -183,7 +183,7 @@ export const CreateFolderModal = ({ onClose, onCreated }) => {
                             className="flex-1 py-2.5  bg-stone-900 text-white text-sm font-semibold hover:bg-stone-700 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
                             {loading
                                 ? <Loader size="sm" />
-                                : <><span className="material-icons-round text-[16px]">create_new_folder</span>Create folder</>}
+                                : <><span className="material-symbols-outlined text-[16px]">create_new_folder</span>Create folder</>}
                         </button>
                     </div>
                 </form>
@@ -284,7 +284,7 @@ export const FloatingAIButton = ({ exclude = [], folderId = null }) => {
                                 >
                                     {item.loading
                                         ? <Loader size="sm" />
-                                        : <span className="material-icons-round text-[19px] md:text-[22px]">{item.icon}</span>
+                                        : <span className="material-symbols-outlined text-[19px] md:text-[22px]">{item.icon}</span>
                                     }
                                 </div>
                             </button>
@@ -300,7 +300,7 @@ export const FloatingAIButton = ({ exclude = [], folderId = null }) => {
                     className={`w-12 h-12 md:w-14 md:h-14  flex items-center justify-center text-white bg-stone-900 shadow-lg shadow-stone-900/25 hover:bg-stone-700 active:scale-95 transition-all duration-200`}
                     style={{ transform: menuOpen ? 'rotate(45deg)' : 'rotate(0deg)' }}
                 >
-                    <span className="material-icons-round text-[22px] md:text-[26px]">add</span>
+                    <span className="material-symbols-outlined text-[22px] md:text-[26px]">add</span>
                 </button>
             </div>
 

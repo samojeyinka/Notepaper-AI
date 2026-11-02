@@ -182,7 +182,7 @@ export const Flashcard = ({ id }) => {
                 <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/40 backdrop-blur-sm">
                     <div className="bg-white border border-stone-200 shadow-2xl p-6 max-w-sm w-full mx-4">
                         <div className="w-12 h-12 bg-red-50 flex items-center justify-center mb-4">
-                            <span className="material-icons-round text-red-500 text-[22px]">delete_outline</span>
+                            <span className="material-symbols-outlined text-red-500 text-[22px]">delete_outline</span>
                         </div>
                         <h3 className="font-display-serif text-lg font-semibold text-stone-900 mb-1">Delete flashcard deck?</h3>
                         <p className="text-sm text-stone-500 mb-6">This will permanently delete <span className="font-semibold text-stone-700">"{title}"</span> and all its cards. This cannot be undone.</p>
@@ -263,7 +263,7 @@ export const Flashcard = ({ id }) => {
                                 disabled={activeIndex === 0}
                                 className="w-7 h-7 md:w-9 md:h-9 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-500 hover:border-plum-400 hover:text-plum-700 transition-colors disabled:opacity-25 disabled:cursor-not-allowed shadow-sm active:scale-95"
                             >
-                                <span className="material-icons-round text-[16px] md:text-[20px]">chevron_left</span>
+                                <span className="material-symbols-outlined text-[16px] md:text-[20px]">chevron_left</span>
                             </button>
                             <span className="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 bg-stone-900 text-white text-[10px] px-2 py-0.5 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
                                 Previous
@@ -276,7 +276,7 @@ export const Flashcard = ({ id }) => {
                                     onClick={() => removeCard(activeIndex)}
                                     className="w-7 h-7 md:w-9 md:h-9 rounded-full bg-white border border-red-200 flex items-center justify-center text-red-400 hover:bg-red-50 hover:border-red-400 transition-colors shadow-sm active:scale-95"
                                 >
-                                    <span className="material-icons-round text-[15px] md:text-[18px]">remove</span>
+                                    <span className="material-symbols-outlined text-[15px] md:text-[18px]">remove</span>
                                 </button>
                                 <span className="pointer-events-none absolute -bottom-7 left-1/2 -translate-x-1/2 bg-stone-900 text-white text-[10px] px-2 py-0.5 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
                                     Remove
@@ -312,7 +312,7 @@ export const Flashcard = ({ id }) => {
                                 disabled={activeIndex === cards.length - 1}
                                 className="w-7 h-7 md:w-9 md:h-9 rounded-full bg-white border border-stone-200 flex items-center justify-center text-stone-500 hover:border-plum-400 hover:text-plum-700 transition-colors disabled:opacity-25 disabled:cursor-not-allowed shadow-sm active:scale-95"
                             >
-                                <span className="material-icons-round text-[16px] md:text-[20px]">chevron_right</span>
+                                <span className="material-symbols-outlined text-[16px] md:text-[20px]">chevron_right</span>
                             </button>
                             <span className="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 bg-stone-900 text-white text-[10px] px-2 py-0.5 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
                                 Next
@@ -325,7 +325,7 @@ export const Flashcard = ({ id }) => {
                                     onClick={addCard}
                                     className="w-7 h-7 md:w-9 md:h-9 rounded-full bg-white border border-plum-400 flex items-center justify-center text-plum-700 hover:bg-plum-50 hover:border-plum-600 transition-colors shadow-sm active:scale-95"
                                 >
-                                    <span className="material-icons-round text-[15px] md:text-[18px]">add</span>
+                                    <span className="material-symbols-outlined text-[15px] md:text-[18px]">add</span>
                                 </button>
                                 <span className="pointer-events-none absolute -bottom-7 left-1/2 -translate-x-1/2 bg-stone-900 text-white text-[10px] px-2 py-0.5 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
                                     Add Card

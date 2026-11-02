@@ -148,7 +148,7 @@ export default function RestoreAccount() {
               to="/signin"
               className="inline-flex items-center gap-2 text-[13px] font-medium text-stone-500 hover:text-stone-900 transition-colors"
             >
-              <span className="material-icons-round text-[15px]">arrow_back</span>
+              <span className="material-symbols-outlined text-[15px]">arrow_back</span>
               Back to sign in
             </Link>
           </footer>

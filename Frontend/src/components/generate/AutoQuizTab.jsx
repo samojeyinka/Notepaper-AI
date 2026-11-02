@@ -50,10 +50,10 @@ const QuizReadyPanel = ({ count, difficulty, subject }) => {
             {/* Lock icon */}
             <div className="relative">
                 <div className="relative w-20 h-12 md:w-28 md:h-28 bg-stone-50  flex items-center justify-center shadow-[0_8px_32px_rgba(0,0,0,0.08)]">
-                    <span className="material-icons-round text-stone-300 text-5xl">lock</span>
+                    <span className="material-symbols-outlined text-stone-300 text-5xl">lock</span>
                 </div>
                 <div className="absolute -bottom-1 -right-1 bg-emerald-100 p-2  shadow-sm">
-                    <span className="material-icons-round text-emerald-600 text-[15px]">check</span>
+                    <span className="material-symbols-outlined text-emerald-600 text-[15px]">check</span>
                 </div>
             </div>
 
@@ -84,7 +84,7 @@ const QuizReadyPanel = ({ count, difficulty, subject }) => {
             <div className="w-full max-w-sm space-y-2 opacity-20 pointer-events-none select-none mt-2">
                 {[...Array(3)].map((_, i) => (
                     <div key={i} className="h-14 bg-stone-100  flex items-center justify-center gap-2">
-                        <span className="material-icons-round text-stone-400 text-[14px]">lock</span>
+                        <span className="material-symbols-outlined text-stone-400 text-[14px]">lock</span>
                         <div className="flex-1 h-2 bg-stone-200  max-w-[60%]" />
                     </div>
                 ))}
@@ -346,12 +346,12 @@ Rules:
                                             : 'bg-stone-50 text-stone-500 hover:bg-stone-100'
                                     }`}
                                 >
-                                    <span className={`material-icons-round text-[15px] ${qType === t.id ? 'text-plum-700' : 'text-stone-400'}`}>
+                                    <span className={`material-symbols-outlined text-[15px] ${qType === t.id ? 'text-plum-700' : 'text-stone-400'}`}>
                                         {t.icon}
                                     </span>
                                     {t.label}
                                     {qType === t.id && (
-                                        <span className="ml-auto material-icons-round text-[14px] text-plum-700">check</span>
+                                        <span className="ml-auto material-symbols-outlined text-[14px] text-plum-700">check</span>
                                     )}
                                 </button>
                             ))}
@@ -402,7 +402,7 @@ Rules:
                     {/* Generate button */}
                     {isGenerating ? (
                         <div className="flex items-center justify-center gap-3 py-4 bg-plum-50/70 ">
-                            <span className="w-5 h-5 border-2 border-plum-600/30 border-t-primary  animate-spin" />
+                            <span className="w-5 h-5 border-2 border-plum-600/30 border-t-primary  animate-spin rounded-full" />
                             <span className="text-sm font-semibold text-plum-700">Generating {questionCount} questions…</span>
                         </div>
                     ) : (
@@ -412,7 +412,7 @@ Rules:
                             className="w-full py-2 md:py-4 bg-stone-900 text-white  font-semibold text-sm flex items-center justify-center gap-2 hover:scale-[0.98] active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:shadow-none"
                         >
                             {!loaded ? (
-                                <span className="w-5 h-5 border-2 border-white/30 border-t-white  animate-spin" />
+                                <span className="w-5 h-5 border-2 border-white/30 border-t-white  animate-spin rounded-full" />
                             ) : (
                                 <>
                                   
@@ -472,7 +472,7 @@ Rules:
                                 <div className="relative">
                                     <div className="absolute inset-0 " />
                                     <div className="relative w-28 h-28 bg-stone-50  flex items-center justify-center shadow-[0_8px_32px_rgba(0,0,0,0.08)]">
-                                        <span className="material-icons-round text-plum-700 text-5xl">quiz</span>
+                                        <span className="material-symbols-outlined text-plum-700 text-5xl">quiz</span>
                                     </div>
                                  
                                 </div>
@@ -515,7 +515,7 @@ Rules:
                         {/* Error */}
                         {status === 'error' && (
                             <div className="flex items-center gap-2 text-red-500 text-sm mt-4">
-                                <span className="material-icons-round text-[18px]">error_outline</span>
+                                <span className="material-symbols-outlined text-[18px]">error_outline</span>
                                 {error}
                             </div>
                         )}
@@ -548,10 +548,10 @@ Rules:
                             className="flex items-center gap-2 px-5 py-2.5  bg-stone-900 text-white text-xs font-bold hover:scale-[0.98] active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed transition "
                         >
                             {isSaving ? (
-                                <span className="w-4 h-4 border-2 border-white/30 border-t-white  animate-spin" />
+                                <span className="w-4 h-4 border-2 border-white/30 border-t-white  animate-spin rounded-full" />
                             ) : (
                                 <>
-                                    <span className="material-icons-round text-[16px]">save</span>
+                                    <span className="material-symbols-outlined text-[16px]">save</span>
                                     Save & Play
                                 </>
                             )}
@@ -583,7 +583,7 @@ Rules:
                         </div>
                         {!isGenerating && !isSaving && (
                             <button onClick={() => setMobilePreview(false)} className="p-1.5  text-stone-400 hover:text-stone-600 transition-colors">
-                                <span className="material-icons-round text-[20px]">close</span>
+                                <span className="material-symbols-outlined text-[20px]">close</span>
                             </button>
                         )}
                     </div>
@@ -603,7 +603,7 @@ Rules:
                         )}
                         {status === 'error' && (
                             <div className="flex items-center gap-2 text-red-500 text-sm mt-4">
-                                <span className="material-icons-round text-[18px]">error_outline</span>
+                                <span className="material-symbols-outlined text-[18px]">error_outline</span>
                                 {error}
                             </div>
                         )}
@@ -623,7 +623,7 @@ Rules:
                                 Back
                             </button>
                             <button onClick={handleSave} disabled={isSaving} className="flex-1 py-1 md:py-2  bg-stone-900 text-white text-sm font-semibold flex items-center justify-center gap-1.5 disabled:opacity-40">
-                                {isSaving ? <span className="w-4 h-4 border-2 border-white/30 border-t-white  animate-spin" /> : <><span className="material-icons-round text-[14px] md:text-[16px]">save</span>Save & Play</>}
+                                {isSaving ? <span className="w-4 h-4 border-2 border-white/30 border-t-white  animate-spin rounded-full" /> : <><span className="material-symbols-outlined text-[14px] md:text-[16px]">save</span>Save & Play</>}
                             </button>
                         </div>
                     )}

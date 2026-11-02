@@ -34,7 +34,7 @@ export default function SecuritySection() {
 
   return (
     <>
-      <section className="bg-white ring-1 ring-stone-200/70 p-6 md:p-7 h-full flex flex-col">
+      <section className="bg-white ring-1 ring-stone-200/70 rounded-2xl p-5 md:p-7 h-full flex flex-col">
         {toast && (
           <Toast
             type={toast.type}
@@ -44,7 +44,7 @@ export default function SecuritySection() {
         )}
 
         <div className="mb-7">
-          <h2 className="font-display-serif text-[20px] font-semibold text-stone-900 leading-tight">Security</h2>
+          <h2 className="text-[20px] font-semibold text-stone-900 leading-tight">Security</h2>
           <p className="text-stone-500 text-[12.5px] mt-1">Sign-in and account protection.</p>
         </div>
 

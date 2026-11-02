@@ -132,7 +132,7 @@ export default function AIGeneratingPage() {
                 <p className="eyebrow text-plum-700 mb-6">Schola</p>
 
                 <div className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-7 bg-emerald-500 flex items-center justify-center">
-                    <span className="material-icons-round text-white text-[34px]" style={{ fontVariationSettings: "'FILL' 1" }}>check</span>
+                    <span className="material-symbols-outlined text-white text-[34px]" style={{ fontVariationSettings: "'FILL' 1" }}>check</span>
                 </div>
 
                 <h2 className="font-display-serif text-[26px] md:text-[32px] font-semibold tracking-tight text-stone-900 leading-tight mb-2">
@@ -148,7 +148,7 @@ export default function AIGeneratingPage() {
                         onClick={() => navigate(targetPath)}
                         className="w-full py-3 bg-plum-600 text-white text-[14px] font-medium flex items-center justify-center gap-2 hover:bg-plum-700 active:scale-[0.98] transition-colors"
                     >
-                        <span className="material-icons-round text-[18px]">open_in_new</span>
+                        <span className="material-symbols-outlined text-[18px]">open_in_new</span>
                         Open {typeLabel}
                     </button>
                     <button
@@ -169,7 +169,7 @@ export default function AIGeneratingPage() {
                 <p className="eyebrow text-plum-700 mb-6">Schola</p>
 
                 <div className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-7 bg-red-50 border border-red-200 flex items-center justify-center">
-                    <span className="material-icons-round text-red-500 text-[34px]">error_outline</span>
+                    <span className="material-symbols-outlined text-red-500 text-[34px]">error_outline</span>
                 </div>
 
                 <h2 className="font-display-serif text-[26px] md:text-[32px] font-semibold tracking-tight text-stone-900 leading-tight mb-2">
@@ -205,7 +205,7 @@ export default function AIGeneratingPage() {
             {/* Action tile */}
             <div className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-7 bg-plum-600 flex items-center justify-center">
                 <span
-                    className="material-icons-round text-white text-[32px] md:text-[38px]"
+                    className="material-symbols-outlined text-white text-[32px] md:text-[38px]"
                     style={{ fontVariationSettings: "'FILL' 1" }}
                 >
                     {action === 'simplify' ? 'filter_alt' : 'lightbulb'}
@@ -232,7 +232,7 @@ export default function AIGeneratingPage() {
             {/* Info card */}
             <div className="bg-white border border-stone-200 p-5 md:p-6 text-left mt-7">
                 <div className="flex items-start gap-3">
-                    <span className="material-icons-round text-plum-600 text-[20px] mt-0.5 shrink-0">info</span>
+                    <span className="material-symbols-outlined text-plum-600 text-[20px] mt-0.5 shrink-0">info</span>
                     <p className="text-[12px] md:text-[13px] text-stone-600 leading-relaxed">
                         This usually takes <span className="font-semibold text-stone-800">1–3 minutes</span>. This page updates automatically — you'll also get a browser notification when it's ready.
                     </p>

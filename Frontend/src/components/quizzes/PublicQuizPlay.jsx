@@ -263,7 +263,7 @@ export default function PublicQuizPlay() {
             <div className="min-h-screen flex flex-col">
                 <Header title="" />
                 <div className="flex-1 flex flex-col items-center justify-center gap-4" style={{ background: '#F8F9FA' }}>
-                    <span className="material-icons-round text-slate-300 text-5xl">quiz</span>
+                    <span className="material-symbols-outlined text-slate-300 text-5xl">quiz</span>
                     <p className="text-slate-500 font-medium">Quiz not found or no longer available.</p>
                     <Link to="/" className="text-primary text-sm font-semibold hover:underline">Go to Notepaper-ai</Link>
                 </div>
@@ -314,7 +314,7 @@ export default function PublicQuizPlay() {
                             }}
                             className="flex items-center gap-1.5 px-3 md:px-4 py-2 text-xs md:text-sm font-semibold text-slate-500 hover:text-primary transition-colors"
                         >
-                            <span className="material-icons-round text-[14px] md:text-[16px]">
+                            <span className="material-symbols-outlined text-[14px] md:text-[16px]">
                                 {copied ? 'check_circle' : 'share'}
                             </span>
                             {copied ? 'Link copied!' : 'Share'}
@@ -349,7 +349,7 @@ export default function PublicQuizPlay() {
 
                                 {/* Tip card */}
                                 <div className="relative p-6 bg-yellow-50 border border-yellow-100 rounded-2xl flex items-start gap-4">
-                                    <span className="material-icons-round text-yellow-500 shrink-0 mt-0.5">lightbulb</span>
+                                    <span className="material-symbols-outlined text-yellow-500 shrink-0 mt-0.5">lightbulb</span>
                                     <p className="text-sm text-yellow-800 leading-relaxed italic">
                                         "Try to recall the answer before looking at the choices — it strengthens memory retrieval."
                                     </p>
@@ -359,7 +359,7 @@ export default function PublicQuizPlay() {
                             {/* Score card */}
                             <div className="bg-white border border-slate-100 rounded-2xl p-5 flex items-center gap-4">
                                 <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center">
-                                    <span className="material-icons-round text-primary text-[20px]">quiz</span>
+                                    <span className="material-symbols-outlined text-primary text-[20px]">quiz</span>
                                 </div>
                                 <div>
                                     <p className="text-xs text-slate-400 font-semibold uppercase tracking-widest">Score so far</p>
@@ -420,7 +420,7 @@ export default function PublicQuizPlay() {
                                                 ? 'bg-emerald-50 text-emerald-700'
                                                 : 'bg-rose-50 text-rose-700'
                                         }`}>
-                                            <span className="material-icons-round text-[17px] shrink-0 mt-0.5">
+                                            <span className="material-symbols-outlined text-[17px] shrink-0 mt-0.5">
                                                 {flash === 'correct' ? 'check_circle' : 'cancel'}
                                             </span>
                                             <div>
@@ -472,9 +472,9 @@ export default function PublicQuizPlay() {
                                                                 : 'bg-slate-100 text-slate-500 group-hover:bg-primary group-hover:text-white'
                                                 }`}>
                                                     {isCorrect
-                                                        ? <span className="material-icons-round text-[14px] md:text-[16px]">check</span>
+                                                        ? <span className="material-symbols-outlined text-[14px] md:text-[16px]">check</span>
                                                         : isWrong
-                                                            ? <span className="material-icons-round text-[16px]">close</span>
+                                                            ? <span className="material-symbols-outlined text-[16px]">close</span>
                                                             : LETTERS[i]
                                                     }
                                                 </div>
@@ -490,7 +490,7 @@ export default function PublicQuizPlay() {
                                                 </span>
 
                                                 {isSelected && !submitted && (
-                                                    <span className="material-icons-round text-primary text-[18px] ml-auto shrink-0">
+                                                    <span className="material-symbols-outlined text-primary text-[18px] ml-auto shrink-0">
                                                         check_circle
                                                     </span>
                                                 )}
@@ -533,7 +533,7 @@ export default function PublicQuizPlay() {
                                         className="flex items-center gap-2 md:gap-3 px-3 md:px-10 py-1.5 md:py-4 bg-slate-900 text-white rounded-md md:rounded-2xl font-medium md:font-semibold text-sm md:text-base shadow-md hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all"
                                     >
                                         Submit Answer
-                                        <span className="material-icons-round text-[18px]">arrow_forward</span>
+                                        <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
                                     </button>
                                 ) : (
                                     <button
@@ -541,7 +541,7 @@ export default function PublicQuizPlay() {
                                         className="flex items-center gap-2 md:gap-3 px-3 md:px-10 py-1.5 md:py-4 bg-slate-900 text-white rounded-md md:rounded-2xl font-medium md:font-semibold text-sm md:text-base shadow-md hover:scale-105 active:scale-95 transition-all"
                                     >
                                         {currentIdx + 1 >= questions.length ? 'See Results' : 'Next Question'}
-                                        <span className="material-icons-round text-[18px]">arrow_forward</span>
+                                        <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
                                     </button>
                                 )}
                             </div>

@@ -595,7 +595,7 @@ export const NoteEditor = forwardRef(function NoteEditor(
             }}
             className="w-6 h-6 bg-red-500 text-white flex items-center justify-center shadow-lg hover:bg-red-600"
           >
-            <span className="material-icons-round text-[13px]">close</span>
+            <span className="material-symbols-outlined text-[13px]">close</span>
           </button>
         </div>
       </div>,
@@ -608,21 +608,21 @@ export const NoteEditor = forwardRef(function NoteEditor(
         onMouseEnter={cancelHide}
         onMouseLeave={scheduleHide}
       >
-        <span className="material-icons-round text-[13px] text-stone-400 shrink-0">link</span>
+        <span className="material-symbols-outlined text-[13px] text-stone-400 shrink-0">link</span>
         <span className="truncate flex-1 text-stone-200 max-w-[180px]">{linkTooltip.href}</span>
         <button
           onMouseDown={(e) => { e.preventDefault(); window.open(linkTooltip.href, '_blank', 'noopener'); }}
           className="ml-1 p-1  hover:bg-stone-700 transition-colors shrink-0"
           title="Open link"
         >
-          <span className="material-icons-round text-[13px]">open_in_new</span>
+          <span className="material-symbols-outlined text-[13px]">open_in_new</span>
         </button>
         <button
           onMouseDown={(e) => { e.preventDefault(); navigator.clipboard.writeText(linkTooltip.href); }}
           className="p-1  hover:bg-stone-700 transition-colors shrink-0"
           title="Copy link"
         >
-          <span className="material-icons-round text-[13px]">content_copy</span>
+          <span className="material-symbols-outlined text-[13px]">content_copy</span>
         </button>
         <button
           onMouseDown={(e) => {
@@ -639,7 +639,7 @@ export const NoteEditor = forwardRef(function NoteEditor(
           className="p-1  hover:bg-red-600 transition-colors shrink-0"
           title="Remove link"
         >
-          <span className="material-icons-round text-[13px]">link_off</span>
+          <span className="material-symbols-outlined text-[13px]">link_off</span>
         </button>
       </div>,
       document.body

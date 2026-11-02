@@ -589,7 +589,7 @@ export const Paper = () => {
                     {aiGeneratingTimedOut ? (
                         <>
                             <div className="w-16 h-16 bg-plum-50 flex items-center justify-center">
-                                <span className="material-icons-round text-plum-600 text-[28px]">hourglass_disabled</span>
+                                <span className="material-symbols-outlined text-plum-600 text-[28px]">hourglass_disabled</span>
                             </div>
                             <div className="text-center max-w-xs">
                                 <h3 className="text-xl font-semibold text-stone-900 mb-2">Taking longer than expected</h3>
@@ -607,7 +607,7 @@ export const Paper = () => {
                             <div className="relative">
                                 <div className="w-20 h-20 rounded-full border-4 border-plum-100 border-t-plum-600 animate-spin" />
                                 <div className="absolute inset-0 flex items-center justify-center">
-                                    <span className="material-icons-round text-plum-600 text-[26px]">article</span>
+                                    <span className="material-symbols-outlined text-plum-600 text-[26px]">article</span>
                                 </div>
                             </div>
                             <div className="text-center max-w-xs">
@@ -622,7 +622,7 @@ export const Paper = () => {
                 <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/40 backdrop-blur-sm">
                     <div className="bg-white  shadow-2xl p-6 max-w-sm w-full mx-4">
                         <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center mb-4">
-                            <span className="material-icons-round text-amber-500 text-[22px]">warning</span>
+                            <span className="material-symbols-outlined text-amber-500 text-[22px]">warning</span>
                         </div>
                         <h3 className="text-lg font-bold text-stone-800 mb-1">
                             Formatting will be lost
@@ -779,7 +779,7 @@ export const Paper = () => {
                     {!isPageSidebarOpen && (
                         <button onClick={() => setIsPageSidebarOpen(true)}
                             className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-10 md:w-6 md:h-20 bg-white border border-stone-200  flex items-center justify-center hover:bg-stone-50 transition-colors z-20">
-                            <span className="material-icons-round text-stone-400">chevron_left</span>
+                            <span className="material-symbols-outlined text-stone-400">chevron_left</span>
                         </button>
                     )}
                 </div>

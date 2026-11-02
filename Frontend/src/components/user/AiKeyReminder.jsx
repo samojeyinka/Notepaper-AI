@@ -14,7 +14,7 @@ export const AiKeyReminder = () => {
         <div className="mx-3 mb-3 px-3.5 py-4 bg-plum-50 border border-plum-200 flex flex-col gap-2.5">
             <div className="flex items-center gap-2.5">
                 <span className="w-7 h-7 bg-plum-100 text-plum-700 flex items-center justify-center flex-shrink-0">
-                    <span className="material-icons-round text-[16px]">key</span>
+                    <span className="material-symbols-outlined text-[16px]">key</span>
                 </span>
                 <p className="text-[12px] font-semibold text-stone-800 leading-tight">Add an AI key</p>
             </div>

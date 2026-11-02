@@ -141,7 +141,7 @@ const PublicNoteView = () => {
             <div className="flex flex-col h-screen bg-white">
                 <Header title="" isAuthenticated={isAuthenticated} />
                 <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center px-6">
-                    <span className="material-icons-round text-stone-300 text-[40px]">description</span>
+                    <span className="material-symbols-outlined text-stone-300 text-[40px]">description</span>
                     <h2 className="text-lg font-semibold text-stone-700">This note isn't available</h2>
                     <p className="text-sm text-stone-400 max-w-xs">It may have been deleted, or the link is incorrect.</p>
                 </div>
@@ -161,7 +161,7 @@ const PublicNoteView = () => {
                         disabled={activePageIndex === 0}
                         className="w-7 h-7 flex items-center justify-center text-stone-500 hover:bg-stone-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                     >
-                        <span className="material-icons-round text-[16px]">chevron_left</span>
+                        <span className="material-symbols-outlined text-[16px]">chevron_left</span>
                     </button>
                     <span className="text-[11px] text-stone-500 font-medium">
                         Page {activePageIndex + 1} of {pages.length}
@@ -171,7 +171,7 @@ const PublicNoteView = () => {
                         disabled={activePageIndex === pages.length - 1}
                         className="w-7 h-7 flex items-center justify-center text-stone-500 hover:bg-stone-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                     >
-                        <span className="material-icons-round text-[16px]">chevron_right</span>
+                        <span className="material-symbols-outlined text-[16px]">chevron_right</span>
                     </button>
                 </div>
 
@@ -180,7 +180,7 @@ const PublicNoteView = () => {
                         onClick={() => setIsMenuOpen(v => !v)}
                         className="flex items-center gap-1.5 px-3 py-1.5  text-xs font-semibold bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors"
                     >
-                        <span className="material-icons-round text-[15px]">download</span>
+                        <span className="material-symbols-outlined text-[15px]">download</span>
                         Export
                     </button>
                     {isMenuOpen && (
@@ -191,14 +191,14 @@ const PublicNoteView = () => {
                                     onClick={() => handleExport('pdf')}
                                     className="w-full flex items-center gap-2 px-4 py-2 hover:bg-stone-50 text-stone-700 text-sm font-medium"
                                 >
-                                    <span className="material-icons-round text-[16px] text-stone-400">picture_as_pdf</span>
+                                    <span className="material-symbols-outlined text-[16px] text-stone-400">picture_as_pdf</span>
                                     Export as PDF
                                 </button>
                                 <button
                                     onClick={() => handleExport('png')}
                                     className="w-full flex items-center gap-2 px-4 py-2 hover:bg-stone-50 text-stone-700 text-sm font-medium"
                                 >
-                                    <span className="material-icons-round text-[16px] text-stone-400">image</span>
+                                    <span className="material-symbols-outlined text-[16px] text-stone-400">image</span>
                                     Export as Image
                                 </button>
                             </div>

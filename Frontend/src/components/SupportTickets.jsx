@@ -24,7 +24,7 @@ export const SupportArchiveHeader = () => {
                     to="/lockedin/support-tickets/new"
                     className="inline-flex items-center gap-2 bg-stone-900 text-white px-5 py-2 text-sm font-semibold hover:bg-stone-700 active:scale-[0.98] transition-all"
                 >
-                    <span className="material-icons-round text-[17px]">add</span>
+                    <span className="material-symbols-outlined text-[17px]">add</span>
                     New ticket
                 </Link>
                 <NotificationIcon />
@@ -44,7 +44,7 @@ export const SupportTab = ({ icon, label, count, isActive, onClick }) => {
                     : 'text-stone-500 hover:text-stone-800 border-transparent'
             }`}
         >
-            <span className="material-icons-round text-[17px]">{icon}</span>
+            <span className="material-symbols-outlined text-[17px]">{icon}</span>
             {label}
             {count !== undefined && (
                 <span className={`text-[10px] font-semibold px-1.5 py-0.5 ${isActive ? 'bg-plum-50 text-plum-700' : 'bg-stone-100 text-stone-400'}`}>
@@ -101,7 +101,7 @@ export const TicketCard = ({ ticketId, status, title, lastActivity, isResolved =
 
                 <div className="shrink-0 flex flex-col items-end gap-1">
                     <span className="text-[11px] text-stone-400 whitespace-nowrap">{lastActivity}</span>
-                    <span className={`material-icons-round text-[18px] transition-all ${isResolved ? 'text-stone-300' : 'text-stone-300 group-hover:text-plum-600 group-hover:translate-x-0.5'}`}>
+                    <span className={`material-symbols-outlined text-[18px] transition-all ${isResolved ? 'text-stone-300' : 'text-stone-300 group-hover:text-plum-600 group-hover:translate-x-0.5'}`}>
                         chevron_right
                     </span>
                 </div>
@@ -173,7 +173,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
                 aria-label="Previous page"
                 className="w-9 h-9 flex items-center justify-center text-stone-500 border border-stone-200 hover:border-stone-400 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
-                <span className="material-icons-round text-[18px]">chevron_left</span>
+                <span className="material-symbols-outlined text-[18px]">chevron_left</span>
             </button>
             {pages.map(page => (
                 <button
@@ -194,7 +194,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
                 aria-label="Next page"
                 className="w-9 h-9 flex items-center justify-center text-stone-500 border border-stone-200 hover:border-stone-400 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
-                <span className="material-icons-round text-[18px]">chevron_right</span>
+                <span className="material-symbols-outlined text-[18px]">chevron_right</span>
             </button>
         </div>
     );
@@ -283,7 +283,7 @@ export const SupportArchiveContent = ({ activeTab, onTabChange }) => {
                     className="mb-2 p-2 border border-stone-200 text-stone-500 hover:border-stone-400 hover:text-plum-700 transition-colors"
                     title="Refresh tickets"
                 >
-                    <span className={`material-icons-round text-[18px] ${refreshing ? 'animate-spin' : ''}`}>refresh</span>
+                    <span className={`material-symbols-outlined text-[18px] ${refreshing ? 'animate-spin' : ''}`}>refresh</span>
                 </button>
             </div>
 

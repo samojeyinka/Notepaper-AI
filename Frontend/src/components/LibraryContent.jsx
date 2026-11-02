@@ -75,7 +75,7 @@ const THEME_BG = {
 const SearchBar = ({ value, onChange, placeholder }) => (
     <div className="relative max-w-2xl">
         <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-            <span className="material-icons-round text-stone-400 text-[18px]">search</span>
+            <span className="material-symbols-outlined text-stone-400 text-[18px]">search</span>
         </div>
         <input
             className="w-full bg-white border border-stone-200 py-2 pl-11 pr-10 shadow-sm focus:ring-2 focus:ring-plum-200 focus:border-plum-400 text-[13px] md:text-sm placeholder-stone-400 outline-none transition-all"
@@ -86,7 +86,7 @@ const SearchBar = ({ value, onChange, placeholder }) => (
         />
         {value && (
             <button onClick={() => onChange('')} className="absolute inset-y-0 right-4 flex items-center text-stone-400 hover:text-stone-600 transition-colors">
-                <span className="material-icons-round text-[16px]">close</span>
+                <span className="material-symbols-outlined text-[16px]">close</span>
             </button>
         )}
     </div>
@@ -111,9 +111,9 @@ const SortSelect = ({ value, options, onChange }) => {
                 onClick={() => setOpen(v => !v)}
                 className="flex items-center gap-1.5 bg-stone-50 border border-stone-200  md: px-3 py-0.5 md:py-1.5 text-[12px] md:text-[13px] text-stone-600 hover:bg-stone-100 transition-colors"
             >
-                <span className="material-icons-round text-stone-400 text-[12px] md:text-[15px]">sort</span>
+                <span className="material-symbols-outlined text-stone-400 text-[12px] md:text-[15px]">sort</span>
                 <span>{selected?.label}</span>
-                <span className={`material-icons-round text-stone-400 text-[14px] transition-transform duration-200 ${open ? 'rotate-180' : ''}`}>
+                <span className={`material-symbols-outlined text-stone-400 text-[14px] transition-transform duration-200 ${open ? 'rotate-180' : ''}`}>
                     expand_more
                 </span>
             </button>
@@ -128,7 +128,7 @@ const SortSelect = ({ value, options, onChange }) => {
                                 o.v === value ? 'text-primary font-semibold' : 'text-stone-600'
                             }`}
                         >
-                            {o.v === value && <span className="material-icons-round text-[13px]">check</span>}
+                            {o.v === value && <span className="material-symbols-outlined text-[13px]">check</span>}
                             <span className={o.v === value ? '' : 'ml-[17px]'}>{o.label}</span>
                         </button>
                     ))}
@@ -176,7 +176,7 @@ const NoteCard = ({ note, onClick, onDelete }) => {
             <div className="bg-white ring-1 ring-stone-200/70 p-4 hover:ring-plum-200 transition-all h-full flex flex-col">
                 <div className="flex justify-between items-start mb-3">
                     <div className="w-9 h-9 bg-plum-50 flex items-center justify-center shrink-0">
-                        <span className="material-icons-round text-plum-700 text-[18px]">description</span>
+                        <span className="material-symbols-outlined text-plum-700 text-[18px]">description</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                         <span className="text-[10px] text-stone-400 bg-stone-100 px-2 py-0.5 ">{timeAgo(note.updated_at)}</span>
@@ -204,7 +204,7 @@ const PaperCard = ({ paper, onClick, onDelete }) => {
             <div className="bg-white ring-1 ring-stone-200/70 p-4 hover:ring-plum-200 transition-all h-full flex flex-col">
                 <div className="flex justify-between items-start mb-3">
                     <div className="w-9 h-9 bg-plum-50 flex items-center justify-center shrink-0">
-                        <span className="material-icons-round text-plum-700 text-[18px]">article</span>
+                        <span className="material-symbols-outlined text-plum-700 text-[18px]">article</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                         <span className="text-[10px] text-stone-400 bg-stone-100 px-2 py-0.5 ">{timeAgo(paper.updated_at)}</span>
@@ -230,7 +230,7 @@ const PresentationCard = ({ pres, onClick, onDelete }) => (
         <div className="bg-white ring-1 ring-stone-200/70 hover:ring-plum-200 transition-all overflow-hidden h-full flex flex-col">
             <div className="w-full aspect-video flex items-center justify-center relative"
                 style={{ background: THEME_BG[pres.theme] ?? '#0f172a' }}>
-                <span className="material-icons-round text-white/20 text-[40px]">slideshow</span>
+                <span className="material-symbols-outlined text-white/20 text-[40px]">slideshow</span>
                 <span className="absolute bottom-2 right-3 text-[10px] text-white/50 font-medium">{pres.slide_count ?? 0} slides</span>
                 {pres.theme && (
                     <span className="absolute top-2 left-2 text-[9px] bg-black/30 text-white/70 px-1.5 py-0.5  capitalize">{pres.theme}</span>
@@ -246,7 +246,7 @@ const PresentationCard = ({ pres, onClick, onDelete }) => (
                 <p className="text-[11px] text-stone-400 mt-auto">{timeAgo(pres.updated_at)}</p>
                 {pres.paper && (
                     <div className="flex items-center gap-1 mt-2 pt-2 border-t border-stone-100">
-                        <span className="material-icons-round text-[12px] text-plum-500">article</span>
+                        <span className="material-symbols-outlined text-[12px] text-plum-500">article</span>
                         <span className="text-[11px] text-stone-400 truncate">{pres.paper.title}</span>
                     </div>
                 )}
@@ -264,7 +264,7 @@ const FlashcardCard = ({ deck, onClick }) => {
             <div className="bg-white ring-1 ring-stone-200/70 p-4 hover:ring-plum-200 transition-all h-full flex flex-col">
                 <div className="flex justify-between items-start mb-2">
                     <div className="w-9 h-9 bg-plum-50 flex items-center justify-center shrink-0">
-                        <span className="material-icons-round text-plum-700 text-[18px]">style</span>
+                        <span className="material-symbols-outlined text-plum-700 text-[18px]">style</span>
                     </div>
                     <span className="text-[10px] text-stone-400 bg-stone-100 px-2 py-0.5 ">{timeAgo(deck.updated_at)}</span>
                 </div>
@@ -294,7 +294,7 @@ const ListRow = ({ icon, iconBg, iconText, title, sub, meta, date, onClick, onDe
     >
         <div className="col-span-6 flex items-center gap-3 min-w-0">
             <div className={`w-9 h-9  ${iconBg} flex items-center justify-center shrink-0`}>
-                <span className={`material-icons-round text-[17px] ${iconText}`}>{icon}</span>
+                <span className={`material-symbols-outlined text-[17px] ${iconText}`}>{icon}</span>
             </div>
             <div className="min-w-0">
                 <p className="text-[13px] font-semibold text-stone-800 truncate">{title}</p>
@@ -332,13 +332,13 @@ const Pagination = ({ meta, loading, onMore, onLess }) => {
             {meta.current_page > 1 && (
                 <button onClick={onLess} disabled={loading}
                     className="flex items-center gap-1.5 px-2 md:px-4 md:py-1.5 py-1  md: border border-stone-200 text-[13px] font-medium text-stone-500 hover:border-primary hover:text-primary disabled:opacity-40 transition-colors">
-                    <span className="material-icons-round text-[15px]">expand_less</span>View less
+                    <span className="material-symbols-outlined text-[15px]">expand_less</span>View less
                 </button>
             )}
             {meta.current_page < meta.last_page && (
                 <button onClick={onMore} disabled={loading}
                     className="flex items-center gap-1.5 px-1 md:px-4 py-1 md:py-1.5  md: border border-stone-200 text-[12px] md:text-[13px] font-medium text-stone-500 hover:border-primary hover:text-primary disabled:opacity-40 transition-colors">
-                    {loading ? <Loader size="xs" /> : <span className="material-icons-round text-[15px]">expand_more</span>}
+                    {loading ? <Loader size="xs" /> : <span className="material-symbols-outlined text-[15px]">expand_more</span>}
                     View more
                 </button>
             )}
@@ -378,7 +378,7 @@ const FAB = ({ onNote, onPaper, onFolder, onPresentation, onFlashcard }) => {
                         onClick={() => { item.onClick(); setOpen(false); }}
                         className="w-8 h-8 md:w-12 md:h-12  md: shadow-lg flex items-center justify-center text-white transition-all hover:scale-110 active:scale-95"
                         style={{ backgroundColor: item.color }}>
-                        <span className="material-icons-round text-[18px] md:text-[22px]">{item.icon}</span>
+                        <span className="material-symbols-outlined text-[18px] md:text-[22px]">{item.icon}</span>
                     </button>
                 </div>
             ))}
@@ -387,7 +387,7 @@ const FAB = ({ onNote, onPaper, onFolder, onPresentation, onFlashcard }) => {
                 className={`w-8 h-8 md:w-14 md:h-14  md: shadow-xl flex items-center justify-center text-white transition-all duration-200 active:scale-95
                     ${open ? 'bg-stone-700 rotate-45' : 'bg-stone-900 hover:bg-stone-700 hover:scale-105'}`}
                 style={{ transform: open ? 'rotate(45deg)' : undefined }}>
-                <span className="material-icons-round text-[18px] md:text-[26px]">add</span>
+                <span className="material-symbols-outlined text-[18px] md:text-[26px]">add</span>
             </button>
             <style>{`@keyframes slideUpFade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}`}</style>
         </div>
@@ -603,13 +603,13 @@ export const LibraryContent = () => {
     const renderEmpty = (tab, onCreate) => (
         <div className="flex flex-col items-center justify-center py-16 gap-3 text-center">
             <div className="w-16 h-16 bg-plum-50 text-plum-600 flex items-center justify-center">
-                <span className="material-icons-round text-[30px]">{TABS.find(t=>t.id===tab)?.icon}</span>
+                <span className="material-symbols-outlined text-[30px]">{TABS.find(t=>t.id===tab)?.icon}</span>
             </div>
             <p className="text-sm text-stone-500">{search ? `No ${tab} match your search.` : `No ${tab} yet.`}</p>
             {!search && onCreate && (
                 <button onClick={onCreate}
                     className="flex items-center gap-2 px-4 py-2 bg-stone-900 text-white text-sm font-semibold hover:bg-stone-700 active:scale-95 transition-all">
-                    <span className="material-icons-round text-[16px]">add</span>
+                    <span className="material-symbols-outlined text-[16px]">add</span>
                     Create one
                 </button>
             )}
@@ -658,7 +658,7 @@ export const LibraryContent = () => {
                                 ? 'border-primary text-primary'
                                 : 'border-transparent text-stone-500 hover:text-stone-800'}`}
                     >
-                        <span className="material-icons-round text-[15px] md:text-[17px]">{tab.icon}</span>
+                        <span className="material-symbols-outlined text-[15px] md:text-[17px]">{tab.icon}</span>
                         {tab.label}
                     </button>
                 ))}
@@ -682,7 +682,7 @@ export const LibraryContent = () => {
                             onClick={() => toggleView(v)}
                             className={`w-7 h-7  flex items-center justify-center transition-all ${view === v ? 'bg-white shadow-sm text-primary' : 'text-stone-400 hover:text-stone-600'}`}
                         >
-                            <span className="material-icons-round text-[17px]">{icon}</span>
+                            <span className="material-symbols-outlined text-[17px]">{icon}</span>
                         </button>
                     ))}
                 </div>
@@ -714,7 +714,7 @@ export const LibraryContent = () => {
                                     {!search && (
                                         <button onClick={() => navigate('/lockedin/notes/new')}
                                             className="border-2 border-dashed border-stone-300 flex flex-col items-center justify-center text-stone-300 hover:text-plum-600 hover:border-plum-400 transition-all group py-8 gap-2">
-                                            <span className="material-icons-round text-[20px] md:text-[30px] group-hover:scale-110 transition-transform">add_circle</span>
+                                            <span className="material-symbols-outlined text-[20px] md:text-[30px] group-hover:scale-110 transition-transform">add_circle</span>
                                             <span className="text-sm medium md:font-semibold">New Note</span>
                                         </button>
                                     )}
@@ -728,7 +728,7 @@ export const LibraryContent = () => {
                                     {!search && (
                                         <button onClick={() => navigate('/lockedin/papers/new')}
                                             className="border-2 border-dashed border-plum-200 flex flex-col items-center justify-center text-stone-300 hover:text-plum-600 hover:border-plum-400 transition-all group py-8 gap-2">
-                                            <span className="material-icons-round text-[20px] md:text-[30px] group-hover:scale-110 transition-transform">add_circle</span>
+                                            <span className="material-symbols-outlined text-[20px] md:text-[30px] group-hover:scale-110 transition-transform">add_circle</span>
                                             <span className="text-sm medium md:font-semibold">New Paper</span>
                                         </button>
                                     )}
@@ -742,7 +742,7 @@ export const LibraryContent = () => {
                                     {!search && (
                                         <button onClick={() => setShowCreateFolder(true)}
                                             className="border-2 border-dashed border-plum-200 flex flex-col items-center justify-center text-stone-300 hover:text-plum-600 hover:border-plum-400 transition-all group aspect-square gap-2">
-                                            <span className="material-icons-round text-[20px] md:text-[30px] group-hover:scale-110 transition-transform">create_new_folder</span>
+                                            <span className="material-symbols-outlined text-[20px] md:text-[30px] group-hover:scale-110 transition-transform">create_new_folder</span>
                                             <span className="text-sm medium md:font-semibold">New Folder</span>
                                         </button>
                                     )}
@@ -756,7 +756,7 @@ export const LibraryContent = () => {
                                     {!search && (
                                         <button onClick={handleCreatePresentation} disabled={creatingPresentation}
                                             className="border-2 border-dashed border-plum-200 flex flex-col items-center justify-center text-stone-300 hover:text-plum-600 hover:border-plum-400 transition-all group aspect-video gap-2 disabled:opacity-60">
-                                            {creatingPresentation ? <Loader size="md" /> : <span className="material-icons-round text-[20px] md:text-[30px] group-hover:scale-110 transition-transform">add_circle</span>}
+                                            {creatingPresentation ? <Loader size="md" /> : <span className="material-symbols-outlined text-[20px] md:text-[30px] group-hover:scale-110 transition-transform">add_circle</span>}
                                             <span className="text-sm medium md:font-semibold">New Slides</span>
                                         </button>
                                     )}

@@ -70,7 +70,7 @@ const GenerateImageModal = ({ onClose, onInsert }) => {
                 <div className="flex items-center justify-between px-2 md:px-4 py-1.5 md:py-3 border-b border-stone-100 shrink-0">
                     <div className="flex items-center gap-2.5">
                         <div className="w-5 h-5 md:w-7 md:h-7  bg-plum-600 flex items-center justify-center shadow-sm shrink-0">
-                            <span className="material-icons-round text-white text-[12px] md:text-[15px]">auto_awesome</span>
+                            <span className="material-symbols-outlined text-white text-[12px] md:text-[15px]">auto_awesome</span>
                         </div>
                         <div>
                             <p className="font-medium md:font-semibold text-[12px] text-stone-800 leading-tight">Image AI</p>
@@ -81,7 +81,7 @@ const GenerateImageModal = ({ onClose, onInsert }) => {
                         onClick={onClose}
                         className="w-7 h-7  flex items-center justify-center text-stone-400 hover:bg-stone-100 transition-colors"
                     >
-                        <span className="material-icons-round text-[13px] md:text-[16px]">close</span>
+                        <span className="material-symbols-outlined text-[13px] md:text-[16px]">close</span>
                     </button>
                 </div>
 
@@ -133,7 +133,7 @@ const GenerateImageModal = ({ onClose, onInsert }) => {
                     {/* Error message */}
                     {status === 'error' && (
                         <p className="text-[11px] text-red-500 flex items-center gap-1">
-                            <span className="material-icons-round text-[13px]">error_outline</span>
+                            <span className="material-symbols-outlined text-[13px]">error_outline</span>
                             {errorMsg}
                         </p>
                     )}
@@ -149,14 +149,14 @@ const GenerateImageModal = ({ onClose, onInsert }) => {
                                     download="generated-image.png"
                                     className="flex items-center gap-1 px-2 py-1  bg-stone-100 text-stone-600 text-[11px] font-medium hover:bg-stone-200 active:scale-[0.98] transition-all"
                                 >
-                                    <span className="material-icons-round text-[13px]">download</span>
+                                    <span className="material-symbols-outlined text-[13px]">download</span>
                                     Download
                                 </a>
                                 <button
                                     onClick={() => onInsert?.(imageUrl)}
                                     className="flex items-center gap-1 px-2 py-1  bg-plum-600 text-white text-[11px] font-medium hover:bg-plum-700 active:scale-[0.98] transition-all"
                                 >
-                                    <span className="material-icons-round text-[13px]">add_photo_alternate</span>
+                                    <span className="material-symbols-outlined text-[13px]">add_photo_alternate</span>
                                     Insert
                                 </button>
                             </>

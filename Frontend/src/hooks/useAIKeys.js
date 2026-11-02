@@ -82,7 +82,7 @@ const fetchKeys = (userId) =>
 // Tiny event bus so ANY component can open the single AI-key modal.
 const _modalListeners = new Set();
 
-export const openAIKeyModal = () => _modalListeners.forEach((fn) => fn());
+export const openAIKeyModal = (options) => _modalListeners.forEach((fn) => fn(options));
 export const subscribeAIKeyModal = (fn) => {
     _modalListeners.add(fn);
 

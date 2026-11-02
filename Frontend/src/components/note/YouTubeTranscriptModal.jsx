@@ -83,7 +83,7 @@ const WebToTextModal = ({ onClose, onInsert }) => {
                 <div className="flex items-center justify-between px-4 py-3 border-b border-stone-100 shrink-0">
                     <div className="flex items-center gap-2.5">
                         <div className="w-5 h-5 md:w-7 md:h-7 :  bg-stone-900 flex items-center justify-center text-white shadow-sm shrink-0">
-                            <span className="material-icons-round text-[13px] md:text-[15px]">article</span>
+                            <span className="material-symbols-outlined text-[13px] md:text-[15px]">article</span>
                         </div>
                         <div>
                             <p className="font-semibold text-[12px] text-stone-800 leading-tight">Web to Text</p>
@@ -94,7 +94,7 @@ const WebToTextModal = ({ onClose, onInsert }) => {
                         onClick={onClose}
                         className="md:w-7 md:h-7 w-5 h-5  flex items-center justify-center text-stone-400 hover:bg-stone-100 transition-colors"
                     >
-                        <span className="material-icons-round text-[13px] md:text-[16px]">close</span>
+                        <span className="material-symbols-outlined text-[13px] md:text-[16px]">close</span>
                     </button>
                 </div>
 
@@ -114,7 +114,7 @@ const WebToTextModal = ({ onClose, onInsert }) => {
                             />
                             {status === 'error' && (
                                 <p className="text-[11px] text-red-500 flex items-center gap-1">
-                                    <span className="material-icons-round text-[13px]">error_outline</span>
+                                    <span className="material-symbols-outlined text-[13px]">error_outline</span>
                                     {errorMessage}
                                 </p>
                             )}

@@ -258,7 +258,7 @@ export default function VoiceToSpeechPage() {
                                         ${isUnsupported ? 'opacity-40 cursor-not-allowed' : ''}
                                     `}
                                 >
-                                    <span className="material-icons-round text-[44px] md:text-[50px]">
+                                    <span className="material-symbols-outlined text-[44px] md:text-[50px]">
                                         {isListening ? 'stop' : 'mic'}
                                     </span>
                                 </button>
@@ -291,7 +291,7 @@ export default function VoiceToSpeechPage() {
 
                             {/* Privacy note */}
                             <div className="flex items-center gap-2 px-4 py-2 bg-stone-100 text-stone-500">
-                                <span className="material-icons-round text-[14px]">lock</span>
+                                <span className="material-symbols-outlined text-[14px]">lock</span>
                                 <p className="text-[11px] font-medium">Processed in your browser, nothing is stored</p>
                             </div>
                         </div>
@@ -322,7 +322,7 @@ export default function VoiceToSpeechPage() {
                             <div className="px-6 py-4 flex items-center justify-between border-b border-stone-100 shrink-0">
                                 <div className="flex items-center gap-3">
                                     <div className="w-6 h-6 bg-plum-50 text-plum-700 flex items-center justify-center">
-                                        <span className="material-icons-round text-[14px]">mic</span>
+                                        <span className="material-symbols-outlined text-[14px]">mic</span>
                                     </div>
                                     <span className="text-xs font-semibold text-stone-500 tracking-wide">Live transcription</span>
                                     {isListening && (
@@ -339,7 +339,7 @@ export default function VoiceToSpeechPage() {
                                         title={copied ? 'Copied!' : 'Copy text'}
                                         className="p-2 text-stone-400 hover:text-plum-700 hover:bg-plum-50 disabled:opacity-30 transition-colors"
                                     >
-                                        <span className="material-icons-round text-[18px]">{copied ? 'check' : 'content_copy'}</span>
+                                        <span className="material-symbols-outlined text-[18px]">{copied ? 'check' : 'content_copy'}</span>
                                     </button>
                                     <button
                                         onClick={handleClear}
@@ -347,7 +347,7 @@ export default function VoiceToSpeechPage() {
                                         title="Clear transcript"
                                         className="p-2 text-stone-400 hover:text-red-600 hover:bg-red-50 disabled:opacity-30 transition-colors"
                                     >
-                                        <span className="material-icons-round text-[18px]">delete_outline</span>
+                                        <span className="material-symbols-outlined text-[18px]">delete_outline</span>
                                     </button>
                                 </div>
                             </div>
@@ -357,7 +357,7 @@ export default function VoiceToSpeechPage() {
                                 {!text && (
                                     <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-center p-8 pointer-events-none select-none">
                                         <div className="w-16 h-16 bg-plum-50 text-plum-600 flex items-center justify-center">
-                                            <span className="material-icons-round text-[30px]">mic_none</span>
+                                            <span className="material-symbols-outlined text-[30px]">mic_none</span>
                                         </div>
                                         <p className="text-stone-400 text-sm max-w-xs leading-relaxed">
                                             {isListening ? 'Listening for your voice…' : 'Your transcribed words will appear here, ready to edit.'}
@@ -385,7 +385,7 @@ export default function VoiceToSpeechPage() {
                                         disabled={!text.trim()}
                                         className="flex items-center gap-1.5 px-4 py-2 border border-stone-300 text-stone-700 text-xs font-semibold hover:border-stone-900 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                                     >
-                                        <span className="material-icons-round text-[15px]">article</span>
+                                        <span className="material-symbols-outlined text-[15px]">article</span>
                                         Into Paper
                                     </button>
                                     <button
@@ -393,7 +393,7 @@ export default function VoiceToSpeechPage() {
                                         disabled={!text.trim()}
                                         className="flex items-center gap-1.5 px-4 py-2 bg-stone-900 text-white text-xs font-semibold hover:bg-stone-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                                     >
-                                        <span className="material-icons-round text-[15px]">note_add</span>
+                                        <span className="material-symbols-outlined text-[15px]">note_add</span>
                                         Into Note
                                     </button>
                                 </div>

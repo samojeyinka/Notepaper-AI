@@ -164,7 +164,7 @@ const FlashcardsContent = () => {
                     >
                         {creating
                             ? <Loader size="sm" />
-                            : <span className="material-icons-round text-[18px]">add</span>
+                            : <span className="material-symbols-outlined text-[18px]">add</span>
                         }
                         New Deck
                     </button>
@@ -177,13 +177,13 @@ const FlashcardsContent = () => {
                     </div>
                 ) : flashcards.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-24 gap-4">
-                        <span className="material-icons-round text-slate-300 text-[64px]">style</span>
+                        <span className="material-symbols-outlined text-slate-300 text-[64px]">style</span>
                         <p className="text-slate-400 text-sm">No flashcard decks yet.</p>
                         <button
                             onClick={handleCreate}
                             className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-primary text-white text-sm font-semibold shadow-sm hover:bg-primary/90 transition-all"
                         >
-                            <span className="material-icons-round text-[17px]">add</span>
+                            <span className="material-symbols-outlined text-[17px]">add</span>
                             Create your first deck
                         </button>
                     </div>
@@ -206,7 +206,7 @@ const FlashcardsContent = () => {
                                     disabled={loading}
                                     className="text-sm text-slate-500 hover:text-slate-800 disabled:opacity-50 flex items-center gap-2 transition-colors"
                                 >
-                                    <span className="material-icons-round text-[18px]">expand_more</span>
+                                    <span className="material-symbols-outlined text-[18px]">expand_more</span>
                                     {loading ? 'Loading…' : 'Load more'}
                                 </button>
                             </div>
