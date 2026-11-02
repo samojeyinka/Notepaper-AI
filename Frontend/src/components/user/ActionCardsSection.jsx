@@ -9,7 +9,7 @@ export const ActionCard = ({ icon, label, hint, chipClass, onClick, loading }) =
   const inner = (
     <>
       <div className={`${chipClass} w-11 h-11  flex items-center justify-center mb-4 transition-transform group-hover:scale-105`}>
-        {loading ? <Loader size="sm" /> : <span className="material-icons-round text-[21px]">{icon}</span>}
+        {loading ? <Loader size="sm" /> : <span className="material-symbols-outlined text-[21px]">{icon}</span>}
       </div>
       <span className="block font-semibold text-[14px] text-stone-800 leading-tight">{label}</span>
       <span className="block text-[11.5px] text-stone-400 mt-1">{hint}</span>

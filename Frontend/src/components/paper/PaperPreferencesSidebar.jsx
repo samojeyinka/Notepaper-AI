@@ -56,11 +56,11 @@ export const PaperPreferencesSidebar = ({
                 {/* Header */}
                 <div className="flex items-center justify-between px-4 md:px-6 py-4 border-b border-stone-200">
                     <div className="flex items-center gap-2">
-                        <span className="material-icons-round text-plum-600 text-[19px]">tune</span>
+                        <span className="material-symbols-outlined text-plum-600 text-[19px]">tune</span>
                         <h3 className="font-display font-semibold text-[15px] text-stone-900">Paper Preferences</h3>
                     </div>
                     <button onClick={onClose} className="w-8 h-8 flex items-center justify-center text-stone-400 hover:bg-stone-100 hover:text-stone-700 transition-colors">
-                        <span className="material-icons-round text-[18px]">close</span>
+                        <span className="material-symbols-outlined text-[18px]">close</span>
                     </button>
                 </div>
 

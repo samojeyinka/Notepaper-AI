@@ -88,7 +88,7 @@ const PublicFlashcardView = () => {
             <div className="flex flex-col h-screen bg-white">
                 <Header title="" isAuthenticated={isAuthenticated} />
                 <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center px-6">
-                    <span className="material-icons-round text-slate-300 text-[40px]">collections</span>
+                    <span className="material-symbols-outlined text-slate-300 text-[40px]">collections</span>
                     <h2 className="text-lg font-semibold text-slate-700">This flashcard deck isn't available</h2>
                     <p className="text-sm text-slate-400 max-w-xs">It may have been deleted, or the link is incorrect.</p>
                     <Link to="/" className="text-primary text-sm font-semibold hover:underline mt-2">Go to Notepaper-ai</Link>
@@ -121,7 +121,7 @@ const PublicFlashcardView = () => {
                         }}
                         className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-500 hover:text-primary transition-colors"
                     >
-                        <span className="material-icons-round text-[14px]">
+                        <span className="material-symbols-outlined text-[14px]">
                             {copied ? 'check_circle' : 'share'}
                         </span>
                         {copied ? 'Link copied!' : 'Share'}
@@ -161,7 +161,7 @@ const PublicFlashcardView = () => {
                                 disabled={activeIndex === 0}
                                 className="absolute left-0 w-8 h-8 md:w-10 md:h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:border-primary hover:text-primary transition-all disabled:opacity-25 disabled:cursor-not-allowed shadow-sm active:scale-95 z-10"
                             >
-                                <span className="material-icons-round text-[16px] md:text-[20px]">chevron_left</span>
+                                <span className="material-symbols-outlined text-[16px] md:text-[20px]">chevron_left</span>
                             </button>
 
                             {/* Card */}
@@ -187,7 +187,7 @@ const PublicFlashcardView = () => {
                                 disabled={activeIndex === cards.length - 1}
                                 className="absolute right-0 w-8 h-8 md:w-10 md:h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:border-primary hover:text-primary transition-all disabled:opacity-25 disabled:cursor-not-allowed shadow-sm active:scale-95 z-10"
                             >
-                                <span className="material-icons-round text-[16px] md:text-[20px]">chevron_right</span>
+                                <span className="material-symbols-outlined text-[16px] md:text-[20px]">chevron_right</span>
                             </button>
                         </div>
 

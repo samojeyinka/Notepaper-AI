@@ -119,7 +119,7 @@ export const NoteSettingsSidebar = ({
         <div className="flex items-center justify-between">
           <h3 className="text-[15px] md:text-[17px] font-semibold font-display text-stone-900">Note Preferences</h3>
           <button onClick={onClose} className="w-8 h-8 flex items-center justify-center text-stone-400 hover:bg-stone-100 hover:text-stone-700 transition-colors">
-             <span className="material-icons-round text-[18px]">close</span>
+             <span className="material-symbols-outlined text-[18px]">close</span>
           </button>
         </div>
 
@@ -131,7 +131,7 @@ export const NoteSettingsSidebar = ({
               disabled={paperPage === 0}
               className="w-7 h-7 flex items-center justify-center bg-stone-100 text-stone-500 hover:bg-stone-200 disabled:opacity-30 disabled:cursor-not-allowed shrink-0 transition-colors"
             >
-              <span className="material-icons-round text-[16px]">chevron_left</span>
+              <span className="material-symbols-outlined text-[16px]">chevron_left</span>
             </button>
 
             <div className="grid grid-cols-3 gap-2.5 flex-1">
@@ -152,7 +152,7 @@ export const NoteSettingsSidebar = ({
               disabled={paperPage >= Math.ceil(paperOptions.length / PAPERS_PER_PAGE) - 1}
               className="w-7 h-7 flex items-center justify-center bg-stone-100 text-stone-500 hover:bg-stone-200 disabled:opacity-30 disabled:cursor-not-allowed shrink-0 transition-colors"
             >
-              <span className="material-icons-round text-[16px]">chevron_right</span>
+              <span className="material-symbols-outlined text-[16px]">chevron_right</span>
             </button>
           </div>
         </section>

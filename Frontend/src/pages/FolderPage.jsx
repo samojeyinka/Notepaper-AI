@@ -119,7 +119,7 @@ const PaperCard = ({ paper, onClick, onDelete }) => (
         <div className="group h-full flex flex-col bg-white  ring-1 ring-stone-200/70 p-4 transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_34px_-22px_rgba(28,25,23,0.28)] hover:ring-plum-200">
             <div className="flex justify-between items-start mb-3">
                 <div className="w-9 h-9  bg-plum-50 flex items-center justify-center shrink-0">
-                    <span className="material-icons-round text-plum-700 text-[18px]">article</span>
+                    <span className="material-symbols-outlined text-plum-700 text-[18px]">article</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                     <span className="text-[10px] text-stone-400 bg-stone-100 px-2 py-0.5 ">{timeAgo(paper.updated_at)}</span>
@@ -150,7 +150,7 @@ const PresentationCard = ({ presentation: pres, onClick, onDelete }) => (
         <div className="group h-full flex flex-col overflow-hidden bg-white  ring-1 ring-stone-200/70 transition-all hover:shadow-[0_16px_34px_-22px_rgba(28,25,23,0.28)] hover:ring-plum-200">
             <div className="w-full aspect-video flex items-center justify-center relative"
                 style={{ background: THEME_BG[pres.theme] ?? '#0f172a' }}>
-                <span className="material-icons-round text-white/20 text-[40px]">slideshow</span>
+                <span className="material-symbols-outlined text-white/20 text-[40px]">slideshow</span>
                 <span className="absolute bottom-2 right-3  bg-stone-950/50 text-white/90 text-[10px] font-medium px-2 py-0.5">
                     {pres.slide_count ?? 0} slides
                 </span>
@@ -168,7 +168,7 @@ const PresentationCard = ({ presentation: pres, onClick, onDelete }) => (
                 <p className="text-[11px] text-stone-400 mt-auto">{timeAgo(pres.updated_at)}</p>
                 {pres.paper && (
                     <div className="flex items-center gap-1 mt-2 pt-2 border-t border-stone-100">
-                        <span className="material-icons-round text-[12px] text-plum-500">article</span>
+                        <span className="material-symbols-outlined text-[12px] text-plum-500">article</span>
                         <span className="text-[11px] text-stone-400 truncate">{pres.paper.title}</span>
                     </div>
                 )}
@@ -181,7 +181,7 @@ const PresentationCard = ({ presentation: pres, onClick, onDelete }) => (
 const EmptyTab = ({ icon, message, sub }) => (
     <div className="flex flex-col items-center justify-center py-16 gap-3 text-center">
         <div className="w-16 h-16  bg-plum-50 text-plum-600 flex items-center justify-center">
-            <span className="material-icons-round text-[30px]">{icon}</span>
+            <span className="material-symbols-outlined text-[30px]">{icon}</span>
         </div>
         <p className="text-sm text-stone-500 font-medium">{message}</p>
         {sub && <p className="text-stone-400 text-xs">{sub}</p>}
@@ -192,7 +192,7 @@ const EmptyTab = ({ icon, message, sub }) => (
 const SearchBar = ({ value, onChange }) => (
     <div className="relative flex-1 min-w-[180px]">
         <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-            <span className="material-icons-round text-stone-400 text-[18px]">search</span>
+            <span className="material-symbols-outlined text-stone-400 text-[18px]">search</span>
         </div>
         <input
             className="w-full bg-white border border-stone-200 py-2 pl-11 pr-10 shadow-sm focus:ring-2 focus:ring-plum-200 focus:border-plum-400 text-[13px] md:text-sm placeholder-stone-400 outline-none transition-all"
@@ -203,7 +203,7 @@ const SearchBar = ({ value, onChange }) => (
         />
         {value && (
             <button onClick={() => onChange('')} className="absolute inset-y-0 right-4 flex items-center text-stone-400 hover:text-stone-600 transition-colors">
-                <span className="material-icons-round text-[16px]">close</span>
+                <span className="material-symbols-outlined text-[16px]">close</span>
             </button>
         )}
     </div>
@@ -228,9 +228,9 @@ const SortSelect = ({ value, options, onChange }) => {
                 onClick={() => setOpen(v => !v)}
                 className="flex items-center gap-1.5 bg-stone-50 border border-stone-200 px-3 py-0.5 md:py-1.5 text-[12px] md:text-[13px] text-stone-600 hover:bg-stone-100 transition-colors"
             >
-                <span className="material-icons-round text-stone-400 text-[12px] md:text-[15px]">sort</span>
+                <span className="material-symbols-outlined text-stone-400 text-[12px] md:text-[15px]">sort</span>
                 <span>{selected?.label}</span>
-                <span className={`material-icons-round text-stone-400 text-[14px] transition-transform duration-200 ${open ? 'rotate-180' : ''}`}>
+                <span className={`material-symbols-outlined text-stone-400 text-[14px] transition-transform duration-200 ${open ? 'rotate-180' : ''}`}>
                     expand_more
                 </span>
             </button>
@@ -244,7 +244,7 @@ const SortSelect = ({ value, options, onChange }) => {
                                 o.value === value ? 'text-primary font-semibold' : 'text-stone-600'
                             }`}
                         >
-                            {o.value === value && <span className="material-icons-round text-[13px]">check</span>}
+                            {o.value === value && <span className="material-symbols-outlined text-[13px]">check</span>}
                             <span className={o.value === value ? '' : 'ml-[17px]'}>{o.label}</span>
                         </button>
                     ))}
@@ -504,7 +504,7 @@ const FolderPage = () => {
                     </div>
                 ) : folderError ? (
                     <div className="flex-1 flex items-center justify-center flex-col gap-3 text-stone-400">
-                        <span className="material-icons-round text-[40px]">error_outline</span>
+                        <span className="material-symbols-outlined text-[40px]">error_outline</span>
                         <p className="text-sm">{folderError}</p>
                         <button onClick={loadFolder} className="text-primary text-sm font-semibold hover:underline">Retry</button>
                     </div>
@@ -519,7 +519,7 @@ const FolderPage = () => {
                                 <div className="flex-1 min-w-0">
                                     <nav className="flex items-center gap-1 text-[11px] text-stone-400 mb-1">
                                         <Link to="/lockedin/library" className="hover:text-primary transition-colors">Library</Link>
-                                        <span className="material-icons-round text-[12px]">chevron_right</span>
+                                        <span className="material-symbols-outlined text-[12px]">chevron_right</span>
                                         <span className="text-stone-600 font-medium">{folder?.name}</span>
                                     </nav>
                                     <h1 className="font-display-serif text-[22px] md:text-[28px] font-semibold tracking-tight text-stone-900 leading-tight">{folder?.name}</h1>
@@ -534,7 +534,7 @@ const FolderPage = () => {
                                     title="Delete folder"
                                     className="w-9 h-9  flex items-center justify-center text-stone-300 hover:text-red-500 hover:bg-red-50 transition-colors"
                                 >
-                                    <span className="material-icons-round text-[19px]">delete_outline</span>
+                                    <span className="material-symbols-outlined text-[19px]">delete_outline</span>
                                 </button>
                                 <NotificationIcon />
                             </div>
@@ -553,7 +553,7 @@ const FolderPage = () => {
                                                 : 'border-transparent text-stone-500 hover:text-stone-800'
                                             }`}
                                     >
-                                        <span className="material-icons-round text-[15px] md:text-[17px]">{tab.icon}</span>
+                                        <span className="material-symbols-outlined text-[15px] md:text-[17px]">{tab.icon}</span>
                                         {tab.label}
                                     </button>
                                 ))}
@@ -576,7 +576,7 @@ const FolderPage = () => {
                                             title="Refresh"
                                             className="w-9 h-9  flex items-center justify-center bg-stone-50 border border-stone-200 text-stone-400 hover:text-primary hover:border-primary disabled:opacity-40 transition-colors"
                                         >
-                                            <span className={`material-icons-round text-[18px] ${notesLoading ? 'animate-spin' : ''}`}>refresh</span>
+                                            <span className={`material-symbols-outlined text-[18px] ${notesLoading ? 'animate-spin' : ''}`}>refresh</span>
                                         </button>
                                     </div>
 

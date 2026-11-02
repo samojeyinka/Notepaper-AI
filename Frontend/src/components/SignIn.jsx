@@ -129,7 +129,7 @@ export default function SignIn() {
     try {
       const result = await login({ ...formData, remember_me: rememberMe });
       if (result.requires2fa) {
-        navigate('/auth/2fa', { state: { tempToken: result.tempToken }, replace: true });
+        navigate('/auth/2fa', { state: { tempToken: result.tempToken, from }, replace: true });
         return;
       }
       setSuccess({ message: 'Welcome back! Taking you in...' });
@@ -255,7 +255,7 @@ export default function SignIn() {
                   className="auth-primary-btn w-full disabled:opacity-60 disabled:cursor-not-allowed font-semibold py-3.5 transition-colors text-[15px] flex items-center justify-center gap-2"
                 >
                   {loading ? (
-                    <span className="w-4 h-4 border-2 border-white/30 border-t-white  animate-spin" />
+                    <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" aria-hidden="true" />
                   ) : 'Log in'}
                 </button>
               </form>

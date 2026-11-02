@@ -112,7 +112,7 @@ const MaterialPickerModal = ({ tab, setTab, search, setSearch, selected, onToggl
                 <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-slate-100 shrink-0">
                     <h3 className="font-semibold text-[15px] text-slate-800">Add Materials</h3>
                     <button onClick={onClose} className="w-8 h-8  flex items-center justify-center text-slate-400 hover:bg-slate-100 transition-colors">
-                        <span className="material-icons-round text-[18px]">close</span>
+                        <span className="material-symbols-outlined text-[18px]">close</span>
                     </button>
                 </div>
 
@@ -120,7 +120,7 @@ const MaterialPickerModal = ({ tab, setTab, search, setSearch, selected, onToggl
                     {Object.keys(LIBRARY_ENDPOINTS).map(t => (
                         <button key={t} onClick={() => { setTab(t); setSearch(''); }}
                             className={`flex items-center gap-1.5 px-3 py-1.5  text-[12px] font-semibold whitespace-nowrap transition-all ${tab === t ? `${TAB_BG[t]} ${TAB_COLORS[t]}` : 'text-slate-400 hover:bg-slate-50'}`}>
-                            <span className="material-icons-round text-[14px]">{TAB_ICONS[t]}</span>
+                            <span className="material-symbols-outlined text-[14px]">{TAB_ICONS[t]}</span>
                             {t}
                         </button>
                     ))}
@@ -128,7 +128,7 @@ const MaterialPickerModal = ({ tab, setTab, search, setSearch, selected, onToggl
 
                 <div className="px-4 pb-2 shrink-0">
                     <div className="relative">
-                        <span className="material-icons-round absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 text-[16px]">search</span>
+                        <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 text-[16px]">search</span>
                         <input value={search} onChange={e => setSearch(e.target.value)}
                             placeholder={`Search ${tab.toLowerCase()}…`}
                             className="w-full bg-slate-50 border border-slate-200  pl-9 pr-4 py-2 text-[13px] outline-none focus:border-primary/40 transition-colors" />
@@ -138,13 +138,13 @@ const MaterialPickerModal = ({ tab, setTab, search, setSearch, selected, onToggl
                 <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-1.5 min-h-0">
                     {loading[tab] && (
                         <div className="py-10 flex flex-col items-center gap-2 text-slate-300">
-                            <span className="w-6 h-6 border-2 border-slate-200 border-t-primary  animate-spin" />
+                            <span className="w-6 h-6 border-2 border-slate-200 border-t-primary  animate-spin rounded-full" />
                             <p className="text-[13px]">Loading…</p>
                         </div>
                     )}
                     {!loading[tab] && items.length === 0 && (
                         <div className="py-10 flex flex-col items-center gap-2 text-slate-300">
-                            <span className="material-icons-round text-4xl">search_off</span>
+                            <span className="material-symbols-outlined text-4xl">search_off</span>
                             <p className="text-[13px]">Nothing found</p>
                         </div>
                     )}
@@ -154,11 +154,11 @@ const MaterialPickerModal = ({ tab, setTab, search, setSearch, selected, onToggl
                             <button key={item.id} onClick={() => onToggle(tab, item)}
                                 className={`w-full flex items-center gap-3 p-3  border transition-all text-left ${checked ? `${TAB_BG[tab]} border-primary/20` : 'border-slate-100 hover:bg-slate-50'}`}>
                                 <div className={`w-9 h-9  flex items-center justify-center shrink-0 ${checked ? TAB_BG[tab] : 'bg-slate-100'}`}>
-                                    <span className={`material-icons-round text-[16px] ${checked ? TAB_COLORS[tab] : 'text-slate-400'}`}>{TAB_ICONS[tab]}</span>
+                                    <span className={`material-symbols-outlined text-[16px] ${checked ? TAB_COLORS[tab] : 'text-slate-400'}`}>{TAB_ICONS[tab]}</span>
                                 </div>
                                 <p className="flex-1 text-[13px] font-semibold text-slate-800 truncate">{item.title}</p>
                                 <div className={`w-5 h-5  border-2 flex items-center justify-center shrink-0 transition-all ${checked ? 'bg-primary border-primary' : 'border-slate-300'}`}>
-                                    {checked && <span className="material-icons-round text-white text-[12px]">check</span>}
+                                    {checked && <span className="material-symbols-outlined text-white text-[12px]">check</span>}
                                 </div>
                             </button>
                         );
@@ -262,9 +262,9 @@ const CreateStudyPlanScreen = ({ onBack, onCreated, initialName = '', initialDat
         return (
             <div className="flex-1 flex flex-col items-center justify-center gap-6 bg-slate-50 lg:ml-64 pt-20 lg:pt-0 min-h-screen">
                 <div className="relative">
-                    <div className="w-24 h-24  border-4 border-primary/20 border-t-primary animate-spin" />
+                    <div className="w-24 h-24  border-4 border-primary/20 border-t-primary animate-spin rounded-full" />
                     <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="material-icons-round text-primary text-[28px]">event_note</span>
+                        <span className="material-symbols-outlined text-primary text-[28px]">event_note</span>
                     </div>
                 </div>
                 <div className="text-center max-w-xs">
@@ -281,7 +281,7 @@ const CreateStudyPlanScreen = ({ onBack, onCreated, initialName = '', initialDat
             <div className="sticky top-0 z-20 bg-slate-50/90 backdrop-blur px-6 py-4 flex items-center justify-between border-b border-slate-200/60">
                 <button onClick={step > 1 ? () => setStep(s => s - 1) : onBack}
                     className="flex items-center gap-2 text-slate-700 hover:text-primary font-semibold text-[14px] transition-colors">
-                    <span className="material-icons-round text-[20px]">arrow_back</span>
+                    <span className="material-symbols-outlined text-[20px]">arrow_back</span>
                     <span className="hidden sm:inline">{step > 1 ? 'Back' : 'Study Planner'}</span>
                 </button>
                 <div className="flex items-center gap-3">
@@ -324,14 +324,14 @@ const CreateStudyPlanScreen = ({ onBack, onCreated, initialName = '', initialDat
                                 className="w-full flex items-center justify-between p-4 border-2 border-dashed border-slate-200  hover:border-primary/40 hover:bg-primary/5 transition-all group">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10  bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                                        <span className="material-icons-round text-primary text-[20px]">add</span>
+                                        <span className="material-symbols-outlined text-primary text-[20px]">add</span>
                                     </div>
                                     <div className="text-left">
                                         <p className="font-semibold text-slate-700 text-[14px]">Add from library</p>
                                         <p className="text-slate-400 text-[12px]">{totalSelected} item{totalSelected !== 1 ? 's' : ''} selected</p>
                                     </div>
                                 </div>
-                                <span className="material-icons-round text-slate-300 text-[20px]">chevron_right</span>
+                                <span className="material-symbols-outlined text-slate-300 text-[20px]">chevron_right</span>
                             </button>
 
                             {totalSelected > 0 && (
@@ -339,10 +339,10 @@ const CreateStudyPlanScreen = ({ onBack, onCreated, initialName = '', initialDat
                                     {Object.entries(selected).flatMap(([tab, items]) =>
                                         items.map(item => (
                                             <div key={item.id} className="flex items-center gap-2 px-3 py-2 bg-slate-50 ">
-                                                <span className={`material-icons-round text-[14px] ${TAB_COLORS[tab]}`}>{TAB_ICONS[tab]}</span>
+                                                <span className={`material-symbols-outlined text-[14px] ${TAB_COLORS[tab]}`}>{TAB_ICONS[tab]}</span>
                                                 <p className="flex-1 text-[13px] font-medium text-slate-700 truncate">{item.title}</p>
                                                 <button onClick={() => toggleMaterial(tab, item)} className="text-slate-300 hover:text-red-400 transition-colors">
-                                                    <span className="material-icons-round text-[16px]">close</span>
+                                                    <span className="material-symbols-outlined text-[16px]">close</span>
                                                 </button>
                                             </div>
                                         ))
@@ -408,7 +408,7 @@ const CreateStudyPlanScreen = ({ onBack, onCreated, initialName = '', initialDat
                             </div>
                             {endDate && startDate && (
                                 <div className="bg-primary/5  px-4 py-3 flex items-center gap-2">
-                                    <span className="material-icons-round text-primary text-[18px]">info</span>
+                                    <span className="material-symbols-outlined text-primary text-[18px]">info</span>
                                     <p className="text-[13px] text-primary font-medium">
                                         {daysLeft(endDate)} days until exam · Schola will distribute sessions across active days
                                     </p>
@@ -434,7 +434,7 @@ const CreateStudyPlanScreen = ({ onBack, onCreated, initialName = '', initialDat
                                     <div key={act.id}
                                         className={`bg-white  p-5 shadow-[0_10px_30px_rgba(44,47,50,0.06)] flex items-start gap-4 transition-all ${!on ? 'opacity-50' : ''}`}>
                                         <div className={`w-12 h-12  flex items-center justify-center shrink-0 ${col.bg}`}>
-                                            <span className={`material-icons-round text-[22px] ${col.icon}`}>{act.icon}</span>
+                                            <span className={`material-symbols-outlined text-[22px] ${col.icon}`}>{act.icon}</span>
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center justify-between mb-1">
@@ -449,7 +449,7 @@ const CreateStudyPlanScreen = ({ onBack, onCreated, initialName = '', initialDat
                         </div>
                         {genError && (
                             <p className="text-sm text-red-500 bg-red-50  px-4 py-3 flex items-center gap-2">
-                                <span className="material-icons-round text-[16px]">error_outline</span>
+                                <span className="material-symbols-outlined text-[16px]">error_outline</span>
                                 {genError}
                             </p>
                         )}
@@ -461,19 +461,19 @@ const CreateStudyPlanScreen = ({ onBack, onCreated, initialName = '', initialDat
             <div className="fixed bottom-0 left-0 lg:left-64 right-0 z-50 flex justify-between items-center px-6 py-4 bg-white/90 backdrop-blur-xl border-t border-slate-100 shadow-[0_-4px_20px_rgba(44,47,50,0.08)]">
                 <button onClick={step > 1 ? () => setStep(s => s - 1) : onBack}
                     className="flex items-center gap-2 px-5 py-2.5  text-slate-600 font-semibold text-[14px] hover:bg-slate-100 transition-all">
-                    <span className="material-icons-round text-[18px]">arrow_back</span>
+                    <span className="material-symbols-outlined text-[18px]">arrow_back</span>
                     Back
                 </button>
                 {!isLast ? (
                     <button onClick={() => setStep(s => s + 1)} disabled={!canNext}
                         className="flex items-center gap-2 px-7 py-2.5 bg-primary text-white  font-bold text-[14px] shadow-lg shadow-primary/25 hover:bg-primary/90 active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
                         Continue
-                        <span className="material-icons-round text-[18px]">arrow_forward</span>
+                        <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
                     </button>
                 ) : (
                     <button onClick={handleGenerate} disabled={submitting}
                         className="flex items-center gap-2 px-7 py-2.5 bg-primary text-white  font-bold text-[14px] shadow-lg shadow-primary/25 hover:bg-primary/90 active:scale-95 transition-all disabled:opacity-40">
-                        <span className="material-icons-round text-[18px]">auto_awesome</span>
+                        <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
                         Generate Plan
                     </button>
                 )}
@@ -506,9 +506,9 @@ const GeneratingOverlay = ({ plan, onReady, onFailed }) => {
     return (
         <div className="absolute inset-0 z-20 bg-white/90 backdrop-blur flex flex-col items-center justify-center gap-6 ">
             <div className="relative">
-                <div className="w-20 h-20  border-4 border-primary/20 border-t-primary animate-spin" />
+                <div className="w-20 h-20  border-4 border-primary/20 border-t-primary animate-spin rounded-full" />
                 <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="material-icons-round text-primary text-[24px]">event_note</span>
+                    <span className="material-symbols-outlined text-primary text-[24px]">event_note</span>
                 </div>
             </div>
             <div className="text-center max-w-xs px-4">
@@ -591,14 +591,14 @@ const PlanDetailScreen = ({ plan: initialPlan, onBack, onPlanUpdate }) => {
             <div className="flex items-start gap-3 mb-6">
                 <button onClick={onBack}
                     className="w-9 h-9  bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-50 transition-colors shadow-sm shrink-0 mt-0.5">
-                    <span className="material-icons-round text-[20px]">arrow_back</span>
+                    <span className="material-symbols-outlined text-[20px]">arrow_back</span>
                 </button>
                 <div className="flex-1 min-w-0">
                     <h1 className="text-xl md:text-2xl font-bold text-slate-900 truncate">{plan.name}</h1>
                     <div className="flex items-center gap-3 mt-1 flex-wrap">
                         <span className={`text-[11px] font-bold px-2.5 py-1  ${sm.bg} ${sm.text}`}>{sm.label}</span>
                         <span className="text-[12px] text-slate-400 flex items-center gap-1">
-                            <span className="material-icons-round text-[14px]">event</span>
+                            <span className="material-symbols-outlined text-[14px]">event</span>
                             Exam: {formatDate(plan.exam_date)}
                         </span>
                         {days_left > 0 && (
@@ -611,7 +611,7 @@ const PlanDetailScreen = ({ plan: initialPlan, onBack, onPlanUpdate }) => {
 
             {isFailed && (
                 <div className="bg-red-50 border border-red-200  p-5 mb-6 flex items-center gap-3">
-                    <span className="material-icons-round text-red-500 text-[24px]">error_outline</span>
+                    <span className="material-symbols-outlined text-red-500 text-[24px]">error_outline</span>
                     <div>
                         <p className="font-semibold text-red-700">Generation failed</p>
                         <p className="text-[13px] text-red-500 mt-0.5">Schola couldn't build your plan. Go back and try again.</p>
@@ -647,7 +647,7 @@ const PlanDetailScreen = ({ plan: initialPlan, onBack, onPlanUpdate }) => {
             {/* Schedule */}
             {!isGenerating && filteredDays.length === 0 ? (
                 <div className="py-16 flex flex-col items-center text-center text-slate-300">
-                    <span className="material-icons-round text-5xl mb-3">event_busy</span>
+                    <span className="material-symbols-outlined text-5xl mb-3">event_busy</span>
                     <p className="font-semibold text-slate-400">Nothing here for this filter</p>
                 </div>
             ) : (
@@ -668,7 +668,7 @@ const PlanDetailScreen = ({ plan: initialPlan, onBack, onPlanUpdate }) => {
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <span className="text-[11px] text-slate-400">{doneCnt}/{day.tasks.length}</span>
-                                        {allDone && <span className="material-icons-round text-emerald-500 text-[16px]">check_circle</span>}
+                                        {allDone && <span className="material-symbols-outlined text-emerald-500 text-[16px]">check_circle</span>}
                                     </div>
                                 </div>
                                 <div className="divide-y divide-slate-50">
@@ -679,7 +679,7 @@ const PlanDetailScreen = ({ plan: initialPlan, onBack, onPlanUpdate }) => {
                                                 onClick={() => toggleTask(day.date, task.id)}
                                                 className={`w-full flex items-center gap-3 px-5 py-3.5 text-left transition-colors hover:bg-slate-50 ${task.done ? 'opacity-50' : ''}`}>
                                                 <div className={`w-8 h-8  flex items-center justify-center shrink-0 ${col.bg}`}>
-                                                    <span className={`material-icons-round text-[15px] ${col.icon}`}>
+                                                    <span className={`material-symbols-outlined text-[15px] ${col.icon}`}>
                                                         {ACTIVITY_TYPES.find(a => a.id === task.type)?.icon ?? 'menu_book'}
                                                     </span>
                                                 </div>
@@ -692,7 +692,7 @@ const PlanDetailScreen = ({ plan: initialPlan, onBack, onPlanUpdate }) => {
                                                     </p>
                                                 </div>
                                                 <div className={`w-5 h-5  border-2 flex items-center justify-center shrink-0 transition-all ${task.done ? 'bg-emerald-500 border-emerald-500' : 'border-slate-300'}`}>
-                                                    {task.done && <span className="material-icons-round text-white text-[12px]">check</span>}
+                                                    {task.done && <span className="material-symbols-outlined text-white text-[12px]">check</span>}
                                                 </div>
                                             </button>
                                         );
@@ -731,7 +731,7 @@ const PlansLandingScreen = ({ onOpen, onGenerate }) => {
     if (loading) {
         return (
             <main className="flex-1 overflow-y-auto bg-slate-50 lg:ml-64 p-4 lg:p-8 pt-20 lg:pt-8 flex items-center justify-center">
-                <span className="w-8 h-8 border-2 border-slate-200 border-t-primary  animate-spin" />
+                <span className="w-8 h-8 border-2 border-slate-200 border-t-primary  animate-spin rounded-full" />
             </main>
         );
     }
@@ -747,7 +747,7 @@ const PlansLandingScreen = ({ onOpen, onGenerate }) => {
                 <div className="flex items-center gap-4">
                     <button onClick={onGenerate}
                         className="flex items-center gap-2 px-5 py-3  font-bold text-[13px] text-white shadow-xl bg-primary hover:bg-primary/90 active:scale-95 transition-all">
-                        <span className="material-icons-round text-[18px]">auto_awesome</span>
+                        <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
                         <span className="hidden sm:inline">New Plan</span>
                     </button>
                     <NotificationIcon />
@@ -757,7 +757,7 @@ const PlansLandingScreen = ({ onOpen, onGenerate }) => {
             {plans.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-24 text-center">
                     <div className="w-20 h-20  bg-primary/10 flex items-center justify-center mb-5">
-                        <span className="material-icons-round text-primary text-[40px]">event_note</span>
+                        <span className="material-symbols-outlined text-primary text-[40px]">event_note</span>
                     </div>
                     <h3 className="text-xl font-bold text-slate-800 mb-2">No study plans yet</h3>
                     <p className="text-slate-400 text-[14px] max-w-xs leading-relaxed mb-6">
@@ -765,7 +765,7 @@ const PlansLandingScreen = ({ onOpen, onGenerate }) => {
                     </p>
                     <button onClick={onGenerate}
                         className="flex items-center gap-2 px-6 py-3  bg-primary text-white font-bold text-[14px] shadow-lg shadow-primary/25 hover:bg-primary/90 active:scale-95 transition-all">
-                        <span className="material-icons-round text-[18px]">auto_awesome</span>
+                        <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
                         Create My First Plan
                     </button>
                 </div>
@@ -804,7 +804,7 @@ const PlansLandingScreen = ({ onOpen, onGenerate }) => {
                                     </button>
                                     <button onClick={() => handleDelete(plan.id)}
                                         className="p-2  text-slate-300 hover:text-red-500 hover:bg-red-50 transition-colors">
-                                        <span className="material-icons-round text-[18px]">delete_outline</span>
+                                        <span className="material-symbols-outlined text-[18px]">delete_outline</span>
                                     </button>
                                 </div>
                             </div>
@@ -812,7 +812,7 @@ const PlansLandingScreen = ({ onOpen, onGenerate }) => {
                     })}
                     <button onClick={onGenerate}
                         className="w-full bg-white  border-2 border-dashed border-slate-200 p-8 flex items-center justify-center gap-3 text-slate-400 hover:border-primary/40 hover:text-primary transition-all">
-                        <span className="material-icons-round text-[22px]">add_circle</span>
+                        <span className="material-symbols-outlined text-[22px]">add_circle</span>
                         <span className="font-semibold text-[14px]">Create another plan</span>
                     </button>
                 </div>

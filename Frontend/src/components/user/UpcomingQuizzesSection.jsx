@@ -31,7 +31,7 @@ const ChallengeCard = ({ challenge, onClick }) => {
         >
             <div className="flex items-center justify-between mb-3">
                 <div className="w-8 h-8  bg-stone-100 flex items-center justify-center text-stone-600">
-                    <span className="material-icons-round text-[17px]">{meta.icon}</span>
+                    <span className="material-symbols-outlined text-[17px]">{meta.icon}</span>
                 </div>
                 <span className={`${STATUS_BADGE[challenge.status] ?? 'bg-stone-100 text-stone-500'} text-[10px] font-medium px-2 py-0.5 `}>
                     {STATUS_LABEL[challenge.status] ?? challenge.status}
@@ -42,7 +42,7 @@ const ChallengeCard = ({ challenge, onClick }) => {
             <p className="text-stone-500 text-[12.5px] leading-relaxed mt-1 line-clamp-2">{challenge.description}</p>
 
             <div className="mt-3.5 flex items-center gap-1.5 text-[11px] text-stone-400">
-                <span className="material-icons-round text-[14px]">calendar_today</span>
+                <span className="material-symbols-outlined text-[14px]">calendar_today</span>
                 Day {challenge.challenge_order}
             </div>
         </button>
@@ -98,7 +98,7 @@ const UpcomingQuizzesSection = () => {
                 {!loading && !sprint && (
                     <div className="bg-white p-6  ring-1 ring-stone-200/70 text-center">
                         <div className="w-11 h-11  bg-plum-50 text-plum-700 flex items-center justify-center mx-auto mb-3">
-                            <span className="material-icons-round text-[22px]">event_note</span>
+                            <span className="material-symbols-outlined text-[22px]">event_note</span>
                         </div>
                         <p className="text-stone-600 text-[13.5px] font-medium">No active sprint</p>
                         <p className="text-stone-400 text-[12px] mt-1 leading-relaxed">
@@ -109,7 +109,7 @@ const UpcomingQuizzesSection = () => {
                             className="mt-4 inline-flex items-center gap-1 text-[12.5px] font-semibold text-plum-700 hover:text-plum-600 transition-colors"
                         >
                             Start a sprint
-                            <span className="material-icons-round text-[15px]">arrow_forward</span>
+                            <span className="material-symbols-outlined text-[15px]">arrow_forward</span>
                         </button>
                     </div>
                 )}
@@ -118,7 +118,7 @@ const UpcomingQuizzesSection = () => {
                 {!loading && sprint && challenges.length === 0 && (
                     <div className="bg-white p-6  ring-1 ring-stone-200/70 text-center">
                         <div className="w-11 h-11  bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-3">
-                            <span className="material-icons-round text-[22px]">check_circle</span>
+                            <span className="material-symbols-outlined text-[22px]">check_circle</span>
                         </div>
                         <p className="text-stone-700 text-[13.5px] font-medium">All caught up</p>
                         <p className="text-stone-400 text-[12px] mt-1">No pending challenges right now.</p>
@@ -141,7 +141,7 @@ const UpcomingQuizzesSection = () => {
                         className="w-full flex items-center justify-center gap-1 pt-1 text-[13px] font-semibold text-plum-700 hover:text-plum-600 transition-colors"
                     >
                         View all sprints
-                        <span className="material-icons-round text-[15px]">arrow_forward</span>
+                        <span className="material-symbols-outlined text-[15px]">arrow_forward</span>
                     </button>
                 )}
             </div>

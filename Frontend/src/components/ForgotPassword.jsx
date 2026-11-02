@@ -88,7 +88,7 @@ export default function ForgotPassword() {
               type="submit"
             >
               {loading ? (
-                <span className="w-4 h-4 border-2 border-white/30 border-t-white  animate-spin" />
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white  animate-spin rounded-full" />
               ) : (
                 'Send reset link'
               )}
@@ -112,7 +112,7 @@ export default function ForgotPassword() {
               className="w-full border border-stone-300 text-stone-800 disabled:opacity-50  py-3.5 font-semibold text-[14px] hover:border-stone-900 transition-colors flex items-center justify-center gap-2"
             >
               {loading ? (
-                <span className="w-4 h-4 border-2 border-stone-400/30 border-t-stone-900  animate-spin" />
+                <span className="w-4 h-4 border-2 border-stone-400/30 border-t-stone-900  animate-spin rounded-full" />
               ) : (
                 <>
                   <span className="material-symbols-outlined text-[18px]">replay</span>

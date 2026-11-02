@@ -49,7 +49,7 @@ const CARD_CLASS =
 
 const Chip = ({ bg, text, icon, size = 'md' }) => (
   <div className={`${bg} ${text} ${size === 'sm' ? 'w-7 h-7 ' : 'w-9 h-9 '} flex items-center justify-center shrink-0`}>
-    <span className={`material-icons-round ${size === 'sm' ? 'text-[15px]' : 'text-[18px]'}`}>{icon}</span>
+    <span className={`material-symbols-outlined ${size === 'sm' ? 'text-[15px]' : 'text-[18px]'}`}>{icon}</span>
   </div>
 );
 
@@ -120,7 +120,7 @@ const PresentationMiniCard = ({ pres, onClick }) => (
       className="relative w-full aspect-[16/9] flex items-center justify-center overflow-hidden"
       style={{ background: THEME_BG[pres.theme] ?? '#0f172a' }}
     >
-      <span className="material-icons-round text-white/30 text-[30px]">slideshow</span>
+      <span className="material-symbols-outlined text-white/30 text-[30px]">slideshow</span>
       <span className="absolute bottom-2 right-2  bg-stone-950/50 text-white/90 text-[9.5px] font-medium px-2 py-0.5">
         {pres.slide_count ?? 0} slides
       </span>
@@ -173,7 +173,7 @@ const TabDropdown = ({ activeTab, onChange }) => {
       >
         <Chip bg="bg-plum-50" text="text-plum-700" icon={current.icon} size="sm" />
         <span className="text-[15px] font-semibold text-stone-800">Recent {current.label}</span>
-        <span className={`material-icons-round text-[17px] text-stone-400 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}>
+        <span className={`material-symbols-outlined text-[17px] text-stone-400 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}>
           expand_more
         </span>
       </button>
@@ -188,10 +188,10 @@ const TabDropdown = ({ activeTab, onChange }) => {
                 ${tab.id === activeTab ? 'bg-plum-50 text-plum-800 font-semibold' : 'font-medium text-stone-600 hover:bg-stone-50'}`}
             >
               <span className={`w-6 h-6  flex items-center justify-center ${tab.id === activeTab ? 'bg-white/70 text-plum-700' : 'bg-stone-100 text-stone-500'}`}>
-                <span className="material-icons-round text-[13px]">{tab.icon}</span>
+                <span className="material-symbols-outlined text-[13px]">{tab.icon}</span>
               </span>
               {tab.label}
-              {tab.id === activeTab && <span className="material-icons-round text-[14px] text-plum-700 ml-auto">check</span>}
+              {tab.id === activeTab && <span className="material-symbols-outlined text-[14px] text-plum-700 ml-auto">check</span>}
             </button>
           ))}
         </div>
@@ -270,7 +270,7 @@ export default function RecentNotesSection() {
   const isLoading = loading[activeTab] ?? false;
 
   const emptyCopy = {
-    notes: 'No notes yet — start with a blank page.',
+    notes: 'No notes yet, start with a blank page.',
     papers: 'No papers yet.',
     folders: 'No folders yet.',
     presentations: 'No slides yet.',
@@ -330,7 +330,7 @@ export default function RecentNotesSection() {
           className="text-[13px] font-semibold text-plum-700 hover:text-plum-600 flex items-center gap-1 transition-colors"
         >
           View all
-          <span className="material-icons-round text-[15px]">arrow_forward</span>
+          <span className="material-symbols-outlined text-[15px]">arrow_forward</span>
         </Link>
       </div>
 
@@ -341,7 +341,7 @@ export default function RecentNotesSection() {
       ) : items.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 gap-3 text-center bg-white/50  ring-1 ring-stone-200/60">
           <div className="w-12 h-12  flex items-center justify-center bg-plum-50 text-plum-700">
-            <span className="material-icons-round text-[22px]">{current?.icon}</span>
+            <span className="material-symbols-outlined text-[22px]">{current?.icon}</span>
           </div>
           <p className="text-sm text-stone-500 max-w-xs">{emptyCopy[activeTab]}</p>
         </div>

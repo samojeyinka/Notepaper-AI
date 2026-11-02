@@ -40,15 +40,15 @@ export const SlideToolbar = ({ slide, onChange, onAddSlide, onMoveUp, onMoveDown
                     <div className="ml-auto flex items-center gap-0.5 md:gap-1 shrink-0">
                         <button onClick={onMoveUp} disabled={!canMoveUp}
                             className="w-6 h-6 flex items-center justify-center  text-stone-400 hover:bg-stone-100 disabled:opacity-20 disabled:cursor-not-allowed transition-all">
-                            <span className="material-icons-round text-[14px]">arrow_upward</span>
+                            <span className="material-symbols-outlined text-[14px]">arrow_upward</span>
                         </button>
                         <button onClick={onMoveDown} disabled={!canMoveDown}
                             className="w-6 h-6 flex items-center justify-center  text-stone-400 hover:bg-stone-100 disabled:opacity-20 disabled:cursor-not-allowed transition-all">
-                            <span className="material-icons-round text-[14px]">arrow_downward</span>
+                            <span className="material-symbols-outlined text-[14px]">arrow_downward</span>
                         </button>
                         <button onClick={onAddSlide}
                             className="flex items-center gap-0.5 px-2 py-0.5  text-[10px] md:text-[11px] font-semibold text-plum-700 bg-plum-50 hover:bg-plum-100 transition-colors">
-                            <span className="material-icons-round text-[12px]">add</span>
+                            <span className="material-symbols-outlined text-[12px]">add</span>
                             <span className="hidden sm:inline">Slide</span>
                         </button>
                         <span className="text-[10px] text-stone-400 ml-0.5 tabular-nums whitespace-nowrap">{slideNum}/{total}</span>
@@ -62,20 +62,20 @@ export const SlideToolbar = ({ slide, onChange, onAddSlide, onMoveUp, onMoveDown
                     {hasBody && (<>
                         <button onClick={() => set({listStyle:'bullet'})} title="Bullets"
                             className={`w-6 h-6 flex items-center justify-center  transition-all shrink-0 ${!isNumbered&&!isText?'bg-stone-900 text-white':'text-stone-500 hover:bg-stone-100'}`}>
-                            <span className="material-icons-round text-[13px]">format_list_bulleted</span>
+                            <span className="material-symbols-outlined text-[13px]">format_list_bulleted</span>
                         </button>
                         <button onClick={() => set({listStyle:'numbered'})} title="Numbered"
                             className={`w-6 h-6 flex items-center justify-center  transition-all shrink-0 ${isNumbered?'bg-stone-900 text-white':'text-stone-500 hover:bg-stone-100'}`}>
-                            <span className="material-icons-round text-[13px]">format_list_numbered</span>
+                            <span className="material-symbols-outlined text-[13px]">format_list_numbered</span>
                         </button>
                         <button onClick={() => set({listStyle:'text'})} title="Free text"
                             className={`w-6 h-6 flex items-center justify-center  transition-all shrink-0 ${isText?'bg-stone-900 text-white':'text-stone-500 hover:bg-stone-100'}`}>
-                            <span className="material-icons-round text-[13px]">notes</span>
+                            <span className="material-symbols-outlined text-[13px]">notes</span>
                         </button>
                         {(slide.bullets??[]).length < 7 && (
                             <button onClick={() => set({bullets:[...(slide.bullets??[]),''] })}
                                 className="flex items-center gap-0.5 px-1.5 py-0.5  text-[10px] md:text-[11px] font-semibold text-stone-500 hover:bg-stone-100 transition-all shrink-0">
-                                <span className="material-icons-round text-[12px]">add</span>
+                                <span className="material-symbols-outlined text-[12px]">add</span>
                                 {isText ? 'Para' : 'Point'}
                             </button>
                         )}
@@ -136,7 +136,7 @@ export const SlideToolbar = ({ slide, onChange, onAddSlide, onMoveUp, onMoveDown
                     {!slide.image ? (
                         <button onClick={onImageUpload}
                             className="flex items-center gap-0.5 px-1.5 py-0.5  text-[10px] md:text-[11px] font-semibold text-stone-500 hover:bg-stone-100 transition-all shrink-0">
-                            <span className="material-icons-round text-[12px]">image</span>
+                            <span className="material-symbols-outlined text-[12px]">image</span>
                             Image
                         </button>
                     ) : (<>
@@ -152,7 +152,7 @@ export const SlideToolbar = ({ slide, onChange, onAddSlide, onMoveUp, onMoveDown
                         </div>
                         <button onClick={() => set({image:null})}
                             className="flex items-center gap-0.5 px-1.5 py-0.5  text-[10px] md:text-[11px] font-semibold text-red-500 hover:bg-red-50 transition-all shrink-0">
-                            <span className="material-icons-round text-[12px]">hide_image</span>
+                            <span className="material-symbols-outlined text-[12px]">hide_image</span>
                             Remove
                         </button>
                     </>)}
@@ -163,7 +163,7 @@ export const SlideToolbar = ({ slide, onChange, onAddSlide, onMoveUp, onMoveDown
                     <button onClick={() => setShowBgModal(true)}
                         className={`flex items-center gap-1 px-1.5 md:px-2 py-0.5  text-[10px] md:text-[11px] font-semibold transition-colors shrink-0 border ${hasBgOverride?'border-plum-400 text-plum-700 bg-plum-50':'border-stone-200 text-stone-500 hover:bg-stone-100'}`}
                         title="Background & Theme">
-                        <span className="material-icons-round text-[13px]">palette</span>
+                        <span className="material-symbols-outlined text-[13px]">palette</span>
                         BG &amp; Theme
                         {hasBgOverride && <span className="w-1.5 h-1.5 rounded-full bg-plum-600 shrink-0" />}
                     </button>

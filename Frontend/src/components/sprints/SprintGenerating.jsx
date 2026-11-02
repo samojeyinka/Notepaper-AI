@@ -76,7 +76,7 @@ const SprintGenerating = ({ sprint, onReady }) => {
                 {/* Info card */}
                 <div className="bg-white border border-stone-200 p-5 md:p-6 text-left mt-7">
                     <div className="flex items-start gap-3">
-                        <span className="material-icons-round text-plum-600 text-[20px] mt-0.5 shrink-0">info</span>
+                        <span className="material-symbols-outlined text-plum-600 text-[20px] mt-0.5 shrink-0">info</span>
                         <p className="text-[13px] text-stone-600 leading-relaxed">
                             This usually takes <span className="font-semibold text-stone-800">2–4 minutes</span>. You can safely go back — come back to this sprint when you're ready.
                         </p>

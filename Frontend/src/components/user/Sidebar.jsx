@@ -4,9 +4,8 @@ import { UserProfileCard } from "./UserProfileCard";
 import { AiKeyReminder } from "./AiKeyReminder";
 
 const Wordmark = () => (
-  <Link to="/" className="dashboard-wordmark">
-    <span className="dashboard-wordmark-name">Notepaper</span>
-    <span className="dashboard-wordmark-ai">AI</span>
+  <Link to="/" aria-label="Notepaper AI home" className="dashboard-wordmark">
+    <img src="/logo.png" alt="Notepaper AI" className="w-[180px] max-w-full h-[56px] object-contain object-left" />
   </Link>
 );
 
@@ -32,7 +31,7 @@ export const Sidebar = ({ activePage }) => {
           aria-label="Toggle menu"
           className="dashboard-menu-toggle p-2 -mr-1 transition-colors"
         >
-          <span className="material-icons-round text-[22px]">
+          <span className="material-symbols-outlined text-[22px]">
             {isMobileMenuOpen ? 'close' : 'menu'}
           </span>
         </button>

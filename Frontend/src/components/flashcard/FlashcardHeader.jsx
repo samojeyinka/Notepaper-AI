@@ -31,7 +31,7 @@ export const FlashcardHeader = ({
                 onClick={() => navigate(backPath)}
                 className="flex items-center gap-1 text-stone-400 hover:text-stone-700 transition-colors"
             >
-                <span className="material-icons-round text-[16px] md:text-[20px]">arrow_back</span>
+                <span className="material-symbols-outlined text-[16px] md:text-[20px]">arrow_back</span>
                 <span className="text-[11px] md:text-sm hidden sm:inline truncate max-w-[80px] md:max-w-[120px]">{backLabel}</span>
             </button>
 
@@ -52,13 +52,13 @@ export const FlashcardHeader = ({
                 )}
                 {saveStatus === 'saved' && (
                     <span className="flex items-center gap-1 px-2 py-1 bg-emerald-50 text-emerald-600 text-[9px] md:text-[10px] font-semibold uppercase tracking-wider">
-                        <span className="material-icons-round text-[11px]">cloud_done</span>
+                        <span className="material-symbols-outlined text-[11px]">cloud_done</span>
                         Saved
                     </span>
                 )}
                 {saveStatus === 'error' && (
                     <span className="flex items-center gap-1 px-2 py-1 bg-red-50 text-red-500 text-[9px] md:text-[10px] font-semibold uppercase tracking-wider">
-                        <span className="material-icons-round text-[11px]">cloud_off</span>
+                        <span className="material-symbols-outlined text-[11px]">cloud_off</span>
                         Unsaved
                     </span>
                 )}
@@ -91,7 +91,7 @@ export const FlashcardHeader = ({
                         onClick={() => setMenuOpen(v => !v)}
                         className="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center text-stone-400 hover:bg-stone-100 hover:text-stone-700 transition-colors"
                     >
-                        <span className="material-icons-round text-[16px] md:text-[20px]">more_vert</span>
+                        <span className="material-symbols-outlined text-[16px] md:text-[20px]">more_vert</span>
                     </button>
 
                     {menuOpen && (
@@ -110,7 +110,7 @@ export const FlashcardHeader = ({
                                         }}
                                         className="w-full flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-2.5 text-[12px] md:text-sm text-stone-700 hover:bg-stone-50 transition-colors"
                                     >
-                                        <span className="material-icons-round text-[13px] md:text-[17px] text-stone-400">share</span>
+                                        <span className="material-symbols-outlined text-[13px] md:text-[17px] text-stone-400">share</span>
                                         Share Link
                                     </button>
                                     <div className="h-px bg-stone-100 my-1" />
@@ -120,7 +120,7 @@ export const FlashcardHeader = ({
                                 onClick={() => { setMenuOpen(false); onDuplicate?.(); }}
                                 className="w-full flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-2.5 text-[12px] md:text-sm text-stone-700 hover:bg-stone-50 transition-colors"
                             >
-                                <span className="material-icons-round text-[13px] md:text-[17px] text-stone-400">content_copy</span>
+                                <span className="material-symbols-outlined text-[13px] md:text-[17px] text-stone-400">content_copy</span>
                                 Duplicate
                             </button>
                             <div className="h-px bg-stone-100 my-1" />
@@ -128,7 +128,7 @@ export const FlashcardHeader = ({
                                 onClick={() => { setMenuOpen(false); onDelete?.(); }}
                                 className="w-full flex items-center  gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-2.5 text-[12px] md:text-sm text-red-500 hover:bg-red-50 transition-colors"
                             >
-                                <span className="material-icons-round text-[13px] md:text-[17px]">delete_outline</span>
+                                <span className="material-symbols-outlined text-[13px] md:text-[17px]">delete_outline</span>
                                 Delete
                             </button>
                         </div>

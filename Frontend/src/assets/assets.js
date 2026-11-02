@@ -1,7 +1,5 @@
 import logo from "./logo.png";
 import notepaperMark from "./notepaper-mark.svg";
-import paystack from "./paystack.png";
-import paypal from "./paypal.png";
 import shakespeare from "./logos/shakespeare.png";
 import shakespearepurple from "./logos/shakespearepurple.png";
 import naomi from "./logos/naomi.png";
@@ -14,8 +12,6 @@ import craftmanship from "./craftmanship.png";
 export {
 logo,
 notepaperMark,
-paystack,
-paypal,
 shakespeare,
 shakespearepurple,
 naomi,

@@ -106,7 +106,7 @@ const VoiceCountdown = ({ voiceState }) => {
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-stone-900/40 backdrop-blur-sm">
             <div className="bg-paper shadow-2xl border border-stone-200 p-8 max-w-sm text-center">
                 <div className="w-12 h-12 mx-auto mb-4 bg-plum-50 text-plum-700 flex items-center justify-center">
-                    <span className="material-icons-round text-[24px]">mic_off</span>
+                    <span className="material-symbols-outlined text-[24px]">mic_off</span>
                 </div>
                 <p className="font-semibold text-stone-900 text-lg mb-1">Not supported</p>
                 <p className="text-stone-500 text-sm">Voice input works in <strong>Chrome</strong> and <strong>Edge</strong>. Safari and Firefox do not support the Web Speech API.</p>
@@ -159,7 +159,7 @@ const ActionButton = ({ icon, image, title, onClick, active, disabled, listening
         {image ? (
             <img src={image} alt="" aria-hidden="true" className="h-[16px] md:h-[18px] w-auto object-contain" />
         ) : (
-            <span className="material-icons-round text-[17px] md:text-[18px]">{icon}</span>
+            <span className="material-symbols-outlined text-[17px] md:text-[18px]">{icon}</span>
         )}
     </button>
 );
@@ -171,7 +171,7 @@ const MenuButton = ({ icon, label, onClick }) => (
         onClick={onClick}
         className="w-full flex items-center gap-3 px-4 py-2 hover:bg-stone-50 text-stone-700 text-[13px] font-medium transition-colors"
     >
-        <span className="material-icons-round text-[17px] text-stone-400">{icon}</span>
+        <span className="material-symbols-outlined text-[17px] text-stone-400">{icon}</span>
         {label}
     </button>
 );
@@ -232,7 +232,7 @@ export const NoteHeader = ({
                         to={`/lockedin/folders/${folderId}`}
                         className="inline-flex items-center gap-1 text-[10px] md:text-[11px] text-stone-400 hover:text-plum-700 transition-colors"
                     >
-                        <span className="material-icons-round text-[11px] md:text-[14px]">arrow_back</span>
+                        <span className="material-symbols-outlined text-[11px] md:text-[14px]">arrow_back</span>
                         Back to folder
                     </Link>
                 </div>
@@ -251,7 +251,7 @@ export const NoteHeader = ({
                     />
                     {status.label && (
                         <span className={`hidden sm:inline-flex shrink-0 items-center gap-1 px-2 py-1 text-[9px] md:text-[10px] font-semibold uppercase tracking-wider ${status.cls}`}>
-                            {saveStatus === 'saving' ? <Loader size="xs" /> : <span className="material-icons-round text-[12px] md:text-[13px]">{status.icon}</span>}
+                            {saveStatus === 'saving' ? <Loader size="xs" /> : <span className="material-symbols-outlined text-[12px] md:text-[13px]">{status.icon}</span>}
                             {saveStatus !== 'loading' && saveStatus !== 'saving' && status.label}
                         </span>
                     )}
@@ -274,7 +274,7 @@ export const NoteHeader = ({
                                 : 'bg-plum-50 text-plum-700 hover:bg-plum-600 hover:text-white'
                             }`}
                     >
-                        <span className="material-icons-round text-[13px] md:text-[14px]">save</span>
+                        <span className="material-symbols-outlined text-[13px] md:text-[14px]">save</span>
                         <span className="hidden sm:inline">Save</span>
                     </button>
 
@@ -295,7 +295,7 @@ export const NoteHeader = ({
                                             onClick={() => { handleCopyLink(); setIsMenuOpen(false); }}
                                             className="w-full flex items-center gap-3 px-4 py-2 hover:bg-stone-50 text-stone-700 text-[13px] font-medium transition-colors"
                                         >
-                                            <span className={`material-icons-round text-[17px] ${linkCopied ? 'text-emerald-500' : 'text-stone-400'}`}>
+                                            <span className={`material-symbols-outlined text-[17px] ${linkCopied ? 'text-emerald-500' : 'text-stone-400'}`}>
                                                 {linkCopied ? 'check_circle' : 'link'}
                                             </span>
                                             {linkCopied ? 'Link copied!' : 'Copy Link'}

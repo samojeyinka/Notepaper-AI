@@ -90,7 +90,7 @@ const StatusBadge = ({ status }) => {
 
     return (
         <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] ${cfg.cls}`}>
-            <span className="material-icons-round text-[10px]">{cfg.icon}</span>
+            <span className="material-symbols-outlined text-[10px]">{cfg.icon}</span>
             {cfg.label}
         </span>
     );
@@ -153,7 +153,7 @@ const SprintRoadmap = ({ sprint }) => {
                     <button onClick={() => navigate('/lockedin/sprints')}
                         aria-label="Back to sprints"
                         className="w-9 h-9 border border-stone-200 bg-white flex items-center justify-center text-stone-500 hover:text-plum-700 hover:border-plum-300 transition-colors shrink-0">
-                        <span className="material-icons-round text-[18px]">arrow_back</span>
+                        <span className="material-symbols-outlined text-[18px]">arrow_back</span>
                     </button>
                     <div className="flex-1 min-w-0">
                         <h1 className="font-display-serif text-[20px] md:text-[26px] font-semibold tracking-tight text-stone-900 truncate leading-tight">
@@ -185,19 +185,19 @@ const SprintRoadmap = ({ sprint }) => {
                     <div className="flex items-center gap-2 mt-3 flex-wrap">
                         {completed > 0 && (
                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 text-[9.5px] font-semibold uppercase tracking-[0.16em]">
-                                <span className="material-icons-round text-[12px]">check_circle</span>
+                                <span className="material-symbols-outlined text-[12px]">check_circle</span>
                                 {completed} completed
                             </span>
                         )}
                         {total - completed > 0 && (
                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-stone-100 text-stone-500 text-[9.5px] font-semibold uppercase tracking-[0.16em]">
-                                <span className="material-icons-round text-[12px]">radio_button_unchecked</span>
+                                <span className="material-symbols-outlined text-[12px]">radio_button_unchecked</span>
                                 {total - completed} remaining
                             </span>
                         )}
                         {isFinished && (
                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 text-amber-700 text-[9.5px] font-semibold uppercase tracking-[0.16em]">
-                                <span className="material-icons-round text-[12px]">emoji_events</span>
+                                <span className="material-symbols-outlined text-[12px]">emoji_events</span>
                                 Sprint complete!
                             </span>
                         )}
@@ -212,7 +212,7 @@ const SprintRoadmap = ({ sprint }) => {
                     {challenges.length === 0 ? (
                         <div className="max-w-sm mx-auto mt-16 text-center">
                             <div className="w-14 h-14 mx-auto bg-stone-50 border border-stone-200 flex items-center justify-center mb-4">
-                                <span className="material-icons-round text-stone-300 text-[24px]">route</span>
+                                <span className="material-symbols-outlined text-stone-300 text-[24px]">route</span>
                             </div>
                             <p className="font-display-serif text-[18px] font-semibold text-stone-900 mb-1">No challenges yet</p>
                             <p className="text-[12.5px] text-stone-400 leading-relaxed">
@@ -276,7 +276,7 @@ const SprintRoadmap = ({ sprint }) => {
                                                                         ${isSelected ? 'ring-2 ring-plum-400 ring-offset-2 ring-offset-paper' : ''}
                                                                         ${accessible ? 'cursor-pointer hover:-translate-y-0.5 active:scale-[0.97]' : 'cursor-default'}`}`}
                                                         >
-                                                            <span className={`material-icons-round text-[20px] ${
+                                                            <span className={`material-symbols-outlined text-[20px] ${
                                                                 step.isFinish
                                                                     ? (isFinished ? 'text-amber-600' : 'text-stone-400')
                                                                     : (status === 'locked' ? 'text-stone-400' : meta.color)
@@ -378,7 +378,7 @@ const SprintRoadmap = ({ sprint }) => {
                                     <button onClick={() => setSelectedId(null)}
                                         aria-label="Close"
                                         className="text-stone-400 hover:text-stone-600 transition-colors mt-0.5 shrink-0 ml-3">
-                                        <span className="material-icons-round text-[20px]">close</span>
+                                        <span className="material-symbols-outlined text-[20px]">close</span>
                                     </button>
                                 </div>
 
@@ -389,7 +389,7 @@ const SprintRoadmap = ({ sprint }) => {
                                     return (
                                         <div className={`flex items-center gap-3 p-3.5 ${m.bg}`}>
                                             <div className="w-10 h-10 bg-white/70 flex items-center justify-center shrink-0">
-                                                <span className={`material-icons-round text-[20px] ${m.color}`}>{m.icon}</span>
+                                                <span className={`material-symbols-outlined text-[20px] ${m.color}`}>{m.icon}</span>
                                             </div>
                                             <div>
                                                 <p className="text-[9.5px] font-semibold text-stone-400 uppercase tracking-[0.2em]">Challenge type</p>
@@ -402,7 +402,7 @@ const SprintRoadmap = ({ sprint }) => {
 
                             <div className="p-6 pt-0 border-t border-stone-100 mt-auto">
                                 <button onClick={() => handleOpenChallenge(selected)} className={primaryBtn}>
-                                    <span className="material-icons-round text-[19px]">
+                                    <span className="material-symbols-outlined text-[19px]">
                                         {sv(selected.status) === 'completed' ? 'replay' : 'play_arrow'}
                                     </span>
                                     {sv(selected.status) === 'completed' ? 'Review Challenge' : 'Start Challenge'}
@@ -412,7 +412,7 @@ const SprintRoadmap = ({ sprint }) => {
                     ) : (
                         <div className="flex-1 flex flex-col items-center justify-center text-center px-6">
                             <div className="w-16 h-16 bg-plum-50 border border-plum-100 flex items-center justify-center mb-4">
-                                <span className="material-icons-round text-plum-600 text-[26px]">touch_app</span>
+                                <span className="material-symbols-outlined text-plum-600 text-[26px]">touch_app</span>
                             </div>
                             <p className="font-display-serif text-[19px] font-semibold text-stone-900 mb-1.5">Select a challenge</p>
                             <p className="text-[12.5px] text-stone-400 leading-relaxed">Pick any unlocked node to read what&rsquo;s inside</p>
@@ -420,14 +420,14 @@ const SprintRoadmap = ({ sprint }) => {
                             <div className="mt-8 w-full space-y-2">
                                 <div className="flex items-center justify-between px-4 py-3 bg-stone-50">
                                     <span className="text-[11px] text-stone-500 font-semibold uppercase tracking-widest flex items-center gap-1.5">
-                                        <span className="material-icons-round text-[14px] text-emerald-600">check_circle</span>
+                                        <span className="material-symbols-outlined text-[14px] text-emerald-600">check_circle</span>
                                         Completed
                                     </span>
                                     <span className="text-[13px] font-semibold text-stone-900 tabular-nums">{completed}/{total}</span>
                                 </div>
                                 <div className="flex items-center justify-between px-4 py-3 bg-stone-50">
                                     <span className="text-[11px] text-stone-500 font-semibold uppercase tracking-widest flex items-center gap-1.5">
-                                        <span className="material-icons-round text-[14px] text-plum-600">bar_chart</span>
+                                        <span className="material-symbols-outlined text-[14px] text-plum-600">bar_chart</span>
                                         Progress
                                     </span>
                                     <span className="text-[13px] font-semibold text-stone-900 tabular-nums">{pct}%</span>
@@ -435,7 +435,7 @@ const SprintRoadmap = ({ sprint }) => {
                                 {sprint.end_date && (
                                     <div className="flex items-center justify-between px-4 py-3 bg-stone-50">
                                         <span className="text-[11px] text-stone-500 font-semibold uppercase tracking-widest flex items-center gap-1.5">
-                                            <span className="material-icons-round text-[14px] text-stone-400">calendar_today</span>
+                                            <span className="material-symbols-outlined text-[14px] text-stone-400">calendar_today</span>
                                             Ends
                                         </span>
                                         <span className="text-[13px] font-semibold text-stone-900">{fmtDate(sprint.end_date)}</span>
@@ -469,7 +469,7 @@ const SprintRoadmap = ({ sprint }) => {
                             <button onClick={() => setSelectedId(null)}
                                 aria-label="Close"
                                 className="text-stone-400 hover:text-stone-600 transition-colors ml-2 mt-0.5 shrink-0">
-                                <span className="material-icons-round text-[18px]">close</span>
+                                <span className="material-symbols-outlined text-[18px]">close</span>
                             </button>
                         </div>
                         <p className="text-[12.5px] text-stone-500 leading-relaxed mb-3">{selected.description}</p>
@@ -477,13 +477,13 @@ const SprintRoadmap = ({ sprint }) => {
                             const m = metaFor(selected);
                             return (
                                 <div className={`inline-flex items-center gap-1.5 px-2 py-1 text-[9.5px] font-semibold uppercase tracking-[0.16em] ${m.bg} ${m.color} mb-4`}>
-                                    <span className="material-icons-round text-[12px]">{m.icon}</span>
+                                    <span className="material-symbols-outlined text-[12px]">{m.icon}</span>
                                     {m.label}
                                 </div>
                             );
                         })()}
                         <button onClick={() => handleOpenChallenge(selected)} className={primaryBtn}>
-                            <span className="material-icons-round text-[17px]">
+                            <span className="material-symbols-outlined text-[17px]">
                                 {sv(selected.status) === 'completed' ? 'replay' : 'play_arrow'}
                             </span>
                             {sv(selected.status) === 'completed' ? 'Review' : 'Start Challenge'}

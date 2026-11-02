@@ -329,7 +329,7 @@ Rules:
                     {/* Generate / Generating */}
                     {isGenerating ? (
                         <button disabled className="w-full py-2 md:py-3 bg-stone-100 text-stone-400  font-medium text-[12px] md:text-sm flex items-center justify-center gap-2">
-                            <span className="w-4 h-4 border-2 border-stone-300 border-t-primary  animate-spin" />
+                            <span className="w-4 h-4 border-2 border-stone-300 border-t-primary  animate-spin rounded-full" />
                         </button>
                     ) : (
                         <button
@@ -365,9 +365,9 @@ Rules:
                                         title={`Download as ${fmt.toUpperCase()}`}
                                     >
                                         {downloading === fmt ? (
-                                            <span className="w-3 h-3 border-2 border-stone-300 border-t-stone-500  animate-spin shrink-0" />
+                                            <span className="w-3 h-3 border-2 border-stone-300 border-t-stone-500  animate-spin shrink-0 rounded-full" />
                                         ) : (
-                                            <span className="material-icons-round text-[13px]">download</span>
+                                            <span className="material-symbols-outlined text-[13px]">download</span>
                                         )}
                                         {fmt.toUpperCase()}
                                     </button>
@@ -396,9 +396,9 @@ Rules:
                                         className="flex items-center gap-1 px-2.5 py-1  text-[11px] font-semibold bg-plum-50 text-plum-800 hover:bg-primary/15 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                                     >
                                         {rerendering ? (
-                                            <span className="w-3 h-3 border-2 border-plum-600/30 border-t-primary  animate-spin shrink-0" />
+                                            <span className="w-3 h-3 border-2 border-plum-600/30 border-t-primary  animate-spin shrink-0 rounded-full" />
                                         ) : (
-                                            <span className="material-icons-round text-[13px]">refresh</span>
+                                            <span className="material-symbols-outlined text-[13px]">refresh</span>
                                         )}
                                         Apply
                                     </button>
@@ -407,7 +407,7 @@ Rules:
                                     onClick={() => setShowCode(v => !v)}
                                     className="flex items-center gap-1 text-[11px] font-semibold text-stone-400 hover:text-plum-700 transition-colors"
                                 >
-                                    <span className="material-icons-round text-[14px]">{showCode ? 'visibility' : 'code'}</span>
+                                    <span className="material-symbols-outlined text-[14px]">{showCode ? 'visibility' : 'code'}</span>
                                     {showCode ? 'Preview' : 'Edit Code'}
                                 </button>
                             </div>
@@ -423,7 +423,7 @@ Rules:
                                 <div className="relative">
                                     <div className="absolute inset-0 " />
                                     <div className="relative w-28 h-28 bg-stone-50  flex items-center justify-center">
-                                        <span className="material-icons-round text-plum-700 text-5xl">account_tree</span>
+                                        <span className="material-symbols-outlined text-plum-700 text-5xl">account_tree</span>
                                     </div>
                                 </div>
                                 <div>
@@ -444,7 +444,7 @@ Rules:
                         {isGenerating && (
                             <div className="h-full flex flex-col items-center justify-center gap-4 min-h-[380px]">
                                 <div className="w-16 h-16  bg-plum-50 flex items-center justify-center">
-                                    <span className="material-icons-round text-plum-700 text-3xl animate-pulse">account_tree</span>
+                                    <span className="material-symbols-outlined text-plum-700 text-3xl animate-pulse">account_tree</span>
                                 </div>
                                 <div className="text-center">
                                     <p className="font-semibold text-stone-700">Generating diagram…</p>
@@ -479,7 +479,7 @@ Rules:
                         {/* Error state */}
                         {status === 'error' && (
                             <div className="flex items-start gap-2 bg-red-50 border border-red-100  px-4 py-3">
-                                <span className="material-icons-round text-red-400 text-[18px] mt-0.5 shrink-0">error_outline</span>
+                                <span className="material-symbols-outlined text-red-400 text-[18px] mt-0.5 shrink-0">error_outline</span>
                                 <div>
                                     <p className="text-sm font-semibold text-red-700">Generation failed</p>
                                     <p className="text-[12px] text-red-500 mt-0.5">{errorMsg || 'Try rephrasing your description.'}</p>

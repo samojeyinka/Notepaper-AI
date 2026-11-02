@@ -229,7 +229,7 @@ export const Presentation = () => {
     );
     if (error || !presentation) return (
         <div className="flex flex-col flex-1 h-screen items-center justify-center bg-paper lg:ml-64">
-            <span className="material-icons-round text-stone-300 text-[56px]">broken_image</span>
+            <span className="material-symbols-outlined text-stone-300 text-[56px]">broken_image</span>
             <p className="text-stone-500 mt-3 text-sm">{error ?? 'Presentation not found.'}</p>
             <button onClick={() => navigate(-1)} className="mt-4 px-5 py-2.5 bg-plum-600 hover:bg-plum-700 text-white text-sm font-medium">Go back</button>
         </div>
@@ -244,7 +244,7 @@ export const Presentation = () => {
             <div className="flex items-center justify-between px-2.5 md:px-5 py-1.5 md:py-3 bg-paper/95 backdrop-blur border-b border-stone-200 shrink-0 z-10 gap-3">
                 <div className="flex items-center gap-3 min-w-0">
                     {/* <button onClick={() => navigate(-1)} className="w-8 h-8  flex items-center justify-center text-stone-400 hover:bg-stone-100 transition-colors shrink-0">
-                        <span className="material-icons-round text-[20px]">arrow_back</span>
+                        <span className="material-symbols-outlined text-[20px]">arrow_back</span>
                     </button> */}
                     <div className="min-w-0">
                         <input
@@ -259,7 +259,7 @@ export const Presentation = () => {
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                     {saving && <span className="flex items-center gap-1 text-[11px] text-plum-600"><Loader size="xs" /></span>}
-                    {!saving && saveMsg==='saved' && <span className="flex items-center gap-1 text-[11px] text-emerald-600"><span className="material-icons-round text-[13px]">check</span>Saved</span>}
+                    {!saving && saveMsg==='saved' && <span className="flex items-center gap-1 text-[11px] text-emerald-600"><span className="material-symbols-outlined text-[13px]">check</span>Saved</span>}
                     <button onClick={() => setIsShakespeareOpen(true)}
                         className="flex items-center gap-1 md:gap-1.5 px-1.5 py-1 md:px-3 md:py-1.5  text-[11px] md:text-xs font-medium md:font-semibold transition-colors bg-plum-50 text-plum-700 hover:bg-plum-100"
                         title="Shakespeare Assist — AI writing">
@@ -268,10 +268,10 @@ export const Presentation = () => {
                     </button>
                     <button onClick={() => setShowNotes(v=>!v)}
                         className={`flex items-center gap-1 md:gap-1.5 px-1.5 py-1 md:px-3 md:py-1.5  text-[11px] md:text-xs font-medium md:font-semibold transition-colors border ${showNotes?'bg-plum-50 text-plum-700 border-plum-200':'text-stone-500 hover:bg-stone-100 border-transparent'}`}>
-                        <span className="material-icons-round text-[11px] md:text-[15px]">speaker_notes</span>Notes
+                        <span className="material-symbols-outlined text-[11px] md:text-[15px]">speaker_notes</span>Notes
                     </button>
                     <button onClick={toggleFS} className="w-5 h-5 md:w-8 md:h-8   flex items-center justify-center text-stone-500 hover:bg-stone-100 transition-all">
-                        <span className="material-icons-round text-[18px]">{isFullscreen?'fullscreen_exit':'fullscreen'}</span>
+                        <span className="material-symbols-outlined text-[18px]">{isFullscreen?'fullscreen_exit':'fullscreen'}</span>
                     </button>
                     {/* Export dropdown */}
                     <div ref={exportMenuRef} className="relative">
@@ -282,7 +282,7 @@ export const Presentation = () => {
                         >
                             {(exporting || exportingPdf)
                                 ? <Loader size="xs" />
-                                : <><span className="material-icons-round text-[14px]">download</span>Export<span className="material-icons-round text-[14px] ml-0.5">expand_more</span></>}
+                                : <><span className="material-symbols-outlined text-[14px]">download</span>Export<span className="material-symbols-outlined text-[14px] ml-0.5">expand_more</span></>}
                         </button>
                         {showExportMenu && (
                             <div className="absolute right-0 top-9 bg-white   shadow-xl border border-stone-200 py-1.5 w-44 z-50 animate-in fade-in zoom-in-95 duration-100">
@@ -290,14 +290,14 @@ export const Presentation = () => {
                                     onClick={() => { setShowExportMenu(false); handleExportPPTX(); }}
                                     className="w-full flex items-center gap-1.5 md:gap-3 px-2 md:px-4 py-1.5 md:py-2.5 text-[12px] md:text-sm text-stone-700 hover:bg-stone-50 transition-colors"
                                 >
-                                    <span className="material-icons-round text-[13px] md:text-[17px] text-plum-600">slideshow</span>
+                                    <span className="material-symbols-outlined text-[13px] md:text-[17px] text-plum-600">slideshow</span>
                                     Export PPTX
                                 </button>
                                 <button
                                     onClick={handleExportPDF}
                                     className="w-full flex items-center gap-1.5 md:gap-3 px-2 md:px-4 py-1.5 md:py-2.5 text-[12px] md:text-sm text-stone-700 hover:bg-stone-50 transition-colors"
                                 >
-                                    <span className="material-icons-round text-[13px] md:text-[17px] text-stone-500">picture_as_pdf</span>
+                                    <span className="material-symbols-outlined text-[13px] md:text-[17px] text-stone-500">picture_as_pdf</span>
                                     Export PDF
                                 </button>
                             </div>
@@ -335,7 +335,7 @@ export const Presentation = () => {
                                     <button onClick={(e) => { e.stopPropagation(); deleteSlide(i); }}
                                         className="absolute top-2 right-2 opacity-0 group-hover/thumb:opacity-100 w-5 h-5  bg-red-500 text-white flex items-center justify-center transition-all shadow"
                                         title="Delete slide">
-                                        <span className="material-icons-round text-[11px]">delete</span>
+                                        <span className="material-symbols-outlined text-[11px]">delete</span>
                                     </button>
                                 )}
                             </div>
@@ -367,7 +367,7 @@ export const Presentation = () => {
                     <div className="flex items-center justify-between px-5 py-2.5 bg-paper/95 border-t border-stone-200 shrink-0">
                         <button onClick={goPrev} disabled={idx===0}
                             className="flex items-center gap-1.5 px-3 py-1.5  text-[12px] md:text-sm md:font-medium text-stone-600 hover:bg-stone-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all">
-                            <span className="material-icons-round text-[15px] md:text-[18px]">chevron_left</span>Prev
+                            <span className="material-symbols-outlined text-[15px] md:text-[18px]">chevron_left</span>Prev
                         </button>
                         <div className="flex items-center gap-2">
                             <span className="text-[12px] font-semibold text-stone-700 tabular-nums">{idx+1}</span>
@@ -375,7 +375,7 @@ export const Presentation = () => {
                         </div>
                         <button onClick={goNext} disabled={idx===slides.length-1}
                             className="flex items-center gap-1.5 px-3 py-1.5  text-[12px] md:text-sm md:font-medium text-stone-600 hover:bg-stone-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all">
-                            Next<span className="material-icons-round text-[15px] md:text-[18px]">chevron_right</span>
+                            Next<span className="material-symbols-outlined text-[15px] md:text-[18px]">chevron_right</span>
                         </button>
                     </div>
 

@@ -51,7 +51,7 @@ export const FontFamilySelect = ({ value, onChange, options = [] }) => {
                 <span className={`text-stone-700 text-[12px] ${selectedOption?.class}`}>
                     {selectedOption?.name || "Select Font"}
                 </span>
-                <span className={`material-icons-round text-stone-400 transition-transform duration-200 ${open ? "rotate-180" : ""}`}>
+                <span className={`material-symbols-outlined text-stone-400 transition-transform duration-200 ${open ? "rotate-180" : ""}`}>
                     expand_more
                 </span>
             </button>
@@ -61,7 +61,7 @@ export const FontFamilySelect = ({ value, onChange, options = [] }) => {
                 <div className="absolute top-full mt-2 w-full bg-white border border-stone-200 shadow-xl z-[80] overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                     {/* Search Bar */}
                     <div className="flex items-center gap-2 px-4 py-3 border-b border-stone-100 bg-stone-50/50">
-                        <span className="material-icons-round text-stone-400 text-[12px]">search</span>
+                        <span className="material-symbols-outlined text-stone-400 text-[12px]">search</span>
                         <input
                             ref={searchRef}
                             type="text"
@@ -92,7 +92,7 @@ export const FontFamilySelect = ({ value, onChange, options = [] }) => {
                                     >
                                         <span className={`${option.class} text-[12px]`}>{option.name}</span>
                                         {isSelected && (
-                                            <span className="material-icons-round text-plum-600 text-[16px]">check</span>
+                                            <span className="material-symbols-outlined text-plum-600 text-[16px]">check</span>
                                         )}
                                     </button>
                                 );

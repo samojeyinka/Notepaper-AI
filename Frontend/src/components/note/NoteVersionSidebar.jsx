@@ -181,7 +181,7 @@ const VersionPreviewModal = ({
                 {/* ── Top bar ── */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100 shrink-0">
                     <div className="flex items-center gap-3">
-                        <span className="material-icons-round text-primary text-[22px]">history</span>
+                        <span className="material-symbols-outlined text-primary text-[22px]">history</span>
                         <div>
                             <h2 className="font-display font-semibold text-stone-900 text-base leading-tight">Version History</h2>
                             <p className="text-[11px] text-stone-400 mt-0.5">Preview a version, then restore it if it's the one you want.</p>
@@ -191,7 +191,7 @@ const VersionPreviewModal = ({
                         onClick={onClose}
                         className="w-9 h-9  flex items-center justify-center text-stone-400 hover:bg-stone-100 transition-colors"
                     >
-                        <span className="material-icons-round text-[20px]">close</span>
+                        <span className="material-symbols-outlined text-[20px]">close</span>
                     </button>
                 </div>
 
@@ -245,7 +245,7 @@ const VersionPreviewModal = ({
                                         disabled={pageIdx === 0}
                                         className="w-7 h-7  flex items-center justify-center bg-stone-100 text-stone-500 hover:bg-stone-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                                     >
-                                        <span className="material-icons-round text-[16px]">chevron_left</span>
+                                        <span className="material-symbols-outlined text-[16px]">chevron_left</span>
                                     </button>
                                     <span className="text-xs font-semibold text-stone-500 select-none tabular-nums">
                                         Page {pageIdx + 1} / {pages.length}
@@ -255,7 +255,7 @@ const VersionPreviewModal = ({
                                         disabled={pageIdx === pages.length - 1}
                                         className="w-7 h-7  flex items-center justify-center bg-stone-100 text-stone-500 hover:bg-stone-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                                     >
-                                        <span className="material-icons-round text-[16px]">chevron_right</span>
+                                        <span className="material-symbols-outlined text-[16px]">chevron_right</span>
                                     </button>
                                 </div>
                             )}
@@ -310,7 +310,7 @@ const VersionPreviewModal = ({
                             {reverting === version?.id ? (
                                 <><Loader size="xs" /></>
                             ) : (
-                                <><span className="material-icons-round text-[15px]">restore</span> Restore this version</>
+                                <><span className="material-symbols-outlined text-[15px]">restore</span> Restore this version</>
                             )}
                         </button>
                     </div>
@@ -376,7 +376,7 @@ export const NoteVersionSidebar = ({
             {/* Header */}
             <div className="flex items-center justify-between px-2.5 md:px-5 py-2 md:py-4 border-b border-stone-100">
                 <div className="flex items-center gap-1 md:gap-2">
-                    <span className="material-icons-round text-primary text-[10px] md:text-[20px]">history</span>
+                    <span className="material-symbols-outlined text-primary text-[10px] md:text-[20px]">history</span>
                     <h3 className="font-display font-medium md:font-bold text-[10px] md:text-sm text-stone-900">Version History</h3>
                     <button
                         onClick={load}
@@ -384,14 +384,14 @@ export const NoteVersionSidebar = ({
                         title="Refresh version list"
                         className="w-5 h-5 md:w-6 md:h-6  flex items-center justify-center text-stone-400 hover:bg-stone-100 hover:text-primary transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                     >
-                        <span className={`material-icons-round text-[13px] md:text-[15px] ${loading ? 'animate-spin' : ''}`}>refresh</span>
+                        <span className={`material-symbols-outlined text-[13px] md:text-[15px] ${loading ? 'animate-spin' : ''}`}>refresh</span>
                     </button>
                 </div>
                 <button
                     onClick={onClose}
                     className="w-5 h-5 md:w-7 md:h-7  flex items-center justify-center text-stone-400 hover:bg-stone-100 transition-colors"
                 >
-                    <span className="material-icons-round text-[14px] md:text-[18px]">close</span>
+                    <span className="material-symbols-outlined text-[14px] md:text-[18px]">close</span>
                 </button>
             </div>
 
@@ -405,14 +405,14 @@ export const NoteVersionSidebar = ({
 
                 {error && (
                     <div className="m-4 p-3 bg-red-50  text-xs text-red-500 font-medium flex items-center gap-2">
-                        <span className="material-icons-round text-[13px] md:text-[16px]">error_outline</span>
+                        <span className="material-symbols-outlined text-[13px] md:text-[16px]">error_outline</span>
                         {error}
                     </div>
                 )}
 
                 {!loading && !error && versions.length === 0 && (
                     <div className="flex flex-col items-center justify-center py-16 gap-3 px-6 text-center">
-                        <span className="material-icons-round text-[36px] text-stone-200">history_toggle_off</span>
+                        <span className="material-symbols-outlined text-[36px] text-stone-200">history_toggle_off</span>
                         <p className="text-[10px] font-normal text-stone-400">No versions yet. Keep writing — snapshots are saved every 5 minutes.</p>
                     </div>
                 )}

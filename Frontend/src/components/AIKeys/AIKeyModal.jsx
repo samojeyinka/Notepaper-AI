@@ -118,7 +118,7 @@ const KeyForm = ({ presets, initial, onSave, onCancel, isFirstKey }) => {
                     rel="noreferrer"
                     className="inline-flex items-center gap-1 text-[12px] text-plum-700 font-medium hover:text-plum-600 mt-2"
                 >
-                    <span className="material-icons-round text-[14px]">key</span>
+                    <span className="material-symbols-outlined text-[14px]">key</span>
                     Get an API key
                 </a>
             </div>
@@ -141,7 +141,7 @@ const KeyForm = ({ presets, initial, onSave, onCancel, isFirstKey }) => {
                         className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600"
                         aria-label={showKey ? 'Hide key' : 'Show key'}
                     >
-                        <span className="material-icons-round text-[18px]">{showKey ? 'visibility_off' : 'visibility'}</span>
+                        <span className="material-symbols-outlined text-[18px]">{showKey ? 'visibility_off' : 'visibility'}</span>
                     </button>
                 </div>
             </div>
@@ -175,7 +175,7 @@ const KeyForm = ({ presets, initial, onSave, onCancel, isFirstKey }) => {
             )}
             {success && (
                 <div className="px-3.5 py-2.5 bg-emerald-50 border border-emerald-200 text-emerald-700 text-[13px] flex items-center gap-2">
-                    <span className="material-icons-round text-[16px]">check_circle</span>
+                    <span className="material-symbols-outlined text-[16px]">check_circle</span>
                     Connected successfully.
                 </div>
             )}
@@ -227,7 +227,7 @@ export const ExistingKeys = ({ data, onEdit, onRemove, onSetDefault }) => {
                         className="flex items-center gap-3 p-3.5 border border-stone-200 bg-stone-50 hover:bg-white transition-colors"
                     >
                         <span className="w-9 h-9 bg-plum-100 text-plum-700 flex items-center justify-center shrink-0">
-                            <span className="material-icons-round text-[20px]">{PROVIDER_ICONS[providerId] ?? 'key'}</span>
+                            <span className="material-symbols-outlined text-[20px]">{PROVIDER_ICONS[providerId] ?? 'key'}</span>
                         </span>
                         <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2">
@@ -253,14 +253,14 @@ export const ExistingKeys = ({ data, onEdit, onRemove, onSetDefault }) => {
                             className="p-1.5 text-stone-400 hover:text-stone-700 hover:bg-stone-200/70 transition-colors"
                             aria-label="Change key"
                         >
-                            <span className="material-icons-round text-[20px]">edit</span>
+                            <span className="material-symbols-outlined text-[20px]">edit</span>
                         </button>
                         <button
                             onClick={() => onRemove(providerId)}
                             className="p-1.5 text-stone-400 hover:text-red-600 hover:bg-red-50 transition-colors"
                             aria-label={`Remove ${provider?.label ?? providerId}`}
                         >
-                            <span className="material-icons-round text-[20px]">delete</span>
+                            <span className="material-symbols-outlined text-[20px]">delete</span>
                         </button>
                     </div>
                 );
@@ -277,10 +277,10 @@ export default function AIKeyModal() {
     const [notice, setNotice] = useState(null);
 
     useEffect(() =>
-        subscribeAIKeyModal(() => {
+        subscribeAIKeyModal((options = {}) => {
             setIsOpen(true);
-            setMode('list');
-            setEditing(null);
+            setMode(options.mode ?? 'list');
+            setEditing(options.editing ?? null);
             setNotice(null);
             if (!loaded) refresh();
         }), [loaded, refresh]);
@@ -322,29 +322,34 @@ export default function AIKeyModal() {
     };
 
     return (
-        <div className="workspace-modal fixed inset-0 z-[60] flex items-center justify-center">
-            <div className="absolute inset-0 bg-stone-900/40 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
+        <div className="workspace-modal fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6">
+            <div className="absolute inset-0 bg-stone-900/40 backdrop-blur-sm" onClick={() => setIsOpen(false)} aria-hidden="true" />
 
-            <div className="workspace-modal-panel relative w-[92%] max-w-lg bg-white shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-200 border border-stone-900/10 max-h-[90vh] flex flex-col">
+            <div
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="ai-key-modal-title"
+                className="workspace-modal-panel relative w-full max-w-lg bg-white shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-200 border border-stone-900/10 max-h-[90vh] min-h-0 flex flex-col overflow-hidden rounded-[18px]"
+            >
                 <div className="px-5 py-4 bg-stone-900 text-white flex items-center justify-between shrink-0">
                     <div className="flex items-center gap-3">
                         <span className="w-9 h-9 bg-white/10 text-plum-300 flex items-center justify-center">
-                            <span className="material-icons-round text-[20px]">key</span>
+                            <span className="material-symbols-outlined text-[20px]">key</span>
                         </span>
                         <div>
-                            <h3 className="font-semibold text-[15px] leading-tight">AI Keys</h3>
+                            <h3 id="ai-key-modal-title" className="font-semibold text-[15px] leading-tight">AI Keys</h3>
                             <p className="text-[11px] text-stone-400">Connect your own AI provider</p>
                         </div>
                     </div>
                     <button onClick={() => setIsOpen(false)} className="p-1.5 hover:bg-white/10 transition-colors" aria-label="Close">
-                        <span className="material-icons-round text-[20px]">close</span>
+                        <span className="material-symbols-outlined text-[20px]">close</span>
                     </button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-5 custom-scrollbar">
+                <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-5 custom-scrollbar">
                     {notice && (
                         <div className="mb-4 px-3.5 py-2.5 bg-emerald-50 border border-emerald-200 text-emerald-700 text-[13px] flex items-center gap-2">
-                            <span className="material-icons-round text-[16px]">check_circle</span>
+                            <span className="material-symbols-outlined text-[16px]">check_circle</span>
                             {notice}
                         </div>
                     )}
@@ -377,7 +382,7 @@ export default function AIKeyModal() {
                                         onClick={() => setMode('add')}
                                         className="mt-4 px-5 py-2.5 bg-stone-900 hover:bg-plum-700 text-white text-sm font-semibold transition-colors inline-flex items-center gap-2"
                                     >
-                                        <span className="material-icons-round text-[18px]">add</span>
+                                        <span className="material-symbols-outlined text-[18px]">add</span>
                                         Add your first key
                                     </button>
                                     <p className="mt-4 text-[12px] text-stone-400">
@@ -397,7 +402,7 @@ export default function AIKeyModal() {
                                             onClick={() => setMode('add')}
                                             className="text-[12px] font-semibold text-plum-700 hover:text-plum-600 flex items-center gap-1"
                                         >
-                                            <span className="material-icons-round text-[15px]">add</span>
+                                            <span className="material-symbols-outlined text-[15px]">add</span>
                                             Add provider
                                         </button>
                                     </div>

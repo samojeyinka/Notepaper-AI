@@ -80,7 +80,7 @@ const SprintPlannerCard = ({ sprint, onNavigate }) => {
                     )}
                     <span className="hidden md:inline-flex items-center gap-1 text-[11.5px] font-semibold text-plum-700 opacity-0 group-hover:opacity-100 transition-opacity">
                         {sprint.status === 'completed' ? 'Review' : 'Continue'}
-                        <span className="material-icons-round text-[14px]">arrow_forward</span>
+                        <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
                     </span>
                 </div>
             </div>
@@ -220,7 +220,7 @@ const SprintsList = () => {
             {hasData && (
                 <div className="flex items-center gap-3 mb-6">
                     <div className="relative flex-1 max-w-md">
-                        <span className="material-icons-round absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-[18px] pointer-events-none">search</span>
+                        <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-[18px] pointer-events-none">search</span>
                         <input
                             type="text"
                             value={search}
@@ -230,7 +230,7 @@ const SprintsList = () => {
                         />
                         {search && (
                             <button onClick={() => handleSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600">
-                                <span className="material-icons-round text-[16px]">close</span>
+                                <span className="material-symbols-outlined text-[16px]">close</span>
                             </button>
                         )}
                     </div>
@@ -240,9 +240,9 @@ const SprintsList = () => {
                             onClick={() => setSortOpen(v => !v)}
                             className="flex items-center gap-2 bg-white border border-stone-200 px-4 py-2.5 text-[13px] font-medium text-stone-600 hover:bg-stone-50 transition-colors whitespace-nowrap"
                         >
-                            <span className="material-icons-round text-stone-400 text-[16px]">sort</span>
+                            <span className="material-symbols-outlined text-stone-400 text-[16px]">sort</span>
                             <span className="hidden sm:inline">{currentSortLabel}</span>
-                            <span className="material-icons-round text-stone-400 text-[16px]">expand_more</span>
+                            <span className="material-symbols-outlined text-stone-400 text-[16px]">expand_more</span>
                         </button>
                         {sortOpen && (
                             <div
@@ -256,7 +256,7 @@ const SprintsList = () => {
                                         className={`w-full flex items-center justify-between px-4 py-2.5 text-[13px] font-medium transition-colors ${sortBy === opt.id ? 'text-plum-700 bg-plum-50' : 'text-stone-600 hover:bg-stone-50'}`}
                                     >
                                         {opt.label}
-                                        {sortBy === opt.id && <span className="material-icons-round text-[14px]">check</span>}
+                                        {sortBy === opt.id && <span className="material-symbols-outlined text-[14px]">check</span>}
                                     </button>
                                 ))}
                             </div>
@@ -339,7 +339,7 @@ const SprintsList = () => {
                                     aria-label="Previous page"
                                     className="w-9 h-9 flex items-center justify-center text-stone-500 border border-stone-200 hover:border-stone-400 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                                 >
-                                    <span className="material-icons-round text-[18px]">chevron_left</span>
+                                    <span className="material-symbols-outlined text-[18px]">chevron_left</span>
                                 </button>
                                 {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
                                     <button
@@ -356,7 +356,7 @@ const SprintsList = () => {
                                     aria-label="Next page"
                                     className="w-9 h-9 flex items-center justify-center text-stone-500 border border-stone-200 hover:border-stone-400 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                                 >
-                                    <span className="material-icons-round text-[18px]">chevron_right</span>
+                                    <span className="material-symbols-outlined text-[18px]">chevron_right</span>
                                 </button>
                             </div>
                         </div>

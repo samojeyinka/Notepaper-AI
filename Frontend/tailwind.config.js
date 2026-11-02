@@ -7,19 +7,19 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: "#6C4EA6",
-        // Mature brand accent — same purple family as the logo, without the neon AI tint
+        primary: "#54786f",
+        // Sage brand accent used across the current interface
         plum: {
-          50: "#F7F3FB",
-          100: "#ECE4F7",
-          200: "#DCCCF0",
-          300: "#C2AAE2",
-          400: "#A487D0",
-          500: "#8465BC",
-          600: "#6C4EA6",
-          700: "#583D8B",
-          800: "#452F6E",
-          900: "#322152",
+          50: "#edf3ef",
+          100: "#e4ece6",
+          200: "#c7d5cb",
+          300: "#b9cbbf",
+          400: "#8da99d",
+          500: "#6f9184",
+          600: "#54786f",
+          700: "#42675a",
+          800: "#355c53",
+          900: "#294b43",
         },
         "background-light": "#F8FAFC",
         "background-dark": "#0F172A",

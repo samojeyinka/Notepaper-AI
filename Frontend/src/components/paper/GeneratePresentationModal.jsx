@@ -113,7 +113,7 @@ STRICT RULES:
                 <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100">
                     <div className="flex items-center gap-2.5">
                         <div className="w-6 h-6 md:w-8 md:h-8   bg-plum-600 flex items-center justify-center shadow-sm">
-                            <span className="material-icons-round text-white text-[14px] md:text-[18px]">slideshow</span>
+                            <span className="material-symbols-outlined text-white text-[14px] md:text-[18px]">slideshow</span>
                         </div>
                         <div>
                             <h2 className="font-display font-medium md:font-semibold text-stone-900 text-[13px] md:text-base leading-tight">Generate Presentation</h2>
@@ -122,7 +122,7 @@ STRICT RULES:
                     </div>
                     <button onClick={onClose} disabled={status === 'generating' || status === 'saving'}
                         className="w-6 h-6 md:w-8 md:h-8  flex items-center justify-center text-stone-400 hover:bg-stone-100 transition-colors disabled:opacity-30">
-                        <span className="material-icons-round text-[18px]">close</span>
+                        <span className="material-symbols-outlined text-[18px]">close</span>
                     </button>
                 </div>
 
@@ -161,7 +161,7 @@ STRICT RULES:
 
                             {error && (
                                 <div className="flex items-start gap-2 p-3 bg-red-50   border border-red-100">
-                                    <span className="material-icons-round text-red-500 text-[13px] md:text-[16px] mt-0.5">error_outline</span>
+                                    <span className="material-symbols-outlined text-red-500 text-[13px] md:text-[16px] mt-0.5">error_outline</span>
                                     <p className="text-[9px] md:text-xs text-red-600">{error}</p>
                                 </div>
                             )}
@@ -176,7 +176,7 @@ STRICT RULES:
                                         <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                                     ) : (
                                         <>
-                                            <span className="material-icons-round text-[18px]">auto_awesome</span>
+                                            <span className="material-symbols-outlined text-[18px]">auto_awesome</span>
                                             Generate {slideCount} Slides
                                         </>
                                     )}
@@ -198,7 +198,7 @@ STRICT RULES:
                         // done
                         <div className="flex flex-col items-center gap-4 py-6">
                             <div className="w-14 h-14  bg-green-500 flex items-center justify-center shadow-xl shadow-green-500/30">
-                                <span className="material-icons-round text-white text-[28px]">check</span>
+                                <span className="material-symbols-outlined text-white text-[28px]">check</span>
                             </div>
                             <div className="text-center">
                                 <p className="font-display font-semibold text-stone-900">Presentation ready!</p>

@@ -94,7 +94,7 @@ const ProviderPanel = ({ presets, providerId }) => {
                         <p className="text-[12px] text-stone-500 mt-0.5 leading-snug">{preset.tagline ?? ''}</p>
                     </div>
                 </div>
-                <span className={`material-icons-round text-stone-400 transition-transform shrink-0 ${open ? 'rotate-180' : ''}`}>
+                <span className={`material-symbols-outlined text-stone-400 transition-transform shrink-0 ${open ? 'rotate-180' : ''}`}>
                     expand_more
                 </span>
             </button>
@@ -108,7 +108,7 @@ const ProviderPanel = ({ presets, providerId }) => {
                     className="inline-flex items-center gap-0.5 text-plum-700 hover:text-plum-600 font-medium underline underline-offset-2"
                 >
                     {info.site}
-                    <span className="material-icons-round text-[12px]">open_in_new</span>
+                    <span className="material-symbols-outlined text-[12px]">open_in_new</span>
                 </a>
             </div>
 
@@ -148,7 +148,7 @@ export default function ModelGuidePage() {
                             onClick={openAIKeyModal}
                             className="px-5 py-2.5 bg-stone-900 hover:bg-plum-700 text-white text-sm font-semibold transition-colors inline-flex items-center gap-2"
                         >
-                            <span className="material-icons-round text-[18px]">vpn_key</span>
+                            <span className="material-symbols-outlined text-[18px]">vpn_key</span>
                             {hasKeys ? 'Manage my keys' : 'Add my API key'}
                         </button>
                         {hasKeys && (

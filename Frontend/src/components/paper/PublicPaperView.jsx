@@ -193,7 +193,7 @@ const PublicPaperView = () => {
             <div className="flex flex-col h-screen bg-white">
                 <Header title="" isAuthenticated={isAuthenticated} />
                 <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center px-6">
-                    <span className="material-icons-round text-stone-300 text-[40px]">description</span>
+                    <span className="material-symbols-outlined text-stone-300 text-[40px]">description</span>
                     <h2 className="text-lg font-semibold text-stone-700">This paper isn't available</h2>
                     <p className="text-sm text-stone-400 max-w-xs">It may have been deleted, or the link is incorrect.</p>
                 </div>
@@ -207,7 +207,7 @@ const PublicPaperView = () => {
             <Header title={title} isAuthenticated={isAuthenticated} />
 
             <div className="flex items-center gap-1 px-4 py-1.5 bg-plum-50 border-b border-plum-100 text-gray-700 text-[10px]">
-                <span className="material-icons-round text-[13px]">workspace_premium</span>
+                <span className="material-symbols-outlined text-[13px]">workspace_premium</span>
                 <span>
                     Exports include a <strong>NotepaperAI</strong> watermark.
                 </span>
@@ -220,7 +220,7 @@ const PublicPaperView = () => {
                         disabled={activePageIndex === 0}
                         className="w-7 h-7 rounded-full flex items-center justify-center text-stone-500 hover:bg-stone-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                     >
-                        <span className="material-icons-round text-[16px]">chevron_left</span>
+                        <span className="material-symbols-outlined text-[16px]">chevron_left</span>
                     </button>
                     <span className="text-[11px] text-stone-500 font-medium">
                         Page {activePageIndex + 1} of {pages.length}
@@ -230,7 +230,7 @@ const PublicPaperView = () => {
                         disabled={activePageIndex === pages.length - 1}
                         className="w-7 h-7 rounded-full flex items-center justify-center text-stone-500 hover:bg-stone-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                     >
-                        <span className="material-icons-round text-[16px]">chevron_right</span>
+                        <span className="material-symbols-outlined text-[16px]">chevron_right</span>
                     </button>
                 </div>
 
@@ -239,7 +239,7 @@ const PublicPaperView = () => {
                         onClick={() => setIsMenuOpen(v => !v)}
                         className="flex items-center gap-1.5 px-3 py-1.5  text-xs font-semibold bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors"
                     >
-                        <span className="material-icons-round text-[15px]">download</span>
+                        <span className="material-symbols-outlined text-[15px]">download</span>
                         Export
                     </button>
                     {isMenuOpen && (
@@ -247,15 +247,15 @@ const PublicPaperView = () => {
                             <div className="fixed inset-0 z-20" onClick={() => setIsMenuOpen(false)} />
                             <div className="absolute right-0 mt-2 w-44 bg-white  shadow-xl border border-stone-100 py-2 z-30">
                                 <button onClick={handleExportPDF} className="w-full flex items-center gap-2 px-4 py-2 hover:bg-stone-50 text-stone-700 text-sm font-medium">
-                                    <span className="material-icons-round text-[16px] text-stone-400">picture_as_pdf</span>
+                                    <span className="material-symbols-outlined text-[16px] text-stone-400">picture_as_pdf</span>
                                     Export as PDF
                                 </button>
                                 <button onClick={handleExportDOCX} className="w-full flex items-center gap-2 px-4 py-2 hover:bg-stone-50 text-stone-700 text-sm font-medium">
-                                    <span className="material-icons-round text-[16px] text-stone-400">description</span>
+                                    <span className="material-symbols-outlined text-[16px] text-stone-400">description</span>
                                     Export as DOCX
                                 </button>
                                 <button onClick={handleExportPPTX} className="w-full flex items-center gap-2 px-4 py-2 hover:bg-stone-50 text-stone-700 text-sm font-medium">
-                                    <span className="material-icons-round text-[16px] text-stone-400">slideshow</span>
+                                    <span className="material-symbols-outlined text-[16px] text-stone-400">slideshow</span>
                                     Export as PPTX
                                 </button>
                             </div>

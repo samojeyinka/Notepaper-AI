@@ -14,10 +14,10 @@ const SECTIONS = [
     ],
   },
   {
-    title: '3. Third parties & payments',
+    title: '3. Third-party AI providers',
     body: [
-      'We use trusted cloud infrastructure and secure payment providers. All payment transactions, including card numbers and payment details, are processed directly by our payment gateway partner, Paystack.',
-      'These details are never stored, processed, or accessed on Notepaper servers. No third party has access to your private notes.',
+      'AI features use keys you bring from providers such as Google, DeepSeek, OpenAI, or Claude. Requests are sent to the provider you choose to deliver the feature you asked for.',
+      'Provider usage and charges are managed directly by that provider. Notepaper does not collect payment details or charge you for AI usage.',
     ],
   },
   {

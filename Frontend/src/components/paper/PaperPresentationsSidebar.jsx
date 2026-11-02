@@ -64,16 +64,16 @@ export const PaperPresentationsSidebar = ({ paperId, onClose, onNewPresentation 
             {/* Header */}
             <div className="flex items-center justify-between px-3 md:px-5 py-3 md:py-4 border-b border-stone-100">
                 <div className="flex items-center gap-2">
-                    <span className="material-icons-round text-primary text-[16px] md:text-[20px]">slideshow</span>
+                    <span className="material-symbols-outlined text-primary text-[16px] md:text-[20px]">slideshow</span>
                     <h3 className="font-display font-bold text-[11px] md:text-sm text-stone-900">Presentations</h3>
                     <button onClick={load} disabled={loading} title="Refresh"
                         className="w-5 h-5 md:w-6 md:h-6  flex items-center justify-center text-stone-400 hover:bg-stone-100 hover:text-primary transition-colors disabled:opacity-40">
-                        <span className={`material-icons-round text-[13px] md:text-[15px] ${loading ? 'animate-spin' : ''}`}>refresh</span>
+                        <span className={`material-symbols-outlined text-[13px] md:text-[15px] ${loading ? 'animate-spin' : ''}`}>refresh</span>
                     </button>
                 </div>
                 <button onClick={onClose}
                     className="w-6 h-6 md:w-7 md:h-7  flex items-center justify-center text-stone-400 hover:bg-stone-100 transition-colors">
-                    <span className="material-icons-round text-[16px] md:text-[18px]">close</span>
+                    <span className="material-symbols-outlined text-[16px] md:text-[18px]">close</span>
                 </button>
             </div>
 
@@ -86,12 +86,12 @@ export const PaperPresentationsSidebar = ({ paperId, onClose, onNewPresentation 
                 )}
                 {error && (
                     <div className="m-4 p-3 bg-red-50  text-xs text-red-500 font-medium flex items-center gap-2">
-                        <span className="material-icons-round text-[16px]">error_outline</span>{error}
+                        <span className="material-symbols-outlined text-[16px]">error_outline</span>{error}
                     </div>
                 )}
                 {!loading && !error && presentations.length === 0 && (
                     <div className="flex flex-col items-center justify-center py-16 gap-3 px-4 md:px-6 text-center">
-                        <span className="material-icons-round text-[32px] md:text-[36px] text-stone-200">slideshow</span>
+                        <span className="material-symbols-outlined text-[32px] md:text-[36px] text-stone-200">slideshow</span>
                         <p className="text-[10px] md:text-[11px] text-stone-400 leading-relaxed">No presentations yet.<br />Generate slides from this paper to get started.</p>
                     </div>
                 )}

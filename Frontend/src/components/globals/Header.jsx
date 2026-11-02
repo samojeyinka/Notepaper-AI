@@ -18,11 +18,8 @@ export default function Header() {
       <nav className="fixed top-0 inset-x-0 z-50 bg-paper/90 backdrop-blur-md border-b border-stone-200/80">
         <div className="max-w-7xl mx-auto px-5 sm:px-6 h-16 lg:h-[72px] flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2.5" onClick={() => setMobileMenuOpen(false)}>
-            {/* <img src={notepaperMark} alt="" aria-hidden="true" className="w-8 h-8 md:w-9 md:h-9 object-contain" /> */}
-            <span className="font-display text-[20px] md:text-[22px] font-bold tracking-tight text-stone-900">
-              Notepaper<span className="text-[#587A7D] text-[15px] md:text-[16px] font-bold tracking-[0.08em] align-middle"> AI</span>
-            </span>
+          <Link to="/" aria-label="Notepaper AI home" className="flex items-center" onClick={() => setMobileMenuOpen(false)}>
+            <img src="/logo.png" alt="Notepaper AI" className="w-[150px] md:w-[170px] h-[50px] md:h-[56px] object-contain object-left" />
           </Link>
 
           {/* Desktop nav */}

@@ -56,7 +56,7 @@ export default function UserTypeSelect({ value, onChange, options = [], loading 
           className="w-full flex items-center justify-between text-left focus:outline-none group/btn"
           style={{
             border: 'none',
-            borderBottom: `1px solid ${open ? '#7c3aed' : '#e2e8f0'}`,
+            borderBottom: `1px solid ${open ? '#54786f' : '#e2e8f0'}`,
             background: 'transparent',
             padding: '8px 0',
             borderRadius: 0,
@@ -124,13 +124,13 @@ export default function UserTypeSelect({ value, onChange, options = [], loading 
                     onClick={() => handleSelect(type)}
                     className={`w-full flex items-center justify-between px-4 py-2.5 text-sm text-left transition-colors duration-100
                       ${isSelected
-                        ? 'bg-purple-50 text-purple-700 font-semibold'
+                        ? 'bg-[#edf3ef] text-[#355c53] font-semibold'
                         : 'text-slate-700 hover:bg-slate-50'
                       }`}
                   >
                     <span>{formatLabel(type)}</span>
                     {isSelected && (
-                      <span className="material-symbols-outlined text-purple-600" style={{ fontSize: '16px' }}>
+                      <span className="material-symbols-outlined text-[#54786f]" style={{ fontSize: '16px' }}>
                         check
                       </span>
                     )}

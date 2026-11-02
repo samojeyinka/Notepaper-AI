@@ -125,9 +125,7 @@ export const DashboardHeader = () => {
                 <h1 className="text-[30px] md:text-[36px] font-semibold tracking-tight text-stone-900 leading-tight">
                     Good {dayParts()}, <span>{first}</span>
                 </h1>
-                <p className="text-[13px] md:text-[14px] text-stone-500">
-                    A calm page for whatever you want to keep close.
-                </p>
+               
             </div>
 
             {/* Right section */}
@@ -138,7 +136,7 @@ export const DashboardHeader = () => {
                     <div className={`dashboard-search-frame flex items-center gap-2 bg-white pl-4 pr-1.5 h-10 ring-1 transition-all duration-200 ${open ? 'ring-stone-900/25 shadow-lg shadow-stone-900/5' : 'ring-stone-200'}`}>
                         {loading
                             ? <Loader size="sm" className="shrink-0" />
-                            : <span className="material-icons-round text-stone-400 text-[19px] shrink-0">search</span>
+                            : <span className="material-symbols-outlined text-stone-400 text-[19px] shrink-0">search</span>
                         }
                         <input
                             ref={inputRef}
@@ -156,7 +154,7 @@ export const DashboardHeader = () => {
                                 className="shrink-0 w-7 h-7  flex items-center justify-center text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors"
                                 aria-label="Clear search"
                             >
-                                <span className="material-icons-round text-[16px]">close</span>
+                                <span className="material-symbols-outlined text-[16px]">close</span>
                             </button>
                         )}
                     </div>
@@ -173,7 +171,7 @@ export const DashboardHeader = () => {
                                     </div>
                                 ) : totalResults === 0 ? (
                                     <div className="flex flex-col items-center justify-center py-10 gap-2">
-                                        <span className="material-icons-round text-stone-200 text-[40px]">search_off</span>
+                                        <span className="material-symbols-outlined text-stone-200 text-[40px]">search_off</span>
                                         <p className="text-stone-500 text-sm">
                                             Nothing found for <strong className="text-stone-700">"{query}"</strong>
                                         </p>
@@ -186,7 +184,7 @@ export const DashboardHeader = () => {
                                             return (
                                                 <div key={type.key}>
                                                     <div className="flex items-center gap-1.5 px-4 pt-3 pb-1">
-                                                        <span className={`material-icons-round text-[14px] ${type.color}`}>{type.icon}</span>
+                                                        <span className={`material-symbols-outlined text-[14px] ${type.color}`}>{type.icon}</span>
                                                         <span className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.18em]">{type.label}</span>
                                                     </div>
                                                     {items.map(item => {
@@ -196,7 +194,7 @@ export const DashboardHeader = () => {
                                                             <button key={item.id} onClick={() => handleSelect(route)}
                                                                 className="w-full flex items-center gap-3 px-4 py-2 hover:bg-stone-50 transition-colors text-left group">
                                                                 <div className={`w-7 h-7  flex items-center justify-center shrink-0 ${type.bg}`}>
-                                                                    <span className={`material-icons-round text-[14px] ${type.color}`}>{type.icon}</span>
+                                                                    <span className={`material-symbols-outlined text-[14px] ${type.color}`}>{type.icon}</span>
                                                                 </div>
                                                                 <div className="flex-1 min-w-0">
                                                                     <p className="text-[13px] font-medium text-stone-700 truncate">
@@ -208,7 +206,7 @@ export const DashboardHeader = () => {
                                                                         </p>
                                                                     )}
                                                                 </div>
-                                                                <span className="material-icons-round text-[14px] text-stone-300 group-hover:text-plum-600 transition-colors shrink-0">chevron_right</span>
+                                                                <span className="material-symbols-outlined text-[14px] text-stone-300 group-hover:text-plum-600 transition-colors shrink-0">chevron_right</span>
                                                             </button>
                                                         );
                                                     })}
@@ -221,7 +219,7 @@ export const DashboardHeader = () => {
                                                 onClick={() => handleSelect(`/lockedin/library?tab=notes&q=${encodeURIComponent(query.trim())}`)}
                                                 className="w-full flex items-center justify-center gap-1.5 text-[12px] font-semibold text-plum-700 hover:text-plum-600 transition-colors"
                                             >
-                                                <span className="material-icons-round text-[14px]">open_in_new</span>
+                                                <span className="material-symbols-outlined text-[14px]">open_in_new</span>
                                                 See all results in Library
                                             </button>
                                         </div>

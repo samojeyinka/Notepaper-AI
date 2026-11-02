@@ -51,13 +51,13 @@ const AccountMenu = ({ compact = false }) => {
         <div role="menu" className="absolute right-0 top-full z-[70] mt-2 w-52 overflow-hidden rounded-xl border border-stone-200 bg-white p-1.5 shadow-xl shadow-stone-900/10">
           <div className="truncate border-b border-stone-100 px-3 py-2 text-xs font-medium text-stone-500">{user?.full_name || 'Your account'}</div>
           <Link role="menuitem" to="/lockedin" onClick={() => setOpen(false)} className="flex min-h-10 items-center gap-2.5 rounded-lg px-3 text-sm text-stone-700 transition hover:bg-[#e9efeb] hover:text-[#355c53]">
-            <span className="material-icons-round text-[18px]">dashboard</span>Dashboard
+            <span className="material-symbols-outlined text-[18px]">dashboard</span>Dashboard
           </Link>
           <Link role="menuitem" to="/lockedin/profile-settings" onClick={() => setOpen(false)} className="flex min-h-10 items-center gap-2.5 rounded-lg px-3 text-sm text-stone-700 transition hover:bg-[#e9efeb] hover:text-[#355c53]">
-            <span className="material-icons-round text-[18px]">settings</span>Settings
+            <span className="material-symbols-outlined text-[18px]">settings</span>Settings
           </Link>
           <button role="menuitem" type="button" onClick={signOut} className="flex min-h-10 w-full items-center gap-2.5 rounded-lg px-3 text-left text-sm text-stone-700 transition hover:bg-[#e9efeb] hover:text-[#355c53]">
-            <span className="material-icons-round text-[18px]">logout</span>Sign out
+            <span className="material-symbols-outlined text-[18px]">logout</span>Sign out
           </button>
         </div>
       )}

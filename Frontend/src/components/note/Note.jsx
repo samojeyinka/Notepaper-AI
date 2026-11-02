@@ -782,7 +782,7 @@ export const Note = () => {
                             onClick={() => setIsPageSidebarOpen(true)}
                             className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-10 md:w-6 md:h-20 bg-white border border-stone-200  flex items-center justify-center hover:bg-stone-50 transition-colors z-20"
                         >
-                            <span className="material-icons-round text-stone-400">chevron_left</span>
+                            <span className="material-symbols-outlined text-stone-400">chevron_left</span>
                         </button>
                     )}
                 </div>

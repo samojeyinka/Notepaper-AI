@@ -54,7 +54,7 @@ export const UserProfileCard = () => {
         </div>
         <div className="flex items-center justify-between w-full min-w-0 gap-1">
           <p className="text-[13px] font-semibold text-stone-800 truncate">{user.full_name}</p>
-          <span className={`material-icons-round text-[18px] text-stone-400 transition-transform duration-200 ${isMenuOpen ? 'rotate-180' : ''}`}>
+          <span className={`material-symbols-outlined text-[18px] text-stone-400 transition-transform duration-200 ${isMenuOpen ? 'rotate-180' : ''}`}>
             expand_more
           </span>
         </div>
@@ -68,7 +68,7 @@ export const UserProfileCard = () => {
               "w-full px-3.5 py-2 flex items-center gap-3 text-[13px] font-medium text-stone-600 hover:bg-plum-50 hover:text-plum-800 transition-colors";
             const content = (
               <>
-                <span className="material-icons-round text-[18px] text-stone-400">{item.icon}</span>
+                <span className="material-symbols-outlined text-[18px] text-stone-400">{item.icon}</span>
                 <span>{item.label}</span>
               </>
             );

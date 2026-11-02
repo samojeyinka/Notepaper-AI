@@ -35,9 +35,11 @@ export const PersonalInfoSection = () => {
     const file = e.target.files[0];
     if (!file) return;
 
+    const previousPicture = formData.profilePicture;
     const localPreview = URL.createObjectURL(file);
     handleInputChange('profilePicture', localPreview);
     updateUser({ profile_picture: localPreview });
+    e.target.value = '';
 
     setUploading(true);
     setToast(null);
@@ -63,8 +65,11 @@ export const PersonalInfoSection = () => {
         throw new Error('Upload failed');
       }
     } catch {
+      handleInputChange('profilePicture', previousPicture);
+      updateUser({ profile_picture: previousPicture });
       setToast({ type: 'error', message: 'Image upload failed. Please try again.' });
     } finally {
+      URL.revokeObjectURL(localPreview);
       setUploading(false);
     }
   };
@@ -90,23 +95,23 @@ export const PersonalInfoSection = () => {
   };
 
   const inputCls =
-    'w-full bg-white border border-stone-200 px-4 py-2.5 text-sm text-stone-800 placeholder:text-stone-300 outline-none focus:ring-2 focus:ring-plum-200 transition-colors';
+    'w-full rounded-xl bg-white border border-stone-200 px-4 py-2.5 text-sm text-stone-800 placeholder:text-stone-300 outline-none focus:ring-2 focus:ring-plum-200 transition-colors';
   const labelCls =
     'block text-[10px] font-bold uppercase tracking-widest text-stone-400 mb-1.5';
 
   return (
-    <section className="bg-white ring-1 ring-stone-200/70 p-6 md:p-8 h-full flex flex-col">
+    <section className="bg-white ring-1 ring-stone-200/70 rounded-2xl p-5 md:p-8 h-full flex flex-col">
       {toast && <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
 
       <div className="flex items-start justify-between gap-4 mb-8">
         <div>
-          <h2 className="font-display-serif text-[20px] font-semibold text-stone-900 leading-tight">Personal information</h2>
+          <h2 className="text-[20px] font-semibold text-stone-900 leading-tight">Personal information</h2>
           <p className="text-stone-500 text-[12.5px] mt-1">How we know you — name, photo and role.</p>
         </div>
         <button
           onClick={handleSaveChanges}
           disabled={loading || uploading}
-          className="shrink-0 bg-stone-900 text-white px-5 py-2 text-sm font-semibold hover:bg-stone-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
+          className="shrink-0 rounded-full bg-stone-900 text-white px-5 py-2 text-sm font-semibold hover:bg-stone-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
         >
           {loading && <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />}
           Save changes
@@ -116,12 +121,12 @@ export const PersonalInfoSection = () => {
       <div className="flex flex-col sm:flex-row gap-8 sm:gap-10">
         {/* Photo */}
         <div className="flex flex-col items-center gap-3 shrink-0">
-          <div className="relative w-28 h-28 bg-stone-100 ring-1 ring-stone-200 overflow-hidden">
-            <img
+          <div className="relative w-28 h-28 rounded-full bg-stone-100 ring-1 ring-stone-200 overflow-hidden flex items-center justify-center">
+            {formData.profilePicture ? <img
               alt="Profile photo"
               className={`w-full h-full object-cover ${uploading ? 'opacity-40' : ''}`}
               src={formData.profilePicture}
-            />
+            /> : <span className="material-symbols-outlined text-stone-400 text-[44px]" aria-hidden="true">person</span>}
             {uploading && (
               <div className="absolute inset-0 flex items-center justify-center">
                 <span className="w-6 h-6 border-2 border-plum-500/40 border-t-plum-600 rounded-full animate-spin" />
@@ -138,7 +143,7 @@ export const PersonalInfoSection = () => {
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
-            className="text-[12px] font-semibold text-plum-700 hover:text-plum-600 underline underline-offset-4 decoration-plum-200 disabled:opacity-50 transition-colors"
+            className="rounded-full px-3 py-1.5 text-[12px] font-semibold text-plum-700 hover:text-plum-600 hover:bg-plum-50 disabled:opacity-50 transition-colors"
           >
             {uploading ? 'Uploading…' : 'Change photo'}
           </button>

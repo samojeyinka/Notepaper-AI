@@ -11,7 +11,7 @@ export const ProfileHeader = () => {
     <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
       <div>
         <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-plum-700 mb-1.5">Account</p>
-        <h1 className="font-display-serif text-[28px] md:text-[34px] font-semibold tracking-tight text-stone-900 leading-tight">
+        <h1 className="text-[28px] md:text-[34px] font-semibold tracking-tight text-stone-900 leading-tight">
           Profile settings
         </h1>
         <p className="text-stone-500 text-[13px] md:text-sm mt-1.5">Your name, photo and sign-in options.</p>
@@ -21,19 +21,20 @@ export const ProfileHeader = () => {
   );
 };
 
-// Square toggle switch — reusable
+// Rounded toggle switch — reusable
 export const ToggleSwitch = ({ checked, onChange, label }) => {
   return (
     <button
       type="button"
       role="switch"
       aria-checked={checked}
+      aria-label={label || 'Two-factor authentication'}
       onClick={() => onChange?.(!checked)}
       className="inline-flex items-center gap-2.5 cursor-pointer group"
     >
-      <span className={`relative w-11 h-6 transition-colors ${checked ? 'bg-plum-600' : 'bg-stone-300 group-hover:bg-stone-400'}`}>
+      <span className={`relative w-11 h-6 rounded-full transition-colors ${checked ? 'bg-plum-600' : 'bg-stone-300 group-hover:bg-stone-400'}`}>
         <span
-          className={`absolute top-1 left-1 w-4 h-4 bg-white shadow-sm transition-transform duration-200 ${checked ? 'translate-x-5' : ''}`}
+          className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${checked ? 'translate-x-5' : ''}`}
         />
       </span>
       {label && <span className="text-sm font-medium text-stone-600">{label}</span>}

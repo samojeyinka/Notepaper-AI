@@ -9,7 +9,7 @@ const DeleteBtn = ({ onDelete }) => (
     <button onClick={onDelete} data-pdf-hide
         className="absolute top-2 right-2 z-30 opacity-0 group-hover/slide:opacity-100 w-7 h-7  bg-red-500/80 hover:bg-red-500 text-white flex items-center justify-center transition-all shadow-md"
         title="Delete slide">
-        <span className="material-icons-round text-[14px]">delete</span>
+        <span className="material-symbols-outlined text-[14px]">delete</span>
     </button>
 );
 
@@ -63,7 +63,7 @@ export const SlideEditor = ({ slide, themeId, onChange, onDelete, canDelete }) =
                         style={{ position:'absolute', top:8, right:8, zIndex:10, opacity: imgHovered ? 1 : 0, transition:'opacity 0.15s' }}
                         className="w-7 h-7 rounded-full bg-black/60 hover:bg-red-500 text-white flex items-center justify-center shadow-lg"
                         title="Remove image">
-                        <span className="material-icons-round text-[14px]">close</span>
+                        <span className="material-symbols-outlined text-[14px]">close</span>
                     </button>
                 </div>
             )}
@@ -79,7 +79,7 @@ export const SlideEditor = ({ slide, themeId, onChange, onDelete, canDelete }) =
             style={{ color:rBody, background:rAddBtn }}
             onMouseEnter={e=>e.currentTarget.style.background=rAddBtnH}
             onMouseLeave={e=>e.currentTarget.style.background=rAddBtn}>
-            <span className="material-icons-round text-[11px]">add</span>{label}
+            <span className="material-symbols-outlined text-[11px]">add</span>{label}
         </button>
     );
 
@@ -121,7 +121,7 @@ export const SlideEditor = ({ slide, themeId, onChange, onDelete, canDelete }) =
     if (slide.layout === 'closing') return commonWrap(
         <div className="w-full h-full flex flex-col items-center justify-center text-center px-[8%]">
             <div style={{ width:48, height:48, borderRadius:'50%', background:'rgba(255,255,255,0.15)', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:18, flexShrink:0 }}>
-                <span className="material-icons-round" style={{ color:'#fff', fontSize:24 }}>celebration</span>
+                <span className="material-symbols-outlined" style={{ color:'#fff', fontSize:24 }}>celebration</span>
             </div>
             <Field value={slide.title} onChange={v=>set({title:v})} max={LIMITS.title}
                 placeholder="Closing title…" align="center"
@@ -178,7 +178,7 @@ export const SlideEditor = ({ slide, themeId, onChange, onDelete, canDelete }) =
                         style={{ position:'absolute', top:8, right:8, zIndex:10, opacity: imgHovered ? 1 : 0, transition:'opacity 0.15s' }}
                         className="w-7 h-7 rounded-full bg-black/60 hover:bg-red-500 text-white flex items-center justify-center shadow-lg"
                         title="Remove image">
-                        <span className="material-icons-round text-[14px]">close</span>
+                        <span className="material-symbols-outlined text-[14px]">close</span>
                     </button>
                 </div>
             )}

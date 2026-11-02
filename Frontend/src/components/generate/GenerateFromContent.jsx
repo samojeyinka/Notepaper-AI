@@ -43,7 +43,7 @@ const MaterialPickerModal = ({
                 <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-stone-100 shrink-0">
                     <h3 className="font-semibold text-[15px] text-stone-800">Add Materials</h3>
                     <button onClick={onClose} className="w-8 h-8  flex items-center justify-center text-stone-400 hover:bg-stone-100 transition-colors">
-                        <span className="material-icons-round text-[18px]">close</span>
+                        <span className="material-symbols-outlined text-[18px]">close</span>
                     </button>
                 </div>
 
@@ -51,7 +51,7 @@ const MaterialPickerModal = ({
                     {TABS.map(t => (
                         <button key={t} onClick={() => { setTab(t); setSearch(''); }}
                             className={`flex items-center gap-1.5 px-3 py-1.5  text-[12px] font-semibold whitespace-nowrap transition-all ${tab === t ? `${TAB_CONFIG[t].bg} ${TAB_CONFIG[t].color}` : 'text-stone-400 hover:bg-stone-50'}`}>
-                            <span className="material-icons-round text-[14px]">{TAB_CONFIG[t].icon}</span>
+                            <span className="material-symbols-outlined text-[14px]">{TAB_CONFIG[t].icon}</span>
                             {t}
                         </button>
                     ))}
@@ -59,7 +59,7 @@ const MaterialPickerModal = ({
 
                 <div className="px-4 pb-2 shrink-0">
                     <div className="relative">
-                        <span className="material-icons-round absolute left-3 top-1/2 -translate-y-1/2 text-stone-300 text-[16px]">search</span>
+                        <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-stone-300 text-[16px]">search</span>
                         <input value={search} onChange={e => setSearch(e.target.value)} placeholder={`Search ${tab.toLowerCase()}…`}
                             className="w-full bg-stone-50 border border-stone-200  pl-9 pr-4 py-2 text-[13px] outline-none focus:border-primary/40 transition-colors" />
                     </div>
@@ -73,7 +73,7 @@ const MaterialPickerModal = ({
                     )}
                     {!libLoading[tab] && items.length === 0 && (
                         <div className="py-10 flex flex-col items-center gap-2 text-stone-300">
-                            <span className="material-icons-round text-4xl">search_off</span>
+                            <span className="material-symbols-outlined text-4xl">search_off</span>
                             <p className="text-[13px]">Nothing found</p>
                         </div>
                     )}
@@ -83,13 +83,13 @@ const MaterialPickerModal = ({
                             <button key={item.id} onClick={() => onToggle(tab, item)}
                                 className={`w-full flex items-center gap-3 p-3  border transition-all text-left ${checked ? `${TAB_CONFIG[tab].bg} border-primary/20 ring-1 ring-primary/20` : 'border-stone-100 hover:bg-stone-50'}`}>
                                 <div className={`w-9 h-9  flex items-center justify-center shrink-0 ${checked ? TAB_CONFIG[tab].bg : 'bg-stone-100'}`}>
-                                    <span className={`material-icons-round text-[16px] ${checked ? TAB_CONFIG[tab].color : 'text-stone-400'}`}>{TAB_CONFIG[tab].icon}</span>
+                                    <span className={`material-symbols-outlined text-[16px] ${checked ? TAB_CONFIG[tab].color : 'text-stone-400'}`}>{TAB_CONFIG[tab].icon}</span>
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <p className="text-[13px] font-semibold text-stone-800 truncate">{item.title}</p>
                                 </div>
                                 <div className={`w-5 h-5  border-2 flex items-center justify-center shrink-0 transition-all ${checked ? 'bg-primary border-primary' : 'border-stone-300'}`}>
-                                    {checked && <span className="material-icons-round text-white text-[12px]">check</span>}
+                                    {checked && <span className="material-symbols-outlined text-white text-[12px]">check</span>}
                                 </div>
                             </button>
                         );
@@ -102,7 +102,7 @@ const MaterialPickerModal = ({
                             className="w-full py-2.5  border border-stone-200 text-[13px] font-semibold text-stone-500 hover:bg-stone-50 disabled:opacity-50 transition-all flex items-center justify-center gap-2">
                             {libLoadingMore[tab]
                                 ? <><Loader size="sm" /></>
-                                : <><span className="material-icons-round text-[16px]">expand_more</span> Load more</>
+                                : <><span className="material-symbols-outlined text-[16px]">expand_more</span> Load more</>
                             }
                         </button>
                     </div>
@@ -235,12 +235,12 @@ export default function GenerateFromContent({
                     <p className="text-sm font-semibold text-stone-700">Generate from your content</p>
                     {hasAny && (
                         <span className="px-2.5 py-1 bg-primary/10 text-primary  text-[9px] font-medium uppercase tracking-wider flex items-center gap-1">
-                            <span className="material-icons-round text-[10px]">library_books</span>
+                            <span className="material-symbols-outlined text-[10px]">library_books</span>
                             {totalSelected + totalFiles} source{totalSelected + totalFiles !== 1 ? 's' : ''} added
                         </span>
                     )}
                 </div>
-                <span className={`material-icons-round text-stone-400 text-[18px] shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}>
+                <span className={`material-symbols-outlined text-stone-400 text-[18px] shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}>
                     expand_more
                 </span>
             </button>
@@ -261,7 +261,7 @@ export default function GenerateFromContent({
                                         <button key={tab} onClick={() => openPicker(tab)}
                                             className={`relative flex items-center gap-2 p-2.5  border text-left transition-all ${cnt > 0 ? `${cfg.bg} border-primary/20` : 'border-stone-100 hover:border-stone-200 hover:bg-stone-50'}`}>
                                             <div className={`w-7 h-7  flex items-center justify-center shrink-0 ${cnt > 0 ? cfg.bg : 'bg-stone-100'}`}>
-                                                <span className={`material-icons-round text-[14px] ${cnt > 0 ? cfg.color : 'text-stone-400'}`}>{cfg.icon}</span>
+                                                <span className={`material-symbols-outlined text-[14px] ${cnt > 0 ? cfg.color : 'text-stone-400'}`}>{cfg.icon}</span>
                                             </div>
                                             <div className="min-w-0">
                                                 <p className={`text-[11px] font-semibold truncate ${cnt > 0 ? cfg.color : 'text-stone-700'}`}>{tab}</p>
@@ -286,10 +286,10 @@ export default function GenerateFromContent({
                                             const cfg = TAB_CONFIG[tab];
                                             return (
                                                 <div key={item.id} className={`flex items-center gap-1 px-2 py-1  text-[11px] font-semibold ${cfg.bg} ${cfg.color}`}>
-                                                    <span className="material-icons-round text-[11px]">{cfg.icon}</span>
+                                                    <span className="material-symbols-outlined text-[11px]">{cfg.icon}</span>
                                                     <span className="truncate max-w-[100px]">{item.title}</span>
                                                     <button onClick={() => toggleMaterial(tab, item)} className="opacity-60 hover:opacity-100 ml-0.5">
-                                                        <span className="material-icons-round text-[11px]">close</span>
+                                                        <span className="material-symbols-outlined text-[11px]">close</span>
                                                     </button>
                                                 </div>
                                             );
@@ -312,7 +312,7 @@ export default function GenerateFromContent({
                                             : 'border-stone-200 text-stone-400 hover:border-primary/40 hover:text-primary'
                                     }`}
                                 >
-                                    <span className="material-icons-round text-[22px]">{isDragging ? 'file_download' : 'cloud_upload'}</span>
+                                    <span className="material-symbols-outlined text-[22px]">{isDragging ? 'file_download' : 'cloud_upload'}</span>
                                     <span className="text-[11px] font-semibold">{isDragging ? 'Drop files here' : 'Upload custom files'}</span>
                                     <span className="text-[10px] opacity-70">PDF, DOCX, XLSX, XLS, CSV</span>
                                 </div>
@@ -323,10 +323,10 @@ export default function GenerateFromContent({
                                     <div className="mt-2 space-y-1.5">
                                         {(uploadedFiles ?? []).map((f, i) => (
                                             <div key={i} className="flex items-center gap-2 px-2.5 py-1.5 bg-stone-50 ">
-                                                <span className="material-icons-round text-stone-400 text-[14px]">description</span>
+                                                <span className="material-symbols-outlined text-stone-400 text-[14px]">description</span>
                                                 <span className="flex-1 text-[11px] font-medium text-stone-700 truncate">{f.name}</span>
                                                 <button onClick={() => removeFile(i)} className="text-stone-400 hover:text-red-500 transition-colors">
-                                                    <span className="material-icons-round text-[14px]">close</span>
+                                                    <span className="material-symbols-outlined text-[14px]">close</span>
                                                 </button>
                                             </div>
                                         ))}
@@ -336,7 +336,7 @@ export default function GenerateFromContent({
 
                             {hasAny && (
                                 <p className="text-[10px] text-primary font-semibold flex items-center gap-1">
-                                    <span className="material-icons-round text-[12px]">info</span>
+                                    <span className="material-symbols-outlined text-[12px]">info</span>
                                     Generate button will use your content as source material
                                 </p>
                             )}

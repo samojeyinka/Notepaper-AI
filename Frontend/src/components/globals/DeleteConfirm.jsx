@@ -19,7 +19,7 @@ export function CardMenu({ onDelete, extraActions = [] }) {
                 onClick={() => setOpen(v => !v)}
                 className="w-7 h-7 flex items-center justify-center  text-slate-300 hover:text-slate-500 hover:bg-slate-100 transition-colors"
             >
-                <span className="material-icons-round text-[18px]">more_vert</span>
+                <span className="material-symbols-outlined text-[18px]">more_vert</span>
             </button>
             {open && (
                 <div className="workspace-menu absolute right-0 top-full mt-1 bg-white border border-slate-200 shadow-lg z-20 py-1 min-w-[130px]">
@@ -30,7 +30,7 @@ export function CardMenu({ onDelete, extraActions = [] }) {
                             onClick={() => { setOpen(false); action.onClick(); }}
                             className="w-full text-left flex items-center gap-2 px-3 py-2 text-[12px] text-slate-700 hover:bg-slate-50 transition-colors"
                         >
-                            <span className="material-icons-round text-[14px] text-slate-400">{action.icon}</span>
+                            <span className="material-symbols-outlined text-[14px] text-slate-400">{action.icon}</span>
                             {action.label}
                         </button>
                     ))}
@@ -39,7 +39,7 @@ export function CardMenu({ onDelete, extraActions = [] }) {
                         onClick={() => { setOpen(false); onDelete(); }}
                         className="w-full text-left flex items-center gap-2 px-3 py-2 text-[12px] text-red-500 hover:bg-red-50 transition-colors"
                     >
-                        <span className="material-icons-round text-[14px]">delete_outline</span>
+                        <span className="material-symbols-outlined text-[14px]">delete_outline</span>
                         Delete
                     </button>
                 </div>
@@ -59,7 +59,7 @@ export function DeleteConfirmModal({ title, subtitle, warning, onConfirm, onCanc
             >
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10  bg-red-50 flex items-center justify-center shrink-0">
-                        <span className="material-icons-round text-red-500 text-[20px]">delete_outline</span>
+                        <span className="material-symbols-outlined text-red-500 text-[20px]">delete_outline</span>
                     </div>
                     <div className="min-w-0">
                         <p className="text-[14px] font-bold text-slate-800">{title}</p>

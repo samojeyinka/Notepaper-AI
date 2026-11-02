@@ -63,14 +63,14 @@ const VersionPreviewModal = ({ versions, selectedIdx, onSelectIdx, onClose, onRe
             <div className="relative flex flex-col bg-white   shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200" style={{ width:'100%',maxWidth:'1100px',margin:'auto',height:'95vh' }}>
                 <div className="flex items-center justify-between px-3 md:px-6 py-3 md:py-4 border-b border-stone-100 shrink-0">
                     <div className="flex items-center gap-2 md:gap-3">
-                        <span className="material-icons-round text-primary text-[18px] md:text-[22px]">history</span>
+                        <span className="material-symbols-outlined text-primary text-[18px] md:text-[22px]">history</span>
                         <div>
                             <h2 className="font-display font-semibold text-stone-900 text-sm md:text-base leading-tight">Version History</h2>
                             <p className="text-[10px] md:text-[11px] text-stone-400 mt-0.5">Preview and restore a previous version.</p>
                         </div>
                     </div>
                     <button onClick={onClose} className="w-7 h-7 md:w-9 md:h-9   flex items-center justify-center text-stone-400 hover:bg-stone-100 transition-colors">
-                        <span className="material-icons-round text-[17px] md:text-[20px]">close</span>
+                        <span className="material-symbols-outlined text-[17px] md:text-[20px]">close</span>
                     </button>
                 </div>
                 <div className="flex flex-1 overflow-hidden">
@@ -103,11 +103,11 @@ const VersionPreviewModal = ({ versions, selectedIdx, onSelectIdx, onClose, onRe
                             {pages.length > 1 && (
                                 <div className="flex items-center gap-2">
                                     <button onClick={()=>setPageIdx(p=>Math.max(0,p-1))} disabled={pageIdx===0} className="w-7 h-7  flex items-center justify-center bg-stone-100 text-stone-500 hover:bg-stone-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
-                                        <span className="material-icons-round text-[16px]">chevron_left</span>
+                                        <span className="material-symbols-outlined text-[16px]">chevron_left</span>
                                     </button>
                                     <span className="text-xs font-semibold text-stone-500 select-none tabular-nums">Page {pageIdx+1} / {pages.length}</span>
                                     <button onClick={()=>setPageIdx(p=>Math.min(pages.length-1,p+1))} disabled={pageIdx===pages.length-1} className="w-7 h-7  flex items-center justify-center bg-stone-100 text-stone-500 hover:bg-stone-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
-                                        <span className="material-icons-round text-[16px]">chevron_right</span>
+                                        <span className="material-symbols-outlined text-[16px]">chevron_right</span>
                                     </button>
                                 </div>
                             )}
@@ -127,7 +127,7 @@ const VersionPreviewModal = ({ versions, selectedIdx, onSelectIdx, onClose, onRe
                             className="flex items-center gap-1.5 md:gap-2 px-3 md:px-6 py-1.5 md:py-2.5   bg-plum-600 text-white text-[11px] md:text-sm font-medium hover:bg-plum-700 active:scale-95 transition-all disabled:opacity-60">
                             {reverting===version?.id
                                 ? <><Loader size="xs" /></>
-                                : <><span className="material-icons-round text-[15px]">restore</span>Restore this version</>}
+                                : <><span className="material-symbols-outlined text-[15px]">restore</span>Restore this version</>}
                         </button>
                     </div>
                 </div>
@@ -172,22 +172,22 @@ export const PaperVersionSidebar = ({ paperId, onClose, onRevert }) => {
         <aside className="w-52 md:w-72 border-l border-stone-200 bg-paper flex flex-col shrink-0 overflow-hidden relative z-30">
             <div className="flex items-center justify-between px-3 md:px-5 py-3 md:py-4 border-b border-stone-100">
                 <div className="flex items-center gap-2">
-                    <span className="material-icons-round text-primary text-[16px] md:text-[20px]">history</span>
+                    <span className="material-symbols-outlined text-primary text-[16px] md:text-[20px]">history</span>
                     <h3 className="font-display font-bold text-[11px] md:text-sm text-stone-900">Version History</h3>
                     <button onClick={load} disabled={loading} title="Refresh" className="w-5 h-5 md:w-6 md:h-6  flex items-center justify-center text-stone-400 hover:bg-stone-100 hover:text-primary transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
-                        <span className={`material-icons-round text-[13px] md:text-[15px] ${loading?'animate-spin':''}`}>refresh</span>
+                        <span className={`material-symbols-outlined text-[13px] md:text-[15px] ${loading?'animate-spin':''}`}>refresh</span>
                     </button>
                 </div>
                 <button onClick={onClose} className="w-6 h-6 md:w-7 md:h-7  flex items-center justify-center text-stone-400 hover:bg-stone-100 transition-colors">
-                    <span className="material-icons-round text-[16px] md:text-[18px]">close</span>
+                    <span className="material-symbols-outlined text-[16px] md:text-[18px]">close</span>
                 </button>
             </div>
             <div className="flex-1 overflow-y-auto custom-scrollbar">
                 {loading && <div className="flex flex-col items-center justify-center py-16 gap-3 text-stone-400"><Loader size="lg" /></div>}
-                {error && <div className="m-4 p-3 bg-red-50  text-xs text-red-500 font-medium flex items-center gap-2"><span className="material-icons-round text-[16px]">error_outline</span>{error}</div>}
+                {error && <div className="m-4 p-3 bg-red-50  text-xs text-red-500 font-medium flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">error_outline</span>{error}</div>}
                 {!loading && !error && versions.length === 0 && (
                     <div className="flex flex-col items-center justify-center py-16 gap-3 px-6 text-center">
-                        <span className="material-icons-round text-[36px] text-stone-200">history_toggle_off</span>
+                        <span className="material-symbols-outlined text-[36px] text-stone-200">history_toggle_off</span>
                         <p className="text-[10px] font-normal text-stone-400">No versions yet. Snapshots are saved every 5 minutes.</p>
                     </div>
                 )}

@@ -142,7 +142,7 @@ const QuizView = ({ content }) => {
                         }}
                         className="w-full py-3.5 md:py-4 rounded-xl md:rounded-2xl bg-slate-900 text-white font-bold text-sm md:text-base hover:bg-slate-800 transition-colors shadow-xl hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
                     >
-                        <span className="material-icons-round text-[20px]">replay</span>
+                        <span className="material-symbols-outlined text-[20px]">replay</span>
                         Try Again
                     </button>
                 </div>
@@ -247,7 +247,7 @@ const QuizView = ({ content }) => {
                                 ? 'bg-emerald-50 text-emerald-700'
                                 : 'bg-rose-50 text-rose-700'
                         }`}>
-                            <span className="material-icons-round text-[18px] shrink-0 mt-0.5">
+                            <span className="material-symbols-outlined text-[18px] shrink-0 mt-0.5">
                                 {flash === 'correct' ? 'check_circle' : 'cancel'}
                             </span>
                             <div>
@@ -297,9 +297,9 @@ const QuizView = ({ content }) => {
                                                 : 'bg-slate-100 text-slate-500 group-hover:bg-primary group-hover:text-white'
                                 }`}>
                                     {isCorrect
-                                        ? <span className="material-icons-round text-[16px]">check</span>
+                                        ? <span className="material-symbols-outlined text-[16px]">check</span>
                                         : isWrong
-                                            ? <span className="material-icons-round text-[16px]">close</span>
+                                            ? <span className="material-symbols-outlined text-[16px]">close</span>
                                             : LETTERS[i]
                                     }
                                 </div>
@@ -314,7 +314,7 @@ const QuizView = ({ content }) => {
                                 </span>
 
                                 {isSelected && !revealed && (
-                                    <span className="material-icons-round text-primary text-[18px] ml-auto">
+                                    <span className="material-symbols-outlined text-primary text-[18px] ml-auto">
                                         check_circle
                                     </span>
                                 )}
@@ -364,7 +364,7 @@ const QuizView = ({ content }) => {
                         }`}
                     >
                         {current + 1 >= questions.length ? 'See Results' : 'Next Question'}
-                        <span className="material-icons-round text-[20px]">arrow_forward</span>
+                        <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
                     </button>
                 )}
             </div>
@@ -379,14 +379,14 @@ const ConceptView = ({ content }) => {
         <div className="space-y-5">
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
                 <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
-                    <span className="material-icons-round text-[14px]">menu_book</span>
+                    <span className="material-symbols-outlined text-[14px]">menu_book</span>
                     Explanation
                 </p>
                 <p className="text-[14px] text-slate-700 leading-relaxed">{content?.explanation}</p>
             </div>
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
                 <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-1.5">
-                    <span className="material-icons-round text-[14px]">lightbulb</span>
+                    <span className="material-symbols-outlined text-[14px]">lightbulb</span>
                     Key Points
                 </p>
                 <ul className="divide-y divide-slate-50">
@@ -428,14 +428,14 @@ const ReadingView = ({ content }) => {
         <div className="space-y-5">
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
                 <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
-                    <span className="material-icons-round text-[14px]">auto_stories</span>
+                    <span className="material-symbols-outlined text-[14px]">auto_stories</span>
                     Reading Passage
                 </p>
                 <p className="text-[14px] text-slate-700 leading-[1.8]">{content?.passage}</p>
             </div>
             <div className="bg-teal-50 rounded-2xl p-5 border border-teal-100">
                 <p className="text-[11px] font-semibold text-teal-700 uppercase tracking-widest mb-2 flex items-center gap-1.5">
-                    <span className="material-icons-round text-[14px]">auto_awesome</span>
+                    <span className="material-symbols-outlined text-[14px]">auto_awesome</span>
                     Summary
                 </p>
                 <p className="text-[13px] text-teal-800 leading-relaxed">{content?.summary}</p>
@@ -524,18 +524,18 @@ const ChallengeInterface = () => {
             <div className="sticky top-3 md:top-0 z-20 bg-white/95 backdrop-blur border-b border-slate-100 px-4 md:px-8 pt-16 lg:pt-0 py-4 flex items-center gap-4">
                 <button onClick={() => navigate(`/lockedin/sprints/${sprintId}`)}
                     className="w-7 h-7 md:w-9 md:h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 transition-colors shrink-0">
-                    <span className="material-icons-round text-[15px] md:text-[18px]">arrow_back</span>
+                    <span className="material-symbols-outlined text-[15px] md:text-[18px]">arrow_back</span>
                 </button>
                 <div className="flex-1 min-w-0">
                     <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[8px] md:text-[10px] font-semibold uppercase tracking-widest ${meta.bg} ${meta.color} mb-0.5`}>
-                        <span className="material-icons-round text-[10px] md:text-[12px]">{meta.icon}</span>
+                        <span className="material-symbols-outlined text-[10px] md:text-[12px]">{meta.icon}</span>
                         {meta.label}
                     </div>
                     <h1 className="text-[14px] md:text-[15px] font-medium md:font-semibold text-slate-900 truncate">{challenge.title}</h1>
                 </div>
                 {alreadyDone ? (
                     <span className="text-emerald-600 flex items-center gap-1.5 text-[11px] font-semibold shrink-0">
-                        <span className="material-icons-round text-[15px]">check_circle</span>
+                        <span className="material-symbols-outlined text-[15px]">check_circle</span>
                         Done
                     </span>
                 ) : challenge.content && (
@@ -546,7 +546,7 @@ const ChallengeInterface = () => {
                     >
                         {completing
                             ? <Loader size="xs" />
-                            : <><span className="material-icons-round text-[13px]">check</span> Mark Complete</>
+                            : <><span className="material-symbols-outlined text-[13px]">check</span> Mark Complete</>
                         }
                     </button>
                 )}
@@ -576,14 +576,14 @@ const ChallengeInterface = () => {
                 <div className="max-w-2xl mx-auto px-4 md:px-6 pb-12">
                     <div className="flex flex-col items-center gap-3 py-8 border-t border-slate-100 text-center">
                         <div className="flex items-center gap-2 text-emerald-600">
-                            <span className="material-icons-round text-[18px]">check_circle</span>
+                            <span className="material-symbols-outlined text-[18px]">check_circle</span>
                             <p className="text-[13px] font-semibold">Challenge marked as complete</p>
                         </div>
                         <button
                             onClick={() => navigate(`/lockedin/sprints/${sprintId}`)}
                             className="text-[12px] text-slate-400 hover:text-slate-700 font-medium flex items-center gap-1.5 transition-colors"
                         >
-                            <span className="material-icons-round text-[15px]">arrow_back</span>
+                            <span className="material-symbols-outlined text-[15px]">arrow_back</span>
                             Back to Sprint
                         </button>
                     </div>

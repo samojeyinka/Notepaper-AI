@@ -45,7 +45,7 @@ const ToolbarButton = ({ icon, action, active, disabled, title, onClick, onActio
       ${disabled ? 'opacity-40 cursor-not-allowed' : ''}`}
     title={title}
   >
-    <span className="material-icons-round text-[13px] md:text-[20px]">{icon}</span>
+    <span className="material-symbols-outlined text-[13px] md:text-[20px]">{icon}</span>
   </button>
 );
 
@@ -94,7 +94,7 @@ const FontSizePopover = ({ anchorRef, options, onSelect }) => (
         >
           {opt.label}
           <span
-            className="material-icons-round text-stone-300"
+            className="material-symbols-outlined text-stone-300"
             style={{ fontSize: opt.value === '1' ? '12px' : opt.value === '3' ? '16px' : opt.value === '5' ? '20px' : '24px' }}
           >
             format_size
@@ -127,7 +127,7 @@ const AdvancedColorPicker = ({ anchorRef, color, onChange, onClose, title, recen
               className="flex items-center gap-1 px-2.5 py-1  bg-stone-100 hover:bg-red-50 hover:text-red-500 text-stone-500 text-[10px] font-bold transition-colors"
               title="Remove background color"
             >
-              <span className="material-icons-round text-[12px]">format_color_reset</span>
+              <span className="material-symbols-outlined text-[12px]">format_color_reset</span>
               None
             </button>
           )}
@@ -259,7 +259,7 @@ const DrawPopover = ({ anchorRef, drawMode, onAction }) => {
               !drawMode?.eraser ? 'bg-stone-900 text-white' : 'bg-stone-100 text-stone-500'
             }`}
           >
-            <span className="material-icons-round text-[11px] md:text-[14px]">edit</span> Pen
+            <span className="material-symbols-outlined text-[11px] md:text-[14px]">edit</span> Pen
           </button>
           <button
             onMouseDown={(e) => { e.preventDefault(); onAction('drawEraser', true); }}
@@ -267,7 +267,7 @@ const DrawPopover = ({ anchorRef, drawMode, onAction }) => {
               drawMode?.eraser ? 'bg-stone-900 text-white' : 'bg-stone-100 text-stone-500'
             }`}
           >
-            <span className="material-icons-round text-[11px] md:text-[14px]">auto_fix_normal</span> Eraser
+            <span className="material-symbols-outlined text-[11px] md:text-[14px]">auto_fix_normal</span> Eraser
           </button>
         </div>
 
@@ -455,7 +455,7 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
           title="Shakespeare Assist — AI writing"
           className="w-8 h-8 md:w-9 md:h-9 flex items-center justify-center bg-plum-600 text-white hover:bg-plum-700 active:scale-95 transition-all"
         >
-          <span className="material-icons-round text-[14px] md:text-[18px]">
+          <span className="material-symbols-outlined text-[14px] md:text-[18px]">
             <img src={shakespeare}/>
           </span>
         </button>
@@ -526,7 +526,7 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
                 ${showFontSize ? 'bg-stone-900 text-white shadow-lg' : 'text-stone-500 hover:bg-stone-100 hover:text-stone-900'}`}
               title="Text Size"
             >
-              <span className="material-icons-round text-[18px] md:text-[22px]">text_fields</span>
+              <span className="material-symbols-outlined text-[18px] md:text-[22px]">text_fields</span>
             </button>
           </div>
           {showFontSize && (
@@ -562,7 +562,7 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
               className={`w-7 h-7 md:w-10 md:h-10   flex items-center justify-center transition-all ${showTextColor ? 'bg-stone-900 text-white' : 'text-stone-500 hover:bg-stone-100 hover:text-stone-900'}`}
               title="Text Color"
             >
-              <span className="material-icons-round text-[13px] md:text-[22px]">format_color_text</span>
+              <span className="material-symbols-outlined text-[13px] md:text-[22px]">format_color_text</span>
             </button>
           </div>
           {showTextColor && (
@@ -589,7 +589,7 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
               className={`w-7 h-7 md:w-10 md:h-10   flex items-center justify-center transition-all ${showHighlight ? 'bg-stone-900 text-white' : 'text-stone-500 hover:bg-stone-100 hover:text-stone-900'}`}
               title="Highlight"
             >
-              <span className="material-icons-round text-[13px] md:text-[22px]">draw</span>
+              <span className="material-symbols-outlined text-[13px] md:text-[22px]">draw</span>
             </button>
           </div>
           {showHighlight && (
@@ -621,7 +621,7 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
             title="Web to Text — extract from any article or blog URL"
             className="w-7 h-7 md:w-10 md:h-10   flex items-center justify-center text-stone-500 hover:bg-stone-100 hover:text-stone-900 active:scale-90 transition-all"
           >
-            <span className="material-icons-round text-[16px] md:text-[20px]">article</span>
+            <span className="material-symbols-outlined text-[16px] md:text-[20px]">article</span>
           </button>
           {/* Hidden file input */}
           <input
@@ -663,7 +663,7 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
               ${isUploading ? 'bg-plum-100 text-plum-700 animate-pulse' : 'text-stone-500 hover:bg-stone-100 hover:text-stone-900'}`}
             title="Insert Image"
           >
-            <span className="material-icons-round text-[13px] md:text-[20px]">{isUploading ? 'hourglass_top' : 'image'}</span>
+            <span className="material-symbols-outlined text-[13px] md:text-[20px]">{isUploading ? 'hourglass_top' : 'image'}</span>
           </button>
           <div ref={tableBtnRef}>
             <button
@@ -681,7 +681,7 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
                 ${showTable ? 'bg-stone-900 text-white shadow-lg' : 'text-stone-500 hover:bg-stone-100 hover:text-stone-900'}`}
               title="Insert Table"
             >
-              <span className="material-icons-round text-[13px] md:text-[20px]">table_chart</span>
+              <span className="material-symbols-outlined text-[13px] md:text-[20px]">table_chart</span>
             </button>
           </div>
           {showTable && (
@@ -716,7 +716,7 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
                 ${showDraw ? 'ring-2 ring-primary ring-offset-1' : ''}`}
               title="Draw"
             >
-              <span className="material-icons-round text-[13px] md:text-[20px]">gesture</span>
+              <span className="material-symbols-outlined text-[13px] md:text-[20px]">gesture</span>
             </button>
           </div>
           {showDraw && (
