@@ -6,11 +6,11 @@ import { presentationService } from "../../api/presentationService";
 import { friendlyAIError } from "../../utils/aiErrors";
 
 const THEMES = [
-    { id: 'modern',    label: 'Modern',    gradient: 'from-stone-900 to-stone-700', accent: '#6366f1' },
+    { id: 'modern',    label: 'Modern',    gradient: 'from-stone-900 to-stone-700', accent: '#54786f' },
     { id: 'minimal',   label: 'Minimal',   gradient: 'from-white to-stone-50',      accent: '#0f172a', dark: true },
     { id: 'academic',  label: 'Academic',  gradient: 'from-blue-900 to-blue-700',   accent: '#60a5fa' },
-    { id: 'bold',      label: 'Bold',      gradient: 'from-violet-700 to-fuchsia-600', accent: '#f0abfc' },
-    { id: 'pastel',    label: 'Pastel',    gradient: 'from-pink-100 to-indigo-100', accent: '#8b5cf6', dark: true },
+    { id: 'bold',      label: 'Bold',      gradient: 'from-emerald-800 to-teal-700', accent: '#a7d7c2' },
+    { id: 'pastel',    label: 'Pastel',    gradient: 'from-emerald-50 to-stone-100', accent: '#54786f', dark: true },
 ];
 
 const SLIDE_COUNT_OPTIONS = [5, 8, 10, 12, 15, 20, 25, 30, 40, 50, 60, 75, 100, 125, 150];
@@ -108,7 +108,7 @@ STRICT RULES:
 
     return createPortal(
         <div className="fixed inset-0 z-[150] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-            <div className="bg-white  shadow-2xl w-full max-w-lg animate-in fade-in zoom-in-95 duration-150 overflow-hidden">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg animate-in fade-in zoom-in-95 duration-150 overflow-hidden">
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100">
                     <div className="flex items-center gap-2.5">
@@ -197,7 +197,7 @@ STRICT RULES:
                     ) : (
                         // done
                         <div className="flex flex-col items-center gap-4 py-6">
-                            <div className="w-14 h-14  bg-green-500 flex items-center justify-center shadow-xl shadow-green-500/30">
+                            <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center shadow-xl shadow-emerald-900/15">
                                 <span className="material-symbols-outlined text-white text-[28px]">check</span>
                             </div>
                             <div className="text-center">

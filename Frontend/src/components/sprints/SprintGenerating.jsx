@@ -59,7 +59,7 @@ const SprintGenerating = ({ sprint, onReady }) => {
                 {/* Action tile */}
                 
                 <p className="eyebrow text-plum-700 mb-2">Building your sprint</p>
-                <h2 className="font-display-serif text-[24px] md:text-[30px] font-semibold tracking-tight text-stone-900 leading-tight mb-2">
+                <h2 className="font-display text-[24px] md:text-[30px] font-semibold tracking-tight text-stone-900 leading-tight mb-2">
                     {sprint.title}
                 </h2>
                 <p className="text-[13px] text-plum-700 font-medium mb-7">{PHASES[phase]}</p>

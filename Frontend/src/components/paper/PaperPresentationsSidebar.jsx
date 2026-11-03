@@ -4,11 +4,11 @@ import { useNavigate } from "react-router-dom";
 import { paperService } from "../../api/paperService";
 
 const THEME_PREVIEWS = {
-    modern:   { bg: 'linear-gradient(135deg, #0b1f3a, #1e3a8a)', accent: '#4f46e5', text: '#fff' },
+    modern:   { bg: 'linear-gradient(135deg, #0b1f3a, #1e3a8a)', accent: '#8da99d', text: '#fff' },
     minimal:  { bg: 'linear-gradient(135deg, #fff, #f8fafc)',    accent: '#0f172a', text: '#0f172a', border: '1px solid #E7E5E4' },
     academic: { bg: 'linear-gradient(135deg, #1e3a5f, #1d4ed8)', accent: '#60a5fa', text: '#fff' },
-    bold:     { bg: 'linear-gradient(135deg, #6d28d9, #c026d3)', accent: '#f0abfc', text: '#fff' },
-    pastel:   { bg: 'linear-gradient(135deg, #fce7f3, #e0e7ff)', accent: '#8b5cf6', text: '#3730a3' },
+    bold:     { bg: 'linear-gradient(135deg, #294b43, #54786f)', accent: '#c7d5cb', text: '#fff' },
+    pastel:   { bg: 'linear-gradient(135deg, #edf3ef, #e4ece6)', accent: '#54786f', text: '#294b43' },
 };
 
 const timeAgo = (dateStr) => {

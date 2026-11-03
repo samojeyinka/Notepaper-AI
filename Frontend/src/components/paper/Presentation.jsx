@@ -231,7 +231,7 @@ export const Presentation = () => {
         <div className="flex flex-col flex-1 h-screen items-center justify-center bg-paper lg:ml-64">
             <span className="material-symbols-outlined text-stone-300 text-[56px]">broken_image</span>
             <p className="text-stone-500 mt-3 text-sm">{error ?? 'Presentation not found.'}</p>
-            <button onClick={() => navigate(-1)} className="mt-4 px-5 py-2.5 bg-plum-600 hover:bg-plum-700 text-white text-sm font-medium">Go back</button>
+            <button onClick={() => navigate(-1)} className="mt-4 px-5 py-2.5 rounded-xl bg-primary hover:bg-plum-700 text-white text-sm font-medium">Go back</button>
         </div>
     );
 
@@ -241,7 +241,7 @@ export const Presentation = () => {
             <input ref={imgInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
 
             {/* App header */}
-            <div className="flex items-center justify-between px-2.5 md:px-5 py-1.5 md:py-3 bg-paper/95 backdrop-blur border-b border-stone-200 shrink-0 z-10 gap-3">
+            <div className="flex items-center justify-between px-2.5 md:px-5 py-1.5 md:py-3 bg-white/95 backdrop-blur border-b border-stone-200 shrink-0 z-10 gap-3">
                 <div className="flex items-center gap-3 min-w-0">
                     {/* <button onClick={() => navigate(-1)} className="w-8 h-8  flex items-center justify-center text-stone-400 hover:bg-stone-100 transition-colors shrink-0">
                         <span className="material-symbols-outlined text-[20px]">arrow_back</span>
@@ -261,16 +261,16 @@ export const Presentation = () => {
                     {saving && <span className="flex items-center gap-1 text-[11px] text-plum-600"><Loader size="xs" /></span>}
                     {!saving && saveMsg==='saved' && <span className="flex items-center gap-1 text-[11px] text-emerald-600"><span className="material-symbols-outlined text-[13px]">check</span>Saved</span>}
                     <button onClick={() => setIsShakespeareOpen(true)}
-                        className="flex items-center gap-1 md:gap-1.5 px-1.5 py-1 md:px-3 md:py-1.5  text-[11px] md:text-xs font-medium md:font-semibold transition-colors bg-plum-50 text-plum-700 hover:bg-plum-100"
+                        className="flex items-center gap-1 md:gap-1.5 px-2 py-1.5 md:px-3 md:py-1.5 rounded-lg text-[11px] md:text-xs font-medium md:font-semibold transition-colors bg-emerald-50 text-primary hover:bg-emerald-100"
                         title="Shakespeare Assist — AI writing">
-                   
+                        <span className="material-symbols-outlined text-[15px]">edit_note</span>
                         <span className="hidden sm:inline">Shakespeare</span>
                     </button>
                     <button onClick={() => setShowNotes(v=>!v)}
-                        className={`flex items-center gap-1 md:gap-1.5 px-1.5 py-1 md:px-3 md:py-1.5  text-[11px] md:text-xs font-medium md:font-semibold transition-colors border ${showNotes?'bg-plum-50 text-plum-700 border-plum-200':'text-stone-500 hover:bg-stone-100 border-transparent'}`}>
+                        className={`flex items-center gap-1 md:gap-1.5 px-2 py-1.5 md:px-3 md:py-1.5 rounded-lg text-[11px] md:text-xs font-medium md:font-semibold transition-colors border ${showNotes?'bg-emerald-50 text-primary border-emerald-200':'text-stone-500 hover:bg-stone-100 border-transparent'}`}>
                         <span className="material-symbols-outlined text-[11px] md:text-[15px]">speaker_notes</span>Notes
                     </button>
-                    <button onClick={toggleFS} className="w-5 h-5 md:w-8 md:h-8   flex items-center justify-center text-stone-500 hover:bg-stone-100 transition-all">
+                    <button onClick={toggleFS} className="w-7 h-7 md:w-8 md:h-8 rounded-lg flex items-center justify-center text-stone-500 hover:bg-stone-100 transition-all">
                         <span className="material-symbols-outlined text-[18px]">{isFullscreen?'fullscreen_exit':'fullscreen'}</span>
                     </button>
                     {/* Export dropdown */}
@@ -278,24 +278,24 @@ export const Presentation = () => {
                         <button
                             onClick={() => setShowExportMenu(v => !v)}
                             disabled={exporting || exportingPdf}
-                            className="flex items-center gap-1 md:gap-1.5 px-2 md:px-4 py-1 md:py-1.5   text-[9px] md:text-xs font-normal md:font-semibold bg-plum-600 text-white hover:bg-plum-700 active:scale-95 transition-colors disabled:opacity-60"
+                            className="flex items-center gap-1 md:gap-1.5 px-2.5 md:px-4 py-1.5 md:py-2 rounded-lg text-[10px] md:text-xs font-medium md:font-semibold bg-primary text-white hover:bg-plum-700 active:scale-95 transition-colors disabled:opacity-60"
                         >
                             {(exporting || exportingPdf)
                                 ? <Loader size="xs" />
                                 : <><span className="material-symbols-outlined text-[14px]">download</span>Export<span className="material-symbols-outlined text-[14px] ml-0.5">expand_more</span></>}
                         </button>
                         {showExportMenu && (
-                            <div className="absolute right-0 top-9 bg-white   shadow-xl border border-stone-200 py-1.5 w-44 z-50 animate-in fade-in zoom-in-95 duration-100">
+                            <div className="absolute right-0 top-10 bg-white rounded-xl shadow-xl border border-stone-200 py-1.5 w-44 z-50 animate-in fade-in zoom-in-95 duration-100 overflow-hidden">
                                 <button
                                     onClick={() => { setShowExportMenu(false); handleExportPPTX(); }}
-                                    className="w-full flex items-center gap-1.5 md:gap-3 px-2 md:px-4 py-1.5 md:py-2.5 text-[12px] md:text-sm text-stone-700 hover:bg-stone-50 transition-colors"
+                                    className="w-full flex items-center gap-1.5 md:gap-3 px-3 md:px-4 py-2 md:py-2.5 text-[12px] md:text-sm text-stone-700 hover:bg-stone-50 transition-colors"
                                 >
                                     <span className="material-symbols-outlined text-[13px] md:text-[17px] text-plum-600">slideshow</span>
                                     Export PPTX
                                 </button>
                                 <button
                                     onClick={handleExportPDF}
-                                    className="w-full flex items-center gap-1.5 md:gap-3 px-2 md:px-4 py-1.5 md:py-2.5 text-[12px] md:text-sm text-stone-700 hover:bg-stone-50 transition-colors"
+                                    className="w-full flex items-center gap-1.5 md:gap-3 px-3 md:px-4 py-2 md:py-2.5 text-[12px] md:text-sm text-stone-700 hover:bg-stone-50 transition-colors"
                                 >
                                     <span className="material-symbols-outlined text-[13px] md:text-[17px] text-stone-500">picture_as_pdf</span>
                                     Export PDF
@@ -327,13 +327,13 @@ export const Presentation = () => {
                         {slides.map((s,i) => (
                             <div key={i} className="relative group/thumb">
                                 <button onClick={() => goTo(i)}
-                                    className={`w-full text-left  p-1.5 transition-all ${i===idx?'ring-2 ring-plum-400 bg-plum-50':'hover:bg-stone-100'}`}>
+                                    className={`w-full text-left rounded-lg p-1.5 transition-all ${i===idx?'ring-2 ring-primary bg-emerald-50':'hover:bg-stone-100'}`}>
                                     <Thumbnail slide={s} themeId={themeId} />
                                     <p className={`text-[9px] font-medium truncate mt-1 ${i===idx?'text-plum-700':'text-stone-500'}`}>{i+1}. {s.title||'Untitled'}</p>
                                 </button>
                                 {slides.length > 1 && (
                                     <button onClick={(e) => { e.stopPropagation(); deleteSlide(i); }}
-                                        className="absolute top-2 right-2 opacity-0 group-hover/thumb:opacity-100 w-5 h-5  bg-red-500 text-white flex items-center justify-center transition-all shadow"
+                                        className="absolute top-2 right-2 opacity-0 group-hover/thumb:opacity-100 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center transition-all shadow"
                                         title="Delete slide">
                                         <span className="material-symbols-outlined text-[11px]">delete</span>
                                     </button>
@@ -364,9 +364,9 @@ export const Presentation = () => {
                     </div>
 
                     {/* Navigation */}
-                    <div className="flex items-center justify-between px-5 py-2.5 bg-paper/95 border-t border-stone-200 shrink-0">
+                    <div className="flex items-center justify-between px-5 py-2.5 bg-white/95 border-t border-stone-200 shrink-0">
                         <button onClick={goPrev} disabled={idx===0}
-                            className="flex items-center gap-1.5 px-3 py-1.5  text-[12px] md:text-sm md:font-medium text-stone-600 hover:bg-stone-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all">
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] md:text-sm md:font-medium text-stone-600 hover:bg-stone-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all">
                             <span className="material-symbols-outlined text-[15px] md:text-[18px]">chevron_left</span>Prev
                         </button>
                         <div className="flex items-center gap-2">
@@ -374,7 +374,7 @@ export const Presentation = () => {
                             <span className="text-[11px] text-stone-400">of {slides.length}</span>
                         </div>
                         <button onClick={goNext} disabled={idx===slides.length-1}
-                            className="flex items-center gap-1.5 px-3 py-1.5  text-[12px] md:text-sm md:font-medium text-stone-600 hover:bg-stone-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all">
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] md:text-sm md:font-medium text-stone-600 hover:bg-stone-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all">
                             Next<span className="material-symbols-outlined text-[15px] md:text-[18px]">chevron_right</span>
                         </button>
                     </div>

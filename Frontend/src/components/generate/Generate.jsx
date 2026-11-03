@@ -274,7 +274,7 @@ export default function Generate() {
                 {/* ── Top bar ──────────────────────────────────────────────── */}
                 <header className="studio-header sticky top-0 z-40 border-b px-6 h-16 md:flex items-center justify-between shrink-0">
                     <div className="flex items-center gap-3">
-                        <span className="font-display-serif text-[18px] font-semibold tracking-tight text-stone-900">AI Studio</span>
+                        <span className="font-display text-[18px] font-semibold tracking-tight text-stone-900">AI Studio</span>
                     </div>
                     <div className="flex items-center gap-3 text-xs">
                         {isStreaming && (
@@ -502,7 +502,7 @@ export default function Generate() {
                                             <span className="material-symbols-outlined text-[44px]">edit_note</span>
                                         </div>
                                         <div>
-                                            <h3 className="font-display-serif text-[22px] font-semibold text-stone-900 mb-2 tracking-tight">Ready when you are</h3>
+                                            <h3 className="font-display text-[22px] font-semibold text-stone-900 mb-2 tracking-tight">Ready when you are</h3>
                                             <p className="text-sm text-stone-500 max-w-sm leading-relaxed mx-auto">
                                                 Tell it what to write below, or pull from a note, paper or folder.
                                             </p>

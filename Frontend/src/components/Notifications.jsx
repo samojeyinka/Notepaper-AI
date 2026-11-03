@@ -68,7 +68,7 @@ export const NotificationsHeader = ({ onMarkAllAsRead, hasUnread }) => (
     <header className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
         <div>
             <p className="eyebrow text-plum-700 mb-1.5">Activity</p>
-            <h1 className="font-display-serif text-[26px] md:text-[32px] font-semibold tracking-tight text-stone-900 leading-tight">
+            <h1 className="font-display text-[26px] md:text-[32px] font-semibold tracking-tight text-stone-900 leading-tight">
                 Notifications
             </h1>
             <p className="text-[13px] text-stone-500 mt-1">Everything your account and Schola have been up to.</p>
@@ -239,7 +239,7 @@ const EmptyState = () => (
         <div className="w-14 h-14 bg-plum-50 text-plum-600 flex items-center justify-center mb-4">
             <span className="material-symbols-outlined text-[26px]">notifications_none</span>
         </div>
-        <h3 className="font-display-serif text-[20px] font-semibold text-stone-900 mb-1">You're all caught up</h3>
+        <h3 className="font-display text-[20px] font-semibold text-stone-900 mb-1">You're all caught up</h3>
         <p className="text-[13px] text-stone-500">New activity will show up here.</p>
     </div>
 );

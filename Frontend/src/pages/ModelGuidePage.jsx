@@ -136,7 +136,7 @@ export default function ModelGuidePage() {
             <main className="flex-1 lg:ml-64 px-4 sm:px-6 lg:px-10 pt-20 lg:pt-10 pb-32 min-w-0 overflow-x-hidden">
                 <div className="max-w-3xl mx-auto">
                     <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-plum-700 mb-1.5">Model Guide</p>
-                    <h1 className="font-display-serif text-[28px] md:text-[34px] font-semibold tracking-tight text-stone-900 leading-tight">
+                    <h1 className="font-display text-[28px] md:text-[34px] font-semibold tracking-tight text-stone-900 leading-tight">
                         Choose your AI provider
                     </h1>
                     <p className="text-stone-500 text-[13px] md:text-sm mt-2 max-w-2xl leading-relaxed">

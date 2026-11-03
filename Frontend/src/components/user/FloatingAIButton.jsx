@@ -77,25 +77,25 @@ export const CreateFolderModal = ({ onClose, onCreated }) => {
     };
 
     const fieldCls =
-        "w-full bg-stone-50 border border-stone-200  px-4 py-2.5 text-sm text-stone-800 placeholder:text-stone-400 outline-none focus:border-plum-500 focus:ring-2 focus:ring-plum-100 transition-colors";
+        "w-full rounded-xl bg-stone-50 border border-stone-200 px-4 py-2.5 text-sm text-stone-800 placeholder:text-stone-400 outline-none focus:border-plum-500 focus:ring-2 focus:ring-plum-100 transition-colors";
 
     return createPortal(
         <div className="workspace-modal fixed inset-0 z-[100] flex items-center justify-center"
             style={{ background: 'rgba(28,25,23,0.5)', backdropFilter: 'blur(4px)' }}>
-            <div className="workspace-modal-panel bg-paper md: shadow-2xl ring-1 ring-stone-200 w-full max-w-md mx-4 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="workspace-modal-panel bg-paper rounded-2xl shadow-2xl ring-1 ring-stone-200 w-full max-w-md mx-4 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
 
                 {/* Header */}
                 <div className="px-6 pt-6 pb-4 border-b border-stone-200/70 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <FolderShape shape={shape} color={color} icon={icon} size={44} />
                         <div>
-                            <h2 className="font-display-serif text-[18px] font-semibold text-stone-900 leading-tight">
+                            <h2 className="font-display text-[18px] font-semibold text-stone-900 leading-tight">
                                 {name || 'New Folder'}
                             </h2>
                             <p className="text-[11.5px] text-stone-400 mt-0.5">Group related pages in one place</p>
                         </div>
                     </div>
-                    <button onClick={onClose} aria-label="Close" className="w-8 h-8  flex items-center justify-center text-stone-400 hover:bg-stone-100 hover:text-stone-700 transition-colors">
+                    <button onClick={onClose} aria-label="Close" className="w-8 h-8 rounded-lg flex items-center justify-center text-stone-400 hover:bg-stone-100 hover:text-stone-700 transition-colors">
                         <span className="material-symbols-outlined text-[18px]">close</span>
                     </button>
                 </div>
@@ -132,7 +132,7 @@ export const CreateFolderModal = ({ onClose, onCreated }) => {
                         <div className="flex flex-wrap gap-2.5">
                             {COLORS.map(c => (
                                 <button key={c.value} type="button" onClick={() => setColor(c.value)} title={c.label}
-                                    className={`w-6 h-6 md:w-7 md:h-7  transition-transform hover:scale-110 active:scale-95 ${color === c.value ? 'ring-2 ring-stone-900 ring-offset-2 scale-110' : ''}`}
+                                    className={`w-6 h-6 md:w-7 md:h-7 rounded-full transition-transform hover:scale-110 active:scale-95 ${color === c.value ? 'ring-2 ring-stone-900 ring-offset-2 scale-110' : ''}`}
                                     style={{ backgroundColor: c.value }}
                                 />
                             ))}
@@ -145,7 +145,7 @@ export const CreateFolderModal = ({ onClose, onCreated }) => {
                         <div className="flex flex-wrap gap-3">
                             {SHAPES.map(s => (
                                 <button key={s.id} type="button" onClick={() => setShape(s.id)} title={s.label}
-                                    className={`transition-transform hover:scale-110 active:scale-95 p-1  ${shape === s.id ? 'ring-2 ring-plum-600 ring-offset-2 ring-offset-paper' : ''}`}
+                                    className={`rounded-lg transition-transform hover:scale-110 active:scale-95 p-1 ${shape === s.id ? 'ring-2 ring-plum-600 ring-offset-2 ring-offset-paper' : ''}`}
                                 >
                                     <div style={{ backgroundColor: color, ...s.style }} className="w-6 h-6 md:w-7 md:h-7" />
                                 </button>
@@ -159,7 +159,7 @@ export const CreateFolderModal = ({ onClose, onCreated }) => {
                         <div className="flex flex-wrap gap-2">
                             {ICONS.map(ic => (
                                 <button key={ic} type="button" onClick={() => setIcon(ic)}
-                                    className={`w-8 h-8 md:w-9 md:h-9  flex items-center justify-center transition-all
+                                    className={`w-8 h-8 md:w-9 md:h-9 rounded-lg flex items-center justify-center transition-all
                                         ${icon === ic ? 'bg-plum-600 text-white shadow-md shadow-plum-600/25' : 'bg-stone-100 text-stone-500 hover:bg-stone-200'}`}
                                 >
                                     <span className="material-symbols-outlined text-[16px] md:text-[18px]">{ic}</span>
@@ -176,11 +176,11 @@ export const CreateFolderModal = ({ onClose, onCreated }) => {
 
                     <div className="flex gap-3 pt-1">
                         <button type="button" onClick={onClose}
-                            className="flex-1 py-2.5  bg-stone-100 text-stone-600 text-sm font-semibold hover:bg-stone-200 transition-colors">
+                            className="flex-1 rounded-xl py-2.5 bg-stone-100 text-stone-600 text-sm font-semibold hover:bg-stone-200 transition-colors">
                             Cancel
                         </button>
                         <button type="submit" disabled={!name.trim() || loading}
-                            className="flex-1 py-2.5  bg-stone-900 text-white text-sm font-semibold hover:bg-stone-700 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                            className="flex-1 rounded-xl py-2.5 bg-primary text-white text-sm font-semibold hover:bg-plum-700 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
                             {loading
                                 ? <Loader size="sm" />
                                 : <><span className="material-symbols-outlined text-[16px]">create_new_folder</span>Create folder</>}
@@ -270,14 +270,14 @@ export const FloatingAIButton = ({ exclude = [], folderId = null }) => {
                                     transition-all duration-200
                                     text-[12px] font-semibold text-stone-700
                                     bg-white ring-1 ring-stone-200 shadow-md shadow-stone-900/5
-                                    px-3 py-1.5  whitespace-nowrap select-none pointer-events-none
+                                    rounded-full px-3 py-1.5 whitespace-nowrap select-none pointer-events-none
                                 ">
                                     {item.label}
                                 </span>
 
                                 {/* Icon circle */}
                                 <div
-                                    className="w-10 md:w-12 h-10 md:h-12  flex items-center justify-center text-white
+                                    className="w-10 md:w-12 h-10 md:h-12 rounded-full flex items-center justify-center text-white
                                         transition-all duration-200 hover:scale-110 active:scale-95
                                         shadow-md shadow-stone-900/15"
                                     style={{ backgroundColor: item.color }}
@@ -297,7 +297,7 @@ export const FloatingAIButton = ({ exclude = [], folderId = null }) => {
                     onClick={() => setMenuOpen(v => !v)}
                     title={menuOpen ? 'Close' : 'Create new…'}
                     aria-label={menuOpen ? 'Close menu' : 'Create new'}
-                    className={`w-12 h-12 md:w-14 md:h-14  flex items-center justify-center text-white bg-stone-900 shadow-lg shadow-stone-900/25 hover:bg-stone-700 active:scale-95 transition-all duration-200`}
+                    className={`w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-white bg-primary shadow-lg shadow-stone-900/20 hover:bg-plum-700 active:scale-95 transition-all duration-200`}
                     style={{ transform: menuOpen ? 'rotate(45deg)' : 'rotate(0deg)' }}
                 >
                     <span className="material-symbols-outlined text-[22px] md:text-[26px]">add</span>

@@ -94,7 +94,7 @@ export default function DeleteAccountConfirm() {
       <div className="bg-white ring-1 ring-red-200/80 p-7 md:p-10">
         <header className="mb-8 text-center">
           <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-red-700 mb-2">Last step</p>
-          <h1 className="font-display-serif text-[24px] md:text-[28px] font-semibold text-stone-900 tracking-tight">
+          <h1 className="font-display text-[24px] md:text-[28px] font-semibold text-stone-900 tracking-tight">
             Final confirmation
           </h1>
           <p className="text-stone-500 text-[13.5px] mt-2 max-w-sm mx-auto leading-relaxed">

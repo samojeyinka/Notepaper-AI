@@ -156,7 +156,7 @@ const SprintRoadmap = ({ sprint }) => {
                         <span className="material-symbols-outlined text-[18px]">arrow_back</span>
                     </button>
                     <div className="flex-1 min-w-0">
-                        <h1 className="font-display-serif text-[20px] md:text-[26px] font-semibold tracking-tight text-stone-900 truncate leading-tight">
+                        <h1 className="font-display text-[20px] md:text-[26px] font-semibold tracking-tight text-stone-900 truncate leading-tight">
                             {sprint.title}
                         </h1>
                         <p className="text-[11.5px] text-stone-400 mt-0.5">
@@ -164,7 +164,7 @@ const SprintRoadmap = ({ sprint }) => {
                         </p>
                     </div>
                     <div className="text-right shrink-0">
-                        <p className="font-display-serif text-[24px] font-semibold text-plum-700 leading-none tabular-nums">{pct}%</p>
+                        <p className="font-display text-[24px] font-semibold text-plum-700 leading-none tabular-nums">{pct}%</p>
                         <p className="text-[9.5px] font-semibold uppercase tracking-widest text-stone-400 mt-1.5">
                             {completed}/{total} done
                         </p>
@@ -214,7 +214,7 @@ const SprintRoadmap = ({ sprint }) => {
                             <div className="w-14 h-14 mx-auto bg-stone-50 border border-stone-200 flex items-center justify-center mb-4">
                                 <span className="material-symbols-outlined text-stone-300 text-[24px]">route</span>
                             </div>
-                            <p className="font-display-serif text-[18px] font-semibold text-stone-900 mb-1">No challenges yet</p>
+                            <p className="font-display text-[18px] font-semibold text-stone-900 mb-1">No challenges yet</p>
                             <p className="text-[12.5px] text-stone-400 leading-relaxed">
                                 Challenges will appear here as soon as this sprint finishes generating.
                             </p>
@@ -373,7 +373,7 @@ const SprintRoadmap = ({ sprint }) => {
                                             </p>
                                             <StatusBadge status={sv(selected.status)} />
                                         </div>
-                                        <h2 className="font-display-serif text-[21px] font-semibold tracking-tight text-stone-900 leading-snug">{selected.title}</h2>
+                                        <h2 className="font-display text-[21px] font-semibold tracking-tight text-stone-900 leading-snug">{selected.title}</h2>
                                     </div>
                                     <button onClick={() => setSelectedId(null)}
                                         aria-label="Close"
@@ -414,7 +414,7 @@ const SprintRoadmap = ({ sprint }) => {
                             <div className="w-16 h-16 bg-plum-50 border border-plum-100 flex items-center justify-center mb-4">
                                 <span className="material-symbols-outlined text-plum-600 text-[26px]">touch_app</span>
                             </div>
-                            <p className="font-display-serif text-[19px] font-semibold text-stone-900 mb-1.5">Select a challenge</p>
+                            <p className="font-display text-[19px] font-semibold text-stone-900 mb-1.5">Select a challenge</p>
                             <p className="text-[12.5px] text-stone-400 leading-relaxed">Pick any unlocked node to read what&rsquo;s inside</p>
 
                             <div className="mt-8 w-full space-y-2">
@@ -464,7 +464,7 @@ const SprintRoadmap = ({ sprint }) => {
                                     </p>
                                     <StatusBadge status={sv(selected.status)} />
                                 </div>
-                                <h3 className="font-display-serif text-[17px] font-semibold text-stone-900 leading-snug">{selected.title}</h3>
+                                <h3 className="font-display text-[17px] font-semibold text-stone-900 leading-snug">{selected.title}</h3>
                             </div>
                             <button onClick={() => setSelectedId(null)}
                                 aria-label="Close"

@@ -187,7 +187,7 @@ Rules:
                     <div className="flex items-center gap-3">
                       
                         <div>
-                            <h2 className="font-display-serif text-[17px] font-semibold text-stone-900 leading-tight">Flashcard studio</h2>
+                            <h2 className="font-display text-[17px] font-semibold text-stone-900 leading-tight">Flashcard studio</h2>
                             <p className="text-[10px] text-stone-400">Study cards, made from any topic</p>
                         </div>
                     </div>
@@ -346,7 +346,7 @@ Rules:
                                  
                                 </div>
                                 <div>
-                                    <h3 className="font-display-serif text-[22px] font-semibold text-stone-900 mb-2 tracking-tight">Turn a topic into cards</h3>
+                                    <h3 className="font-display text-[22px] font-semibold text-stone-900 mb-2 tracking-tight">Turn a topic into cards</h3>
                                     <p className="text-sm text-stone-400 max-w-sm leading-relaxed">
                                         Enter a topic on the left and hit <strong className="text-stone-600">Generate Flashcards</strong> to build your study deck instantly.
                                     </p>

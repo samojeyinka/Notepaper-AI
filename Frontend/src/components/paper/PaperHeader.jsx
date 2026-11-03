@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import NotificationIcon from "../user/NotificationIcon";
 import AccountMenu from "../user/AccountMenu";
 import { APP_BASENAME } from "../../utils/basename";
-import { shakespearepurple } from "../../assets/assets";
 
 const STATUS_CONFIG = {
     loading: { label: 'Loading', icon: 'hourglass_top',  cls: 'bg-stone-100 text-stone-400' },
@@ -107,9 +106,7 @@ const VoiceCountdown = ({ voiceState }) => {
     return null;
 };
 
-// `compact` sizes the Schola button to its portrait image and leaves it
-// untinted, so it gets no active fill — just an opacity nudge on hover.
-const ActionButton = ({ icon, image, title, onClick, active, disabled, listening, compact, children }) => (
+const ActionButton = ({ icon, title, onClick, active, disabled, listening, compact, children }) => (
     <button
         onClick={onClick}
         title={title}
@@ -126,11 +123,7 @@ const ActionButton = ({ icon, image, title, onClick, active, disabled, listening
             }
             ${disabled ? 'opacity-30 cursor-not-allowed' : ''}`}
     >
-        {image ? (
-            <img src={image} alt="" aria-hidden="true" className="h-[16px] md:h-[18px] w-auto object-contain" />
-        ) : (
-            <span className="material-symbols-outlined text-[17px] md:text-[18px]">{icon}</span>
-        )}
+        <span className="material-symbols-outlined text-[17px] md:text-[18px]">{icon}</span>
         {children}
     </button>
 );
@@ -270,7 +263,7 @@ export const PaperHeader = ({
                             </span>
                         )}
                     </ActionButton>
-                    <ActionButton image={shakespearepurple} title="Schola AI assistant" onClick={onToggleAI} active={isAIOpen} compact />
+                    <ActionButton icon="edit_note" title="Schola AI assistant" onClick={onToggleAI} active={isAIOpen} compact />
                     <ActionButton icon="tune" title="Paper preferences" onClick={onOpenPreferences} />
 
                     <div className="relative">

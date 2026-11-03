@@ -154,7 +154,7 @@ const PaperPage = ({
       <div
         className={`absolute inset-0  transition-all duration-300 ${
           isActive
-            ? 'shadow-[0_8px_40px_rgba(28,25,23,0.16)] ring-2 ring-plum-400 ring-offset-4'
+          ? 'shadow-[0_8px_40px_rgba(28,25,23,0.16)] ring-2 ring-primary ring-offset-4'
             : 'shadow-[0_4px_20px_rgba(0,0,0,0.10)]'
         }`}
         style={{ backgroundColor: '#ffffff' }}
@@ -350,11 +350,11 @@ export const PaperEditor = forwardRef(function PaperEditor(
       {/* Image resize overlay */}
       {selectedImg && createPortal(
         <div style={{ position:'fixed',inset:0,zIndex:9998,pointerEvents:'none' }}>
-          <div style={{ position:'fixed',left:selectedImg.rect.left,top:selectedImg.rect.top,width:selectedImg.rect.width,height:selectedImg.rect.height,border:'2px solid #a78bfa',borderRadius:'2px',pointerEvents:'none' }} />
+          <div style={{ position:'fixed',left:selectedImg.rect.left,top:selectedImg.rect.top,width:selectedImg.rect.width,height:selectedImg.rect.height,border:'2px solid #54786f',borderRadius:'2px',pointerEvents:'none' }} />
           {HANDLES.map(h => {
             const pos = handlePos(h, selectedImg.rect);
             return (
-              <div key={h} style={{ position:'fixed',left:pos.left,top:pos.top,width:10,height:10,background:'white',border:'2px solid #8465BC',borderRadius:'2px',cursor:handleCursor[h],pointerEvents:'all',zIndex:9999 }}
+              <div key={h} style={{ position:'fixed',left:pos.left,top:pos.top,width:10,height:10,background:'white',border:'2px solid #54786f',borderRadius:'2px',cursor:handleCursor[h],pointerEvents:'all',zIndex:9999 }}
                 onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); resizeDragRef.current = { handle:h,startX:e.clientX,startY:e.clientY,startW:selectedImg.el.offsetWidth,startH:selectedImg.el.offsetHeight }; }} />
             );
           })}

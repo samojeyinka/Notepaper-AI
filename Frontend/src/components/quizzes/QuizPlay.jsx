@@ -214,7 +214,7 @@ const ScoreScreen = ({ score, total, quiz, onRestart, onBack}) => {
                     </div>
                     <div>
                         <p className={`text-sm font-semibold uppercase tracking-[0.16em] ${grade.color}`}>{grade.label}</p>
-                        <h2 className="font-display-serif text-stone-900 font-semibold text-5xl mt-2">{pct}%</h2>
+                        <h2 className="font-display text-stone-900 font-semibold text-5xl mt-2">{pct}%</h2>
                         <p className="text-stone-500 text-sm mt-1">{score} out of {total} correct</p>
                     </div>
 
@@ -451,7 +451,7 @@ export default function QuizPlay() {
                             </div>
                             <div>
                                 <p className="text-xs text-stone-400 font-semibold uppercase tracking-[0.16em]">Score so far</p>
-                                <p className="font-display-serif text-2xl font-semibold text-stone-900 mt-0.5">
+                                <p className="font-display text-2xl font-semibold text-stone-900 mt-0.5">
                                     {score} <span className="text-stone-300 text-lg font-normal">/ {currentIdx}</span>
                                 </p>
                             </div>
@@ -476,7 +476,7 @@ export default function QuizPlay() {
                                 </span>
 
                                 {/* Question text */}
-                                <h2 className="font-display-serif text-[16px] md:text-2xl text-stone-900 leading-snug">
+                                <h2 className="font-display text-[16px] md:text-2xl text-stone-900 leading-snug">
                                     {q.question}
                                 </h2>
 
@@ -585,7 +585,7 @@ export default function QuizPlay() {
                                     onChange={e => setInputVal(e.target.value)}
                                     disabled={submitted}
                                     placeholder="Type your answer…"
-                                    className="w-full bg-transparent font-display-serif text-[13px] md:text-lg text-stone-900 border-none outline-none placeholder-stone-300 disabled:opacity-60"
+                                    className="w-full bg-transparent font-display text-[13px] md:text-lg text-stone-900 border-none outline-none placeholder-stone-300 disabled:opacity-60"
                                     onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); submitted ? advance() : checkAnswer();}}}
                                 />
                             </div>

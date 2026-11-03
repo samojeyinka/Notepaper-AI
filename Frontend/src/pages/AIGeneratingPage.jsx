@@ -135,7 +135,7 @@ export default function AIGeneratingPage() {
                     <span className="material-symbols-outlined text-white text-[34px]" style={{ fontVariationSettings: "'FILL' 1" }}>check</span>
                 </div>
 
-                <h2 className="font-display-serif text-[26px] md:text-[32px] font-semibold tracking-tight text-stone-900 leading-tight mb-2">
+                <h2 className="font-display text-[26px] md:text-[32px] font-semibold tracking-tight text-stone-900 leading-tight mb-2">
                     Your {actionLabel.toLowerCase()} {typeLabel.toLowerCase()} is ready
                 </h2>
                 {resultTitle && (
@@ -172,7 +172,7 @@ export default function AIGeneratingPage() {
                     <span className="material-symbols-outlined text-red-500 text-[34px]">error_outline</span>
                 </div>
 
-                <h2 className="font-display-serif text-[26px] md:text-[32px] font-semibold tracking-tight text-stone-900 leading-tight mb-2">
+                <h2 className="font-display text-[26px] md:text-[32px] font-semibold tracking-tight text-stone-900 leading-tight mb-2">
                     Something went wrong
                 </h2>
                 <p className="text-[14px] text-stone-500 mb-7">Generation timed out. Please go back and try again.</p>
@@ -212,7 +212,7 @@ export default function AIGeneratingPage() {
                 </span>
             </div>
 
-            <h2 className="font-display-serif text-[24px] md:text-[30px] font-semibold tracking-tight text-stone-900 leading-tight mb-2">
+            <h2 className="font-display text-[24px] md:text-[30px] font-semibold tracking-tight text-stone-900 leading-tight mb-2">
                 Schola is {action === 'simplify' ? 'simplifying' : 'expanding'} your {typeLabel.toLowerCase()}
             </h2>
             <p className="text-[13px] text-plum-700 font-medium mb-7">{phases[phase]}</p>

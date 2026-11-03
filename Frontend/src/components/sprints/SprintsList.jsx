@@ -168,7 +168,7 @@ const SprintsList = () => {
             <div className="sprints-header flex items-end justify-between gap-4 mb-8">
                 <div>
                     <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-plum-700 mb-1.5">Focused study</p>
-                    <h1 className="font-display-serif text-[28px] md:text-[34px] font-semibold tracking-tight text-stone-900 leading-tight">Sprints</h1>
+                    <h1 className="font-display text-[28px] md:text-[34px] font-semibold tracking-tight text-stone-900 leading-tight">Sprints</h1>
                     <p className="text-stone-500 text-[13px] md:text-sm mt-1.5">Short, focused study pushes with a clear end.</p>
                 </div>
                 <div className="flex items-center gap-3 md:gap-5">
@@ -187,7 +187,7 @@ const SprintsList = () => {
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-paper-darker/70 ring-1 ring-stone-200/80 px-6 md:px-9 py-6 md:py-8 mb-8">
                     <div className="max-w-sm">
                         <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-plum-700 mb-2">Momentum</p>
-                        <p className="font-display-serif text-[19px] md:text-[22px] font-semibold text-stone-900 leading-snug">
+                        <p className="font-display text-[19px] md:text-[22px] font-semibold text-stone-900 leading-snug">
                             {activeCount > 0
                                 ? `You're in the middle of ${activeCount} active ${activeCount === 1 ? 'sprint' : 'sprints'}.`
                                 : 'Nice work — you have a clean slate.'}
@@ -199,17 +199,17 @@ const SprintsList = () => {
 
                     <div className="flex items-center gap-8 md:gap-10 shrink-0">
                         <div>
-                            <p className="font-display-serif text-[26px] md:text-[30px] font-semibold text-plum-700 leading-none">{totalDone}</p>
+                            <p className="font-display text-[26px] md:text-[30px] font-semibold text-plum-700 leading-none">{totalDone}</p>
                             <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 mt-1.5">Challenges cleared</p>
                         </div>
                         <div className="w-px h-9 bg-stone-300/70 hidden md:block" />
                         <div>
-                            <p className="font-display-serif text-[26px] md:text-[30px] font-semibold text-stone-900 leading-none">{completedCount}</p>
+                            <p className="font-display text-[26px] md:text-[30px] font-semibold text-stone-900 leading-none">{completedCount}</p>
                             <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 mt-1.5">Completed sprints</p>
                         </div>
                         <div className="w-px h-9 bg-stone-300/70 hidden md:block" />
                         <div>
-                            <p className="font-display-serif text-[26px] md:text-[30px] font-semibold text-stone-900 leading-none">{sprints.length}</p>
+                            <p className="font-display text-[26px] md:text-[30px] font-semibold text-stone-900 leading-none">{sprints.length}</p>
                             <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 mt-1.5">Total sprints</p>
                         </div>
                     </div>
@@ -294,7 +294,7 @@ const SprintsList = () => {
             {/* Empty — no sprints yet */}
             {!loading && !error && sprints.length === 0 && (
                 <div className="flex flex-col items-center justify-center py-24 text-center">
-                    <h3 className="font-display-serif text-[22px] font-semibold text-stone-900 mb-2">Plan your first sprint</h3>
+                    <h3 className="font-display text-[22px] font-semibold text-stone-900 mb-2">Plan your first sprint</h3>
                     <p className="text-stone-500 text-sm max-w-sm leading-relaxed mb-7">
                         Pick a goal, give it a few days, and let a sprint break it into one focused challenge at a time.
                     </p>

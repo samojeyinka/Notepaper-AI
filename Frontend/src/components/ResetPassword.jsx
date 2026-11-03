@@ -97,7 +97,7 @@ export default function ResetPassword() {
 
         <header className="mb-7">
           <p className="eyebrow text-plum-700 mb-3">New password</p>
-          <h1 className="font-display-serif text-3xl md:text-4xl font-semibold tracking-tight text-stone-900">
+          <h1 className="font-display text-3xl md:text-4xl font-semibold tracking-tight text-stone-900">
             Set a new password
           </h1>
           <p className="text-stone-500 text-[15px] mt-2">

@@ -56,7 +56,7 @@ export default function RestoreAccount() {
       <section className="hidden md:flex flex-1 p-12 lg:p-16 items-center justify-center bg-paper-darker/50 border-r border-stone-200/70">
         <div className="max-w-md">
           <p className="eyebrow text-plum-700 mb-5">Welcome back</p>
-          <h1 className="font-display-serif text-4xl xl:text-5xl font-semibold tracking-tight text-stone-900 leading-[1.1] mb-6">
+          <h1 className="font-display text-4xl xl:text-5xl font-semibold tracking-tight text-stone-900 leading-[1.1] mb-6">
             Your pages were <span className="italic text-plum-700">kept for you.</span>
           </h1>
           <p className="text-stone-600 text-[16px] leading-relaxed">
@@ -85,7 +85,7 @@ export default function RestoreAccount() {
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-plum-700 mb-2">
               {success ? 'Check your inbox' : 'Restore account'}
             </p>
-            <h2 className="font-display-serif text-[26px] md:text-[30px] font-semibold tracking-tight text-stone-900 leading-tight">
+            <h2 className="font-display text-[26px] md:text-[30px] font-semibold tracking-tight text-stone-900 leading-tight">
               {success ? 'Link on its way' : "Let's get you back in"}
             </h2>
             <p className="text-stone-500 text-[13.5px] mt-2 leading-relaxed">

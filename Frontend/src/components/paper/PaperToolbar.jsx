@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { HexColorPicker } from "react-colorful";
-import { shakespeare } from "../../assets/assets";
 
 const POPOVER_MAX_HEIGHT = 520;
 const POPOVER_MARGIN     = 8;
@@ -240,7 +239,7 @@ export const PaperToolbar = ({ onAction, activeState, recentColors = [], onAddRe
         {/* 0. Shakespeare AI */}
         <button onMouseDown={(e) => { e.preventDefault(); onOpenShakespeare?.(); }} title="Shakespeare Assist — AI writing"
           className="w-8 h-8 md:w-9 md:h-9 flex items-center justify-center bg-plum-600 text-white hover:bg-plum-700 active:scale-95 transition-all">
-          <img src={shakespeare}/>
+          <span className="material-symbols-outlined text-[18px] md:text-[20px]">edit_note</span>
         </button>
 
         <div className="h-px w-7 bg-stone-200 shrink-0" />

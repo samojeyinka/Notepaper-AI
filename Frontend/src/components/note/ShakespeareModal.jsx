@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { shakespeare } from '../../assets/assets';
 import { useAIKeys } from '../../hooks/useAIKeys';
 import { friendlyAIError } from '../../utils/aiErrors';
 import { generateWithUserKey, NO_AI_KEY_MESSAGE } from '../../utils/aiRuntime';
@@ -117,8 +116,8 @@ const ShakespeareModal = ({ onClose, onInsert }) => {
                 {/* Header */}
                 <div className="flex items-center justify-between px-2 md:px-4 py-1.5 md:py-3 border-b border-stone-100 shrink-0">
                     <div className="flex items-center gap-2.5">
-                        <div className="w-5 h-5 md:w-7 md:h-7  bg-stone-900 flex items-center justify-center shadow-sm overflow-hidden shrink-0">
-                            <img src={shakespeare} className="w-full h-full object-cover" alt="Shakespeare Assist" />
+                        <div className="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                            <span className="material-symbols-outlined text-[19px] md:text-[21px]" aria-hidden="true">edit_note</span>
                         </div>
                         <div>
                             <p className="font-medium md:font-semibold text-[12px] text-stone-800 leading-tight">Shakespeare Assist</p>

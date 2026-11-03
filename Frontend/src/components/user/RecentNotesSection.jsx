@@ -105,11 +105,11 @@ const FolderMiniCard = ({ folder, onClick }) => (
       <FolderShape shape={folder.shape ?? 'squircle'} color={folder.color ?? '#55786d'} icon={folder.icon ?? 'folder'} size={42} />
       <div className="min-w-0">
         <h4 className="font-semibold text-[13.5px] text-stone-800 truncate">{folder.name}</h4>
-        <p className="text-[11px] text-stone-400 mt-0.5 capitalize">{folder.shape ?? 'folder'} · {timeAgo(folder.updated_at)}</p>
+        <p className="text-[11px] text-stone-400 mt-0.5 capitalize">{timeAgo(folder.updated_at)}</p>
       </div>
     </div>
     <p className="text-stone-500 text-[12px] leading-relaxed line-clamp-2 mt-3 flex-1">
-      {folder.description || 'A place to keep related pages together.'}
+      {folder.description || ''}
     </p>
   </button>
 );

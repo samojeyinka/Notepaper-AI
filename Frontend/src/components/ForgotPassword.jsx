@@ -55,7 +55,7 @@ export default function ForgotPassword() {
 
         <header className="mb-8">
           <p className="eyebrow text-plum-700 mb-3">{success ? 'Almost there' : 'Account recovery'}</p>
-          <h1 className="font-display-serif text-3xl md:text-4xl font-semibold tracking-tight text-stone-900">
+          <h1 className="font-display text-3xl md:text-4xl font-semibold tracking-tight text-stone-900">
             {success ? 'Check your email' : 'Reset your password'}
           </h1>
           <p className="text-stone-500 text-[15px] mt-2 leading-relaxed">

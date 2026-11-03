@@ -82,7 +82,7 @@ function Waveform() {
             {[...Array(9)].map((_, i) => (
                 <div
                     key={i}
-                    className="w-1.5 bg-plum-600"
+                    className="w-1.5 rounded-full bg-primary"
                     style={{
                         animation: `wave 0.9s ease-in-out ${i * 0.08}s infinite alternate`,
                         height: '100%',
@@ -201,18 +201,18 @@ export default function VoiceToSpeechPage() {
     };
 
     return (
-        <div className="flex min-h-screen bg-paper font-display text-stone-900 antialiased selection:bg-plum-200">
+        <div className="flex min-h-screen bg-stone-50 font-display text-stone-900 antialiased selection:bg-emerald-100">
             <Sidebar activePage="/lockedin/voice-to-speech" />
 
             <main className="flex-1 flex flex-col lg:ml-64 min-w-0">
 
                 {/* Top bar */}
-                <header className="sticky top-0 z-40 bg-paper/90 backdrop-blur-md border-b border-stone-200/80 px-6 h-16 flex items-center justify-between shrink-0">
+                <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-stone-200/80 px-4 md:px-6 h-14 md:h-16 flex items-center justify-between shrink-0">
                     <div className="flex items-center gap-3">
-                        <span className="font-display-serif text-[18px] font-semibold tracking-tight text-stone-900">Voice notes</span>
+                        <span className="font-display text-[16px] md:text-[18px] font-semibold tracking-tight text-stone-900">Voice notes</span>
                         <div className="h-4 w-px bg-stone-300/60" />
-                        <span className={`px-3 py-1 text-[10px] font-semibold uppercase tracking-wider transition-colors ${
-                            isListening ? 'bg-red-50 text-red-700' : 'bg-stone-100 text-stone-500'
+                        <span className={`px-3 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider transition-colors ${
+                            isListening ? 'bg-red-50 text-red-700' : 'bg-emerald-50 text-emerald-800'
                         }`}>
                             {isListening ? 'Recording' : 'Ready'}
                         </span>
@@ -220,7 +220,7 @@ export default function VoiceToSpeechPage() {
                     <div className="flex items-center gap-4">
                         {isListening && (
                             <span className="flex items-center gap-2 text-sm font-mono font-semibold text-stone-600">
-                                <span className="w-2 h-2 bg-red-600 animate-pulse" />
+                                <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse" />
                                 {formatTime(elapsed)}
                             </span>
                         )}
@@ -235,25 +235,25 @@ export default function VoiceToSpeechPage() {
                     <section className="col-span-12 lg:col-span-5 flex flex-col gap-5">
 
                         {/* Mic card */}
-                        <div className="bg-white ring-1 ring-stone-200/70 p-8 md:p-10 flex flex-col items-center gap-7">
+                        <div className="bg-white rounded-2xl ring-1 ring-stone-200/70 shadow-sm p-6 md:p-10 flex flex-col items-center gap-7">
 
                             {/* Mic button */}
                             <div className="relative flex items-center justify-center">
                                 {isListening && (
                                     <>
-                                        <span className="absolute w-40 h-40 bg-red-200/40 animate-ping" />
-                                        <span className="absolute w-52 h-52 bg-red-100/40 animate-ping" style={{ animationDelay: '0.3s' }} />
+                                        <span className="absolute w-40 h-40 rounded-full bg-red-200/40 animate-ping" />
+                                        <span className="absolute w-52 h-52 rounded-full bg-red-100/40 animate-ping" style={{ animationDelay: '0.3s' }} />
                                     </>
                                 )}
                                 <button
                                     onClick={handleVoiceToggle}
                                     disabled={isUnsupported}
-                                    className={`relative w-24 h-24 md:w-28 md:h-28 flex items-center justify-center text-white transition-all focus:outline-none border-2
+                                    className={`relative w-24 h-24 md:w-28 md:h-28 rounded-full flex items-center justify-center text-white transition-all focus:outline-none border-2 shadow-lg focus-visible:ring-4 focus-visible:ring-emerald-200
                                         ${isListening
                                             ? 'bg-red-600 hover:bg-red-700 border-red-700'
                                             : isCountdown
                                                 ? 'bg-amber-500 border-amber-600 cursor-not-allowed'
-                                                : 'bg-plum-600 hover:bg-plum-700 border-plum-700'
+                                                : 'bg-primary hover:bg-plum-700 border-plum-700'
                                         }
                                         ${isUnsupported ? 'opacity-40 cursor-not-allowed' : ''}
                                     `}
@@ -268,7 +268,7 @@ export default function VoiceToSpeechPage() {
                             <div className="text-center min-h-[70px] flex flex-col items-center justify-center">
                                 {isCountdown && (
                                     <>
-                                        <span className="font-display-serif text-[64px] font-semibold text-amber-600 leading-none">{countdown}</span>
+                                        <span className="font-display text-[64px] font-semibold text-amber-600 leading-none">{countdown}</span>
                                         <p className="text-stone-500 text-sm mt-2">Get ready…</p>
                                     </>
                                 )}
@@ -280,7 +280,7 @@ export default function VoiceToSpeechPage() {
                                 )}
                                 {voiceState === 'idle' && !isUnsupported && (
                                     <>
-                                        <p className="font-semibold text-stone-800">Tap to record</p>
+                                <p className="font-semibold text-stone-800">Tap to record</p>
                                         <p className="text-xs text-stone-400 mt-1">Speak, words appear as you go</p>
                                     </>
                                 )}
@@ -290,15 +290,15 @@ export default function VoiceToSpeechPage() {
                             </div>
 
                             {/* Privacy note */}
-                            <div className="flex items-center gap-2 px-4 py-2 bg-stone-100 text-stone-500">
+                            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-stone-100 text-stone-500">
                                 <span className="material-symbols-outlined text-[14px]">lock</span>
                                 <p className="text-[11px] font-medium">Processed in your browser, nothing is stored</p>
                             </div>
                         </div>
 
                         {/* How it works */}
-                        <div className="bg-stone-900 text-white p-6 md:p-7 flex flex-col gap-5">
-                            <p className="font-display-serif text-[18px] font-semibold">How it works</p>
+                        <div className="bg-stone-900 text-white rounded-2xl p-6 md:p-7 flex flex-col gap-5">
+                            <p className="font-display text-[18px] font-semibold">How it works</p>
                             <div className="flex flex-col gap-3.5">
                                 {[
                                     { n: '1', text: 'Tap the mic and speak naturally' },
@@ -306,7 +306,7 @@ export default function VoiceToSpeechPage() {
                                     { n: '3', text: 'Send it into a Note or Paper' },
                                 ].map(({ n, text }) => (
                                     <div key={n} className="flex items-center gap-3">
-                                        <span className="w-6 h-6 bg-white/10 text-white/80 text-[11px] font-semibold flex items-center justify-center shrink-0">{n}</span>
+                                        <span className="w-6 h-6 rounded-lg bg-white/10 text-white/80 text-[11px] font-semibold flex items-center justify-center shrink-0">{n}</span>
                                         <p className="text-[12.5px] text-white/70">{text}</p>
                                     </div>
                                 ))}
@@ -316,12 +316,12 @@ export default function VoiceToSpeechPage() {
 
                     {/* Right — transcript workspace */}
                     <section className="col-span-12 lg:col-span-7">
-                        <div className="bg-white ring-1 ring-stone-200/70 flex flex-col overflow-hidden" style={{ minHeight: '560px' }}>
+                        <div className="bg-white rounded-2xl ring-1 ring-stone-200/70 shadow-sm flex flex-col overflow-hidden" style={{ minHeight: '560px' }}>
 
                             {/* Workspace header */}
                             <div className="px-6 py-4 flex items-center justify-between border-b border-stone-100 shrink-0">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-6 h-6 bg-plum-50 text-plum-700 flex items-center justify-center">
+                                    <div className="w-7 h-7 rounded-lg bg-emerald-50 text-primary flex items-center justify-center">
                                         <span className="material-symbols-outlined text-[14px]">mic</span>
                                     </div>
                                     <span className="text-xs font-semibold text-stone-500 tracking-wide">Live transcription</span>
@@ -337,7 +337,7 @@ export default function VoiceToSpeechPage() {
                                         onClick={handleCopy}
                                         disabled={!text.trim()}
                                         title={copied ? 'Copied!' : 'Copy text'}
-                                        className="p-2 text-stone-400 hover:text-plum-700 hover:bg-plum-50 disabled:opacity-30 transition-colors"
+                                        className="p-2 rounded-lg text-stone-400 hover:text-primary hover:bg-emerald-50 disabled:opacity-30 transition-colors"
                                     >
                                         <span className="material-symbols-outlined text-[18px]">{copied ? 'check' : 'content_copy'}</span>
                                     </button>
@@ -345,7 +345,7 @@ export default function VoiceToSpeechPage() {
                                         onClick={handleClear}
                                         disabled={!text}
                                         title="Clear transcript"
-                                        className="p-2 text-stone-400 hover:text-red-600 hover:bg-red-50 disabled:opacity-30 transition-colors"
+                                        className="p-2 rounded-lg text-stone-400 hover:text-red-600 hover:bg-red-50 disabled:opacity-30 transition-colors"
                                     >
                                         <span className="material-symbols-outlined text-[18px]">delete_outline</span>
                                     </button>
@@ -356,7 +356,7 @@ export default function VoiceToSpeechPage() {
                             <div className="flex-1 relative">
                                 {!text && (
                                     <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-center p-8 pointer-events-none select-none">
-                                        <div className="w-16 h-16 bg-plum-50 text-plum-600 flex items-center justify-center">
+                                        <div className="w-16 h-16 rounded-2xl bg-emerald-50 text-primary flex items-center justify-center">
                                             <span className="material-symbols-outlined text-[30px]">mic_none</span>
                                         </div>
                                         <p className="text-stone-400 text-sm max-w-xs leading-relaxed">
@@ -383,7 +383,7 @@ export default function VoiceToSpeechPage() {
                                     <button
                                         onClick={handleInsertPaper}
                                         disabled={!text.trim()}
-                                        className="flex items-center gap-1.5 px-4 py-2 border border-stone-300 text-stone-700 text-xs font-semibold hover:border-stone-900 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                        className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-stone-300 text-stone-700 text-xs font-semibold hover:border-primary hover:bg-emerald-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                                     >
                                         <span className="material-symbols-outlined text-[15px]">article</span>
                                         Into Paper
@@ -391,7 +391,7 @@ export default function VoiceToSpeechPage() {
                                     <button
                                         onClick={handleInsert}
                                         disabled={!text.trim()}
-                                        className="flex items-center gap-1.5 px-4 py-2 bg-stone-900 text-white text-xs font-semibold hover:bg-stone-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                        className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary text-white text-xs font-semibold hover:bg-plum-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                                     >
                                         <span className="material-symbols-outlined text-[15px]">note_add</span>
                                         Into Note

@@ -102,7 +102,7 @@ export const Paper = () => {
     const [textColor, setTextColor]     = useState("#1C1917");
     const [paddingX, setPaddingX]       = useState(96);
     const [paddingY, setPaddingY]       = useState(80);
-    const [recentColors, setRecentColors] = useState(["#1C1917","#6C4EA6","#0F172A","#B45309","#15803D","#B91C1C"]);
+    const [recentColors, setRecentColors] = useState(["#1C1917","#54786f","#0F172A","#B45309","#15803D","#B91C1C"]);
 
     // Undo/redo
     const { push: historyPush, undo: historyUndo, redo: historyRedo, canUndo, canRedo } = useUndoHistory();
@@ -620,7 +620,7 @@ export const Paper = () => {
             )}
             {exportWarning && (
                 <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/40 backdrop-blur-sm">
-                    <div className="bg-white  shadow-2xl p-6 max-w-sm w-full mx-4">
+                    <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4">
                         <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center mb-4">
                             <span className="material-symbols-outlined text-amber-500 text-[22px]">warning</span>
                         </div>
