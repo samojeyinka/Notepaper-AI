@@ -1,8 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
-import * as htmlToImage from 'html-to-image';
-import { jsPDF } from "jspdf";
-import JSZip from 'jszip';
 import { NoteEditor } from "./NoteEditor";
 import { logo } from "../../assets/assets";
 import SEO from "../globals/SEO";
@@ -72,6 +69,7 @@ const PublicNoteView = () => {
     const slug = () => (title || 'note').replace(/\s+/g, '-').toLowerCase();
 
     const capturePages = async () => {
+        const htmlToImage = await import('html-to-image');
         const refs = pageRefsRef.current.filter(Boolean);
         const canvases = [];
         for (const el of refs) {
@@ -92,6 +90,7 @@ const PublicNoteView = () => {
             const MARGIN = 40;
 
             if (format === 'pdf') {
+                const { jsPDF } = await import('jspdf');
                 const pdf = new jsPDF({ orientation: 'portrait', unit: 'px', format: [PAGE_W, PAGE_H] });
                 for (let i = 0; i < canvases.length; i++) {
                     if (i > 0) pdf.addPage();
@@ -105,6 +104,7 @@ const PublicNoteView = () => {
                     link.href = canvases[0].toDataURL('image/png');
                     link.click();
                 } else {
+                    const JSZip = (await import('jszip')).default;
                     const zip = new JSZip();
                     const folder = zip.folder(slug());
                     canvases.forEach((c, i) => {

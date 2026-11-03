@@ -9,7 +9,7 @@ const FeaturesPage = () => {
       <SEO
         title="Features"
         path="/features"
-        description="Capture notes and transform them into study plans, flashcards, and practice quizzes in one calm notebook."
+        description="Capture notes and transform them into study plans, flashcards, and practice quizzes in one notebook."
       />
       <Features />
     </>

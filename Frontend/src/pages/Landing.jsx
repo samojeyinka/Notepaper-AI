@@ -14,7 +14,7 @@ const Landing = () => {
     <div className="landing-page bg-paper font-display text-stone-900 antialiased selection:bg-[#d8e3e1]">
       <SEO
         path="/"
-        description="Notepaper is a calm home for your notes — write in your own handwriting, then turn them into study plans, flashcards, quizzes and presentations on a page that feels like paper."
+        description="Notepaper is a home for your notes — write in your own handwriting, then turn them into study plans, flashcards, quizzes and presentations on a page that feels like paper."
       />
       <Header />
       <main className="relative overflow-hidden">

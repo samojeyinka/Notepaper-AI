@@ -1,67 +1,53 @@
 import LandingPage from './Landing';
-import SignUpPage from './SignUpPage';
-import SignInPage from './SignInPage';
-import ForgotPasswordPage from './ForgotPasswordPage';
-import CheckMailPage from './CheckMailPage';
-import VerifyEmailPage from './VerifyEmailPage';
-import TwoFactorPage from './TwoFactorPage';
-import AboutUsPage from './AboutUsPage';
-import FeaturesPage from './FeaturesPage';
-import ContactUsPage from './ContactUsPage';
-import HowItWorksPage from './HowItWorksPage';
-import OurStoryPage from './OurStoryPage';
-import PrivacyPage from './PrivacyPage';
-import LockedInPage from './LockedInPage';
-import StudyPlanPage from './StudyPlanPage';
-import SprintPage from './SprintPage';
-import LibraryPage from './LibraryPage';
-import ProfileSettingsPage from './ProfileSettingsPage';
-import ChangePasswordPage from './ChangePasswordPage';
-import NotificationsPage from './NotificationsPage';
-import HelpSupportPage from './HelpSupportPage';
-import SupportTicketsPage from './SupportTicketsPage';
-import NewSupportTicketsPage from './NewSupportTicketsPage';
-import SupportTicketPage from './SupportTicketPage';
-import ResetPasswordPage from './ResetPasswordPage';
-import RestoreAccountPage from './RestoreAccountPage';
-import RestoreAccountFinalPage from './RestoreAccountFinalPage';
-import DeleteAccountPage from './DeleteAccountPage';
-import NotePage from './NotePage';
-import FolderPage from './FolderPage';
-import TermsPage from './TermsPage';
-import PublicFlashcardPage from './PublicFlashcardPage';
+import { lazyPage } from '../utils/lazyPage';
 
-export{
-    LandingPage,
-    SignUpPage,
-    SignInPage,
-    ForgotPasswordPage,
-    ResetPasswordPage,
-    RestoreAccountPage,
-    RestoreAccountFinalPage,
-    DeleteAccountPage,
-    CheckMailPage,
-    VerifyEmailPage,
-    TwoFactorPage,
-    AboutUsPage,
-    HelpSupportPage,
-    FeaturesPage,
-    ContactUsPage,
-    HowItWorksPage,
-    OurStoryPage,
-    PrivacyPage,
-    LockedInPage,
-    StudyPlanPage,
-    SprintPage,
-    LibraryPage,
-    ProfileSettingsPage,
-    ChangePasswordPage,
-    NotificationsPage,
-    SupportTicketsPage,
-    NewSupportTicketsPage,
-    SupportTicketPage,
-    NotePage,
-    FolderPage,
-    TermsPage,
-    PublicFlashcardPage,
-}
+
+export { LandingPage };
+
+export const SignUpPage = lazyPage(() => import('./SignUpPage'));
+export const SignInPage = lazyPage(() => import('./SignInPage'));
+export const ForgotPasswordPage = lazyPage(() => import('./ForgotPasswordPage'));
+export const ResetPasswordPage = lazyPage(() => import('./ResetPasswordPage'));
+export const RestoreAccountPage = lazyPage(() => import('./RestoreAccountPage'));
+export const RestoreAccountFinalPage = lazyPage(() => import('./RestoreAccountFinalPage'));
+export const DeleteAccountPage = lazyPage(() => import('./DeleteAccountPage'));
+export const CheckMailPage = lazyPage(() => import('./CheckMailPage'));
+export const VerifyEmailPage = lazyPage(() => import('./VerifyEmailPage'));
+export const TwoFactorPage = lazyPage(() => import('./TwoFactorPage'));
+export const AboutUsPage = lazyPage(() => import('./AboutUsPage'));
+export const HelpSupportPage = lazyPage(() => import('./HelpSupportPage'));
+export const FeaturesPage = lazyPage(() => import('./FeaturesPage'));
+export const ContactUsPage = lazyPage(() => import('./ContactUsPage'));
+export const HowItWorksPage = lazyPage(() => import('./HowItWorksPage'));
+export const OurStoryPage = lazyPage(() => import('./OurStoryPage'));
+export const PrivacyPage = lazyPage(() => import('./PrivacyPage'));
+export const LockedInPage = lazyPage(() => import('./LockedInPage'));
+export const StudyPlanPage = lazyPage(() => import('./StudyPlanPage'));
+export const SprintPage = lazyPage(() => import('./SprintPage'));
+export const LibraryPage = lazyPage(() => import('./LibraryPage'));
+export const ProfileSettingsPage = lazyPage(() => import('./ProfileSettingsPage'));
+export const ChangePasswordPage = lazyPage(() => import('./ChangePasswordPage'));
+export const NotificationsPage = lazyPage(() => import('./NotificationsPage'));
+export const SupportTicketsPage = lazyPage(() => import('./SupportTicketsPage'));
+export const NewSupportTicketsPage = lazyPage(() => import('./NewSupportTicketsPage'));
+export const SupportTicketPage = lazyPage(() => import('./SupportTicketPage'));
+export const NotePage = lazyPage(() => import('./NotePage'));
+export const FolderPage = lazyPage(() => import('./FolderPage'));
+export const TermsPage = lazyPage(() => import('./TermsPage'));
+export const PublicFlashcardPage = lazyPage(() => import('./PublicFlashcardPage'));
+export const PaperPage = lazyPage(() => import('./PaperPage'));
+export const PresentationPage = lazyPage(() => import('./PresentationPage'));
+export const FlashcardPage = lazyPage(() => import('./FlashcardPage'));
+export const VoiceToSpeechPage = lazyPage(() => import('./VoiceToSpeechPage'));
+export const GeneratePage = lazyPage(() => import('./GeneratePage'));
+export const QuizzesPage = lazyPage(() => import('./QuizzesPage'));
+export const QuizCreatePage = lazyPage(() => import('./QuizCreatePage'));
+export const QuizPlayPage = lazyPage(() => import('./QuizPlayPage'));
+export const PublicQuizPage = lazyPage(() => import('./PublicQuizPage'));
+export const SprintCreatePage = lazyPage(() => import('./SprintCreatePage'));
+export const SprintDetailPage = lazyPage(() => import('./SprintDetailPage'));
+export const SprintChallengePage = lazyPage(() => import('./SprintChallengePage'));
+export const AIGeneratingPage = lazyPage(() => import('./AIGeneratingPage'));
+export const ModelGuidePage = lazyPage(() => import('./ModelGuidePage'));
+export const PublicNotePage = lazyPage(() => import('./PublicNotePage'));
+export const PublicPaperPage = lazyPage(() => import('./PublicPaperPage'));

@@ -20,9 +20,6 @@ import { usePaperSync } from "../../hooks/usePaperSync";
 import { useUndoHistory } from "../../hooks/useUndoHistory";
 import { deserializePaper, paperService } from "../../api/paperService";
 import { workspaceCache } from "../../api/workspaceCache";
-import * as htmlToImage from 'html-to-image';
-import { jsPDF } from "jspdf";
-import JSZip from 'jszip';
 
 // ── Markdown → HTML ───────────────────────────────────────────────────────────
 function inlineFormat(text) {
@@ -343,6 +340,7 @@ export const Paper = () => {
     const slug = () => title.replace(/\s+/g,'-').toLowerCase() || 'paper';
 
     const capturePages = async () => {
+        const htmlToImage = await import('html-to-image');
         const refs = pageRefsRef.current.filter(Boolean);
         const canvases = [];
         const TRANSPARENT = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
@@ -419,6 +417,7 @@ export const Paper = () => {
             await forceFlush();
             const canvases = await capturePages();
             const W = 816, H = 1056;
+            const { jsPDF } = await import('jspdf');
             const pdf = new jsPDF({ orientation:'portrait',unit:'px',format:[W,H] });
             for (let i=0;i<canvases.length;i++) {
                 if (i>0) pdf.addPage();

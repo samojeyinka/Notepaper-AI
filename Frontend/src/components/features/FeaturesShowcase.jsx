@@ -5,7 +5,7 @@ const HIGHLIGHTS = [
   'Automatic cloud saving so your work is never lost',
   'Private workspaces with zero advertising and zero noisy feeds',
   'One click generation for study plans, flashcards, and quizzes',
-  'Paper like notebook styling designed for calm daily focus',
+  'Paper like notebook styling designed for daily focus',
 ];
 
 export default function FeaturesShowcase() {
@@ -20,7 +20,7 @@ export default function FeaturesShowcase() {
               <span className="text-[#45666c]">Study without friction.</span>
             </h2>
             <p className="text-stone-600 text-base md:text-lg leading-relaxed mt-5 max-w-xl">
-              Most digital note tools overload you with complex menus and endless settings. NotepaperAI keeps the page calm and lets you focus on understanding the material.
+              Most digital note tools overload you with complex menus and endless settings. NotepaperAI keeps the page accessible and lets you focus on understanding the material.
             </p>
 
             <ul className="space-y-4 pt-6">

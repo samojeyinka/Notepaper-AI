@@ -39,7 +39,7 @@ export default function Footer() {
               <img src="/logo.png" alt="Notepaper AI" className="w-[150px] h-[50px] object-contain object-left" />
             </Link>
             <p className="text-sm text-stone-600 leading-relaxed max-w-sm">
-              A calm place for class notes, voice notes, and useful study tools.
+              A place for class notes, voice notes, and useful study tools.
             </p>
             <div className="flex gap-4 mt-6">
               {socials.map((s) => (
