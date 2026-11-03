@@ -15,7 +15,7 @@ export default function SEO({
 }) {
   const fullTitle = title
     ? `${title}: ${SITE_NAME}`
-    : `${SITE_NAME}: Write it down. Keep it close.`
+    : `${SITE_NAME}: Write like paper. Learn beyond it.`
 
   const canonical = `${BASE_URL}${path}`
 
