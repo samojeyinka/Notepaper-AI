@@ -53,7 +53,7 @@ export default function RestoreAccountFinal() {
       <section className="hidden md:flex flex-1 p-12 lg:p-16 items-center justify-center bg-paper-darker/50 border-r border-stone-200/70">
         <div className="max-w-md">
           <p className="eyebrow text-plum-700 mb-5">One last step</p>
-          <h1 className="font-display-serif text-4xl xl:text-5xl font-semibold tracking-tight text-stone-900 leading-[1.1] mb-6">
+          <h1 className="font-display text-4xl xl:text-5xl font-semibold tracking-tight text-stone-900 leading-[1.1] mb-6">
             Pick up where you <span className="italic text-plum-700">left off.</span>
           </h1>
           <p className="text-stone-600 text-[16px] leading-relaxed">
@@ -79,7 +79,7 @@ export default function RestoreAccountFinal() {
         <div className="max-w-md mx-auto w-full">
           <header className="mb-9 text-center md:text-left">
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-plum-700 mb-2">Restore account</p>
-            <h2 className="font-display-serif text-[26px] md:text-[30px] font-semibold tracking-tight text-stone-900 leading-tight">
+            <h2 className="font-display text-[26px] md:text-[30px] font-semibold tracking-tight text-stone-900 leading-tight">
               Ready when you are
             </h2>
             <p className="text-stone-500 text-[13.5px] mt-2 leading-relaxed">

@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { HexColorPicker } from "react-colorful";
-import { shakespeare } from "../../assets/assets";
 
 // Portal popover — renders into document.body so it escapes any overflow container.
 // Position is computed from anchorRef (the button's wrapper div) via getBoundingClientRect.
@@ -455,9 +454,7 @@ export const NoteToolbar = ({ onAction, activeState, recentColors = [], onAddRec
           title="Shakespeare Assist — AI writing"
           className="w-8 h-8 md:w-9 md:h-9 flex items-center justify-center bg-plum-600 text-white hover:bg-plum-700 active:scale-95 transition-all"
         >
-          <span className="material-symbols-outlined text-[14px] md:text-[18px]">
-            <img src={shakespeare}/>
-          </span>
+          <span className="material-symbols-outlined text-[18px] md:text-[20px]">edit_note</span>
         </button>
 
         <div className="h-px w-7 bg-stone-200 shrink-0" />

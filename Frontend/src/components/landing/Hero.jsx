@@ -6,9 +6,9 @@ export default function Hero() {
     <section className="landing-hero overflow-hidden">
       <div className="landing-hero-panel relative flex items-center justify-center overflow-hidden mx-auto text-center">
         <div className="landing-hero-copy relative z-10 max-w-4xl px-5 sm:px-8 py-16 md:py-24">
-          <h1 className="landing-heading text-[40px] leading-[1.04] sm:text-6xl lg:text-[76px] font-semibold tracking-[-0.055em] text-white">
-            Your notes, ready
-            <br className="hidden sm:block" /> to become <span>something more.</span>
+          <h1 className=" text-[32px] leading-[1.08] sm:text-6xl lg:text-[76px] font-semibold tracking-[-0.055em] text-white">
+            Write like it’s paper.
+            <br className="hidden sm:block " /> See it become <span className='text-[#f0dfc5]'>something more.</span>
           </h1>
           <p className="text-base md:text-lg leading-relaxed max-w-2xl mx-auto mt-5">
             Write, dictate, or collect your ideas. Then turn them into study plans, flashcards, and quizzes when you need them.

@@ -7,14 +7,14 @@ export const FoundersLetter = () => {
         <div className="story-letter-paper bg-white border border-stone-200 p-8 md:p-14">
           <p className="landing-kicker mb-8">A LETTER FROM THE FOUNDER</p>
 
-          <div className="font-display-serif text-stone-800 text-[16px] md:text-lg leading-[1.9] space-y-6">
+          <div className="font-display text-stone-800 text-[16px] md:text-lg leading-[1.9] space-y-6">
             <p>To everyone who writes things down,</p>
             <p>
               We built Notepaper because we missed the weight of a journal in our
               hands and the freedom of a blank page. We believe software should
               make room for thought, not replace it.
             </p>
-            <p>Every decision in this product, from the feel of the ink to the calm of the interface, is in service of helping you slow down, think clearly, and keep the things that matter.</p>
+            <p>Every decision in this product, from the feel of the ink to the the interface, is in service of helping you slow down, think clearly, and keep the things that matter.</p>
             <p>Thank you for being part of the journey. We are just getting started.</p>
           </div>
 

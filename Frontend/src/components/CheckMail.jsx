@@ -24,7 +24,7 @@ export default function CheckEmail() {
         {/* Wordmark */}
         <div className="flex items-center justify-center gap-2.5 mb-10">
           <img src={logo} alt="Notepaper AI" className="w-9 object-contain" />
-          <span className="font-display-serif text-[22px] font-bold tracking-tight text-stone-900">
+          <span className="font-display text-[22px] font-bold tracking-tight text-stone-900">
             Notepaper<span className="text-plum-600 text-[15px] font-bold tracking-[0.18em] align-middle">AI</span>
           </span>
         </div>
@@ -35,7 +35,7 @@ export default function CheckEmail() {
           </div>
 
           <p className="eyebrow text-plum-700 mb-3">Almost there</p>
-          <h1 className="font-display-serif text-3xl md:text-[34px] font-semibold tracking-tight text-stone-900">
+          <h1 className="font-display text-3xl md:text-[34px] font-semibold tracking-tight text-stone-900">
             Check your email
           </h1>
           <p className="text-stone-500 text-[15px] leading-relaxed mt-3">

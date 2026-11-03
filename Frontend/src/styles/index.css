@@ -675,10 +675,6 @@ body {
    Marketing / brand primitives — refined stationery, no craft-gimmicks
    ════════════════════════════════════════════════════════════════════════ */
 
-.font-display-serif {
-  font-family: 'Playfair Display', 'Crimson Pro', Georgia, serif;
-}
-
 /* Small capital kicker above a headline */
 .eyebrow {
   font-size: 12px;

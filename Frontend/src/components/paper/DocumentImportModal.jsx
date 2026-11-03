@@ -71,7 +71,7 @@ export const DocumentImportModal = ({ onClose, onInsert }) => {
 
     return createPortal(
         <div className="fixed inset-0 z-[150] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-            <div className="bg-white  shadow-2xl w-full max-w-lg animate-in fade-in zoom-in-95 duration-150 overflow-hidden">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg animate-in fade-in zoom-in-95 duration-150 overflow-hidden">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100">
                     <div className="flex items-center gap-2.5">
                         <span className="material-symbols-outlined text-primary text-[22px]">upload_file</span>

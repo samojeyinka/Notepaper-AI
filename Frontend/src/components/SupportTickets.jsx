@@ -12,7 +12,7 @@ export const SupportArchiveHeader = () => {
         <header className="w-full flex items-end justify-between gap-4 mb-8">
             <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-plum-700 mb-1.5">Need a hand?</p>
-                <h1 className="font-display-serif text-[28px] md:text-[34px] font-semibold tracking-tight text-stone-900 leading-tight">
+                <h1 className="font-display text-[28px] md:text-[34px] font-semibold tracking-tight text-stone-900 leading-tight">
                     Help &amp; support
                 </h1>
                 <p className="text-stone-500 text-[13px] md:text-sm mt-1.5">
@@ -126,7 +126,7 @@ export const TicketList = ({ tickets, loading }) => {
     if (!tickets.length) {
         return (
             <div className="flex flex-col items-center justify-center py-16 md:py-20 text-center">
-                <p className="font-display-serif text-[18px] font-semibold text-stone-800 mb-1.5">Nothing here yet</p>
+                <p className="font-display text-[18px] font-semibold text-stone-800 mb-1.5">Nothing here yet</p>
                 <p className="text-stone-500 text-sm max-w-xs mx-auto leading-relaxed">
                     New tickets will show up here as they arrive.
                 </p>
@@ -294,7 +294,7 @@ export const SupportArchiveContent = ({ activeTab, onTabChange }) => {
             ) : paginatedTickets.length === 0 ? (
                 activeTab === 'active' ? (
                     <div className="flex flex-col items-center justify-center py-16 md:py-20 text-center">
-                        <p className="font-display-serif text-[19px] font-semibold text-stone-800 mb-1.5">All clear</p>
+                        <p className="font-display text-[19px] font-semibold text-stone-800 mb-1.5">All clear</p>
                         <p className="text-stone-500 text-sm max-w-xs mx-auto leading-relaxed mb-6">
                             No open tickets right now. If something's off, we're one message away.
                         </p>
@@ -307,7 +307,7 @@ export const SupportArchiveContent = ({ activeTab, onTabChange }) => {
                     </div>
                 ) : (
                     <div className="flex flex-col items-center justify-center py-16 md:py-20 text-center">
-                        <p className="font-display-serif text-[19px] font-semibold text-stone-800 mb-1.5">No resolved tickets</p>
+                        <p className="font-display text-[19px] font-semibold text-stone-800 mb-1.5">No resolved tickets</p>
                         <p className="text-stone-500 text-sm">Anything we close shows up here.</p>
                     </div>
                 )

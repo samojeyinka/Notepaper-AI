@@ -17,12 +17,12 @@ export function CardMenu({ onDelete, extraActions = [] }) {
             <button
                 type="button"
                 onClick={() => setOpen(v => !v)}
-                className="w-7 h-7 flex items-center justify-center  text-slate-300 hover:text-slate-500 hover:bg-slate-100 transition-colors"
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-300 hover:text-slate-500 hover:bg-slate-100 transition-colors"
             >
                 <span className="material-symbols-outlined text-[18px]">more_vert</span>
             </button>
             {open && (
-                <div className="workspace-menu absolute right-0 top-full mt-1 bg-white border border-slate-200 shadow-lg z-20 py-1 min-w-[130px]">
+                <div className="workspace-menu absolute right-0 top-full mt-1 bg-white rounded-xl border border-slate-200 shadow-lg z-20 py-1 min-w-[130px] overflow-hidden">
                     {extraActions.map((action, i) => (
                         <button
                             key={i}
@@ -54,11 +54,11 @@ export function DeleteConfirmModal({ title, subtitle, warning, onConfirm, onCanc
         <div className="workspace-modal fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onCancel}>
             <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px]" />
             <div
-                className="workspace-modal-panel relative bg-white shadow-xl w-full max-w-sm p-6 flex flex-col gap-4"
+                className="workspace-modal-panel relative bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 flex flex-col gap-4"
                 onClick={e => e.stopPropagation()}
             >
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10  bg-red-50 flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center shrink-0">
                         <span className="material-symbols-outlined text-red-500 text-[20px]">delete_outline</span>
                     </div>
                     <div className="min-w-0">
@@ -71,14 +71,14 @@ export function DeleteConfirmModal({ title, subtitle, warning, onConfirm, onCanc
                     <button
                         type="button"
                         onClick={onCancel}
-                        className="flex-1 px-4 py-2.5  border border-slate-200 text-[13px] font-semibold text-slate-600 hover:bg-slate-50 transition-colors"
+                        className="flex-1 rounded-xl px-4 py-2.5 border border-slate-200 text-[13px] font-semibold text-slate-600 hover:bg-slate-50 transition-colors"
                     >
                         Cancel
                     </button>
                     <button
                         type="button"
                         onClick={onConfirm}
-                        className="flex-1 px-4 py-2.5  bg-red-500 text-white text-[13px] font-semibold hover:bg-red-600 transition-colors active:scale-95"
+                        className="flex-1 rounded-xl px-4 py-2.5 bg-red-500 text-white text-[13px] font-semibold hover:bg-red-600 transition-colors active:scale-95"
                     >
                         Delete
                     </button>

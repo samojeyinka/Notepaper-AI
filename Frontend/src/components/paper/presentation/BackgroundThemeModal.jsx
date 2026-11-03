@@ -9,11 +9,11 @@ export const BgThemeModal = ({ slide, onChange, themeId, onThemeChange, onClose 
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/30 backdrop-blur-sm p-4" onMouseDown={onClose}>
-            <div className="bg-white  shadow-2xl w-full max-w-lg overflow-hidden" onMouseDown={e => e.stopPropagation()}>
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden" onMouseDown={e => e.stopPropagation()}>
                 {/* Header */}
                 <div className="flex items-center justify-between px-5 py-3.5 border-b border-stone-200">
-                    <h3 className="font-display-serif font-semibold text-[15px] text-stone-900">Background &amp; Theme</h3>
-                    <button onClick={onClose} className="w-7 h-7  flex items-center justify-center text-stone-400 hover:bg-stone-100 transition-colors">
+                    <h3 className="font-display font-semibold text-[15px] text-stone-900">Background &amp; Theme</h3>
+                    <button onClick={onClose} className="w-8 h-8 rounded-lg flex items-center justify-center text-stone-400 hover:bg-stone-100 transition-colors">
                         <span className="material-symbols-outlined text-[18px]">close</span>
                     </button>
                 </div>

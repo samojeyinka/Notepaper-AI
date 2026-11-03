@@ -285,7 +285,7 @@ Rules:
                     <div className="flex items-center gap-3">
                        
                         <div>
-                            <h2 className="font-display-serif text-[17px] font-semibold text-stone-900 leading-tight">Diagram studio</h2>
+                            <h2 className="font-display text-[17px] font-semibold text-stone-900 leading-tight">Diagram studio</h2>
                             <p className="text-[11px] text-stone-400 mt-0.5">Flowcharts & diagrams, from a prompt</p>
                         </div>
                     </div>
@@ -427,7 +427,7 @@ Rules:
                                     </div>
                                 </div>
                                 <div>
-                                    <h3 className="font-display-serif text-[22px] font-semibold text-stone-900 mb-2 tracking-tight">Sketch it out</h3>
+                                    <h3 className="font-display text-[22px] font-semibold text-stone-900 mb-2 tracking-tight">Sketch it out</h3>
                                     <p className="text-sm text-stone-400 max-w-sm leading-relaxed">
                                         Choose a type, describe what you need, and hit <strong className="text-stone-600">Generate Diagram</strong>.
                                     </p>

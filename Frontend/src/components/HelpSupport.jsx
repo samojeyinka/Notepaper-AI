@@ -108,7 +108,7 @@ const CategoryModal = ({ category, onClose }) => {
 
           {/* Modal header */}
           <div className="rounded-t-2xl px-6 py-5 flex items-center justify-between border-b border-stone-100">
-            <h2 className="font-display-serif text-xl font-semibold text-stone-900">{category}</h2>
+            <h2 className="font-display text-xl font-semibold text-stone-900">{category}</h2>
             <button onClick={onClose} className="p-1.5  hover:bg-stone-100 transition-colors">
               <span className="material-symbols-outlined text-stone-500">close</span>
             </button>

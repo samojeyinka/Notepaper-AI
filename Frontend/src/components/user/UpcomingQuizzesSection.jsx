@@ -84,7 +84,7 @@ const UpcomingQuizzesSection = () => {
         <div className="dashboard-practice xl:col-span-1">
             <div className="mb-5">
                 <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-stone-400 mb-1.5">Practice</p>
-                <h2 className="font-display-serif text-[20px] font-semibold tracking-tight text-stone-900">Upcoming challenges</h2>
+                <h2 className="font-display text-[20px] font-semibold tracking-tight text-stone-900">Upcoming challenges</h2>
             </div>
 
             <div className="space-y-4">

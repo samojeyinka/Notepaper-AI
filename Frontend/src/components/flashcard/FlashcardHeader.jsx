@@ -25,7 +25,7 @@ export const FlashcardHeader = ({
     const backLabel = folder?.name ?? 'Library';
 
     return (
-        <header className="flex items-center justify-between px-2 md:px-4 py-2 md:py-3 border-b border-stone-200 bg-paper/95 backdrop-blur z-20 relative">
+                <header className="flex items-center justify-between px-2 md:px-4 py-2 md:py-3 border-b border-stone-200 bg-white/95 backdrop-blur z-20 relative">
             {/* Back */}
             <button
                 onClick={() => navigate(backPath)}
@@ -46,18 +46,18 @@ export const FlashcardHeader = ({
             {/* Right actions */}
             <div className="flex items-center gap-1 md:gap-2">
                 {saveStatus === 'saving' && (
-                    <span className="flex items-center gap-1 px-2 py-1 bg-plum-50 text-plum-600 text-[9px] md:text-[10px] font-semibold uppercase tracking-wider">
+                    <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-50 text-primary text-[9px] md:text-[10px] font-semibold uppercase tracking-wider">
                         <Loader size="xs" />
                     </span>
                 )}
                 {saveStatus === 'saved' && (
-                    <span className="flex items-center gap-1 px-2 py-1 bg-emerald-50 text-emerald-600 text-[9px] md:text-[10px] font-semibold uppercase tracking-wider">
+                    <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[9px] md:text-[10px] font-semibold uppercase tracking-wider">
                         <span className="material-symbols-outlined text-[11px]">cloud_done</span>
                         Saved
                     </span>
                 )}
                 {saveStatus === 'error' && (
-                    <span className="flex items-center gap-1 px-2 py-1 bg-red-50 text-red-500 text-[9px] md:text-[10px] font-semibold uppercase tracking-wider">
+                    <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-red-50 text-red-500 text-[9px] md:text-[10px] font-semibold uppercase tracking-wider">
                         <span className="material-symbols-outlined text-[11px]">cloud_off</span>
                         Unsaved
                     </span>
@@ -65,7 +65,7 @@ export const FlashcardHeader = ({
 
                 <button
                     onClick={onToggleEditMode}
-                    className={`flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-1 md:py-1.5 text-[10px] md:text-xs font-semibold transition-colors ${
+                    className={`flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-1 md:py-1.5 rounded-lg text-[10px] md:text-xs font-semibold transition-colors ${
                         editMode
                             ? 'bg-plum-600 text-white hover:bg-plum-700'
                             : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
@@ -78,7 +78,7 @@ export const FlashcardHeader = ({
                 {/* AI generate button */}
                 <button
                     onClick={() => navigate('/lockedin/generate?tab=flashcards')}
-                    className="flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-1 md:py-1.5 text-[10px] md:text-xs font-semibold bg-plum-50 text-plum-700 hover:bg-plum-100 transition-colors"
+                    className="flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-1 md:py-1.5 rounded-lg text-[10px] md:text-xs font-semibold bg-emerald-50 text-primary hover:bg-emerald-100 transition-colors"
                     title="Generate flashcards with AI"
                 >
                 
@@ -89,14 +89,14 @@ export const FlashcardHeader = ({
                 <div className="relative">
                     <button
                         onClick={() => setMenuOpen(v => !v)}
-                        className="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center text-stone-400 hover:bg-stone-100 hover:text-stone-700 transition-colors"
+                        className="w-8 h-8 rounded-lg flex items-center justify-center text-stone-400 hover:bg-stone-100 hover:text-stone-700 transition-colors"
                     >
                         <span className="material-symbols-outlined text-[16px] md:text-[20px]">more_vert</span>
                     </button>
 
                     {menuOpen && (
                         <div
-                            className="absolute right-0 top-10 bg-white shadow-xl border border-stone-200 py-1.5 w-40 md:w-44 z-50 animate-in fade-in zoom-in-95 duration-100"
+                            className="absolute right-0 top-10 bg-white rounded-xl shadow-xl border border-stone-200 py-1.5 w-40 md:w-44 z-50 animate-in fade-in zoom-in-95 duration-100 overflow-hidden"
                             onMouseLeave={() => setMenuOpen(false)}
                         >
                             {flashcardId && (

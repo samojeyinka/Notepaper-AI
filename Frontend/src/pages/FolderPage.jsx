@@ -522,7 +522,7 @@ const FolderPage = () => {
                                         <span className="material-symbols-outlined text-[12px]">chevron_right</span>
                                         <span className="text-stone-600 font-medium">{folder?.name}</span>
                                     </nav>
-                                    <h1 className="font-display-serif text-[22px] md:text-[28px] font-semibold tracking-tight text-stone-900 leading-tight">{folder?.name}</h1>
+                                    <h1 className="font-display text-[22px] md:text-[28px] font-semibold tracking-tight text-stone-900 leading-tight">{folder?.name}</h1>
                                     {folder?.description && <p className="text-sm text-stone-500 mt-1">{folder.description}</p>}
                                     {folder?.updated_at && (
                                         <p className="text-xs text-stone-400 mt-1.5">Updated {timeAgo(folder.updated_at)}</p>

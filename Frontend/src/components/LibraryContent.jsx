@@ -67,8 +67,8 @@ const SORT_OPTIONS = {
 // ── Presentation theme preview ────────────────────────────────────────────────
 const THEME_BG = {
     modern:   '#0f172a', minimal: '#d1fae5', academic: '#1e3a5f',
-    bold:     'linear-gradient(135deg,#6d28d9,#c026d3)',
-    pastel:   'linear-gradient(135deg,#fce7f3,#e0e7ff)',
+    bold:     'linear-gradient(135deg,#294b43,#54786f)',
+    pastel:   'linear-gradient(135deg,#edf3ef,#e4ece6)',
 };
 
 // ── Search Bar ────────────────────────────────────────────────────────────────
@@ -78,7 +78,7 @@ const SearchBar = ({ value, onChange, placeholder }) => (
             <span className="material-symbols-outlined text-stone-400 text-[18px]">search</span>
         </div>
         <input
-            className="w-full bg-white border border-stone-200 py-2 pl-11 pr-10 shadow-sm focus:ring-2 focus:ring-plum-200 focus:border-plum-400 text-[13px] md:text-sm placeholder-stone-400 outline-none transition-all"
+            className="w-full rounded-xl bg-white border border-stone-200 py-2 pl-11 pr-10 shadow-sm focus:ring-2 focus:ring-plum-200 focus:border-plum-400 text-[13px] md:text-sm placeholder-stone-400 outline-none transition-all"
             placeholder={placeholder ?? 'Search…'}
             type="text"
             value={value}
@@ -109,7 +109,7 @@ const SortSelect = ({ value, options, onChange }) => {
         <div ref={ref} className="relative shrink-0">
             <button
                 onClick={() => setOpen(v => !v)}
-                className="flex items-center gap-1.5 bg-stone-50 border border-stone-200  md: px-3 py-0.5 md:py-1.5 text-[12px] md:text-[13px] text-stone-600 hover:bg-stone-100 transition-colors"
+                className="flex items-center gap-1.5 rounded-xl bg-white border border-stone-200 px-3 py-1.5 text-[12px] md:text-[13px] text-stone-600 hover:bg-stone-50 transition-colors"
             >
                 <span className="material-symbols-outlined text-stone-400 text-[12px] md:text-[15px]">sort</span>
                 <span>{selected?.label}</span>
@@ -119,7 +119,7 @@ const SortSelect = ({ value, options, onChange }) => {
             </button>
 
             {open && (
-                <div className="absolute right-0 top-full mt-1.5 bg-white border border-stone-100  shadow-xl py-1 z-30 min-w-[140px] animate-in fade-in zoom-in-95 duration-100">
+                <div className="absolute right-0 top-full mt-1.5 bg-white rounded-xl border border-stone-100 shadow-xl py-1 z-30 min-w-[140px] animate-in fade-in zoom-in-95 duration-100 overflow-hidden">
                     {options.map(o => (
                         <button
                             key={o.v}
@@ -154,7 +154,7 @@ const CardShell = ({ onClick, className = '', children }) => (
 // ── Folder card (grid) ────────────────────────────────────────────────────────
 const FolderGridCard = ({ folder, onClick, onDelete }) => (
     <CardShell onClick={onClick}>
-        <div className="bg-white ring-1 ring-stone-200/70 p-5 flex flex-col items-center justify-center relative overflow-hidden transition-all duration-300 hover:-translate-y-0.5 hover:ring-plum-200 aspect-square">
+        <div className="bg-white rounded-2xl ring-1 ring-stone-200/70 p-5 flex flex-col items-center justify-center relative overflow-hidden transition-all duration-300 hover:-translate-y-0.5 hover:ring-plum-200 aspect-square">
             <div className="absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity" style={{ backgroundColor: folder.color ?? '#55786d' }} />
             {onDelete && (
                 <div className="absolute top-2 right-2 z-10">
@@ -173,13 +173,13 @@ const NoteCard = ({ note, onClick, onDelete }) => {
     const snippet = extractSnippet(note.snippet ?? note.content ?? '');
     return (
         <CardShell onClick={onClick}>
-            <div className="bg-white ring-1 ring-stone-200/70 p-4 hover:ring-plum-200 transition-all h-full flex flex-col">
+            <div className="bg-white rounded-2xl ring-1 ring-stone-200/70 p-4 hover:ring-plum-200 transition-all h-full flex flex-col">
                 <div className="flex justify-between items-start mb-3">
-                    <div className="w-9 h-9 bg-plum-50 flex items-center justify-center shrink-0">
+                    <div className="w-9 h-9 rounded-xl bg-plum-50 flex items-center justify-center shrink-0">
                         <span className="material-symbols-outlined text-plum-700 text-[18px]">description</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                        <span className="text-[10px] text-stone-400 bg-stone-100 px-2 py-0.5 ">{timeAgo(note.updated_at)}</span>
+                        <span className="text-[10px] text-stone-400 bg-stone-100 rounded-full px-2 py-0.5">{timeAgo(note.updated_at)}</span>
                         {onDelete && <CardMenu onDelete={onDelete} />}
                     </div>
                 </div>
@@ -187,7 +187,7 @@ const NoteCard = ({ note, onClick, onDelete }) => {
                 <p className="text-stone-400 text-[12px] line-clamp-3 font-serif italic leading-relaxed flex-1">{snippet || 'No content yet.'}</p>
                 {note.folder && (
                     <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-stone-100">
-                        <div className="w-3.5 h-3.5 shrink-0" style={{ backgroundColor: note.folder.color ?? '#55786d' }} />
+                        <div className="w-3.5 h-3.5 rounded-full shrink-0" style={{ backgroundColor: note.folder.color ?? '#55786d' }} />
                         <span className="text-[11px] text-stone-400 truncate">{note.folder.name}</span>
                     </div>
                 )}
@@ -201,13 +201,13 @@ const PaperCard = ({ paper, onClick, onDelete }) => {
     const snippet = extractSnippet(paper.snippet ?? paper.content ?? '');
     return (
         <CardShell onClick={onClick}>
-            <div className="bg-white ring-1 ring-stone-200/70 p-4 hover:ring-plum-200 transition-all h-full flex flex-col">
+            <div className="bg-white rounded-2xl ring-1 ring-stone-200/70 p-4 hover:ring-plum-200 transition-all h-full flex flex-col">
                 <div className="flex justify-between items-start mb-3">
-                    <div className="w-9 h-9 bg-plum-50 flex items-center justify-center shrink-0">
+                    <div className="w-9 h-9 rounded-xl bg-plum-50 flex items-center justify-center shrink-0">
                         <span className="material-symbols-outlined text-plum-700 text-[18px]">article</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                        <span className="text-[10px] text-stone-400 bg-stone-100 px-2 py-0.5 ">{timeAgo(paper.updated_at)}</span>
+                        <span className="text-[10px] text-stone-400 bg-stone-100 rounded-full px-2 py-0.5">{timeAgo(paper.updated_at)}</span>
                         {onDelete && <CardMenu onDelete={onDelete} />}
                     </div>
                 </div>
@@ -215,7 +215,7 @@ const PaperCard = ({ paper, onClick, onDelete }) => {
                 <p className="text-stone-400 text-[12px] line-clamp-3 leading-relaxed flex-1">{snippet || 'No content yet.'}</p>
                 {paper.folder && (
                     <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-stone-100">
-                        <div className="w-3.5 h-3.5 shrink-0" style={{ backgroundColor: paper.folder.color ?? '#55786d' }} />
+                        <div className="w-3.5 h-3.5 rounded-full shrink-0" style={{ backgroundColor: paper.folder.color ?? '#55786d' }} />
                         <span className="text-[11px] text-stone-400 truncate">{paper.folder.name}</span>
                     </div>
                 )}
@@ -227,16 +227,16 @@ const PaperCard = ({ paper, onClick, onDelete }) => {
 // ── Presentation card ─────────────────────────────────────────────────────────
 const PresentationCard = ({ pres, onClick, onDelete }) => (
     <CardShell onClick={onClick}>
-        <div className="bg-white ring-1 ring-stone-200/70 hover:ring-plum-200 transition-all overflow-hidden h-full flex flex-col">
+        <div className="bg-white rounded-2xl ring-1 ring-stone-200/70 hover:ring-plum-200 transition-all overflow-hidden h-full flex flex-col">
             <div className="w-full aspect-video flex items-center justify-center relative"
                 style={{ background: THEME_BG[pres.theme] ?? '#0f172a' }}>
                 <span className="material-symbols-outlined text-white/20 text-[40px]">slideshow</span>
                 <span className="absolute bottom-2 right-3 text-[10px] text-white/50 font-medium">{pres.slide_count ?? 0} slides</span>
                 {pres.theme && (
-                    <span className="absolute top-2 left-2 text-[9px] bg-black/30 text-white/70 px-1.5 py-0.5  capitalize">{pres.theme}</span>
+                    <span className="absolute top-2 left-2 text-[9px] bg-black/30 rounded-full text-white/70 px-2 py-0.5 capitalize">{pres.theme}</span>
                 )}
                 {onDelete && (
-                    <div className="absolute top-1.5 right-1.5 bg-white/85  backdrop-blur-sm">
+                    <div className="absolute top-1.5 right-1.5 rounded-full bg-white/85 backdrop-blur-sm">
                         <CardMenu onDelete={onDelete} />
                     </div>
                 )}
@@ -261,12 +261,12 @@ const FlashcardCard = ({ deck, onClick }) => {
     const firstCard = deck.cards?.[0];
     return (
         <button onClick={onClick} className="text-left group focus:outline-none w-full">
-            <div className="bg-white ring-1 ring-stone-200/70 p-4 hover:ring-plum-200 transition-all h-full flex flex-col">
+            <div className="bg-white rounded-2xl ring-1 ring-stone-200/70 p-4 hover:ring-plum-200 transition-all h-full flex flex-col">
                 <div className="flex justify-between items-start mb-2">
-                    <div className="w-9 h-9 bg-plum-50 flex items-center justify-center shrink-0">
+                    <div className="w-9 h-9 rounded-xl bg-plum-50 flex items-center justify-center shrink-0">
                         <span className="material-symbols-outlined text-plum-700 text-[18px]">style</span>
                     </div>
-                    <span className="text-[10px] text-stone-400 bg-stone-100 px-2 py-0.5 ">{timeAgo(deck.updated_at)}</span>
+                    <span className="text-[10px] text-stone-400 bg-stone-100 rounded-full px-2 py-0.5">{timeAgo(deck.updated_at)}</span>
                 </div>
                 <h4 className="font-semibold text-[14px] text-stone-800 mb-1 line-clamp-1">{deck.title || 'Untitled Deck'}</h4>
                 <p className="text-[11px] text-plum-600 font-medium mb-2">{count} {count === 1 ? 'card' : 'cards'}</p>
@@ -293,7 +293,7 @@ const ListRow = ({ icon, iconBg, iconText, title, sub, meta, date, onClick, onDe
         className="w-full grid grid-cols-1 md:grid-cols-12 items-center gap-3 px-5 py-3.5 border-b border-stone-100 last:border-0 hover:bg-stone-50/60 transition-colors text-left cursor-pointer"
     >
         <div className="col-span-6 flex items-center gap-3 min-w-0">
-            <div className={`w-9 h-9  ${iconBg} flex items-center justify-center shrink-0`}>
+            <div className={`w-9 h-9 rounded-xl ${iconBg} flex items-center justify-center shrink-0`}>
                 <span className={`material-symbols-outlined text-[17px] ${iconText}`}>{icon}</span>
             </div>
             <div className="min-w-0">
@@ -331,13 +331,13 @@ const Pagination = ({ meta, loading, onMore, onLess }) => {
         <div className="flex items-center justify-center gap-3 mt-6">
             {meta.current_page > 1 && (
                 <button onClick={onLess} disabled={loading}
-                    className="flex items-center gap-1.5 px-2 md:px-4 md:py-1.5 py-1  md: border border-stone-200 text-[13px] font-medium text-stone-500 hover:border-primary hover:text-primary disabled:opacity-40 transition-colors">
+                    className="flex items-center gap-1.5 rounded-xl px-2 md:px-4 md:py-1.5 py-1.5 border border-stone-200 text-[13px] font-medium text-stone-500 hover:border-primary hover:text-primary disabled:opacity-40 transition-colors">
                     <span className="material-symbols-outlined text-[15px]">expand_less</span>View less
                 </button>
             )}
             {meta.current_page < meta.last_page && (
                 <button onClick={onMore} disabled={loading}
-                    className="flex items-center gap-1.5 px-1 md:px-4 py-1 md:py-1.5  md: border border-stone-200 text-[12px] md:text-[13px] font-medium text-stone-500 hover:border-primary hover:text-primary disabled:opacity-40 transition-colors">
+                    className="flex items-center gap-1.5 rounded-xl px-2 md:px-4 py-1.5 border border-stone-200 text-[12px] md:text-[13px] font-medium text-stone-500 hover:border-primary hover:text-primary disabled:opacity-40 transition-colors">
                     {loading ? <Loader size="xs" /> : <span className="material-symbols-outlined text-[15px]">expand_more</span>}
                     View more
                 </button>
@@ -371,12 +371,12 @@ const FAB = ({ onNote, onPaper, onFolder, onPresentation, onFlashcard }) => {
             {open && items.map((item, i) => (
                 <div key={i} className="flex items-center gap-3"
                     style={{ animation: `slideUpFade 0.18s ease both`, animationDelay: `${i * 40}ms` }}>
-                    <span className="text-[11px] md:text-[12px] md:font-medium text-stone-700 bg-white ring-1 ring-stone-200 shadow-md px-2.5 py-1 whitespace-nowrap select-none">
+                    <span className="text-[11px] md:text-[12px] md:font-medium text-stone-700 bg-white rounded-full ring-1 ring-stone-200 shadow-md px-3 py-1.5 whitespace-nowrap select-none">
                         {item.label}
                     </span>
                     <button
                         onClick={() => { item.onClick(); setOpen(false); }}
-                        className="w-8 h-8 md:w-12 md:h-12  md: shadow-lg flex items-center justify-center text-white transition-all hover:scale-110 active:scale-95"
+                        className="w-10 h-10 md:w-12 md:h-12 rounded-full shadow-lg flex items-center justify-center text-white transition-all hover:scale-110 active:scale-95"
                         style={{ backgroundColor: item.color }}>
                         <span className="material-symbols-outlined text-[18px] md:text-[22px]">{item.icon}</span>
                     </button>
@@ -384,8 +384,8 @@ const FAB = ({ onNote, onPaper, onFolder, onPresentation, onFlashcard }) => {
             ))}
             <button
                 onClick={() => setOpen(v => !v)}
-                className={`w-8 h-8 md:w-14 md:h-14  md: shadow-xl flex items-center justify-center text-white transition-all duration-200 active:scale-95
-                    ${open ? 'bg-stone-700 rotate-45' : 'bg-stone-900 hover:bg-stone-700 hover:scale-105'}`}
+                className={`w-12 h-12 md:w-14 md:h-14 rounded-full shadow-xl flex items-center justify-center text-white transition-all duration-200 active:scale-95
+                    ${open ? 'bg-stone-700 rotate-45' : 'bg-primary hover:bg-plum-700 hover:scale-105'}`}
                 style={{ transform: open ? 'rotate(45deg)' : undefined }}>
                 <span className="material-symbols-outlined text-[18px] md:text-[26px]">add</span>
             </button>
@@ -602,13 +602,13 @@ export const LibraryContent = () => {
     // ── Render helpers ────────────────────────────────────────────────────────
     const renderEmpty = (tab, onCreate) => (
         <div className="flex flex-col items-center justify-center py-16 gap-3 text-center">
-            <div className="w-16 h-16 bg-plum-50 text-plum-600 flex items-center justify-center">
+            <div className="w-16 h-16 rounded-2xl bg-plum-50 text-plum-600 flex items-center justify-center">
                 <span className="material-symbols-outlined text-[30px]">{TABS.find(t=>t.id===tab)?.icon}</span>
             </div>
             <p className="text-sm text-stone-500">{search ? `No ${tab} match your search.` : `No ${tab} yet.`}</p>
             {!search && onCreate && (
                 <button onClick={onCreate}
-                    className="flex items-center gap-2 px-4 py-2 bg-stone-900 text-white text-sm font-semibold hover:bg-stone-700 active:scale-95 transition-all">
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-plum-700 active:scale-95 transition-all">
                     <span className="material-symbols-outlined text-[16px]">add</span>
                     Create one
                 </button>
@@ -641,7 +641,7 @@ export const LibraryContent = () => {
             <header className="library-header mb-8 flex items-center justify-between">
                 <div>
                     <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-plum-700 mb-1.5">Your workspace</p>
-                    <h1 className="font-display-serif text-[28px] md:text-[34px] font-semibold tracking-tight text-stone-900 leading-tight">Library</h1>
+                    <h1 className="font-display text-[28px] md:text-[34px] font-semibold tracking-tight text-stone-900 leading-tight">Library</h1>
                     <p className="text-stone-500 text-[13px] md:text-sm mt-1.5">Everything you've written, in one place.</p>
                 </div>
                 <NotificationIcon/>
@@ -672,7 +672,7 @@ export const LibraryContent = () => {
                 {sortOpts.length > 0 && (
                     <SortSelect value={tabSort} options={sortOpts} onChange={val => handleSortChange(activeTab, val)} />
                 )}
-                <div className="flex items-center bg-stone-100  p-0.5 shrink-0">
+                <div className="flex items-center bg-stone-100 rounded-lg p-0.5 shrink-0">
                     {[
                         { v: 'grid', icon: 'grid_view'  },
                         { v: 'list', icon: 'view_list'  },
@@ -680,7 +680,7 @@ export const LibraryContent = () => {
                         <button
                             key={v}
                             onClick={() => toggleView(v)}
-                            className={`w-7 h-7  flex items-center justify-center transition-all ${view === v ? 'bg-white shadow-sm text-primary' : 'text-stone-400 hover:text-stone-600'}`}
+                            className={`w-7 h-7 rounded-md flex items-center justify-center transition-all ${view === v ? 'bg-white shadow-sm text-primary' : 'text-stone-400 hover:text-stone-600'}`}
                         >
                             <span className="material-symbols-outlined text-[17px]">{icon}</span>
                         </button>
@@ -713,7 +713,7 @@ export const LibraryContent = () => {
                                     ))}
                                     {!search && (
                                         <button onClick={() => navigate('/lockedin/notes/new')}
-                                            className="border-2 border-dashed border-stone-300 flex flex-col items-center justify-center text-stone-300 hover:text-plum-600 hover:border-plum-400 transition-all group py-8 gap-2">
+                                            className="rounded-2xl border-2 border-dashed border-stone-300 flex flex-col items-center justify-center text-stone-300 hover:text-plum-600 hover:border-plum-400 transition-all group py-8 gap-2">
                                             <span className="material-symbols-outlined text-[20px] md:text-[30px] group-hover:scale-110 transition-transform">add_circle</span>
                                             <span className="text-sm medium md:font-semibold">New Note</span>
                                         </button>
@@ -727,7 +727,7 @@ export const LibraryContent = () => {
                                     ))}
                                     {!search && (
                                         <button onClick={() => navigate('/lockedin/papers/new')}
-                                            className="border-2 border-dashed border-plum-200 flex flex-col items-center justify-center text-stone-300 hover:text-plum-600 hover:border-plum-400 transition-all group py-8 gap-2">
+                                            className="rounded-2xl border-2 border-dashed border-plum-200 flex flex-col items-center justify-center text-stone-300 hover:text-plum-600 hover:border-plum-400 transition-all group py-8 gap-2">
                                             <span className="material-symbols-outlined text-[20px] md:text-[30px] group-hover:scale-110 transition-transform">add_circle</span>
                                             <span className="text-sm medium md:font-semibold">New Paper</span>
                                         </button>
@@ -741,7 +741,7 @@ export const LibraryContent = () => {
                                     ))}
                                     {!search && (
                                         <button onClick={() => setShowCreateFolder(true)}
-                                            className="border-2 border-dashed border-plum-200 flex flex-col items-center justify-center text-stone-300 hover:text-plum-600 hover:border-plum-400 transition-all group aspect-square gap-2">
+                                            className="rounded-2xl border-2 border-dashed border-plum-200 flex flex-col items-center justify-center text-stone-300 hover:text-plum-600 hover:border-plum-400 transition-all group aspect-square gap-2">
                                             <span className="material-symbols-outlined text-[20px] md:text-[30px] group-hover:scale-110 transition-transform">create_new_folder</span>
                                             <span className="text-sm medium md:font-semibold">New Folder</span>
                                         </button>
@@ -755,7 +755,7 @@ export const LibraryContent = () => {
                                     ))}
                                     {!search && (
                                         <button onClick={handleCreatePresentation} disabled={creatingPresentation}
-                                            className="border-2 border-dashed border-plum-200 flex flex-col items-center justify-center text-stone-300 hover:text-plum-600 hover:border-plum-400 transition-all group aspect-video gap-2 disabled:opacity-60">
+                                            className="rounded-2xl border-2 border-dashed border-plum-200 flex flex-col items-center justify-center text-stone-300 hover:text-plum-600 hover:border-plum-400 transition-all group aspect-video gap-2 disabled:opacity-60">
                                             {creatingPresentation ? <Loader size="md" /> : <span className="material-symbols-outlined text-[20px] md:text-[30px] group-hover:scale-110 transition-transform">add_circle</span>}
                                             <span className="text-sm medium md:font-semibold">New Slides</span>
                                         </button>
@@ -774,7 +774,7 @@ export const LibraryContent = () => {
 
                     {/* ── List view ── */}
                     {view === 'list' && (
-                        <div className="bg-white ring-1 ring-stone-200/70 overflow-hidden" style={{ boxShadow: '0px 4px 20px rgba(0,0,0,0.03)' }}>
+                        <div className="bg-white rounded-2xl ring-1 ring-stone-200/70 overflow-hidden" style={{ boxShadow: '0px 4px 20px rgba(0,0,0,0.03)' }}>
                             <ListHeader cols={LIST_HEADER_COLS} />
 
                             {activeTab === 'notes' && tabData.map(note => (

@@ -180,22 +180,22 @@ export const Flashcard = ({ id }) => {
             <SEO title={title} path={id ? `/lockedin/flashcards/${id}` : '/lockedin/flashcards/new'} noIndex={true} />
             {confirmDelete && (
                 <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/40 backdrop-blur-sm">
-                    <div className="bg-white border border-stone-200 shadow-2xl p-6 max-w-sm w-full mx-4">
-                        <div className="w-12 h-12 bg-red-50 flex items-center justify-center mb-4">
+                    <div className="bg-white rounded-2xl border border-stone-200 shadow-2xl p-6 max-w-sm w-full mx-4">
+                        <div className="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center mb-4">
                             <span className="material-symbols-outlined text-red-500 text-[22px]">delete_outline</span>
                         </div>
-                        <h3 className="font-display-serif text-lg font-semibold text-stone-900 mb-1">Delete flashcard deck?</h3>
+                        <h3 className="font-display text-lg font-semibold text-stone-900 mb-1">Delete flashcard deck?</h3>
                         <p className="text-sm text-stone-500 mb-6">This will permanently delete <span className="font-semibold text-stone-700">"{title}"</span> and all its cards. This cannot be undone.</p>
                         <div className="flex gap-3">
                             <button
                                 onClick={() => setConfirmDelete(false)}
-                                className="flex-1 px-4 py-2.5 border border-stone-200 text-stone-700 text-sm font-semibold hover:bg-stone-50 transition-colors"
+                                className="flex-1 rounded-xl px-4 py-2.5 border border-stone-200 text-stone-700 text-sm font-semibold hover:bg-stone-50 transition-colors"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={confirmDeleteDeck}
-                                className="flex-1 px-4 py-2.5 bg-red-500 text-white text-sm font-semibold hover:bg-red-600 transition-colors"
+                                className="flex-1 rounded-xl px-4 py-2.5 bg-red-500 text-white text-sm font-semibold hover:bg-red-600 transition-colors"
                             >
                                 Delete
                             </button>
@@ -235,12 +235,12 @@ export const Flashcard = ({ id }) => {
 
                 {/* Front / Back toggle (edit mode) */}
                 {editMode && (
-                    <div className="flex items-center bg-stone-100 p-1 gap-1 mb-3 md:mb-4">
+                    <div className="flex items-center bg-stone-100 rounded-xl p-1 gap-1 mb-3 md:mb-4">
                         {['front', 'back'].map(side => (
                             <button
                                 key={side}
                                 onClick={() => setEditSide(side)}
-                                className={`px-4 md:px-5 py-1 md:py-1.5 text-[10px] md:text-xs font-semibold transition-colors capitalize ${
+                                className={`px-4 md:px-5 py-1 md:py-1.5 rounded-lg text-[10px] md:text-xs font-semibold transition-colors capitalize ${
                                     editSide === side
                                         ? 'bg-white text-stone-900 shadow-sm'
                                         : 'text-stone-400 hover:text-stone-600'
