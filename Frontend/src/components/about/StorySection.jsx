@@ -1,7 +1,7 @@
 import React from 'react';
 
 const STORY = [
-  { number: '01', tag: 'THE START', title: 'A better place to put your thoughts', body: 'A good notebook gives ideas somewhere to land. We wanted the same calm feeling on screen, with room for handwriting, typed notes, and the small thoughts that become something bigger.' },
+  { number: '01', tag: 'THE START', title: 'A better place to put your thoughts', body: 'A good notebook gives ideas somewhere to land. We wanted the same feeling on screen, with room for handwriting, typed notes, and the small thoughts that become something bigger.' },
   { number: '02', tag: 'THE QUESTION', title: 'What happens after the page is full?', body: 'Students collect pages of useful material, then face the extra work of turning it into a way to study. We asked how the notebook itself could help with that next part.' },
   { number: '03', tag: 'THE ANSWER', title: 'Keep the notes. Make them useful.', body: 'NotepaperAI connects the act of writing with study plans, flashcards, and quizzes. Your notes stay at the center while the tools help you return to what matters.' },
 ];

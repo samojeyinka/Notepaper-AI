@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
-import * as htmlToImage from 'html-to-image';
-import { jsPDF } from "jspdf";
 import { PaperEditor } from "./PaperEditor";
 import { logo } from "../../assets/assets";
 import SEO from "../globals/SEO";
@@ -69,6 +67,7 @@ const PublicPaperView = () => {
     const slug = () => (title || 'paper').replace(/\s+/g, '-').toLowerCase();
 
     const capturePages = async () => {
+        const htmlToImage = await import('html-to-image');
         const refs = pageRefsRef.current.filter(Boolean);
         const canvases = [];
         const TRANSPARENT = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
@@ -137,6 +136,7 @@ const PublicPaperView = () => {
         try {
             const canvases = await capturePages();
             const W = 816, H = 1056;
+            const { jsPDF } = await import('jspdf');
             const pdf = new jsPDF({ orientation: 'portrait', unit: 'px', format: [W, H] });
             for (let i = 0; i < canvases.length; i++) {
                 if (i > 0) pdf.addPage();

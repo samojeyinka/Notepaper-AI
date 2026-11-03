@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { useAuth } from './AuthContext';
-import echo from '../lib/echo';
 import { notificationService } from '../api/notificationService';
 
 const NotificationsContext = createContext(null);
@@ -31,31 +30,47 @@ export function NotificationsProvider({ children }) {
             .finally(() => setLoading(false));
     }, [user?.id, fetchPage]);
 
-    // Real-time: push incoming notification to the top, skip duplicates
+    // Real-time: push incoming notification to the top, skip duplicates.
+    // Echo/Pusher is only downloaded for signed-in users, keeping it out of the
+    // initial bundle for public pages.
     useEffect(() => {
         if (!user?.id) return;
 
-        const channel = echo.private(`App.Models.User.${user.id}`);
+        const channelName = `App.Models.User.${user.id}`;
+        let cancelled = false;
+        let echo = null;
 
-        channel.notification((notification) => {
-            setNotifications((prev) => {
-                if (prev.some((n) => n.id === notification.id)) return prev;
-                return [
-                    {
-                        id: notification.id,
-                        type: notification.type,
-                        data: Object.fromEntries(
-                            Object.entries(notification).filter(([k]) => k !== 'id' && k !== 'type')
-                        ),
-                        read_at: null,
-                        created_at: new Date().toISOString(),
-                    },
-                    ...prev,
-                ];
-            });
-        });
+        import('../lib/echo')
+            .then(({ default: echoInstance }) => {
+                if (cancelled) return;
+                echo = echoInstance;
 
-        return () => echo.leave(`App.Models.User.${user.id}`);
+                const channel = echo.private(channelName);
+
+                channel.notification((notification) => {
+                    setNotifications((prev) => {
+                        if (prev.some((n) => n.id === notification.id)) return prev;
+                        return [
+                            {
+                                id: notification.id,
+                                type: notification.type,
+                                data: Object.fromEntries(
+                                    Object.entries(notification).filter(([k]) => k !== 'id' && k !== 'type')
+                                ),
+                                read_at: null,
+                                created_at: new Date().toISOString(),
+                            },
+                            ...prev,
+                        ];
+                    });
+                });
+            })
+            .catch(() => { /* realtime is optional; polling/refresh still works */ });
+
+        return () => {
+            cancelled = true;
+            if (echo) echo.leave(channelName);
+        };
     }, [user?.id]);
 
     const loadMore = useCallback(async () => {

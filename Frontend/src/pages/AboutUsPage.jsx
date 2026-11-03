@@ -15,7 +15,7 @@ export default function AboutUsPage() {
       <SEO
         title="About Us"
         path="/about-us"
-        description="Learn about NotepaperAI, a calm notebook designed to help students write notes and turn them into study plans, flashcards, and quizzes."
+        description="Learn about NotepaperAI, a notebook designed to help students write notes and turn them into study plans, flashcards, and quizzes."
       />
       <Header />
       <main className="relative overflow-hidden">
@@ -23,7 +23,7 @@ export default function AboutUsPage() {
         <StorySection />
         <ValuesSection />
         <CTA
-          title="Experience a calmer way to study"
+          title="Experience a better way to study"
           description="Open your notebook today and see how comfortable studying can feel when the software stays out of your way."
           buttonText="Start writing free"
           buttonLink="/signup"

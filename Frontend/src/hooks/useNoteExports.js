@@ -1,11 +1,9 @@
-import * as htmlToImage from 'html-to-image';
-import { jsPDF } from "jspdf";
-import JSZip from 'jszip';
 import { exportSlug } from "../utils/export";
 
 export const useNoteExports = ({ pageRefsRef, title }) => {
 
     const capturePages = async () => {
+        const htmlToImage = await import('html-to-image');
         const refs = pageRefsRef.current.filter(Boolean);
         const canvases = [];
         for (const el of refs) {
@@ -26,6 +24,7 @@ export const useNoteExports = ({ pageRefsRef, title }) => {
             const MARGIN = 40; // left/right margin in PDF
 
             if (format === 'pdf') {
+                const { jsPDF } = await import('jspdf');
                 const pdf = new jsPDF({ orientation: 'portrait', unit: 'px', format: [PAGE_W, PAGE_H] });
                 for (let i = 0; i < canvases.length; i++) {
                     if (i > 0) pdf.addPage();
@@ -50,6 +49,7 @@ export const useNoteExports = ({ pageRefsRef, title }) => {
                     link.click();
                 } else {
                     // Multiple pages — zip them
+                    const JSZip = (await import('jszip')).default;
                     const zip = new JSZip();
                     const folder = zip.folder(exportSlug(title, 'note'));
                     canvases.forEach((c, i) => {

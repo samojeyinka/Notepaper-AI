@@ -7,33 +7,18 @@ import {
     LockedInPage, StudyPlanPage, SprintPage, LibraryPage,
     ProfileSettingsPage, ChangePasswordPage,
     NotificationsPage, HelpSupportPage, SupportTicketsPage, NewSupportTicketsPage, SupportTicketPage,
-    TermsPage, PublicFlashcardPage
+    TermsPage, PublicFlashcardPage,
+    NotePage, PaperPage, PresentationPage, FolderPage, FlashcardPage,
+    VoiceToSpeechPage, GeneratePage, QuizzesPage, QuizCreatePage, QuizPlayPage,
+    PublicQuizPage, SprintCreatePage, SprintDetailPage, SprintChallengePage,
+    AIGeneratingPage, ModelGuidePage, PublicNotePage, PublicPaperPage
 } from '../pages/pages';
-import NotePage from '../pages/NotePage';
-import PaperPage from '../pages/PaperPage';
-import PresentationPage from '../pages/PresentationPage';
-import FolderPage from '../pages/FolderPage';
-import FlashcardPage from '../pages/FlashcardPage';
-import VoiceToSpeechPage from '../pages/VoiceToSpeechPage';
-import GeneratePage from '../pages/GeneratePage';
-import QuizzesPage from '../pages/QuizzesPage';
-import QuizCreatePage from '../pages/QuizCreatePage';
-import QuizPlayPage from '../pages/QuizPlayPage';
-import PublicQuizPage from '../pages/PublicQuizPage';
-import SprintCreatePage from '../pages/SprintCreatePage';
-import SprintDetailPage from '../pages/SprintDetailPage';
-import SprintChallengePage from '../pages/SprintChallengePage';
-import AIGeneratingPage from '../pages/AIGeneratingPage';
-import ModelGuidePage from '../pages/ModelGuidePage';
-import PublicNotePage from '../pages/PublicNotePage';
-import PublicPaperPage from '../pages/PublicPaperPage';
 import ScrollToTop from './ScrollToTop';
 import ProtectedRoute, { GuestRoute } from './ProtectedRoute';
 import { APP_BASENAME } from './basename';
 import AIKeyModal from '../components/AIKeys/AIKeyModal';
 
-// Pathless layout so globally-mounted UI (the AI key modal) sits inside the
-// router and can use <Link>, while every existing route keeps its own path.
+
 const GlobalOverlays = () => (
     <>
         <Outlet />
@@ -163,7 +148,7 @@ const AppRoutes = createBrowserRouter([
         </ScrollToTop></GuestRoute>,
     },
 
-    // user (protected — require valid in-memory token)
+ 
 
     {
         path: '/lockedin',
@@ -325,13 +310,13 @@ const AppRoutes = createBrowserRouter([
         element: <ProtectedRoute><ScrollToTop><AIGeneratingPage /></ScrollToTop></ProtectedRoute>,
     },
 
-    // Public quiz — accessible without login
+  
     {
         path: '/quiz/:id',
         element: <ScrollToTop><PublicQuizPage /></ScrollToTop>,
     },
 
-    // Public note/paper — accessible without login, read-only
+  
     {
         path: '/note/:id',
         element: <ScrollToTop><PublicNotePage /></ScrollToTop>,
